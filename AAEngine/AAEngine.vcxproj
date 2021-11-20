@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{091bacde-fe9f-44da-a52d-8ab3b026a626}</ProjectGuid>
+    <RootNamespace>AAEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib />
+    <ProjectReference />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib />
+    <ProjectReference />
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Scene\Bone.h" />
+    <ClInclude Include="src\Scene\Animator.h" />
+    <ClInclude Include="src\Renderer\AnimModelLoader.h" />
+    <ClInclude Include="src\Scene\AnimProp.h" />
+    <ClInclude Include="include\AncientArcher\Controls\Input.h" />
+    <ClInclude Include="src\Renderer\OSInterface\Window.h" />
+    <ClInclude Include="src\Scene\Animation.h" />
+    <ClInclude Include="include\AncientArcher\Utility\rand.h" />
+    <ClInclude Include="src\Physics\Physics.h" />
+    <ClInclude Include="src\DefaultShaders.h" />
+    <ClInclude Include="src\GUI\imGUI.h" />
+    <ClInclude Include="src\Renderer\LoadCube.h" />
+    <ClInclude Include="src\Renderer\LoadPlane.h" />
+    <ClInclude Include="src\Renderer\TextureLoader.h" />
+    <ClInclude Include="include\AncientArcher\Version.h" />
+    <ClInclude Include="src\GUI\PlainGUI.h" />
+    <ClInclude Include="src\Scene\Skybox.h" />
+    <ClInclude Include="src\Sound\SoundEffect.h" />
+    <ClInclude Include="src\Renderer\TextureInfo.h" />
+    <ClInclude Include="src\Scene\Camera.h" />
+    <ClInclude Include="src\Scene\Prop.h" />
+    <ClInclude Include="glad\glad.h" />
+    <ClInclude Include="src\Sound\ErrorCheck.h" />
+    <ClInclude Include="src\Sound\SoundListener.h" />
+    <ClInclude Include="src\Sound\LongSound.h" />
+    <ClInclude Include="include\AncientArcher\Utility\Files.h" />
+    <ClInclude Include="KHR\khrplatform.h" />
+    <ClInclude Include="src\Renderer\ModelLoader.h" />
+    <ClInclude Include="include\AncientArcher\AncientArcher.h" />
+    <ClInclude Include="src\Renderer\MeshInfo.h" />
+    <ClInclude Include="include\AncientArcher\Utility\SceneCheck.h" />
+    <ClInclude Include="src\Renderer\OpenGL\OGLGraphics.h" />
+    <ClInclude Include="src\Scene\Lights.h" />
+    <ClInclude Include="src\Renderer\OpenGL\OGLShader.h" />
+    <ClInclude Include="src\Renderer\Vertex.h" />
+    <ClInclude Include="src\Sound\SoundDevice.h" />
+    <ClInclude Include="src\Sound\Speaker.h" />
+    <ClInclude Include="src\Utility\Conversions.h" />
+    <ClInclude Include="src\Base\UniqueInstance.h" />
+    <ClInclude Include="src\Renderer\OpenGL\QueryShader.h" />
+    <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Scene\Bone.cpp" />
+    <ClCompile Include="src\Scene\Animator.cpp" />
+    <ClCompile Include="src\Renderer\AnimModelLoader.cpp" />
+    <ClCompile Include="src\Scene\AnimProp.cpp" />
+    <ClCompile Include="src\DefaultShaders.cpp" />
+    <ClCompile Include="src\Renderer\OSInterface\Callbacks.cpp" />
+    <ClCompile Include="src\Renderer\OSInterface\Window.cpp" />
+    <ClCompile Include="src\Scene\Animation.cpp" />
+    <ClCompile Include="src\Physics\Physics.cpp" />
+    <ClCompile Include="src\GUI\imGUI.cpp" />
+    <ClCompile Include="src\Renderer\LoadCube.cpp" />
+    <ClCompile Include="src\Renderer\ModelLoader.cpp" />
+    <ClCompile Include="src\Renderer\LoadPlane.cpp" />
+    <ClCompile Include="src\Renderer\TextureLoader.cpp" />
+    <ClCompile Include="src\GUI\PlainGUI.cpp" />
+    <ClCompile Include="src\Scene\Skybox.cpp" />
+    <ClCompile Include="src\Sound\SoundEffect.cpp" />
+    <ClCompile Include="src\Base\UniqueInstance.cpp" />
+    <ClCompile Include="src\Scene\Lights.cpp" />
+    <ClCompile Include="src\Sound\SoundListener.cpp" />
+    <ClCompile Include="src\Sound\LongSound.cpp" />
+    <ClCompile Include="src\Sound\Speaker.cpp" />
+    <ClCompile Include="src\Sound\SoundDevice.cpp" />
+    <ClCompile Include="src\Scene\Camera.cpp" />
+    <ClCompile Include="src\Scene\Prop.cpp" />
+    <ClCompile Include="src\AncientArcher.cpp" />
+    <ClCompile Include="src\Renderer\MeshInfo.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\OGLGraphics.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\OGLShader.cpp" />
+    <ClCompile Include="src\Utility\rand.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\vendor\stb\stb_image.cpp" />
+    <ClCompile Include="src\Renderer\Vertex.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
