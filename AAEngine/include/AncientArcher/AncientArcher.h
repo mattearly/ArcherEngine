@@ -261,12 +261,16 @@ public:
   /// <param name="id">id of the animated prop to effect</param>
   /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
   void RotateAnimProp(const unsigned int id, glm::vec3 rot);
+  
 
-  unsigned int AddAnimation_testing(const char* path);
+  unsigned int AddAnimation_testing(const char* path, const unsigned int anim_prop_id);
+
 
   bool RemoveAnimation_testing(const unsigned int animation_id);
 
+
   void SetAnimationOnAnimProp_testing(const unsigned int animation_id, const unsigned int animprop_id);
+
 
   enum class COLLIDERTYPE { BOX, SPHERE, CAPSULE };
 

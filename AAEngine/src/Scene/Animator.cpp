@@ -1,8 +1,7 @@
 #include "Animator.h"
-#include "AnimProp.h"
 namespace AA {
 
-Animator::Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans) {
+Animator::Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans, AnimProp& anim_prop) {
   cached_global_inverse_transform = inv_trans;
   m_CurrentTime = 0.0;
   m_CurrentAnimation = anim;
@@ -22,16 +21,11 @@ void Animator::UpdateAnimation(float dt) {
   }
 }
 
-//void Animator::PlayAnimation(Animation* pAnimation) {
-//  m_CurrentAnimation = pAnimation;
-//  m_CurrentTime = 0.0f;
-//}
-
 void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform) {
   std::string nodeName = node->name;
   glm::mat4 nodeTransform = node->transformation;
 
-  Bone* Bone = m_CurrentAnimation->FindBone(nodeName);
+  Bone* Bone = m_CurrentAnimation->m_Skeleton.FindBone(nodeName);
 
   if (Bone) {
     Bone->Update(m_CurrentTime);
@@ -40,7 +34,8 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
 
   glm::mat4 accum_transform = parentTransform * nodeTransform;
 
-  auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
+  auto boneInfoMap = m_CurrentAnimation->m_Skeleton.GetBoneIDMap();
+
   if (boneInfoMap.find(nodeName) != boneInfoMap.end()) {  // if bone found
     int index = boneInfoMap[nodeName].id;
     glm::mat4 offset = boneInfoMap[nodeName].offset;

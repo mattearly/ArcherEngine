@@ -91,6 +91,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Scene\Skeleton.h" />
     <ClInclude Include="src\Scene\Bone.h" />
     <ClInclude Include="src\Scene\Animator.h" />
     <ClInclude Include="src\Renderer\AnimModelLoader.h" />
@@ -108,6 +109,7 @@
     <ClInclude Include="include\AncientArcher\Version.h" />
     <ClInclude Include="src\GUI\PlainGUI.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
+    <ClInclude Include="src\Scene\Spacial3D.h" />
     <ClInclude Include="src\Sound\SoundEffect.h" />
     <ClInclude Include="src\Renderer\TextureInfo.h" />
     <ClInclude Include="src\Scene\Camera.h" />
@@ -135,6 +137,7 @@
     <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Scene\Skeleton.cpp" />
     <ClCompile Include="src\Scene\Bone.cpp" />
     <ClCompile Include="src\Scene\Animator.cpp" />
     <ClCompile Include="src\Renderer\AnimModelLoader.cpp" />
@@ -151,6 +154,7 @@
     <ClCompile Include="src\Renderer\TextureLoader.cpp" />
     <ClCompile Include="src\GUI\PlainGUI.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
+    <ClCompile Include="src\Scene\Spacial3D.cpp" />
     <ClCompile Include="src\Sound\SoundEffect.cpp" />
     <ClCompile Include="src\Base\UniqueInstance.cpp" />
     <ClCompile Include="src\Scene\Lights.cpp" />

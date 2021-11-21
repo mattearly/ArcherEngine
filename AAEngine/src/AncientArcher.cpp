@@ -450,9 +450,17 @@ void AncientArcher::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
   throw("anim prop id doesn't exist or is invalid");
 }
 
-unsigned int AncientArcher::AddAnimation_testing(const char* path) {
-  mAnimation_testing.emplace_back(std::make_shared<Animation>(path));
-  return mAnimation_testing.back()->GetUID();
+unsigned int AncientArcher::AddAnimation_testing(const char* path, const unsigned int anim_prop_id) {
+
+  for (auto& prop : mAnimProps_testing) {
+    if (prop->GetUID() == anim_prop_id) {
+      mAnimation_testing.emplace_back(std::make_shared<Animation>(path, prop));
+      return mAnimation_testing.back()->GetUID();
+    }
+  }
+
+  throw("prop id doesn't exist");
+
 }
 
 bool AncientArcher::RemoveAnimation_testing(const unsigned int animation_id) {

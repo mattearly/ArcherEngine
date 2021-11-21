@@ -36,11 +36,12 @@ int AnimModelLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::stri
   const aiScene* scene = importer.ReadFile(path, post_processing_flags);
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-    if (!scene)
+    if (!scene) {
 #ifdef _DEBUG
       std::cout << "scene loading error: " << importer.GetErrorString() << std::endl;
 #endif
-    return -1;
+      return -1;
+    }
     if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
       return -2;
     if (!scene->mRootNode)
@@ -53,16 +54,6 @@ int AnimModelLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::stri
   LastLoadedAnimPath = path;
 
   recursive_processNode(out_model, scene->mRootNode, scene);
-
-  //if (!out_model.mAnimation)
-  //  out_model.mAnimation = std::make_unique<Animation>(LastLoadedAnimPath, &out_model);
-  //else
-  //  throw("animation already set!");
-
-  //if (!out_model.mAnimator)
-  //  out_model.mAnimator = std::make_unique<Animator>(out_model.mAnimation.get(), out_model.mGlobalInverseTransform);
-  //else
-  //  throw("animator already set!");
 
   return 0;
 }
@@ -95,24 +86,24 @@ void local_helper_setVertexBoneData(AnimVertex& vertex, int boneID, float weight
 
 // helper
 void AnimModelLoader::extractBoneWeightForVertices(AnimProp& out_model, std::vector<AnimVertex>& vertices, aiMesh* mesh, const aiScene* scene) {
-    int bone_counter = 0;
   for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
     int boneID = -1;
     std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
 
-    boneID = bone_counter++;
-    //if (out_model.m_BoneInfoMap.find(boneName) == out_model.m_BoneInfoMap.end()) {
-    //  // didn't find bone, create a new one
-    //  BoneInfo newBoneInfo{};
-    //  newBoneInfo.id = out_model.m_BoneCounter;
-    //  newBoneInfo.offset = ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
-    //  out_model.m_BoneInfoMap[boneName] = newBoneInfo;
-    //  boneID = out_model.m_BoneCounter;
-    //  out_model.m_BoneCounter++;
-    //} else {
-    //  boneID = out_model.m_BoneInfoMap[boneName].id;
-    //}
+    if (out_model.m_Skeleton.m_BoneInfoMap.find(boneName) == out_model.m_Skeleton.m_BoneInfoMap.end()) {
+      // didn't find bone, create a new one
+      BoneInfo newBoneInfo{};
+      newBoneInfo.id = out_model.m_Skeleton.m_BoneCounter;
+      newBoneInfo.offset = ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+      out_model.m_Skeleton.m_BoneInfoMap[boneName] = newBoneInfo;
+      boneID = out_model.m_Skeleton.m_BoneCounter;
+      out_model.m_Skeleton.m_BoneCounter++;
+    } else {
+      boneID = out_model.m_Skeleton.m_BoneInfoMap[boneName].id;
+    }
+
     assert(boneID != -1);
+
     auto weights = mesh->mBones[boneIndex]->mWeights;
     int numWeights = mesh->mBones[boneIndex]->mNumWeights;
 

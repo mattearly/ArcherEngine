@@ -1,5 +1,4 @@
 #pragma once
-
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -10,42 +9,32 @@
 #include <iostream>
 #include <vector>
 #include <map>
-#include "../Utility/Conversions.h"
 #include "Bone.h"
-#include "../Renderer/Vertex.h"
 #include "AnimProp.h"
+#include "../Utility/Conversions.h"
+#include "../Renderer/Vertex.h"
 #include "../Base/UniqueInstance.h"
+#include "Skeleton.h"
 
 namespace AA {
-
-
-//class Bone;
-struct BoneInfo {
-  /*id is index in finalBoneMatrices*/
-  int id;
-
-  /*offset matrix transforms vertex from model space to bone space*/
-  glm::mat4 offset;
-};
 
 struct AssimpNodeData {
   glm::mat4 transformation;
   std::string name;
   int childrenCount;
   std::vector<AssimpNodeData> children;
-}; 
+};
 
 class AnimProp;
 
 class Animation : public UniqueInstance {
+
 public:
   Animation();
 
-  Animation(const std::string& animationPath);
+  Animation(const std::string& animationPath, std::shared_ptr<AnimProp> anim_prop);
 
   ~Animation();
-
-  Bone* FindBone(const std::string& name);
 
   float GetTicksPerSecond();
 
@@ -53,24 +42,21 @@ public:
 
   const AssimpNodeData& GetRootNode();
 
-  const std::map<std::string, BoneInfo>& GetBoneIDMap();
-
-  //void ReadMissingBones(const aiAnimation* animation, AnimProp& model);
-
-  void ReadBones(const aiAnimation* animation);
+  void ReadMissingBones(const aiAnimation* animation, std::shared_ptr<AnimProp> anim_prop);
 
   void ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src);
+
+  Skeleton m_Skeleton;
 
 private:
 
   float m_Duration;
+
   float m_TicksPerSecond;
-  std::vector<Bone> m_Bones;
-  unsigned int m_BoneCounter;
+  
   AssimpNodeData m_RootNode;
-  std::map<std::string, BoneInfo> m_BoneInfoMap;
 
+  
 };
-
 
 }

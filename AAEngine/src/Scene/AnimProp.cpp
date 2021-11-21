@@ -11,7 +11,6 @@
 namespace AA {
 
 AnimProp::AnimProp(const std::string& path) : Prop() {
-  //m_BoneCounter = 0;
   if (mMeshes.empty()) {
     AnimModelLoader::LoadGameObjectFromFile(*this, path);
   }
@@ -41,7 +40,7 @@ void AnimProp::SetAnimator(std::shared_ptr<Animation> anim) {
   if (mAnimator)
     mAnimator.reset();
 
-  mAnimator = std::make_unique<Animator>(anim, glm::mat4(1));
+  mAnimator = std::make_unique<Animator>(anim, glm::mat4(1), *this);
 }
 
 void AnimProp::Draw(const std::shared_ptr<Camera>& cam) {

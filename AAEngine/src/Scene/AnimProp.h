@@ -1,6 +1,5 @@
 #pragma once
 #include "Prop.h"
-//#include "Animation.h"
 #include "Animator.h"
 #include "../Renderer/MeshInfo.h"
 #include "../Base/UniqueInstance.h"
@@ -12,12 +11,15 @@
 #include <memory>
 #include <string>
 #include <map>
+#include "Skeleton.h"
 namespace AA {
 
 class Animator;
 class Animation;
-//struct BoneInfo;
 
+/// <summary>
+/// AKA Skeletal Mesh
+/// </summary>
 class AnimProp : public Prop {
 public:
   AnimProp(const std::string& path);
@@ -34,8 +36,7 @@ public:
 
   std::unique_ptr<Animator> mAnimator;
 
-  //std::map<std::string, BoneInfo> m_BoneInfoMap;
-  //int m_BoneCounter;
+  Skeleton m_Skeleton;
 
   friend class AnimModelLoader;
   friend class AncientArcher;

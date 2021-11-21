@@ -4,7 +4,7 @@ namespace AA {
 
 Animation::Animation() = default;
 
-Animation::Animation(const std::string& animationPath) {
+Animation::Animation(const std::string& animationPath, std::shared_ptr<AnimProp> anim_prop) {
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
   assert(scene && scene->mRootNode);
@@ -13,23 +13,10 @@ Animation::Animation(const std::string& animationPath) {
   m_Duration = static_cast<float>(animation->mDuration);
   m_TicksPerSecond = static_cast<float>(animation->mTicksPerSecond);
   ReadHeirarchyData(m_RootNode, scene->mRootNode);
-  //ReadMissingBones(animation, *model);
-  m_BoneCounter = 0;
-  ReadBones(animation);
+  ReadMissingBones(animation, anim_prop);
 }
 
 Animation::~Animation() {}
-
-Bone* Animation::FindBone(const std::string& name) {
-  auto iter = std::find_if(m_Bones.begin(), m_Bones.end(),
-    [&](const Bone& Bone)
-  {
-    return Bone.GetBoneName() == name;
-  }
-  );
-  if (iter == m_Bones.end()) return nullptr;
-  else return &(*iter);
-}
 
 float Animation::GetTicksPerSecond() { return m_TicksPerSecond; }
 
@@ -37,42 +24,24 @@ float Animation::GetDuration() { return m_Duration; }
 
 const AssimpNodeData& Animation::GetRootNode() { return m_RootNode; }
 
-const std::map<std::string, BoneInfo>& Animation::GetBoneIDMap() {
-  return m_BoneInfoMap;
-}
+void Animation::ReadMissingBones(const aiAnimation* animation, std::shared_ptr<AnimProp> anim_prop) {
+  int size = animation->mNumChannels;
 
-
-//void Animation::ReadMissingBones(const aiAnimation* animation, AnimProp& model) {
-//  int size = animation->mNumChannels;
-//
-//  //reading channels(bones engaged in an animation and their keyframes)
-//  for (int i = 0; i < size; i++) {
-//    auto channel = animation->mChannels[i];
-//    std::string boneName = channel->mNodeName.data;
-//
-//    if (model.m_BoneInfoMap.find(boneName) == model.m_BoneInfoMap.end()) {
-//      model.m_BoneInfoMap[boneName].id = model.m_BoneCounter;
-//      model.m_BoneCounter++;
-//    }
-//    m_Bones.emplace_back(channel->mNodeName.data, model.m_BoneInfoMap[channel->mNodeName.data].id, channel);
-//  }
-//
-//  m_BoneInfoMap.merge(model.m_BoneInfoMap);   // merge was added in c++17
-//}
-
-
-void Animation::ReadBones(const aiAnimation* animation) {
-  unsigned int size = animation->mNumChannels;
-  for (unsigned int i = 0; i < size; i++) {
+  //reading channels(bones engaged in an animation and their keyframes)
+  for (int i = 0; i < size; i++) {
     auto channel = animation->mChannels[i];
     std::string boneName = channel->mNodeName.data;
-    if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end()) {  // bone not already on list
-      m_BoneInfoMap[boneName].id = m_BoneCounter;
-      m_BoneCounter++;
+
+    if (anim_prop->m_Skeleton.m_BoneInfoMap.find(boneName) == anim_prop->m_Skeleton.m_BoneInfoMap.end()) {
+      anim_prop->m_Skeleton.m_BoneInfoMap[boneName].id = anim_prop->m_Skeleton.m_BoneCounter;
+      anim_prop->m_Skeleton.m_BoneCounter++;
     }
-    m_Bones.emplace_back(boneName, m_BoneInfoMap[boneName].id, channel);
+    m_Skeleton.m_Bones.emplace_back(channel->mNodeName.data, anim_prop->m_Skeleton.m_BoneInfoMap[channel->mNodeName.data].id, channel);
   }
+
+  m_Skeleton.m_BoneInfoMap.merge(anim_prop->m_Skeleton.m_BoneInfoMap);   // merge was added in c++17
 }
+
 
 void Animation::ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src) {
   assert(src);
