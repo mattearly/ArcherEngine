@@ -1,8 +1,7 @@
 #include "Prop.h"
-#include "Camera.h"
 #include "../Renderer/OpenGL/OGLGraphics.h"
 #include "../Renderer/OpenGL/OGLShader.h"
-#include "../Renderer/ModelLoader.h"
+#include "../Renderer/MeshLoader.h"
 #include "../Renderer/LoadCube.h"
 #include "../Utility/Conversions.h"
 #include "../DefaultShaders.h"
@@ -15,7 +14,7 @@ Prop::Prop() {
 
 Prop::Prop(const char* path) {
   mLit = true;
-  if (ModelLoader::LoadGameObjectFromFile(*this, path) == -1)
+  if (MeshLoader::LoadGameObjectFromFile(*this, path) == -1)
     throw ("failed to load path");
 }
 
@@ -84,14 +83,14 @@ void Prop::Draw(const std::shared_ptr<Camera>& cam) {
 
 void Prop::RemoveCache() {
   if (!mMeshes.empty()) {
-    ModelLoader::UnloadGameObject(mMeshes);
+    MeshLoader::UnloadGameObject(mMeshes);
     mMeshes.clear();
   }
 }
 
 void Prop::Load(const std::string& path) {
   if (mMeshes.empty()) {
-    if (ModelLoader::LoadGameObjectFromFile(*this, path) == -1) {
+    if (MeshLoader::LoadGameObjectFromFile(*this, path) == -1) {
       throw ("failed to load path");
     }
   }

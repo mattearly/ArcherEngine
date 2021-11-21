@@ -1,6 +1,6 @@
 #include "TextureLoader.h"
 #include "OpenGL/OGLGraphics.h"
-#include "ModelLoader.h"
+#include "MeshLoader.h"
 #include <stb_image.h>
 #include <assimp/Importer.hpp>
 #include <string>
@@ -17,43 +17,43 @@ std::unordered_map<unsigned int, std::string> TextureLoader::LoadAllTextures(con
 
   std::unordered_map<unsigned int, std::string> all_loaded_textures;
 
-//#ifdef _DEBUG
-//   std::cout << "Texture Load Debug::";
-//  int shading_model;
-//  ai_material->Get(AI_MATKEY_SHADING_MODEL, shading_model);
-//  switch (shading_model) {
-//  case aiShadingMode_Flat:
-//    std::cout << "Shading mode is aiShadingMode_Flat\n";
-//    break;
-//  case aiShadingMode_Gouraud:
-//    std::cout << "Shading mode is aiShadingMode_Gouraud\n";
-//    break;
-//  case aiShadingMode_Phong:
-//    std::cout << "Shading mode is aiShadingMode_Phong\n";
-//    break;
-//  case aiShadingMode_Blinn:
-//    std::cout << "Shading mode is aiShadingMode_Blinn\n";
-//    break;
-//  case aiShadingMode_Toon:
-//    std::cout << "Shading mode is aiShadingMode_Toon\n";
-//    break;
-//  case aiShadingMode_OrenNayar:
-//    std::cout << "Shading mode is aiShadingMode_OrenNayar\n";
-//    break;
-//  case aiShadingMode_Minnaert:
-//    std::cout << "Shading mode is aiShadingMode_Minnaert\n";
-//    break;
-//  case aiShadingMode_NoShading:
-//    std::cout << "Shading mode is aiShadingMode_NoShading\n";
-//    break;
-//  case aiShadingMode_Fresnel:
-//    std::cout << "Shading mode is aiShadingMode_Fresnel\n";
-//    break;
-//  default: break;
-//  }
-//#endif
+  //#ifdef _DEBUG
+  //   std::cout << "Texture Load Debug::";
+  //  int shading_model;
+  //  ai_material->Get(AI_MATKEY_SHADING_MODEL, shading_model);
+  //  switch (shading_model) {
+  //  case aiShadingMode_Flat:
+  //    std::cout << "Shading mode is aiShadingMode_Flat\n";
+  //    break;
+  //  case aiShadingMode_Gouraud:
+  //    std::cout << "Shading mode is aiShadingMode_Gouraud\n";
+  //    break;
+  //  case aiShadingMode_Phong:
+  //    std::cout << "Shading mode is aiShadingMode_Phong\n";
+  //    break;
+  //  case aiShadingMode_Blinn:
+  //    std::cout << "Shading mode is aiShadingMode_Blinn\n";
+  //    break;
+  //  case aiShadingMode_Toon:
+  //    std::cout << "Shading mode is aiShadingMode_Toon\n";
+  //    break;
+  //  case aiShadingMode_OrenNayar:
+  //    std::cout << "Shading mode is aiShadingMode_OrenNayar\n";
+  //    break;
+  //  case aiShadingMode_Minnaert:
+  //    std::cout << "Shading mode is aiShadingMode_Minnaert\n";
+  //    break;
+  //  case aiShadingMode_NoShading:
+  //    std::cout << "Shading mode is aiShadingMode_NoShading\n";
+  //    break;
+  //  case aiShadingMode_Fresnel:
+  //    std::cout << "Shading mode is aiShadingMode_Fresnel\n";
+  //    break;
+  //  default: break;
+  //  }
+  //#endif
 
-  // get the albedo (diffuse) textures
+    // get the albedo (diffuse) textures
   std::unordered_map<unsigned int, std::string> albedo_textures;
   if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_DIFFUSE, "Albedo", orig_filepath, albedo_textures) == 0) {
     for (auto& a_tex : albedo_textures) {

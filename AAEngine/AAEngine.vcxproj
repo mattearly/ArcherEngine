@@ -91,14 +91,14 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Scene\Skeleton.h" />
-    <ClInclude Include="src\Scene\Bone.h" />
-    <ClInclude Include="src\Scene\Animator.h" />
-    <ClInclude Include="src\Renderer\AnimModelLoader.h" />
-    <ClInclude Include="src\Scene\AnimProp.h" />
+    <ClInclude Include="src\Mesh\Skeleton.h" />
+    <ClInclude Include="src\Mesh\Bone.h" />
+    <ClInclude Include="src\Mesh\Animator.h" />
+    <ClInclude Include="src\Renderer\AnimMeshLoader.h" />
+    <ClInclude Include="src\Mesh\AnimProp.h" />
     <ClInclude Include="include\AncientArcher\Controls\Input.h" />
     <ClInclude Include="src\Renderer\OSInterface\Window.h" />
-    <ClInclude Include="src\Scene\Animation.h" />
+    <ClInclude Include="src\Mesh\Animation.h" />
     <ClInclude Include="include\AncientArcher\Utility\rand.h" />
     <ClInclude Include="src\Physics\Physics.h" />
     <ClInclude Include="src\DefaultShaders.h" />
@@ -109,18 +109,18 @@
     <ClInclude Include="include\AncientArcher\Version.h" />
     <ClInclude Include="src\GUI\PlainGUI.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
-    <ClInclude Include="src\Scene\Spacial3D.h" />
+    <ClInclude Include="src\Mesh\Spacial3D.h" />
     <ClInclude Include="src\Sound\SoundEffect.h" />
     <ClInclude Include="src\Renderer\TextureInfo.h" />
     <ClInclude Include="src\Scene\Camera.h" />
-    <ClInclude Include="src\Scene\Prop.h" />
+    <ClInclude Include="src\Mesh\Prop.h" />
     <ClInclude Include="glad\glad.h" />
     <ClInclude Include="src\Sound\ErrorCheck.h" />
     <ClInclude Include="src\Sound\SoundListener.h" />
     <ClInclude Include="src\Sound\LongSound.h" />
     <ClInclude Include="include\AncientArcher\Utility\Files.h" />
     <ClInclude Include="KHR\khrplatform.h" />
-    <ClInclude Include="src\Renderer\ModelLoader.h" />
+    <ClInclude Include="src\Renderer\MeshLoader.h" />
     <ClInclude Include="include\AncientArcher\AncientArcher.h" />
     <ClInclude Include="src\Renderer\MeshInfo.h" />
     <ClInclude Include="include\AncientArcher\Utility\SceneCheck.h" />
@@ -137,24 +137,24 @@
     <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Scene\Skeleton.cpp" />
-    <ClCompile Include="src\Scene\Bone.cpp" />
-    <ClCompile Include="src\Scene\Animator.cpp" />
-    <ClCompile Include="src\Renderer\AnimModelLoader.cpp" />
-    <ClCompile Include="src\Scene\AnimProp.cpp" />
+    <ClCompile Include="src\Mesh\Skeleton.cpp" />
+    <ClCompile Include="src\Mesh\Bone.cpp" />
+    <ClCompile Include="src\Mesh\Animator.cpp" />
+    <ClCompile Include="src\Renderer\AnimMeshLoader.cpp" />
+    <ClCompile Include="src\Mesh\AnimProp.cpp" />
     <ClCompile Include="src\DefaultShaders.cpp" />
     <ClCompile Include="src\Renderer\OSInterface\Callbacks.cpp" />
     <ClCompile Include="src\Renderer\OSInterface\Window.cpp" />
-    <ClCompile Include="src\Scene\Animation.cpp" />
+    <ClCompile Include="src\Mesh\Animation.cpp" />
     <ClCompile Include="src\Physics\Physics.cpp" />
     <ClCompile Include="src\GUI\imGUI.cpp" />
     <ClCompile Include="src\Renderer\LoadCube.cpp" />
-    <ClCompile Include="src\Renderer\ModelLoader.cpp" />
+    <ClCompile Include="src\Renderer\MeshLoader.cpp" />
     <ClCompile Include="src\Renderer\LoadPlane.cpp" />
     <ClCompile Include="src\Renderer\TextureLoader.cpp" />
     <ClCompile Include="src\GUI\PlainGUI.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
-    <ClCompile Include="src\Scene\Spacial3D.cpp" />
+    <ClCompile Include="src\Mesh\Spacial3D.cpp" />
     <ClCompile Include="src\Sound\SoundEffect.cpp" />
     <ClCompile Include="src\Base\UniqueInstance.cpp" />
     <ClCompile Include="src\Scene\Lights.cpp" />
@@ -163,7 +163,7 @@
     <ClCompile Include="src\Sound\Speaker.cpp" />
     <ClCompile Include="src\Sound\SoundDevice.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
-    <ClCompile Include="src\Scene\Prop.cpp" />
+    <ClCompile Include="src\Mesh\Prop.cpp" />
     <ClCompile Include="src\AncientArcher.cpp" />
     <ClCompile Include="src\Renderer\MeshInfo.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OGLGraphics.cpp" />

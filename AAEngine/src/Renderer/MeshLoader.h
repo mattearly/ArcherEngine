@@ -1,5 +1,5 @@
 #pragma once
-#include "../Scene/Prop.h"
+#include "../Mesh/Prop.h"
 #include "MeshInfo.h"
 #include "TextureInfo.h"
 #include <assimp/scene.h>
@@ -11,7 +11,7 @@ namespace AA {
 
 
 // ModelLoader is pretty specific to opengl currently
-class ModelLoader {
+class MeshLoader {
 public:
   static int LoadGameObjectFromFile(Prop& out_model, const std::string& path);
   static void UnloadGameObject(const std::vector<MeshInfo>& toUnload);
@@ -19,7 +19,7 @@ private:
   static void recursive_processNode(aiNode* node, const aiScene* scene, Prop& out_model);
   static bool CheckIfModelIsAlreadyLoaded(Prop& out_model, const std::string& path);
 
-  ModelLoader() = delete;
+  MeshLoader() = delete;
 };
 
 } // end namespace AA

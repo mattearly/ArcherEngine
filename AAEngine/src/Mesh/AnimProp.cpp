@@ -1,10 +1,10 @@
 #include "AnimProp.h"
-#include "../Renderer/AnimModelLoader.h"
 #include "Prop.h"
-#include "Camera.h"
+#include "../Scene/Camera.h"
 #include "../Renderer/OpenGL/OGLGraphics.h"
 #include "../Renderer/OpenGL/OGLShader.h"
-#include "../Renderer/ModelLoader.h"
+#include "../Renderer/MeshLoader.h"
+#include "../Renderer/AnimMeshLoader.h"
 #include "../Renderer/LoadCube.h"
 #include "../Utility/Conversions.h"
 #include "../DefaultShaders.h"
@@ -12,13 +12,13 @@ namespace AA {
 
 AnimProp::AnimProp(const std::string& path) : Prop() {
   if (mMeshes.empty()) {
-    AnimModelLoader::LoadGameObjectFromFile(*this, path);
+    AnimMeshLoader::LoadGameObjectFromFile(*this, path);
   }
 }
 
 void AnimProp::RemoveCache() {
   if (!mMeshes.empty()) {
-    AnimModelLoader::UnloadGameObject(mMeshes);
+    AnimMeshLoader::UnloadGameObject(mMeshes);
     mMeshes.clear();
     mAnimator.reset();
   }
@@ -26,7 +26,7 @@ void AnimProp::RemoveCache() {
 
 void AnimProp::Load(const std::string& path) {
   if (mMeshes.empty()) {
-    AnimModelLoader::LoadGameObjectFromFile(*this, path);
+    AnimMeshLoader::LoadGameObjectFromFile(*this, path);
   }
 }
 
@@ -66,4 +66,5 @@ void AnimProp::Draw(const std::shared_ptr<Camera>& cam) {
     OGLGraphics::RenderElements(m.vao, m.numElements);
   }
 }
+
 }

@@ -1,6 +1,9 @@
-#include "AnimModelLoader.h"
+#include "AnimMeshLoader.h"
 #include "TextureLoader.h"
 #include "OpenGL/OGLGraphics.h"
+#include "../Mesh/AnimProp.h"
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 #ifdef _DEBUG
 #include <iostream>
 #endif
@@ -10,7 +13,7 @@ static std::string LastLoadedAnimPath;
 
 //todo: add refinfo for reusing already loaded models
 
-int AnimModelLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::string& path) {
+int AnimMeshLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::string& path) {
 #ifdef _DEBUG
   std::cout << "-> LOAD... ANIMATED PROP: " << path << std::endl;
 #endif
@@ -58,7 +61,7 @@ int AnimModelLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::stri
   return 0;
 }
 
-void AnimModelLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload) {
+void AnimMeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload) {
   for (const auto& a_mesh : toUnload) {
     OGLGraphics::DeleteMesh(a_mesh.vao);
     TextureLoader::UnloadTexture(a_mesh.textureDrawIds);
@@ -85,7 +88,7 @@ void local_helper_setVertexBoneData(AnimVertex& vertex, int boneID, float weight
 }
 
 // helper
-void AnimModelLoader::extractBoneWeightForVertices(AnimProp& out_model, std::vector<AnimVertex>& vertices, aiMesh* mesh, const aiScene* scene) {
+void AnimMeshLoader::extractBoneWeightForVertices(AnimProp& out_model, std::vector<AnimVertex>& vertices, aiMesh* mesh, const aiScene* scene) {
   for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
     int boneID = -1;
     std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
@@ -151,13 +154,13 @@ void local_helper_processMesh(std::vector<AnimVertex>& out_loaded_verts, std::ve
 }
 
 // helper
-void AnimModelLoader::recursive_processNode(AnimProp& out_model, aiNode* node, const aiScene* scene) {
+void AnimMeshLoader::recursive_processNode(AnimProp& out_model, aiNode* node, const aiScene* scene) {
   for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
     aiMesh* ai_mesh = scene->mMeshes[node->mMeshes[i]];
     std::vector<AnimVertex> loaded_verts;
     std::vector<GLuint> loaded_indices;
     std::unordered_map<unsigned int, std::string> loaded_textures;
-    
+
     MeshInfo tmp_mesh(0, 0);
 
     local_helper_processMesh(loaded_verts, loaded_indices, tmp_mesh.textureDrawIds, ai_mesh, scene);

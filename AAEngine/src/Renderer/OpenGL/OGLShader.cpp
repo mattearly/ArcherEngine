@@ -111,9 +111,9 @@ void OGLShader::loadShader(const char* vert_source, const char* frag_source) {
     char v_infoLog[512];
     glGetShaderInfoLog(vertexShader, 512, nullptr, v_infoLog);
     throw(v_infoLog);
-    //std::cout << "error in vertex shader, compilation failed: " << v_infoLog << std::endl;
-    //char a;
-    //std::cin >> a;
+    std::cout << "error in vertex shader, compilation failed: " << v_infoLog << std::endl;
+    char a;
+    std::cin >> a;
 #endif
     //exit(-1);
   }

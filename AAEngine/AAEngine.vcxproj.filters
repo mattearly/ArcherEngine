@@ -33,7 +33,7 @@
     <ClInclude Include="src\Sound\Speaker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Prop.h">
+    <ClInclude Include="src\Mesh\Prop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Camera.h">
@@ -63,7 +63,7 @@
     <ClInclude Include="src\Renderer\TextureInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\ModelLoader.h">
+    <ClInclude Include="src\Renderer\MeshLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AncientArcher\Utility\Files.h">
@@ -120,7 +120,7 @@
     <ClInclude Include="src\Physics\Physics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Animation.h">
+    <ClInclude Include="src\Mesh\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\OSInterface\Window.h">
@@ -129,22 +129,22 @@
     <ClInclude Include="include\AncientArcher\Controls\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\AnimProp.h">
+    <ClInclude Include="src\Mesh\AnimProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\AnimModelLoader.h">
+    <ClInclude Include="src\Renderer\AnimMeshLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Animator.h">
+    <ClInclude Include="src\Mesh\Animator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Bone.h">
+    <ClInclude Include="src\Mesh\Bone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Spacial3D.h">
+    <ClInclude Include="src\Mesh\Spacial3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Skeleton.h">
+    <ClInclude Include="src\Mesh\Skeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -167,7 +167,7 @@
     <ClCompile Include="src\Scene\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Prop.cpp">
+    <ClCompile Include="src\Mesh\Prop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\AncientArcher.cpp">
@@ -197,7 +197,7 @@
     <ClCompile Include="src\GUI\PlainGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\ModelLoader.cpp">
+    <ClCompile Include="src\Renderer\MeshLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\TextureLoader.cpp">
@@ -227,7 +227,7 @@
     <ClCompile Include="src\Physics\Physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Animation.cpp">
+    <ClCompile Include="src\Mesh\Animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OSInterface\Callbacks.cpp">
@@ -239,22 +239,22 @@
     <ClCompile Include="src\DefaultShaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\AnimProp.cpp">
+    <ClCompile Include="src\Mesh\AnimProp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\AnimModelLoader.cpp">
+    <ClCompile Include="src\Renderer\AnimMeshLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Animator.cpp">
+    <ClCompile Include="src\Mesh\Animator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Bone.cpp">
+    <ClCompile Include="src\Mesh\Bone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Spacial3D.cpp">
+    <ClCompile Include="src\Mesh\Spacial3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Skeleton.cpp">
+    <ClCompile Include="src\Mesh\Skeleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

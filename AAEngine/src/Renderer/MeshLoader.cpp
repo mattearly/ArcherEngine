@@ -1,4 +1,4 @@
-#include "ModelLoader.h"
+#include "MeshLoader.h"
 #include "TextureLoader.h"
 #include "Vertex.h"
 #include "../Utility/Conversions.h"
@@ -40,7 +40,7 @@ static std::forward_list<RefModelInfo> AllLoadedModels;
 /// <param name="out_model">the model to be populated if successful</param>
 /// <param name="path">full original path</param>
 /// <returns>true if out_model was populated, false if not</returns>
-bool ModelLoader::CheckIfModelIsAlreadyLoaded(Prop& out_model, const std::string& path) {
+bool MeshLoader::CheckIfModelIsAlreadyLoaded(Prop& out_model, const std::string& path) {
   for (auto& model : AllLoadedModels) {
     if (model.path == "")
       continue;
@@ -66,7 +66,7 @@ static std::string LastLoadedPath;
 //    -2 = scene has incomplete flag from assimp after attempted to load
 //    -3 = there is no root node on the model
 // otherwise returns 0 if the import is successful
-int ModelLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path) {
+int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path) {
 
   bool already_loaded = CheckIfModelIsAlreadyLoaded(out_model, path);
   if (already_loaded) return 0;
@@ -125,7 +125,7 @@ int ModelLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path
 
 
 // unloads all textures and vao's from a list of nodeinfos
-void ModelLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload) {
+void MeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload) {
   for (const auto& a_mesh : toUnload) {
     OGLGraphics::DeleteMesh(a_mesh.vao);
     TextureLoader::UnloadTexture(a_mesh.textureDrawIds);
@@ -182,7 +182,7 @@ MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x
 
 
 // recursive helper function for LoadGameObjectFromFile
-void ModelLoader::recursive_processNode(aiNode* node, const aiScene* scene, Prop& out_model) {
+void MeshLoader::recursive_processNode(aiNode* node, const aiScene* scene, Prop& out_model) {
   for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
     aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
     out_model.mMeshes.push_back(local_helper_processMesh(mesh, scene, &node->mTransformation));

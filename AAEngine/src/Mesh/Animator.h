@@ -1,9 +1,11 @@
 #pragma once
-#include <string>
 #include "Animation.h"
 #include "AnimProp.h"
+#include <string>
 #include <map>
 #include <memory>
+
+
 namespace AA {
 
 class Animation;
@@ -13,7 +15,9 @@ struct AssimpNodeData;
 class AnimProp;
 
 class Animator {
+
 public:
+
   Animator() = delete;
 
   Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans, AnimProp& anim_prop);
@@ -35,6 +39,7 @@ private:
   float m_DeltaTime;
 
   glm::mat4 cached_global_inverse_transform;
+
 };
 
 }

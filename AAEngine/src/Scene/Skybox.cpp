@@ -4,8 +4,6 @@
 #include "../Renderer/LoadCube.h"
 #include "../Renderer/TextureLoader.h"
 #include "../DefaultShaders.h"
-#include <stb_image.h>
-#include <glad/glad.h>
 #ifdef _DEBUG
 #include <iostream>
 #endif

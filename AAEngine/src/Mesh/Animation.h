@@ -30,6 +30,7 @@ class AnimProp;
 class Animation : public UniqueInstance {
 
 public:
+
   Animation();
 
   Animation(const std::string& animationPath, std::shared_ptr<AnimProp> anim_prop);
@@ -55,7 +56,6 @@ private:
   float m_TicksPerSecond;
   
   AssimpNodeData m_RootNode;
-
   
 };
 

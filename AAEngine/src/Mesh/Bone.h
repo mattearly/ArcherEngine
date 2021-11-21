@@ -2,12 +2,6 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
-#include <assimp/Importer.hpp>
-#include <assimp/quaternion.h>
-#include <assimp/postprocess.h>
-#include <assimp/vector3.h>
-#include <assimp/matrix4x4.h>
-#include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include "../Utility/Conversions.h"
 namespace AA {

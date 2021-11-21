@@ -1,4 +1,6 @@
 #include "Animation.h"
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 #include <map>
 namespace AA {
 
@@ -39,7 +41,8 @@ void Animation::ReadMissingBones(const aiAnimation* animation, std::shared_ptr<A
     m_Skeleton.m_Bones.emplace_back(channel->mNodeName.data, anim_prop->m_Skeleton.m_BoneInfoMap[channel->mNodeName.data].id, channel);
   }
 
-  m_Skeleton.m_BoneInfoMap.merge(anim_prop->m_Skeleton.m_BoneInfoMap);   // merge was added in c++17
+  //m_Skeleton.m_BoneInfoMap.merge(anim_prop->m_Skeleton.m_BoneInfoMap);   // merge was added in c++17
+  m_Skeleton.m_BoneInfoMap = anim_prop->m_Skeleton.m_BoneInfoMap;
 }
 
 
