@@ -292,6 +292,7 @@ uniform mat4 u_model_matrix;
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform int isAnimating;
 void main()
 {
     pass_TexUV = inTexUV;
@@ -311,7 +312,12 @@ void main()
     }
 		
     mat4 viewModel = u_view_matrix * u_model_matrix;
-    gl_Position = u_projection_matrix * viewModel * totalPosition;
+
+    if (isAnimating > 0) {
+      gl_Position = u_projection_matrix * viewModel * totalPosition;
+    } else {
+      gl_Position = u_projection_matrix * viewModel * vec4(inPos,1.0);
+    }
 }
 )";
   if (!skel_3d) {

@@ -2,11 +2,12 @@
 #include "../include/AncientArcher/Version.h"
 #include "Physics/Physics.h"
 #include "Scene/Camera.h"
-#include "Scene/Prop.h"
-#include "Scene/AnimProp.h"
+#include "Mesh/Prop.h"
+#include "Mesh/AnimProp.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
-#include "Renderer/ModelLoader.h"
+#include "Renderer/MeshLoader.h"
+#include "Renderer/AnimMeshLoader.h"
 #include "Renderer/TextureLoader.h"
 #include "Renderer/OpenGL/OGLGraphics.h"
 #include "Renderer/OSInterface/Window.h"
@@ -420,6 +421,9 @@ unsigned int AncientArcher::AddAnimProp_testing(const char* path, bool lit, glm:
   mAnimProps_testing.emplace_back(std::make_shared<AnimProp>(path));
   mAnimProps_testing.back()->mLit = lit;
   mAnimProps_testing.back()->spacial_data.MoveTo(starting_location);
+#ifdef _DEBUG
+  std::cout << "loaded: " << path << ", id: " << mAnimProps_testing.back()->GetUID() << std::endl;
+#endif
   return mAnimProps_testing.back()->GetUID();
 }
 
@@ -450,6 +454,15 @@ void AncientArcher::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
   throw("anim prop id doesn't exist or is invalid");
 }
 
+unsigned int AncientArcher::GetAnimPropBoneCount(const unsigned int id) {
+  for (auto& prop : mAnimProps_testing) {
+    if (prop->GetUID() == id)
+      return prop->m_Skeleton.m_Bones.size();
+  }
+  
+  return 0;
+}
+
 unsigned int AncientArcher::AddAnimation_testing(const char* path, const unsigned int anim_prop_id) {
 
   for (auto& prop : mAnimProps_testing) {
@@ -458,9 +471,7 @@ unsigned int AncientArcher::AddAnimation_testing(const char* path, const unsigne
       return mAnimation_testing.back()->GetUID();
     }
   }
-
   throw("prop id doesn't exist");
-
 }
 
 bool AncientArcher::RemoveAnimation_testing(const unsigned int animation_id) {
@@ -1247,14 +1258,11 @@ void AncientArcher::update() {
 
     if (ap->spacial_data.modified)
       ap->spacial_data.ProcessModifications();
-
-    if (ap->mAnimator) {
+    
+    if (ap->mAnimator)
       ap->UpdateAnim(elapsedTime);
-      auto transforms = ap->mAnimator->GetFinalBoneMatrices();
-      for (unsigned int i = 0; i < transforms.size(); ++i) {
-        DefaultShaders::get_skel_3d()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-      }
-    }
+
+
   }
 
   if (mSimulateWorldPhysics) {
@@ -1294,6 +1302,15 @@ void AncientArcher::render() {
       p->Draw(mCameras.front());
     }
     for (auto& ap : mAnimProps_testing) {
+      if (ap->mAnimator) {
+        DefaultShaders::get_skel_3d()->SetBool("isAnimating", 1);
+        auto transforms = ap->mAnimator->GetFinalBoneMatrices();
+        for (unsigned int i = 0; i < transforms.size(); ++i) {
+          DefaultShaders::get_skel_3d()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+        }
+      } else {
+        DefaultShaders::get_skel_3d()->SetBool("isAnimating", 0);
+      }
       ap->Draw(mCameras.front());
     }
     if (mSkybox) {
@@ -1329,10 +1346,14 @@ void AncientArcher::teardown() {
 
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {
-    ModelLoader::UnloadGameObject(p->mMeshes);  // todo: consider moving to the destructor the prop
+    MeshLoader::UnloadGameObject(p->mMeshes);  // todo: consider moving to the destructor the prop
   }
-
   mProps.clear();
+
+  for (const auto& ap: mAnimProps_testing) {
+    AnimMeshLoader::UnloadGameObject(ap->mMeshes);
+  }
+  mAnimProps_testing.clear();
 
   // delete imgui
   if (mIMGUI) {

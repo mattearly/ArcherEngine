@@ -261,6 +261,8 @@ public:
   /// <param name="id">id of the animated prop to effect</param>
   /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
   void RotateAnimProp(const unsigned int id, glm::vec3 rot);
+
+  unsigned int GetAnimPropBoneCount(const unsigned int id);
   
 
   unsigned int AddAnimation_testing(const char* path, const unsigned int anim_prop_id);
