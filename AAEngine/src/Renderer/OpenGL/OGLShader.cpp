@@ -131,9 +131,9 @@ void OGLShader::loadShader(const char* vert_source, const char* frag_source) {
     char f_infoLog[512];
     glGetShaderInfoLog(fragmentShader, 512, nullptr, f_infoLog);
     throw(f_infoLog);
-    //std::cout << "error in fragment shader, compilation failed: " << f_infoLog << std::endl;
-    //char a;
-    //std::cin >> a;
+    std::cout << "error in fragment shader, compilation failed: " << f_infoLog << std::endl;
+    char a;
+    std::cin >> a;
 #endif
     //exit(-1);
   }

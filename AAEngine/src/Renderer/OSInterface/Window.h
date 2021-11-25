@@ -15,6 +15,7 @@ enum class RENDER_TECH { OPENGL4, D3D11, VULKAN1 };
 // hidden is the same as normal, just not drawn
 // disabled is raw motion (doesn't apply desktop cursor settings) - check if it is supported with glfwRawMouseMotionSupported()
 enum class CURSOR_MODE { HIDDEN = 0x00034002, DISABLED = 0x00034003, NORMAL = 0x00034001 };  //glfw hidden, disabled, normal
+
 struct WindowOptions final {
   WindowOptions();
   int _width, _height;

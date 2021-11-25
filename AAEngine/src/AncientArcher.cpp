@@ -54,9 +54,7 @@ bool AncientArcher::Init() {
   SetIMGUI(true);
 
   // start base default shaders
-  DefaultShaders::init_diffuse_3d();
   DefaultShaders::init_phong_3d();
-  DefaultShaders::init_skel_3d();
 
   // lazy init sound
   SoundDevice::Init();
@@ -147,9 +145,7 @@ void AncientArcher::SetCamMaxRenderDistance(int camId, float amt) {
         amt = abs(amt);
       cam->MaxRenderDistance = amt;
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       return;
     }
   }
@@ -162,12 +158,8 @@ void AncientArcher::SetCamToPerspective(int camId) {
       cam->mProjectionType = ProjectionType::PERSPECTIVE;
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
       cam->updateViewMatrix();
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -180,12 +172,8 @@ void AncientArcher::SetCamToOrtho_testing(int camId) {
       cam->mProjectionType = ProjectionType::ORTHO;
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
       cam->updateViewMatrix();
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
     }
   }
   throw("cam id doesn't exist or is invalid");
@@ -200,9 +188,7 @@ void AncientArcher::SetCamFOV(int camId, float new_fov) {
       if (new_fov > 360.f) new_fov = 360.f;
       cam->FOV = abs(new_fov);
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       return;
     }
   }
@@ -213,9 +199,7 @@ void AncientArcher::SetCamDimensions_testing(int camId, int w, int h) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
     }
   }
   throw("cam id doesn't exist or is invalid");
@@ -226,9 +210,7 @@ void AncientArcher::SetCamPosition(int camId, glm::vec3 new_loc) {
     if (cam->GetUID() == camId) {
       cam->Position = new_loc;
       cam->updateCameraVectors();
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -244,9 +226,7 @@ void AncientArcher::SetCamPitch(int camId, float new_pitch_degrees) {
         new_pitch_degrees = -89.9f;
       cam->Pitch = new_pitch_degrees;
       cam->updateCameraVectors();
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -262,9 +242,7 @@ void AncientArcher::SetCamYaw(int camId, float new_yaw_degrees) {
         new_yaw_degrees += 360.f;
       cam->Yaw = new_yaw_degrees;
       cam->updateCameraVectors();
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -276,9 +254,7 @@ void AncientArcher::ShiftCamPosition(int camId, glm::vec3 offset) {
     if (cam->GetUID() == camId) {
       cam->Position += offset;
       cam->updateCameraVectors();
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -303,9 +279,7 @@ void AncientArcher::ShiftCamPitchAndYaw(int camId, double pitch_offset_degrees, 
       cam->Yaw = static_cast<float>(new_yaw_degrees);
 
       cam->updateCameraVectors();
-      DefaultShaders::get_diffuse_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
-      DefaultShaders::get_skel_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -338,6 +312,7 @@ glm::vec3 AncientArcher::GetCamPosition(int camId) {
   }
   throw("cam id doesn't exist or is invalid");
 }
+
 float AncientArcher::GetCamPitch(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
@@ -459,7 +434,6 @@ unsigned int AncientArcher::GetAnimPropBoneCount(const unsigned int id) {
     if (prop->GetUID() == id)
       return prop->m_Skeleton.m_Bones.size();
   }
-  
   return 0;
 }
 
@@ -616,7 +590,7 @@ int AncientArcher::AddPointLight(glm::vec3 pos, float constant, float linear, fl
     specular += "Specular";
 
     assert(DefaultShaders::get_phong_3d());
-    DefaultShaders::get_phong_3d()->Use(); // <- vs lies if u see green squigglies
+    DefaultShaders::get_phong_3d()->Use();
     DefaultShaders::get_phong_3d()->SetVec3(position, mPointLights.back()->Position);
     DefaultShaders::get_phong_3d()->SetFloat(constant, mPointLights.back()->Constant);
     DefaultShaders::get_phong_3d()->SetFloat(linear, mPointLights.back()->Linear);
@@ -628,6 +602,7 @@ int AncientArcher::AddPointLight(glm::vec3 pos, float constant, float linear, fl
   }
   return mPointLights.back()->id;  // unique id
 }
+
 bool AncientArcher::RemovePointLight(int which_by_id) {
   // returns true if successfully removed the point light, false otherwise
   if (mPointLights.empty())
@@ -662,6 +637,7 @@ bool AncientArcher::RemovePointLight(int which_by_id) {
   } else
     return false;
 }
+
 void AncientArcher::MovePointLight(int which, glm::vec3 new_pos) {
   if (which < 0)
     throw("dont");
@@ -681,6 +657,7 @@ void AncientArcher::MovePointLight(int which, glm::vec3 new_pos) {
   }
   throw("u messed up");
 }
+
 void AncientArcher::ChangePointLight(int which, glm::vec3 new_pos, float new_constant, float new_linear, float new_quad,
   glm::vec3 new_amb, glm::vec3 new_diff, glm::vec3 new_spec) {
   if (which < 0)
@@ -724,7 +701,7 @@ void AncientArcher::ChangePointLight(int which, glm::vec3 new_pos, float new_con
         diffuse += "Diffuse";
         specular += "Specular";
 
-        DefaultShaders::get_phong_3d()->Use(); // <- vs lies if u see green squigglies
+        DefaultShaders::get_phong_3d()->Use();
         DefaultShaders::get_phong_3d()->SetVec3(pos, pl->Position);
         DefaultShaders::get_phong_3d()->SetFloat(constant, pl->Constant);
         DefaultShaders::get_phong_3d()->SetFloat(linear, pl->Linear);
@@ -739,6 +716,7 @@ void AncientArcher::ChangePointLight(int which, glm::vec3 new_pos, float new_con
   }
   throw("u messed up");
 }
+
 int AncientArcher::AddSpotLight(
   glm::vec3 pos, glm::vec3 dir, float inner, float outer, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
   if (mSpotLights.size() == MAXSPOTLIGHTS) {
@@ -786,7 +764,7 @@ int AncientArcher::AddSpotLight(
     specular += "Specular";
 
     assert(DefaultShaders::get_phong_3d());
-    DefaultShaders::get_phong_3d()->Use(); // <- vs lies if u see green squigglies
+    DefaultShaders::get_phong_3d()->Use();
     DefaultShaders::get_phong_3d()->SetVec3(pos, mSpotLights.back()->Position);
     DefaultShaders::get_phong_3d()->SetFloat(cutoff, mSpotLights.back()->CutOff);
     DefaultShaders::get_phong_3d()->SetFloat(ocutoff, mSpotLights.back()->OuterCutOff);
@@ -801,6 +779,7 @@ int AncientArcher::AddSpotLight(
   }
   return mSpotLights.back()->id;  // unique id
 }
+
 bool AncientArcher::RemoveSpotLight(int which_by_id) {
   // returns true if it removed the spot light, false otherwise
   if (mSpotLights.empty())
@@ -838,6 +817,7 @@ bool AncientArcher::RemoveSpotLight(int which_by_id) {
   } else
     return false;
 }
+
 void AncientArcher::MoveSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir) {
   if (which < 0)
     throw("dont");
@@ -860,6 +840,7 @@ void AncientArcher::MoveSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_di
   }
   throw("u messed up");
 }
+
 void AncientArcher::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir, float new_inner,
   float new_outer, float new_constant, float new_linear, float new_quad, glm::vec3 new_amb,
   glm::vec3 new_diff, glm::vec3 new_spec) {
@@ -969,6 +950,7 @@ void AncientArcher::SetSoundEffectVolume(int sound_id, float new_vol) {
 
   throw("sound effect volume speaker id not found");
 }
+
 void AncientArcher::RemoveSoundEffect(int soundId) {
   if (mSoundEffects.empty())
     throw("no sounds exist, nothing to remove");
@@ -980,6 +962,7 @@ void AncientArcher::RemoveSoundEffect(int soundId) {
   if (before_size == after_size)
     throw("didn't remove anything");
 }
+
 void AncientArcher::PlaySoundEffect(int id, bool interrupt) {
   if (mSpeakers.empty())
     throw("no speakers");
@@ -1004,6 +987,7 @@ void AncientArcher::AddMusic(const char* path) {
   }
   throw("music already loaded, use remove music first");
 }
+
 void AncientArcher::RemoveMusic() {
   if (mMusic) {
     delete mMusic;
@@ -1012,6 +996,7 @@ void AncientArcher::RemoveMusic() {
   }
   throw("no music to remove");
 }
+
 void AncientArcher::PlayMusic() {
   if (mMusic) {
     mMusic->Play();
@@ -1019,6 +1004,7 @@ void AncientArcher::PlayMusic() {
   }
   throw("no music to play");
 }
+
 void AncientArcher::PauseMusic() {
   if (mMusic) {
     mMusic->Pause();
@@ -1026,6 +1012,7 @@ void AncientArcher::PauseMusic() {
   }
   throw("no music loaded");
 }
+
 void AncientArcher::ResumeMusic() {
   if (mMusic) {
     mMusic->Resume();
@@ -1033,6 +1020,7 @@ void AncientArcher::ResumeMusic() {
   }
   throw("no music loaded");
 }
+
 void AncientArcher::StopMusic() {
   if (mMusic) {
     mMusic->Stop();
@@ -1047,18 +1035,22 @@ void AncientArcher::SetMusicVolume(float new_vol) {
   }
   throw("no music loaded");
 }
+
 void AncientArcher::SetCursorToHidden() noexcept {
   if (mWindow)
     mWindow->SetCursorToHidden();
 }
+
 void AncientArcher::SetCursorToDisabled() noexcept {
   if (mWindow)
     mWindow->SetCursorToDisabled();
 }
+
 void AncientArcher::SetCursorToNormal() noexcept {
   if (mWindow)
     mWindow->SetCursorToNormal();
 }
+
 //void AncientArcher::AddButton(glm::vec2 pos, glm::vec2 scale, glm::vec3 color, float alpha) {
 //  mGUI_testing->AddButton(pos, scale.x, scale.y, color, alpha);
 //}
@@ -1091,19 +1083,23 @@ void AncientArcher::SetIMGUI(const bool value) {
     }
   }
 }
+
 void AncientArcher::SetWindowClearColor(glm::vec3 color) noexcept {
   OGLGraphics::SetViewportClearColor(color);
 }
+
 // returns -1 if there is no window
 int AncientArcher::GetWindowWidth() noexcept {
   if (!mWindow) return -1;
   return mWindow->GetCurrentWidth();
 }
+
 // returns -1 if there is no window
 int AncientArcher::GetWindowHeight() noexcept {
   if (!mWindow) return -1;
   return mWindow->GetCurrentHeight();
 }
+
 // changes the window title, does nothing if window is null
 void AncientArcher::SetWindowTitle(const char* name) noexcept {
   if (!mWindow) return;
@@ -1112,6 +1108,7 @@ void AncientArcher::SetWindowTitle(const char* name) noexcept {
   temp->_title = name;
   mWindow->ApplyChanges();
 }
+
 // toggles fullscreen as expected, does nothign if window is null
 void AncientArcher::ToggleFullscreen(bool try_borderless) noexcept {
   if (!mWindow) return;
@@ -1128,6 +1125,7 @@ void AncientArcher::ToggleFullscreen(bool try_borderless) noexcept {
   }
   mWindow->ApplyChanges();
 }
+
 unsigned int AncientArcher::AddToOnBegin(void(*function)()) {
   static unsigned int next_begin_id = 0;
   next_begin_id++;
@@ -1135,69 +1133,84 @@ unsigned int AncientArcher::AddToOnBegin(void(*function)()) {
   onStart.insert(std::make_pair(next_begin_id, function));
   return next_begin_id;
 }
+
 unsigned int AncientArcher::AddToUpdate(void(*function)(float)) {
   static unsigned int next_deltaupdate_id = 0;
   next_deltaupdate_id++;
   onUpdate.emplace(next_deltaupdate_id, function);
   return next_deltaupdate_id;
 }
+
 unsigned int AncientArcher::AddToImGuiUpdate(void(*function)()) {
   static unsigned int next_imgui_id = 0;
   next_imgui_id++;
   onImGuiUpdate.emplace(next_imgui_id, function);
   return next_imgui_id;
 }
+
 unsigned int AncientArcher::AddToScrollHandling(void(*function)(MouseScrollWheel&)) {
   static unsigned int next_scrollhandling_id = 0;
   next_scrollhandling_id++;
   onScrollHandling.emplace(next_scrollhandling_id, function);
   return next_scrollhandling_id;
 }
+
 unsigned int AncientArcher::AddToKeyHandling(void(*function)(KeyboardButtons&)) {
   static unsigned int next_keyhandling_id = 0;
   next_keyhandling_id++;
   onKeyHandling.emplace(next_keyhandling_id, function);
   return next_keyhandling_id;
 }
+
 unsigned int AncientArcher::AddToMouseHandling(void(*function)(MouseCursorPos&)) {
   static unsigned int next_mousehandling_id = 0;
   next_mousehandling_id++;
   onMouseHandling.emplace(next_mousehandling_id, function);
   return next_mousehandling_id;
 }
+
 unsigned int AncientArcher::AddToMouseButtonHandling(void(*function)(MouseButtons&)) {
   static unsigned int next_mouseButtonhandling_id = 0;
   next_mouseButtonhandling_id++;
   onMouseButtonHandling.emplace(next_mouseButtonhandling_id, function);
   return next_mouseButtonhandling_id;
 }
+
 unsigned int AncientArcher::AddToOnTeardown(void(*function)()) {
   static unsigned int next_teardown_id = 0;
   next_teardown_id++;
   onQuit.emplace(next_teardown_id, function);
   return next_teardown_id;
 }
+
 bool AncientArcher::RemoveFromOnBegin(unsigned int r_id) {
   return static_cast<bool>(onStart.erase(r_id));
 }
+
 bool AncientArcher::RemoveFromUpdate(unsigned int r_id) {
   return static_cast<bool>(onUpdate.erase(r_id));
 }
+
 bool AncientArcher::RemoveFromImGuiUpdate(unsigned int r_id) {
   return static_cast<bool>(onImGuiUpdate.erase(r_id));
 }
+
 bool AncientArcher::RemoveFromScrollHandling(unsigned int r_id) {
   return static_cast<bool>(onScrollHandling.erase(r_id));
 }
+
 bool AncientArcher::RemoveFromKeyHandling(unsigned int r_id) {
   return static_cast<bool>(onKeyHandling.erase(r_id));
 }
+
 bool AncientArcher::RemoveFromMouseHandling(unsigned int r_id) {
   return static_cast<bool>(onMouseHandling.erase(r_id));
 }
+
 bool AncientArcher::RemoveFromMouseButtonHandling(unsigned int r_id) {
   return static_cast<bool>(onMouseButtonHandling.erase(r_id));
 }
+
 bool AncientArcher::RemoveFromTeardown(unsigned int r_id) {
   return static_cast<bool>(onQuit.erase(r_id));
 }
@@ -1240,13 +1253,8 @@ void AncientArcher::update() {
       }
       extern_ProjectionResized = false;
     }
-
-    DefaultShaders::get_diffuse_3d()->SetMat4("u_projection_matrix", mCameras.front()->mProjectionMatrix);
-    DefaultShaders::get_diffuse_3d()->SetMat4("u_view_matrix", mCameras.front()->mViewMatrix);
     DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", mCameras.front()->mProjectionMatrix);
     DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", mCameras.front()->mViewMatrix);
-    DefaultShaders::get_skel_3d()->SetMat4("u_projection_matrix", mCameras.front()->mProjectionMatrix);
-    DefaultShaders::get_skel_3d()->SetMat4("u_view_matrix", mCameras.front()->mViewMatrix);
   }
 
   for (auto& p : mProps) {
@@ -1255,14 +1263,10 @@ void AncientArcher::update() {
   }
 
   for (auto& ap : mAnimProps_testing) {
-
     if (ap->spacial_data.modified)
       ap->spacial_data.ProcessModifications();
-    
     if (ap->mAnimator)
       ap->UpdateAnim(elapsedTime);
-
-
   }
 
   if (mSimulateWorldPhysics) {
@@ -1298,18 +1302,18 @@ void AncientArcher::render() {
 
   // todo(matt): better way to handle cams 
   if (!mCameras.empty()) {
+    DefaultShaders::get_phong_3d()->SetBool("isAnimating", false);
     for (auto& p : mProps) {
       p->Draw(mCameras.front());
     }
     for (auto& ap : mAnimProps_testing) {
+      DefaultShaders::get_phong_3d()->SetBool("isAnimating", false);
       if (ap->mAnimator) {
-        DefaultShaders::get_skel_3d()->SetBool("isAnimating", 1);
+        DefaultShaders::get_phong_3d()->SetBool("isAnimating", true);
         auto transforms = ap->mAnimator->GetFinalBoneMatrices();
         for (unsigned int i = 0; i < transforms.size(); ++i) {
-          DefaultShaders::get_skel_3d()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+          DefaultShaders::get_phong_3d()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
         }
-      } else {
-        DefaultShaders::get_skel_3d()->SetBool("isAnimating", 0);
       }
       ap->Draw(mCameras.front());
     }
@@ -1350,7 +1354,7 @@ void AncientArcher::teardown() {
   }
   mProps.clear();
 
-  for (const auto& ap: mAnimProps_testing) {
+  for (const auto& ap : mAnimProps_testing) {
     AnimMeshLoader::UnloadGameObject(ap->mMeshes);
   }
   mAnimProps_testing.clear();

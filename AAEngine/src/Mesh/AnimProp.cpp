@@ -45,13 +45,15 @@ void AnimProp::SetAnimator(std::shared_ptr<Animation> anim) {
 
 void AnimProp::Draw(const std::shared_ptr<Camera>& cam) {
   OGLShader* shader = nullptr;
-  shader = DefaultShaders::get_skel_3d();
+  shader = DefaultShaders::get_phong_3d();
   shader->Use();
   shader->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
   shader->SetMat4("u_view_matrix", cam->mViewMatrix);
-
   shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
   shader->SetBool("hasAlbedo", false);
+  shader->SetBool("hasSpecular", false);
+  shader->SetBool("hasNormal", false);
+  shader->SetBool("hasEmission", false);
 
   for (MeshInfo& m : mMeshes) {
     for (const auto& texture : m.textureDrawIds) {
@@ -60,6 +62,21 @@ void AnimProp::Draw(const std::shared_ptr<Camera>& cam) {
         shader->SetBool("hasAlbedo", true);
         shader->SetInt(("material." + texType).c_str(), 0);
         OGLGraphics::SetTexture(0, texture.first);
+      }
+      if (texType == "Specular") {
+        shader->SetBool("hasSpecular", true);
+        shader->SetInt(("material." + texType).c_str(), 1);
+        OGLGraphics::SetTexture(1, texture.first);
+      }
+      if (texType == "Normal") {
+        shader->SetBool("hasNormal", true);
+        shader->SetInt(("material." + texType).c_str(), 2);
+        OGLGraphics::SetTexture(2, texture.first);
+      }
+      if (texType == "Emission") {
+        shader->SetBool("hasEmission", true);
+        shader->SetInt(("material." + texType).c_str(), 3);
+        OGLGraphics::SetTexture(3, texture.first);
       }
     }
     OGLGraphics::SetCullFace(m.backface_culled);

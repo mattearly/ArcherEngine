@@ -20,7 +20,7 @@ Prop::Prop(const char* path) {
 
 void Prop::Draw(const std::shared_ptr<Camera>& cam) {
   OGLShader* shader = NULL;
-  shader = (mLit) ? DefaultShaders::get_phong_3d() : DefaultShaders::get_diffuse_3d();
+  shader = DefaultShaders::get_phong_3d();
   shader->Use();
   shader->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
   shader->SetMat4("u_view_matrix", cam->mViewMatrix);
@@ -28,11 +28,9 @@ void Prop::Draw(const std::shared_ptr<Camera>& cam) {
 
   for (MeshInfo& m : mMeshes) {
     shader->SetBool("hasAlbedo", false);
-    if (mLit) {
-      shader->SetBool("hasSpecular", false);
-      shader->SetBool("hasNormal", false);
-      shader->SetBool("hasEmission", false);
-    }
+    shader->SetBool("hasSpecular", false);
+    shader->SetBool("hasNormal", false);
+    shader->SetBool("hasEmission", false);
 
     //if (m.physicsBody) {
     //  physxTransform_to_glmMat4(m.physicsBody->getGlobalPose(), m.local_transform);

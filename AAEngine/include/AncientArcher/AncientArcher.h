@@ -29,6 +29,7 @@ class Speaker;
 
 class AncientArcher {
 public:
+
   /// <summary>
   /// Prints Engine Version if in Debug.
   /// Creates a Default Window and Renderer
@@ -261,6 +262,7 @@ public:
   /// <param name="id">id of the animated prop to effect</param>
   /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
   void RotateAnimProp(const unsigned int id, glm::vec3 rot);
+
 
   unsigned int GetAnimPropBoneCount(const unsigned int id);
   

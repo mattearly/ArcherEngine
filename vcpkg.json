@@ -1,12 +1,12 @@
 {
 	"name": "aaengine",
 	"version": "8",
-    "dependencies": [ 
-		"glm", 
-		"assimp", 
-		"glfw3", 
-		"glad", 
-		"openal-soft", 
+	"dependencies": [
+		"glm",
+		"assimp",
+		"glfw3",
+		"glad",
+		"openal-soft",
 		"libsndfile",
 		"imgui",
 		"physx"

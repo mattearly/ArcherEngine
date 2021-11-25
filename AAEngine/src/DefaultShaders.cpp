@@ -1,95 +1,77 @@
 #include "DefaultShaders.h"
 namespace AA {
-OGLShader* diffuse_3d;
+
 OGLShader* phong_3d;
-OGLShader* skel_3d;
-OGLShader* DefaultShaders::get_diffuse_3d() {
-  diffuse_3d->Use();
-  return diffuse_3d;
-}
+
 OGLShader* DefaultShaders::get_phong_3d() {
   phong_3d->Use();
   return phong_3d;
 }
-OGLShader* DefaultShaders::get_skel_3d() {
-  skel_3d->Use();
-  return skel_3d;
-}
-void DefaultShaders::init_diffuse_3d() {
-  const std::string vert_3D_diff = R"(
-#version 430 core
-layout(location=0)in vec3 inPos;
-layout(location=1)in vec2 inTexUV;
-//out vec3 pass_Pos;
-out vec2 pass_TexUV;
-uniform mat4 u_projection_matrix;
-uniform mat4 u_view_matrix;
-uniform mat4 u_model_matrix;
-void main()
-{
-  vec3 pos = (u_model_matrix * vec4(inPos, 1.0)).xyz;
-  pass_TexUV = inTexUV;
-  vec4 final_pos = u_projection_matrix * u_view_matrix * vec4(pos, 1);
-  gl_Position = final_pos;
-}
-)";
-  const std::string frag_diff = R"(
-#version 430 core
-in vec2 pass_TexUV;
-out vec4 out_Color;
-struct Material {
-  sampler2D Albedo;
-};
-uniform int hasAlbedo;
-uniform Material material;
-void main() {
-  if (hasAlbedo > 0) {
-    out_Color = texture(material.Albedo, pass_TexUV);
-  } else {
-    out_Color = vec4(0.75, 0.0, 0.0, 1.0); // red for no texture
-  }
-}
-)";
-  if (!diffuse_3d) {
-    diffuse_3d = new OGLShader(vert_3D_diff.c_str(), frag_diff.c_str());
-  }
-}
-void DefaultShaders::init_phong_3d() {
 
-  const std::string vert_3D_lit = R"(
+void DefaultShaders::init_phong_3d() {
+  if (phong_3d)
+    return;
+
+  const std::string PHONG_VERT_CODE = R"(
+
 #version 430 core
 layout(location=0)in vec3 inPos;
 layout(location=1)in vec2 inTexUV;
 layout(location=2)in vec3 inNorm;
-//layout(location=3)in vec3 inTangent;
-//layout(location=4)in vec3 inBitangent;
+layout(location=3)in ivec4 inBoneIds;
+layout(location=4)in vec4 inWeights;
+
 layout(location=0)out vec3 pass_Pos;
 layout(location=1)out vec2 pass_TexUV;
 layout(location=2)out vec3 pass_Norm;
-//out vec3 pass_Tangent;
-//out vec3 pass_Bitangent;
+
 uniform mat4 u_projection_matrix;
 uniform mat4 u_view_matrix;
 uniform mat4 u_model_matrix;
-void main()
-{
-  pass_Pos = (u_model_matrix * vec4(inPos, 1.0)).xyz;
+
+const int MAX_BONES = 100;
+const int MAX_BONE_INFLUENCE = 4;
+uniform mat4 finalBonesMatrices[MAX_BONES];
+
+uniform int isAnimating;
+
+void main() {
   pass_TexUV = inTexUV;
-  mat3 normal_matrix = transpose(inverse(mat3(u_model_matrix)));
-  pass_Norm = normalize(normal_matrix * inNorm);
-  //pass_Tangent = normalize(normal_matrix * inTangent);
-  //pass_Bitangent = normalize(normal_matrix * inBitangent);
-  gl_Position = u_projection_matrix * u_view_matrix * vec4(pass_Pos, 1);
+  vec4 totalPosition = vec4(0.0);
+
+  if (isAnimating > 0) {
+    vec3 totalNormal = vec3(0.0);
+    for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++) {
+      if(inBoneIds[i] == -1) continue;
+      if(inBoneIds[i] >= MAX_BONES) {
+          totalPosition = vec4(inPos, 1.0f);
+          break;
+      }
+      vec4 localPosition = finalBonesMatrices[inBoneIds[i]] * vec4(inPos,1.0);
+      totalPosition += localPosition * inWeights[i];
+      //totalNormal += mat3(finalBonesMatrices[inBoneIds[i]]) * inNorm;
+    }
+    pass_Pos = (u_model_matrix * totalPosition).xyz;
+  } else {  // Not Animating
+    mat3 normal_matrix = transpose(inverse(mat3(u_model_matrix)));
+    pass_Norm = normalize(normal_matrix * inNorm);
+    pass_Pos = (u_model_matrix * vec4(inPos, 1.0)).xyz;
+    totalPosition = vec4(inPos, 1.0);
+  }
+  mat4 viewMatrix = u_view_matrix * u_model_matrix;
+  gl_Position = u_projection_matrix * viewMatrix * totalPosition;
 }
+
 )";
-  const std::string frag_lit = R"(
+
+  const std::string PHONG_FRAG_CODE = R"(
 #version 430 core
 layout(location=0)in vec3 pass_Pos;
 layout(location=1)in vec2 pass_TexUV;
 layout(location=2)in vec3 pass_Norm;
-//in vec3 pass_Tangent;
-//in vec3 pass_Bitangent;
+
 layout(location=0)out vec4 out_Color;
+
 struct Material {
   sampler2D Albedo;
   sampler2D Specular;
@@ -114,8 +96,8 @@ struct SpotLight {
   float Constant, Linear, Quadratic;
   vec3 Ambient, Diffuse, Specular;
 };
-const vec3 default_color = vec3(0.9);
-const int MAXPOINTLIGHTS = 24; // if changed, needs to match on core
+const vec3 default_color = vec3(0.1);
+const int MAXPOINTLIGHTS = 24; // if changed, needs to match on light controllers
 const int MAXSPOTLIGHTS = 12;
 uniform vec3 u_view_pos;
 uniform int hasAlbedo;
@@ -179,17 +161,16 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
     ambient = light.Ambient * default_color;
     diffuse = light.Diffuse * diff * default_color;
   }
+  ambient *= attenuation;
+  diffuse *= attenuation;
+  vec3 specular;
   if (hasSpecular > 0) {
-    vec3 specular = light.Specular * spec * texture(material.Specular, pass_TexUV).rgb;
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
-    return (ambient + diffuse + specular);
+    specular = light.Specular * spec * texture(material.Specular, pass_TexUV).rgb;
   } else {
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    return (ambient + diffuse);
+    specular = vec3(1,1,1);
   }
+  specular *= attenuation;
+  return (ambient + diffuse + specular);
 }
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
   vec3 lightDir = normalize(light.Position - pass_Pos);
@@ -248,99 +229,15 @@ void main()
     result += CalcPointLight(pointLight[i], normal, view_dir);
   for (i = 0; i < NUM_SPOT_LIGHTS; i++)
     result += CalcSpotLight(spotLight[i], normal, view_dir);
-  if (hasEmission != 0) {
+  if (hasEmission > 0) {
     vec3 emission = texture(material.Emission, pass_TexUV).rgb;
     result += emission;
   }
   out_Color = vec4(result, 1.0);
 }
 )";
-  if (!phong_3d) {
-    phong_3d = new OGLShader(vert_3D_lit.c_str(), frag_lit.c_str());
-  }
-}
-void DefaultShaders::init_skel_3d() {
 
-  const std::string skel_anim_frag = R"(
-#version 430 core
-layout(location=1)in vec2 pass_TexUV;
-out vec4 out_Color;
-struct Material {
-  sampler2D Albedo;
-};
-uniform int hasAlbedo;
-uniform Material material;
-void main() {
-  if (hasAlbedo > 0) {
-    out_Color = texture(material.Albedo, pass_TexUV);
-  } else {
-    out_Color = vec4(0.75, 0.0, 0.0, 1.0); // red for no texture
-  }
+  phong_3d = new OGLShader(PHONG_VERT_CODE.c_str(), PHONG_FRAG_CODE.c_str());
 }
-)";
-  const std::string skel_anim_vert = R"(
-#version 430 core
-layout(location=0)in vec3 inPos;
-layout(location=1)in vec2 inTexUV;
-//skip normal
-layout(location=3)in ivec4 inBoneIds;
-layout(location=4)in vec4 inWeights;
-layout(location=1)out vec2 pass_TexUV;
-uniform mat4 u_projection_matrix;
-uniform mat4 u_view_matrix;
-uniform mat4 u_model_matrix;
-const int MAX_BONES = 100;
-const int MAX_BONE_INFLUENCE = 4;
-uniform mat4 finalBonesMatrices[MAX_BONES];
-uniform int isAnimating;
-void main()
-{
-    pass_TexUV = inTexUV;
-    vec4 totalPosition = vec4(0.0);
-    for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
-    {
-        if(inBoneIds[i] == -1) 
-            continue;
-        if(inBoneIds[i] >= MAX_BONES) 
-        {
-            totalPosition = vec4(inPos,1.0f);
-            break;
-        }
-        vec4 localPosition = finalBonesMatrices[inBoneIds[i]] * vec4(inPos,1.0);
-        totalPosition += localPosition * inWeights[i];
-        //vec3 localNormal = mat3(finalBonesMatrices[inBoneIds[i]]) * norm;
-    }
-		
-    mat4 viewModel = u_view_matrix * u_model_matrix;
-
-    if (isAnimating > 0) {
-      gl_Position = u_projection_matrix * viewModel * totalPosition;
-    } else {
-      gl_Position = u_projection_matrix * viewModel * vec4(inPos,1.0);
-    }
-}
-)";
-  if (!skel_3d) {
-    skel_3d = new OGLShader(skel_anim_vert.c_str(), skel_anim_frag.c_str());
-  }
-}
-
-
-// old helper functions we probably don't need anymore
-//// helper function to update a shader projection from a specific camera
-//void updateProjectionFromCam(OGLShader* shader_to_update, const Camera& from_cam) {
-//  if (!shader_to_update)
-//    return;
-//  shader_to_update->Use();
-//  shader_to_update->SetMat4("u_projection_matrix", from_cam.mProjectionMatrix);
-//}
-//
-//// helper function to update a shader view from a specific camera
-//void updateViewFromCam(OGLShader* shader_to_update, const Camera& from_cam) {
-//  if (!shader_to_update)
-//    return;
-//  shader_to_update->Use();
-//  shader_to_update->SetMat4("u_view_matrix", from_cam.mViewMatrix);
-//}
 
 }  // end namespace AA
