@@ -462,8 +462,8 @@ void AncientArcher::SetAnimationOnAnimProp(const unsigned int animation_id, cons
       if (animation_id == -1) { // -1 means reset
         if (animprop->mAnimator) {
           animprop->mAnimator.reset();
-          return;  // done
         }
+        return;  // done
       }
       for (auto& animation : mAnimation) {
         if (animation->GetUID() == animation_id) {
