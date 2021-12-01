@@ -7,8 +7,8 @@ namespace AA {
 
 class DefaultShaders {
 public:
-  static void init_phong_3d();
-  static OGLShader* get_phong_3d();
+  static void init_ubershader();
+  static OGLShader* get_ubershader();
 
 private:
   DefaultShaders() = delete;

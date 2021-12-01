@@ -20,7 +20,7 @@ Prop::Prop(const char* path) {
 
 void Prop::Draw(const std::shared_ptr<Camera>& cam) {
   OGLShader* shader = NULL;
-  shader = DefaultShaders::get_phong_3d();
+  shader = DefaultShaders::get_ubershader();
   shader->Use();
   shader->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
   shader->SetMat4("u_view_matrix", cam->mViewMatrix);
@@ -68,7 +68,7 @@ void Prop::Draw(const std::shared_ptr<Camera>& cam) {
     }
 
     //if (m.emission != vec4(0)) {
-    //  DefaultShaders::get_phong_3d()->SetVec4("emission", m.emission);
+    //  DefaultShaders::get_ubershader()->SetVec4("emission", m.emission);
     //}
 
 

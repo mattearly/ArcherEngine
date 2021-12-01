@@ -24,29 +24,20 @@
 #include <algorithm>
 #include <unordered_map>
 
-#ifdef _DEBUG
-#include <iostream>
-#include <cstdio>
-#include <iomanip>
-#endif
-
 namespace AA {
 
-extern void             extern_Pollevents();
-extern bool             extern_NewKeyReads;
-extern bool             extern_ProjectionResized;
-extern KeyboardButtons  extern_KeyboardInputReciever;
-extern MouseScrollWheel extern_ScrollInputReciever;
-extern MouseCursorPos   extern_MouseInputReciever;
-extern MouseButtons     extern_MouseButtonReciever;
+extern void g_poll_input_events();
+extern bool g_new_key_reads;
+extern bool g_os_window_resized;
+extern KeyboardButtons g_keyboard_input_status;
+extern MouseScrollWheel g_scroll_input_status;
+extern MouseCursorPos g_mouse_input_status;
+extern MouseButtons g_mouse_button_status;
 
 bool AncientArcher::Init() {
   if (isInit) {
     return false;
   }
-#ifdef _DEBUG 
-  printf("DEBUG: Initializing AA v%i.%i.%i\n", ENGINEVERSIONMAJOR, ENGINEVERSIONMINOR, ENGINEVERSIONPATCH);
-#endif
 
   // create a new window with the default options
   // todo (matt): allow custom option init
@@ -54,7 +45,7 @@ bool AncientArcher::Init() {
   SetIMGUI(true);
 
   // start base default shaders
-  DefaultShaders::init_phong_3d();
+  DefaultShaders::init_ubershader();
 
   // lazy init sound
   SoundDevice::Init();
@@ -80,7 +71,7 @@ int AncientArcher::Run() {
   while (!mWindow->GetShouldClose()) {
     update();
     render();
-    extern_Pollevents();
+    g_poll_input_events();
   }
   teardown();
   return 0;
@@ -145,7 +136,7 @@ void AncientArcher::SetCamMaxRenderDistance(int camId, float amt) {
         amt = abs(amt);
       cam->MaxRenderDistance = amt;
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       return;
     }
   }
@@ -158,8 +149,8 @@ void AncientArcher::SetCamToPerspective(int camId) {
       cam->mProjectionType = ProjectionType::PERSPECTIVE;
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
       cam->updateViewMatrix();
-      DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -172,8 +163,8 @@ void AncientArcher::SetCamToOrtho_testing(int camId) {
       cam->mProjectionType = ProjectionType::ORTHO;
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
       cam->updateViewMatrix();
-      DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
     }
   }
   throw("cam id doesn't exist or is invalid");
@@ -188,7 +179,7 @@ void AncientArcher::SetCamFOV(int camId, float new_fov) {
       if (new_fov > 360.f) new_fov = 360.f;
       cam->FOV = abs(new_fov);
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       return;
     }
   }
@@ -199,7 +190,7 @@ void AncientArcher::SetCamDimensions_testing(int camId, int w, int h) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
     }
   }
   throw("cam id doesn't exist or is invalid");
@@ -210,7 +201,7 @@ void AncientArcher::SetCamPosition(int camId, glm::vec3 new_loc) {
     if (cam->GetUID() == camId) {
       cam->Position = new_loc;
       cam->updateCameraVectors();
-      DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -226,7 +217,7 @@ void AncientArcher::SetCamPitch(int camId, float new_pitch_degrees) {
         new_pitch_degrees = -89.9f;
       cam->Pitch = new_pitch_degrees;
       cam->updateCameraVectors();
-      DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -242,7 +233,7 @@ void AncientArcher::SetCamYaw(int camId, float new_yaw_degrees) {
         new_yaw_degrees += 360.f;
       cam->Yaw = new_yaw_degrees;
       cam->updateCameraVectors();
-      DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -254,7 +245,7 @@ void AncientArcher::ShiftCamPosition(int camId, glm::vec3 offset) {
     if (cam->GetUID() == camId) {
       cam->Position += offset;
       cam->updateCameraVectors();
-      DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -279,7 +270,7 @@ void AncientArcher::ShiftCamPitchAndYaw(int camId, double pitch_offset_degrees, 
       cam->Yaw = static_cast<float>(new_yaw_degrees);
 
       cam->updateCameraVectors();
-      DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", cam->mViewMatrix);
+      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -392,18 +383,18 @@ void AncientArcher::RotateProp(const unsigned int id, glm::vec3 rot) {
   throw("prop id doesn't exist or is invalid");
 }
 
-unsigned int AncientArcher::AddAnimProp_testing(const char* path, bool lit, glm::vec3 starting_location) {
-  mAnimProps_testing.emplace_back(std::make_shared<AnimProp>(path));
-  mAnimProps_testing.back()->mLit = lit;
-  mAnimProps_testing.back()->spacial_data.MoveTo(starting_location);
+unsigned int AncientArcher::AddAnimProp(const char* path, bool lit, glm::vec3 starting_location) {
+  mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
+  mAnimProps.back()->mLit = lit;
+  mAnimProps.back()->spacial_data.MoveTo(starting_location);
 #ifdef _DEBUG
-  std::cout << "loaded: " << path << ", id: " << mAnimProps_testing.back()->GetUID() << std::endl;
+  std::cout << "loaded: " << path << ", id: " << mAnimProps.back()->GetUID() << std::endl;
 #endif
-  return mAnimProps_testing.back()->GetUID();
+  return mAnimProps.back()->GetUID();
 }
 
 void AncientArcher::MoveAnimProp(const unsigned int id, glm::vec3 loc) {
-  for (auto& prop : mAnimProps_testing) {
+  for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       return prop->spacial_data.MoveTo(loc);
     }
@@ -412,7 +403,7 @@ void AncientArcher::MoveAnimProp(const unsigned int id, glm::vec3 loc) {
 }
 
 void AncientArcher::ScaleAnimProp(const unsigned int id, glm::vec3 scale) {
-  for (auto& prop : mAnimProps_testing) {
+  for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       return prop->spacial_data.ScaleTo(scale);
     }
@@ -421,7 +412,7 @@ void AncientArcher::ScaleAnimProp(const unsigned int id, glm::vec3 scale) {
 }
 
 void AncientArcher::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
-  for (auto& prop : mAnimProps_testing) {
+  for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       return prop->spacial_data.RotateTo(rot);
     }
@@ -429,49 +420,54 @@ void AncientArcher::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
   throw("anim prop id doesn't exist or is invalid");
 }
 
-unsigned int AncientArcher::GetAnimPropBoneCount(const unsigned int id) {
-  for (auto& prop : mAnimProps_testing) {
-    if (prop->GetUID() == id)
+unsigned int AncientArcher::GetAnimPropBoneCount_testing(const unsigned int anim_prop_id) {
+  for (auto& prop : mAnimProps) {
+    if (prop->GetUID() == anim_prop_id)
       return prop->m_Skeleton.m_Bones.size();
   }
   return 0;
 }
 
-unsigned int AncientArcher::AddAnimation_testing(const char* path, const unsigned int anim_prop_id) {
-
-  for (auto& prop : mAnimProps_testing) {
+unsigned int AncientArcher::AddAnimation(const char* path, const unsigned int anim_prop_id) {
+  for (auto& prop : mAnimProps) {
     if (prop->GetUID() == anim_prop_id) {
-      mAnimation_testing.emplace_back(std::make_shared<Animation>(path, prop));
-      return mAnimation_testing.back()->GetUID();
+      mAnimation.emplace_back(std::make_shared<Animation>(path, prop));
+      return mAnimation.back()->GetUID();
     }
   }
   throw("prop id doesn't exist");
 }
 
-bool AncientArcher::RemoveAnimation_testing(const unsigned int animation_id) {
-  auto before_size = mAnimation_testing.size();
+bool AncientArcher::RemoveAnimation(const unsigned int animation_id) {
+  auto before_size = mAnimation.size();
 
-  auto ret_it = mAnimation_testing.erase(
+  auto ret_it = mAnimation.erase(
     std::remove_if(
-      mAnimation_testing.begin(),
-      mAnimation_testing.end(),
+      mAnimation.begin(),
+      mAnimation.end(),
       [&](auto& anim) { return anim->GetUID() == animation_id; }),
-    mAnimation_testing.end());
+    mAnimation.end());
 
-  auto after_size = mAnimation_testing.size();
+  auto after_size = mAnimation.size();
 
   // return true if successful removal, false otherwise
   return (before_size != after_size);
 }
 
-void AncientArcher::SetAnimationOnAnimProp_testing(const unsigned int animation_id, const unsigned int animprop_id) {
+void AncientArcher::SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id) {
   // this is terribly inefficient, but it should work
-  for (auto& animation : mAnimation_testing) {
-    if (animation->GetUID() == animation_id) {
-      // animation exists
-      for (auto& animprop : mAnimProps_testing) {
-        if (animprop->GetUID() == animprop_id) {
-          // aaaaaaaand animated prop exists
+  for (auto& animprop : mAnimProps) {
+    if (animprop->GetUID() == animprop_id) {
+      // animated prop exists
+      if (animation_id == -1) { // -1 means reset
+        if (animprop->mAnimator) {
+          animprop->mAnimator.reset();
+          return;  // done
+        }
+      }
+      for (auto& animation : mAnimation) {
+        if (animation->GetUID() == animation_id) {
+          // animation exists
           animprop->SetAnimator(animation);
           return;
         }
@@ -481,7 +477,7 @@ void AncientArcher::SetAnimationOnAnimProp_testing(const unsigned int animation_
   throw("invalid animation id or animated prop id");
 }
 
-void AncientArcher::AddPropPhysics_testing(const int prop_id, const COLLIDERTYPE type) {
+void AncientArcher::AddPropPhysics(const int prop_id, const COLLIDERTYPE type) {
   // todo: fix
   for (auto& p : mProps) {
     if (p->GetUID() == prop_id) {
@@ -509,11 +505,11 @@ void AncientArcher::AddPropPhysics_testing(const int prop_id, const COLLIDERTYPE
   throw("prop id does not exist");
 }
 
-void AncientArcher::AddGroundPlane_testing(const glm::vec3 norm, float distance) {
+void AncientArcher::AddGroundPlane(const glm::vec3 norm, float distance) {
   Physics::Get()->CreateGroundPlane(physx::PxVec3(norm.x, norm.y, norm.z), distance);
 }
 
-void AncientArcher::SimulateWorldPhysics_testing(bool status) {
+void AncientArcher::SimulateWorldPhysics(bool status) {
   mSimulateWorldPhysics = status;
 }
 
@@ -536,20 +532,20 @@ void AncientArcher::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 
   }
 
   {
-    assert(DefaultShaders::get_phong_3d());
-    DefaultShaders::get_phong_3d()->Use();
-    DefaultShaders::get_phong_3d()->SetInt("isDirectionalLightOn", 1);
-    DefaultShaders::get_phong_3d()->SetVec3("directionalLight.Direction", mDirectionalLight->Direction);
-    DefaultShaders::get_phong_3d()->SetVec3("directionalLight.Ambient", mDirectionalLight->Ambient);
-    DefaultShaders::get_phong_3d()->SetVec3("directionalLight.Diffuse", mDirectionalLight->Diffuse);
-    DefaultShaders::get_phong_3d()->SetVec3("directionalLight.Specular", mDirectionalLight->Specular);
+    assert(DefaultShaders::get_ubershader());
+    DefaultShaders::get_ubershader()->Use();
+    DefaultShaders::get_ubershader()->SetInt("isDirectionalLightOn", 1);
+    DefaultShaders::get_ubershader()->SetVec3("directionalLight.Direction", mDirectionalLight->Direction);
+    DefaultShaders::get_ubershader()->SetVec3("directionalLight.Ambient", mDirectionalLight->Ambient);
+    DefaultShaders::get_ubershader()->SetVec3("directionalLight.Diffuse", mDirectionalLight->Diffuse);
+    DefaultShaders::get_ubershader()->SetVec3("directionalLight.Specular", mDirectionalLight->Specular);
   }
 }
 
 void AncientArcher::RemoveDirectionalLight() {
-  assert(DefaultShaders::get_phong_3d());
-  DefaultShaders::get_phong_3d()->Use();
-  DefaultShaders::get_phong_3d()->SetInt("isDirectionalLightOn", 0);
+  assert(DefaultShaders::get_ubershader());
+  DefaultShaders::get_ubershader()->Use();
+  DefaultShaders::get_ubershader()->SetInt("isDirectionalLightOn", 0);
   mDirectionalLight.reset();
 }
 
@@ -589,16 +585,16 @@ int AncientArcher::AddPointLight(glm::vec3 pos, float constant, float linear, fl
     diffuse += "Diffuse";
     specular += "Specular";
 
-    assert(DefaultShaders::get_phong_3d());
-    DefaultShaders::get_phong_3d()->Use();
-    DefaultShaders::get_phong_3d()->SetVec3(position, mPointLights.back()->Position);
-    DefaultShaders::get_phong_3d()->SetFloat(constant, mPointLights.back()->Constant);
-    DefaultShaders::get_phong_3d()->SetFloat(linear, mPointLights.back()->Linear);
-    DefaultShaders::get_phong_3d()->SetFloat(quadratic, mPointLights.back()->Quadratic);
-    DefaultShaders::get_phong_3d()->SetVec3(ambient, mPointLights.back()->Ambient);
-    DefaultShaders::get_phong_3d()->SetVec3(diffuse, mPointLights.back()->Diffuse);
-    DefaultShaders::get_phong_3d()->SetVec3(specular, mPointLights.back()->Specular);
-    DefaultShaders::get_phong_3d()->SetInt("NUM_POINT_LIGHTS", static_cast<int>(new_point_size + 1));
+    assert(DefaultShaders::get_ubershader());
+    DefaultShaders::get_ubershader()->Use();
+    DefaultShaders::get_ubershader()->SetVec3(position, mPointLights.back()->Position);
+    DefaultShaders::get_ubershader()->SetFloat(constant, mPointLights.back()->Constant);
+    DefaultShaders::get_ubershader()->SetFloat(linear, mPointLights.back()->Linear);
+    DefaultShaders::get_ubershader()->SetFloat(quadratic, mPointLights.back()->Quadratic);
+    DefaultShaders::get_ubershader()->SetVec3(ambient, mPointLights.back()->Ambient);
+    DefaultShaders::get_ubershader()->SetVec3(diffuse, mPointLights.back()->Diffuse);
+    DefaultShaders::get_ubershader()->SetVec3(specular, mPointLights.back()->Specular);
+    DefaultShaders::get_ubershader()->SetInt("NUM_POINT_LIGHTS", static_cast<int>(new_point_size + 1));
   }
   return mPointLights.back()->id;  // unique id
 }
@@ -617,8 +613,8 @@ bool AncientArcher::RemovePointLight(int which_by_id) {
   auto after_size = mPointLights.size();
 
   if (before_size != after_size) {
-    DefaultShaders::get_phong_3d()->Use();
-    DefaultShaders::get_phong_3d()->SetInt("NUM_POINT_LIGHTS", static_cast<int>(after_size));
+    DefaultShaders::get_ubershader()->Use();
+    DefaultShaders::get_ubershader()->SetInt("NUM_POINT_LIGHTS", static_cast<int>(after_size));
 
     // sync lights on shader after the change
     for (int i = 0; i < after_size; i++) {
@@ -649,8 +645,8 @@ void AncientArcher::MovePointLight(int which, glm::vec3 new_pos) {
       std::stringstream ss;
       ss << loc_in_vec;
       std::string position = "pointLight[" + ss.str() + "].Position";
-      DefaultShaders::get_phong_3d()->Use();
-      DefaultShaders::get_phong_3d()->SetVec3(position.c_str(), pl->Position);
+      DefaultShaders::get_ubershader()->Use();
+      DefaultShaders::get_ubershader()->SetVec3(position.c_str(), pl->Position);
       return;
     }
     loc_in_vec++;
@@ -701,14 +697,14 @@ void AncientArcher::ChangePointLight(int which, glm::vec3 new_pos, float new_con
         diffuse += "Diffuse";
         specular += "Specular";
 
-        DefaultShaders::get_phong_3d()->Use();
-        DefaultShaders::get_phong_3d()->SetVec3(pos, pl->Position);
-        DefaultShaders::get_phong_3d()->SetFloat(constant, pl->Constant);
-        DefaultShaders::get_phong_3d()->SetFloat(linear, pl->Linear);
-        DefaultShaders::get_phong_3d()->SetFloat(quadrat, pl->Quadratic);
-        DefaultShaders::get_phong_3d()->SetVec3(ambient, pl->Ambient);
-        DefaultShaders::get_phong_3d()->SetVec3(diffuse, pl->Diffuse);
-        DefaultShaders::get_phong_3d()->SetVec3(specular, pl->Specular);
+        DefaultShaders::get_ubershader()->Use();
+        DefaultShaders::get_ubershader()->SetVec3(pos, pl->Position);
+        DefaultShaders::get_ubershader()->SetFloat(constant, pl->Constant);
+        DefaultShaders::get_ubershader()->SetFloat(linear, pl->Linear);
+        DefaultShaders::get_ubershader()->SetFloat(quadrat, pl->Quadratic);
+        DefaultShaders::get_ubershader()->SetVec3(ambient, pl->Ambient);
+        DefaultShaders::get_ubershader()->SetVec3(diffuse, pl->Diffuse);
+        DefaultShaders::get_ubershader()->SetVec3(specular, pl->Specular);
       }
       return;
     }
@@ -763,19 +759,19 @@ int AncientArcher::AddSpotLight(
     diffuse += "Diffuse";
     specular += "Specular";
 
-    assert(DefaultShaders::get_phong_3d());
-    DefaultShaders::get_phong_3d()->Use();
-    DefaultShaders::get_phong_3d()->SetVec3(pos, mSpotLights.back()->Position);
-    DefaultShaders::get_phong_3d()->SetFloat(cutoff, mSpotLights.back()->CutOff);
-    DefaultShaders::get_phong_3d()->SetFloat(ocutoff, mSpotLights.back()->OuterCutOff);
-    DefaultShaders::get_phong_3d()->SetVec3(direction, mSpotLights.back()->Direction);
-    DefaultShaders::get_phong_3d()->SetFloat(constant, mSpotLights.back()->Constant);
-    DefaultShaders::get_phong_3d()->SetFloat(linear, mSpotLights.back()->Linear);
-    DefaultShaders::get_phong_3d()->SetFloat(quadrat, mSpotLights.back()->Quadratic);
-    DefaultShaders::get_phong_3d()->SetVec3(ambient, mSpotLights.back()->Ambient);
-    DefaultShaders::get_phong_3d()->SetVec3(diffuse, mSpotLights.back()->Diffuse);
-    DefaultShaders::get_phong_3d()->SetVec3(specular, mSpotLights.back()->Specular);
-    DefaultShaders::get_phong_3d()->SetInt("NUM_SPOT_LIGHTS", static_cast<int>(new_spot_loc + 1));
+    assert(DefaultShaders::get_ubershader());
+    DefaultShaders::get_ubershader()->Use();
+    DefaultShaders::get_ubershader()->SetVec3(pos, mSpotLights.back()->Position);
+    DefaultShaders::get_ubershader()->SetFloat(cutoff, mSpotLights.back()->CutOff);
+    DefaultShaders::get_ubershader()->SetFloat(ocutoff, mSpotLights.back()->OuterCutOff);
+    DefaultShaders::get_ubershader()->SetVec3(direction, mSpotLights.back()->Direction);
+    DefaultShaders::get_ubershader()->SetFloat(constant, mSpotLights.back()->Constant);
+    DefaultShaders::get_ubershader()->SetFloat(linear, mSpotLights.back()->Linear);
+    DefaultShaders::get_ubershader()->SetFloat(quadrat, mSpotLights.back()->Quadratic);
+    DefaultShaders::get_ubershader()->SetVec3(ambient, mSpotLights.back()->Ambient);
+    DefaultShaders::get_ubershader()->SetVec3(diffuse, mSpotLights.back()->Diffuse);
+    DefaultShaders::get_ubershader()->SetVec3(specular, mSpotLights.back()->Specular);
+    DefaultShaders::get_ubershader()->SetInt("NUM_SPOT_LIGHTS", static_cast<int>(new_spot_loc + 1));
   }
   return mSpotLights.back()->id;  // unique id
 }
@@ -794,8 +790,8 @@ bool AncientArcher::RemoveSpotLight(int which_by_id) {
   auto after_size = mSpotLights.size();
 
   if (before_size != after_size) {
-    DefaultShaders::get_phong_3d()->Use();
-    DefaultShaders::get_phong_3d()->SetInt("NUM_SPOT_LIGHTS", static_cast<int>(after_size));
+    DefaultShaders::get_ubershader()->Use();
+    DefaultShaders::get_ubershader()->SetInt("NUM_SPOT_LIGHTS", static_cast<int>(after_size));
 
     // sync lights on shader after the change
     for (int i = 0; i < after_size; i++) {
@@ -827,13 +823,13 @@ void AncientArcher::MoveSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_di
     if (sl->id == which) {
       sl->Position = new_pos;
       sl->Direction = new_dir;
-      DefaultShaders::get_phong_3d()->Use();
+      DefaultShaders::get_ubershader()->Use();
       std::stringstream ss;
       ss << loc_in_vec;
       std::string position = "spotLight[" + ss.str() + "].Position";
       std::string direction = "spotLight[" + ss.str() + "].Direction";
-      DefaultShaders::get_phong_3d()->SetVec3(position, sl->Position);
-      DefaultShaders::get_phong_3d()->SetVec3(direction, sl->Direction);
+      DefaultShaders::get_ubershader()->SetVec3(position, sl->Position);
+      DefaultShaders::get_ubershader()->SetVec3(direction, sl->Direction);
       return;
     }
     loc_in_vec++;
@@ -897,17 +893,17 @@ void AncientArcher::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_
         diffuse += "Diffuse";
         specular += "Specular";
 
-        DefaultShaders::get_phong_3d()->Use();
-        DefaultShaders::get_phong_3d()->SetVec3(pos, sl->Position);
-        DefaultShaders::get_phong_3d()->SetFloat(cutoff, sl->CutOff);
-        DefaultShaders::get_phong_3d()->SetFloat(ocutoff, sl->OuterCutOff);
-        DefaultShaders::get_phong_3d()->SetVec3(direction, sl->Direction);
-        DefaultShaders::get_phong_3d()->SetFloat(constant, sl->Constant);
-        DefaultShaders::get_phong_3d()->SetFloat(linear, sl->Linear);
-        DefaultShaders::get_phong_3d()->SetFloat(quadrat, sl->Quadratic);
-        DefaultShaders::get_phong_3d()->SetVec3(ambient, sl->Ambient);
-        DefaultShaders::get_phong_3d()->SetVec3(diffuse, sl->Diffuse);
-        DefaultShaders::get_phong_3d()->SetVec3(specular, sl->Specular);
+        DefaultShaders::get_ubershader()->Use();
+        DefaultShaders::get_ubershader()->SetVec3(pos, sl->Position);
+        DefaultShaders::get_ubershader()->SetFloat(cutoff, sl->CutOff);
+        DefaultShaders::get_ubershader()->SetFloat(ocutoff, sl->OuterCutOff);
+        DefaultShaders::get_ubershader()->SetVec3(direction, sl->Direction);
+        DefaultShaders::get_ubershader()->SetFloat(constant, sl->Constant);
+        DefaultShaders::get_ubershader()->SetFloat(linear, sl->Linear);
+        DefaultShaders::get_ubershader()->SetFloat(quadrat, sl->Quadratic);
+        DefaultShaders::get_ubershader()->SetVec3(ambient, sl->Ambient);
+        DefaultShaders::get_ubershader()->SetVec3(diffuse, sl->Diffuse);
+        DefaultShaders::get_ubershader()->SetVec3(specular, sl->Specular);
       }
       return;
     }
@@ -1051,23 +1047,6 @@ void AncientArcher::SetCursorToNormal() noexcept {
     mWindow->SetCursorToNormal();
 }
 
-//void AncientArcher::AddButton(glm::vec2 pos, glm::vec2 scale, glm::vec3 color, float alpha) {
-//  mGUI_testing->AddButton(pos, scale.x, scale.y, color, alpha);
-//}
-//void AncientArcher::AddButton(glm::vec2 pos, glm::vec2 scale, float alpha, const char* texture_path) {
-//  mGUI_testing->AddButton(pos, scale.x, scale.y, alpha, texture_path);
-//}
-//void AncientArcher::SetGUIVisibility(const bool value) {
-//  if (!mGUI_testing)
-//    return;
-//  if (value) {
-//    mGUI_testing->ShowInterface();
-//  } else {
-//    mGUI_testing->HideInterface();
-//  }
-//}
-
-// private function to enable imgui for testing purposes
 void AncientArcher::SetIMGUI(const bool value) {
   if (!value) {
     if (mIMGUI) {
@@ -1246,15 +1225,15 @@ void AncientArcher::update() {
   for (auto& oDU : onUpdate) { oDU.second(elapsedTime); }
 
   if (!mCameras.empty()) {
-    if (extern_ProjectionResized) {
+    if (g_os_window_resized) {
       int width(mWindow->GetCurrentWidth()), height(mWindow->GetCurrentHeight());
       for (auto& cam : mCameras) {
         cam->updateProjectionMatrix(width, height);
       }
-      extern_ProjectionResized = false;
+      g_os_window_resized = false;
     }
-    DefaultShaders::get_phong_3d()->SetMat4("u_projection_matrix", mCameras.front()->mProjectionMatrix);
-    DefaultShaders::get_phong_3d()->SetMat4("u_view_matrix", mCameras.front()->mViewMatrix);
+    DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", mCameras.front()->mProjectionMatrix);
+    DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", mCameras.front()->mViewMatrix);
   }
 
   for (auto& p : mProps) {
@@ -1262,7 +1241,7 @@ void AncientArcher::update() {
       p->spacial_data.ProcessModifications();
   }
 
-  for (auto& ap : mAnimProps_testing) {
+  for (auto& ap : mAnimProps) {
     if (ap->spacial_data.modified)
       ap->spacial_data.ProcessModifications();
     if (ap->mAnimator)
@@ -1282,15 +1261,15 @@ void AncientArcher::update() {
     }
   }
 
-  if (extern_NewKeyReads) {
+  if (g_new_key_reads) {
     for (auto& oKH : onKeyHandling) {
-      oKH.second(extern_KeyboardInputReciever);
+      oKH.second(g_keyboard_input_status);
     }
-    extern_NewKeyReads = false;
+    g_new_key_reads = false;
   }
 
-  for (auto& oMH : onMouseHandling) { oMH.second(extern_MouseInputReciever); }
-  for (auto& oSH : onScrollHandling) { oSH.second(extern_ScrollInputReciever); }
+  for (auto& oMH : onMouseHandling) { oMH.second(g_mouse_input_status); }
+  for (auto& oSH : onScrollHandling) { oSH.second(g_scroll_input_status); }
 }
 
 // Renders visable props every frame
@@ -1302,17 +1281,17 @@ void AncientArcher::render() {
 
   // todo(matt): better way to handle cams 
   if (!mCameras.empty()) {
-    DefaultShaders::get_phong_3d()->SetBool("isAnimating", false);
+    DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
     for (auto& p : mProps) {
       p->Draw(mCameras.front());
     }
-    for (auto& ap : mAnimProps_testing) {
-      DefaultShaders::get_phong_3d()->SetBool("isAnimating", false);
+    for (auto& ap : mAnimProps) {
+      DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
       if (ap->mAnimator) {
-        DefaultShaders::get_phong_3d()->SetBool("isAnimating", true);
+        DefaultShaders::get_ubershader()->SetBool("isAnimating", true);
         auto transforms = ap->mAnimator->GetFinalBoneMatrices();
         for (unsigned int i = 0; i < transforms.size(); ++i) {
-          DefaultShaders::get_phong_3d()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+          DefaultShaders::get_ubershader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
         }
       }
       ap->Draw(mCameras.front());
@@ -1354,10 +1333,10 @@ void AncientArcher::teardown() {
   }
   mProps.clear();
 
-  for (const auto& ap : mAnimProps_testing) {
+  for (const auto& ap : mAnimProps) {
     AnimMeshLoader::UnloadGameObject(ap->mMeshes);
   }
-  mAnimProps_testing.clear();
+  mAnimProps.clear();
 
   // delete imgui
   if (mIMGUI) {

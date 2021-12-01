@@ -240,7 +240,7 @@ public:
   /// <param name="lit">optional: use lit shader? true if not specified</param>
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <returns>id of the animated prop</returns>
-  unsigned int AddAnimProp_testing(const char* path, bool lit = true, glm::vec3 starting_location = glm::vec3(0));
+  unsigned int AddAnimProp(const char* path, bool lit = true, glm::vec3 starting_location = glm::vec3(0));
 
   /// <summary>
   /// Moves a animated prop to a location
@@ -263,17 +263,30 @@ public:
   /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
   void RotateAnimProp(const unsigned int id, glm::vec3 rot);
 
-
-  unsigned int GetAnimPropBoneCount(const unsigned int id);
+  /// <summary>
+  /// Returns the bone count.
+  /// </summary>
+  /// <param name="id"></param>
+  /// <returns></returns>
+  unsigned int GetAnimPropBoneCount_testing(const unsigned int anim_prop_id);
   
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="path"></param>
+  /// <param name="anim_prop_id"></param>
+  /// <returns></returns>
+  unsigned int AddAnimation(const char* path, const unsigned int anim_prop_id);
 
-  unsigned int AddAnimation_testing(const char* path, const unsigned int anim_prop_id);
 
+  bool RemoveAnimation(const unsigned int animation_id);
 
-  bool RemoveAnimation_testing(const unsigned int animation_id);
-
-
-  void SetAnimationOnAnimProp_testing(const unsigned int animation_id, const unsigned int animprop_id);
+  /// <summary>
+  /// set animation to an prop with bones (animprop)
+  /// </summary>
+  /// <param name="animation_id">id of the animation or -1 to turn off animation</param>
+  /// <param name="animprop_id">id of the prop</param>
+  void SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id);
 
 
   enum class COLLIDERTYPE { BOX, SPHERE, CAPSULE };
@@ -284,20 +297,20 @@ public:
   /// </summary>
   /// <param name="prop_id">id of the prop to effect</param>
   /// <param name="type">what kind of colliderbox</param>
-  void AddPropPhysics_testing(const int prop_id, const COLLIDERTYPE type = COLLIDERTYPE::BOX);
+  void AddPropPhysics(const int prop_id, const COLLIDERTYPE type = COLLIDERTYPE::BOX);
 
   /// <summary>
   /// Adds a invisible ground plane. In testing.
   /// </summary>
   /// <param name="norm">facing direction</param>
   /// <param name="distance">distance (from norm direction?)</param>
-  void AddGroundPlane_testing(const glm::vec3 norm, float distance);
+  void AddGroundPlane(const glm::vec3 norm, float distance);
 
   /// <summary>
   /// Sets the stats of the physics update every frame.
   /// </summary>
   /// <param name="status">true to turn on, false to turn off</param>
-  void SimulateWorldPhysics_testing(bool status);
+  void SimulateWorldPhysics(bool status);
 
   /// <summary>
   /// Sets a skybox with 6 textures
@@ -628,9 +641,9 @@ private:
 
   std::vector<std::shared_ptr<Prop> > mProps;
 
-  std::vector<std::shared_ptr<AnimProp> > mAnimProps_testing;
+  std::vector<std::shared_ptr<AnimProp> > mAnimProps;
 
-  std::vector<std::shared_ptr<Animation> > mAnimation_testing;
+  std::vector<std::shared_ptr<Animation> > mAnimation;
 
   Skybox* mSkybox;
 

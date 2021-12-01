@@ -20,7 +20,9 @@ using namespace physx;
 class Physics {
 public:
   static Physics* Get();
+
   void StepPhysics(float dt);
+
   PxRigidDynamic* CreateBox(const PxVec3& pos, const PxVec3& dims, const PxVec3* linVel = NULL, PxReal density = 1.0f);
 
   PxRigidDynamic* CreateSphere(const PxVec3& pos, PxReal radius, const PxVec3* linVel = NULL, PxReal density = 1.0f);
@@ -34,6 +36,7 @@ public:
   void removeActor(PxRigidActor* actor);
 
   ~Physics();
+
 private:
   Physics();
   physx::PxDefaultAllocator mDefaultAllocatorCallback;

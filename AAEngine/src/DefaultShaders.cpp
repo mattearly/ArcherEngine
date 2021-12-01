@@ -1,19 +1,18 @@
 #include "DefaultShaders.h"
 namespace AA {
 
-OGLShader* phong_3d;
+OGLShader* UBERSHADER;
 
-OGLShader* DefaultShaders::get_phong_3d() {
-  phong_3d->Use();
-  return phong_3d;
+OGLShader* DefaultShaders::get_ubershader() {
+  UBERSHADER->Use();
+  return UBERSHADER;
 }
 
-void DefaultShaders::init_phong_3d() {
-  if (phong_3d)
+void DefaultShaders::init_ubershader() {
+  if (UBERSHADER)
     return;
 
-  const std::string PHONG_VERT_CODE = R"(
-
+  const std::string UBERSHADER_VERT_CODE = R"(
 #version 430 core
 layout(location=0)in vec3 inPos;
 layout(location=1)in vec2 inTexUV;
@@ -31,11 +30,11 @@ uniform mat4 u_model_matrix;
 
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
-uniform mat4 finalBonesMatrices[MAX_BONES];
 
+uniform mat4 finalBonesMatrices[MAX_BONES];
 uniform int isAnimating;
 
-void main() {
+void main(){
   pass_TexUV = inTexUV;
   vec4 totalPosition = vec4(0.0);
 
@@ -64,7 +63,7 @@ void main() {
 
 )";
 
-  const std::string PHONG_FRAG_CODE = R"(
+  const std::string UBERSHADER_FRAG_CODE = R"(
 #version 430 core
 layout(location=0)in vec3 pass_Pos;
 layout(location=1)in vec2 pass_TexUV;
@@ -96,9 +95,11 @@ struct SpotLight {
   float Constant, Linear, Quadratic;
   vec3 Ambient, Diffuse, Specular;
 };
+
 const vec3 default_color = vec3(0.1);
 const int MAXPOINTLIGHTS = 24; // if changed, needs to match on light controllers
 const int MAXSPOTLIGHTS = 12;
+
 uniform vec3 u_view_pos;
 uniform int hasAlbedo;
 uniform int hasSpecular;
@@ -111,6 +112,7 @@ uniform PointLight pointLight[MAXPOINTLIGHTS];
 uniform SpotLight spotLight[MAXSPOTLIGHTS];
 uniform int NUM_POINT_LIGHTS;
 uniform int NUM_SPOT_LIGHTS;
+
 vec3 CalcDirectionalLight(vec3 normal, vec3 viewDir) {
   vec3 lightDir = normalize(-directionalLight.Direction);
   // diffuse shading
@@ -138,6 +140,7 @@ vec3 CalcDirectionalLight(vec3 normal, vec3 viewDir) {
     return(ambient + diffuse);
   }
 }
+
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
   vec3 lightDir = normalize(light.Position - pass_Pos);
   // diffuse shading
@@ -172,6 +175,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
   specular *= attenuation;
   return (ambient + diffuse + specular);
 }
+
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
   vec3 lightDir = normalize(light.Position - pass_Pos);
   // diffuse shading
@@ -211,6 +215,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
     return (ambient + diffuse);
   }
 }
+
 void main()
 {
   vec3 normal;
@@ -235,9 +240,10 @@ void main()
   }
   out_Color = vec4(result, 1.0);
 }
+
 )";
 
-  phong_3d = new OGLShader(PHONG_VERT_CODE.c_str(), PHONG_FRAG_CODE.c_str());
+  UBERSHADER = new OGLShader(UBERSHADER_VERT_CODE.c_str(), UBERSHADER_FRAG_CODE.c_str());
 }
 
 }  // end namespace AA

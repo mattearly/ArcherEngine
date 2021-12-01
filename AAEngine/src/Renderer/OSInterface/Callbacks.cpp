@@ -5,18 +5,18 @@
 
 namespace AA {
 
-bool extern_NewKeyReads = false;
-bool extern_ProjectionResized = true;  // start true so projection updates right away
+bool g_new_key_reads = false;
+bool g_os_window_resized = true;  // start true so projection updates right away
 
-void extern_Pollevents() {
+void g_poll_input_events() {
   glfwPollEvents();
 }
 
 // todo: reset the reciever structs back to default on window switch (maybe?)
-KeyboardButtons  extern_KeyboardInputReciever;
-MouseScrollWheel extern_ScrollInputReciever;
-MouseCursorPos   extern_MouseInputReciever;
-MouseButtons     extern_MouseButtonReciever; 
+KeyboardButtons  g_keyboard_input_status;
+MouseScrollWheel g_scroll_input_status;
+MouseCursorPos   g_mouse_input_status;
+MouseButtons     g_mouse_button_status; 
 
 void GLFWERRORCALLBACK(int e, const char* msg) {
   if (e != GLFW_NO_ERROR) {
@@ -41,13 +41,13 @@ void FRAMEBUFFERSIZESETCALLBACK(GLFWwindow* window, int w, int h) {
     break;
   }
   // Update Projection Matricies
-  extern_ProjectionResized = true;
+  g_os_window_resized = true;
 }
 
 void NORMALMOUSEREPORTINGCALLBACK(GLFWwindow* window, double xpos, double ypos) {
   // Update Cached Position
-  extern_MouseInputReciever.xOffset = xpos;
-  extern_MouseInputReciever.yOffset = ypos;
+  g_mouse_input_status.xOffset = xpos;
+  g_mouse_input_status.yOffset = ypos;
   //std::cout << "Mouse Pos: " << xpos << " " << ypos << '\n';
 }
 
@@ -64,475 +64,475 @@ void ONWINDOWFOCUSCALLBACK(GLFWwindow* window, int focused) {
 void KEYCALLBACK(GLFWwindow* w, int key, int scancode, int action, int mods) {
   // esc
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.esc = true;
+    g_keyboard_input_status.esc = true;
   } else if (key == GLFW_KEY_ESCAPE == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.esc = false;
+    g_keyboard_input_status.esc = false;
   }
   // function keys
   if (key == GLFW_KEY_F1 == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f1 = true;
+    g_keyboard_input_status.f1 = true;
   } else if (key == GLFW_KEY_F1 == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f1 = false;
+    g_keyboard_input_status.f1 = false;
   }
   if (key == GLFW_KEY_F2 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f2 = true;
+    g_keyboard_input_status.f2 = true;
   } else if (key == GLFW_KEY_F2 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f2 = false;
+    g_keyboard_input_status.f2 = false;
   }
   if (key == GLFW_KEY_F3 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f3 = true;
+    g_keyboard_input_status.f3 = true;
   } else if (key == GLFW_KEY_F3 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f3 = false;
+    g_keyboard_input_status.f3 = false;
   }
   if (key == GLFW_KEY_F4 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f4 = true;
+    g_keyboard_input_status.f4 = true;
   } else if (key == GLFW_KEY_F4 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f4 = false;
+    g_keyboard_input_status.f4 = false;
   }
   if (key == GLFW_KEY_F5 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f5 = true;
+    g_keyboard_input_status.f5 = true;
   } else if (key == GLFW_KEY_F5 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f5 = false;
+    g_keyboard_input_status.f5 = false;
   }
   if (key == GLFW_KEY_F6 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f6 = true;
+    g_keyboard_input_status.f6 = true;
   } else if (key == GLFW_KEY_F6 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f6 = false;
+    g_keyboard_input_status.f6 = false;
   }
   if (key == GLFW_KEY_F7 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f7 = true;
+    g_keyboard_input_status.f7 = true;
   } else if (key == GLFW_KEY_F7 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f7 = false;
+    g_keyboard_input_status.f7 = false;
   }
   if (key == GLFW_KEY_F8 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f8 = true;
+    g_keyboard_input_status.f8 = true;
   } else if (key == GLFW_KEY_F8 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f8 = false;
+    g_keyboard_input_status.f8 = false;
   }
   if (key == GLFW_KEY_F9 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f9 = true;
+    g_keyboard_input_status.f9 = true;
   } else if (key == GLFW_KEY_F9 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f9 = false;
+    g_keyboard_input_status.f9 = false;
   }
   if (key == GLFW_KEY_F10 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f10 = true;
+    g_keyboard_input_status.f10 = true;
   } else if (key == GLFW_KEY_F10 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f10 = false;
+    g_keyboard_input_status.f10 = false;
   }
   if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f11 = true;
+    g_keyboard_input_status.f11 = true;
   } else if (key == GLFW_KEY_F11 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f11 = false;
+    g_keyboard_input_status.f11 = false;
   }
   if (key == GLFW_KEY_F12 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f12 = true;
+    g_keyboard_input_status.f12 = true;
   } else if (key == GLFW_KEY_F12 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f12 = false;
+    g_keyboard_input_status.f12 = false;
   }
   // number key row
   if (key == GLFW_KEY_GRAVE_ACCENT && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.graveAccent = true;
+    g_keyboard_input_status.graveAccent = true;
   } else if (key == GLFW_KEY_GRAVE_ACCENT && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.graveAccent = false;
+    g_keyboard_input_status.graveAccent = false;
   }
   if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n1 = true;
+    g_keyboard_input_status.n1 = true;
   } else if (key == GLFW_KEY_1 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n1 = false;
+    g_keyboard_input_status.n1 = false;
   }
   if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n2 = true;
+    g_keyboard_input_status.n2 = true;
   } else if (key == GLFW_KEY_2 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n2 = false;
+    g_keyboard_input_status.n2 = false;
   }
   if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n3 = true;
+    g_keyboard_input_status.n3 = true;
   } else if (key == GLFW_KEY_3 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n3 = false;
+    g_keyboard_input_status.n3 = false;
   }
   if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n4 = true;
+    g_keyboard_input_status.n4 = true;
   } else if (key == GLFW_KEY_4 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n4 = false;
+    g_keyboard_input_status.n4 = false;
   }
   if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n5 = true;
+    g_keyboard_input_status.n5 = true;
   } else if (key == GLFW_KEY_5 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n5 = false;
+    g_keyboard_input_status.n5 = false;
   }
   if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n6 = true;
+    g_keyboard_input_status.n6 = true;
   } else if (key == GLFW_KEY_6 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n6 = false;
+    g_keyboard_input_status.n6 = false;
   }
   if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n7 = true;
+    g_keyboard_input_status.n7 = true;
   } else if (key == GLFW_KEY_7 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n7 = false;
+    g_keyboard_input_status.n7 = false;
   }
   if (key == GLFW_KEY_8 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n8 = true;
+    g_keyboard_input_status.n8 = true;
   } else if (key == GLFW_KEY_8 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n8 = false;
+    g_keyboard_input_status.n8 = false;
   }
   if (key == GLFW_KEY_9 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n9 = true;
+    g_keyboard_input_status.n9 = true;
   } else if (key == GLFW_KEY_9 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n9 = false;
+    g_keyboard_input_status.n9 = false;
   }
   if (key == GLFW_KEY_0 && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n0 = true;
+    g_keyboard_input_status.n0 = true;
   } else if (key == GLFW_KEY_0 && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n0 = false;
+    g_keyboard_input_status.n0 = false;
   }
   if (key == GLFW_KEY_MINUS && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.minus = true;
+    g_keyboard_input_status.minus = true;
   } else if (key == GLFW_KEY_MINUS && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.minus = false;
+    g_keyboard_input_status.minus = false;
   }
   if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.equal = true;
+    g_keyboard_input_status.equal = true;
   } else if (key == GLFW_KEY_EQUAL && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.equal = false;
+    g_keyboard_input_status.equal = false;
   }
   if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.backspace = true;
+    g_keyboard_input_status.backspace = true;
   } else if (key == GLFW_KEY_BACKSPACE && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.backspace = false;
+    g_keyboard_input_status.backspace = false;
   }
   // alphabet keys
   if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.a = true;
+    g_keyboard_input_status.a = true;
   } else if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.a = false;
+    g_keyboard_input_status.a = false;
   }
   if (key == GLFW_KEY_B && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.b = true;
+    g_keyboard_input_status.b = true;
   } else if (key == GLFW_KEY_B && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.b = false;
+    g_keyboard_input_status.b = false;
   }
   if (key == GLFW_KEY_C && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.c = true;
+    g_keyboard_input_status.c = true;
   } else if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.c = false;
+    g_keyboard_input_status.c = false;
   }
   if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.d = true;
+    g_keyboard_input_status.d = true;
   } else if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.d = false;
+    g_keyboard_input_status.d = false;
   }
   if (key == GLFW_KEY_E && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.e = true;
+    g_keyboard_input_status.e = true;
   } else if (key == GLFW_KEY_E && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.e = false;
+    g_keyboard_input_status.e = false;
   }
   if (key == GLFW_KEY_F && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.f = true;
+    g_keyboard_input_status.f = true;
   } else if (key == GLFW_KEY_F && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.f = false;
+    g_keyboard_input_status.f = false;
   }
   if (key == GLFW_KEY_G && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.g = true;
+    g_keyboard_input_status.g = true;
   } else if (key == GLFW_KEY_G && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.g = false;
+    g_keyboard_input_status.g = false;
   }
   if (key == GLFW_KEY_H && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.h = true;
+    g_keyboard_input_status.h = true;
   } else if (key == GLFW_KEY_H && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.h = false;
+    g_keyboard_input_status.h = false;
   }
   if (key == GLFW_KEY_I && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.i = true;
+    g_keyboard_input_status.i = true;
   } else if (key == GLFW_KEY_I && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.i = false;
+    g_keyboard_input_status.i = false;
   }
   if (key == GLFW_KEY_J && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.j = true;
+    g_keyboard_input_status.j = true;
   } else if (key == GLFW_KEY_J && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.j = false;
+    g_keyboard_input_status.j = false;
   }
   if (key == GLFW_KEY_K && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.k = true;
+    g_keyboard_input_status.k = true;
   } else if (key == GLFW_KEY_K && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.k = false;
+    g_keyboard_input_status.k = false;
   }
   if (key == GLFW_KEY_L && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.l = true;
+    g_keyboard_input_status.l = true;
   } else if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.l = false;
+    g_keyboard_input_status.l = false;
   }
   if (key == GLFW_KEY_M && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.m = true;
+    g_keyboard_input_status.m = true;
   } else if (key == GLFW_KEY_M && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.m = false;
+    g_keyboard_input_status.m = false;
   }
   if (key == GLFW_KEY_N && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.n = true;
+    g_keyboard_input_status.n = true;
   } else if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.n = false;
+    g_keyboard_input_status.n = false;
   }
   if (key == GLFW_KEY_O && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.o = true;
+    g_keyboard_input_status.o = true;
   } else if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.o = false;
+    g_keyboard_input_status.o = false;
   }
   if (key == GLFW_KEY_P && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.p = true;
+    g_keyboard_input_status.p = true;
   } else if (key == GLFW_KEY_P && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.p = false;
+    g_keyboard_input_status.p = false;
   }
   if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.q = true;
+    g_keyboard_input_status.q = true;
   } else if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.q = false;
+    g_keyboard_input_status.q = false;
   }
   if (key == GLFW_KEY_R && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.r = true;
+    g_keyboard_input_status.r = true;
   } else if (key == GLFW_KEY_R && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.r = false;
+    g_keyboard_input_status.r = false;
   }
   if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.s = true;
+    g_keyboard_input_status.s = true;
   } else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.s = false;
+    g_keyboard_input_status.s = false;
   }
   if (key == GLFW_KEY_T && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.t = true;
+    g_keyboard_input_status.t = true;
   } else if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.t = false;
+    g_keyboard_input_status.t = false;
   }
   if (key == GLFW_KEY_U && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.u = true;
+    g_keyboard_input_status.u = true;
   } else if (key == GLFW_KEY_U && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.u = false;
+    g_keyboard_input_status.u = false;
   }
   if (key == GLFW_KEY_V && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.v = true;
+    g_keyboard_input_status.v = true;
   } else if (key == GLFW_KEY_V && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.v = false;
+    g_keyboard_input_status.v = false;
   }
   if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.w = true;
+    g_keyboard_input_status.w = true;
   } else if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.w = false;
+    g_keyboard_input_status.w = false;
   }
   if (key == GLFW_KEY_X && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.x = true;
+    g_keyboard_input_status.x = true;
   } else if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.x = false;
+    g_keyboard_input_status.x = false;
   }
   if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.y = true;
+    g_keyboard_input_status.y = true;
   } else if (key == GLFW_KEY_Y && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.y = false;
+    g_keyboard_input_status.y = false;
   }
   if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.z = true;
+    g_keyboard_input_status.z = true;
   } else if (key == GLFW_KEY_Z && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.z = false;
+    g_keyboard_input_status.z = false;
   }
   // tab-shift-control-alt
   if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.tab = true;
+    g_keyboard_input_status.tab = true;
   } else if (key == GLFW_KEY_TAB && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.tab = false;
+    g_keyboard_input_status.tab = false;
   }
   if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.leftShift = true;
+    g_keyboard_input_status.leftShift = true;
   } else if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.leftShift = false;
+    g_keyboard_input_status.leftShift = false;
   }
   if (key == GLFW_KEY_RIGHT_SHIFT && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.rightShift = true;
+    g_keyboard_input_status.rightShift = true;
   } else if (key == GLFW_KEY_RIGHT_SHIFT && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.rightShift = false;
+    g_keyboard_input_status.rightShift = false;
   }
   if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.leftControl = true;
+    g_keyboard_input_status.leftControl = true;
   } else if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.leftControl = false;
+    g_keyboard_input_status.leftControl = false;
   }
   if (key == GLFW_KEY_RIGHT_CONTROL && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.rightControl = true;
+    g_keyboard_input_status.rightControl = true;
   } else if (key == GLFW_KEY_RIGHT_CONTROL && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.rightControl = false;
+    g_keyboard_input_status.rightControl = false;
   }
   if (key == GLFW_KEY_LEFT_ALT && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.leftAlt = true;
+    g_keyboard_input_status.leftAlt = true;
   } else if (key == GLFW_KEY_LEFT_ALT && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.leftAlt = false;
+    g_keyboard_input_status.leftAlt = false;
   }
   if (key == GLFW_KEY_RIGHT_ALT && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.rightAlt = true;
+    g_keyboard_input_status.rightAlt = true;
   } else if (key == GLFW_KEY_RIGHT_ALT && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.rightAlt = false;
+    g_keyboard_input_status.rightAlt = false;
   }
   if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.spacebar = true;
+    g_keyboard_input_status.spacebar = true;
   } else if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.spacebar = false;
+    g_keyboard_input_status.spacebar = false;
   }
   // brackets
   if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.leftSquareBracket = true;
+    g_keyboard_input_status.leftSquareBracket = true;
   } else if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.leftSquareBracket = false;
+    g_keyboard_input_status.leftSquareBracket = false;
   }
   if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.rightSquareBracket = true;
+    g_keyboard_input_status.rightSquareBracket = true;
   } else if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.rightSquareBracket = false;
+    g_keyboard_input_status.rightSquareBracket = false;
   }
   // slash-quote-semicolon-enter
   if (key == GLFW_KEY_BACKSLASH && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.backslash = true;
+    g_keyboard_input_status.backslash = true;
   } else if (key == GLFW_KEY_BACKSLASH && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.backslash = false;
+    g_keyboard_input_status.backslash = false;
   }
   if (key == GLFW_KEY_SEMICOLON && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.semiColon = true;
+    g_keyboard_input_status.semiColon = true;
   } else if (key == GLFW_KEY_SEMICOLON && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.semiColon = false;
+    g_keyboard_input_status.semiColon = false;
   }
   if (key == GLFW_KEY_APOSTROPHE && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.apostrophe = true;
+    g_keyboard_input_status.apostrophe = true;
   } else if (key == GLFW_KEY_APOSTROPHE && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.apostrophe = false;
+    g_keyboard_input_status.apostrophe = false;
   }
   if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.enter = true;
+    g_keyboard_input_status.enter = true;
   } else if (key == GLFW_KEY_ENTER && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.enter = false;
+    g_keyboard_input_status.enter = false;
   }
   // comma-period-forwardslash
   if (key == GLFW_KEY_COMMA && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.comma = true;
+    g_keyboard_input_status.comma = true;
   } else if (key == GLFW_KEY_COMMA && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.comma = false;
+    g_keyboard_input_status.comma = false;
   }
   if (key == GLFW_KEY_PERIOD && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.period = true;
+    g_keyboard_input_status.period = true;
   } else if (key == GLFW_KEY_PERIOD && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.period = false;
+    g_keyboard_input_status.period = false;
   }
   if (key == GLFW_KEY_SLASH && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.forwardSlash = true;
+    g_keyboard_input_status.forwardSlash = true;
   } else if (key == GLFW_KEY_SLASH && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.forwardSlash = false;
+    g_keyboard_input_status.forwardSlash = false;
   }
   // printscreen-etc
   if (key == GLFW_KEY_PRINT_SCREEN && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.printScreen = true;
+    g_keyboard_input_status.printScreen = true;
   } else if (key == GLFW_KEY_PRINT_SCREEN && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.printScreen = false;
+    g_keyboard_input_status.printScreen = false;
   }
   if (key == GLFW_KEY_SCROLL_LOCK && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.scrollLock = true;
+    g_keyboard_input_status.scrollLock = true;
   } else if (key == GLFW_KEY_SCROLL_LOCK && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.scrollLock = false;
+    g_keyboard_input_status.scrollLock = false;
   }
   if (key == GLFW_KEY_PAUSE && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.pauseBreak = true;
+    g_keyboard_input_status.pauseBreak = true;
   } else if (key == GLFW_KEY_PAUSE && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.pauseBreak = false;
+    g_keyboard_input_status.pauseBreak = false;
   }
   if (key == GLFW_KEY_INSERT && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.insert = true;
+    g_keyboard_input_status.insert = true;
   } else if (key == GLFW_KEY_INSERT && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.insert = false;
+    g_keyboard_input_status.insert = false;
   }
   if (key == GLFW_KEY_DELETE && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.del = true;
+    g_keyboard_input_status.del = true;
   } else if (key == GLFW_KEY_DELETE && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.del = false;
+    g_keyboard_input_status.del = false;
   }
   if (key == GLFW_KEY_HOME && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.home = true;
+    g_keyboard_input_status.home = true;
   } else if (key == GLFW_KEY_HOME && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.home = false;
+    g_keyboard_input_status.home = false;
   }
   if (key == GLFW_KEY_END && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.end = true;
+    g_keyboard_input_status.end = true;
   } else if (key == GLFW_KEY_END && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.end = false;
+    g_keyboard_input_status.end = false;
   }
   if (key == GLFW_KEY_PAGE_UP && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.pageUp = true;
+    g_keyboard_input_status.pageUp = true;
   } else if (key == GLFW_KEY_PAGE_UP && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.pageUp = false;
+    g_keyboard_input_status.pageUp = false;
   }
   if (key == GLFW_KEY_PAGE_DOWN && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.pageDown = true;
+    g_keyboard_input_status.pageDown = true;
   } else if (key == GLFW_KEY_PAGE_DOWN && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.pageDown = false;
+    g_keyboard_input_status.pageDown = false;
   }
   // arrows
   if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.upArrow = true;
+    g_keyboard_input_status.upArrow = true;
   } else if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.upArrow = false;
+    g_keyboard_input_status.upArrow = false;
   }
   if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.downArrow = true;
+    g_keyboard_input_status.downArrow = true;
   } else if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.downArrow = false;
+    g_keyboard_input_status.downArrow = false;
   }
   if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.leftArrow = true;
+    g_keyboard_input_status.leftArrow = true;
   } else if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.leftArrow = false;
+    g_keyboard_input_status.leftArrow = false;
   }
   if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-    extern_KeyboardInputReciever.rightArrow = true;
+    g_keyboard_input_status.rightArrow = true;
   } else if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
-    extern_KeyboardInputReciever.rightArrow = false;
+    g_keyboard_input_status.rightArrow = false;
   }
-  extern_NewKeyReads = true;
+  g_new_key_reads = true;
 }
 
 void MOUSEBUTTONCALLBACK(GLFWwindow* w, int button, int action, int mods) {
   // mouse clicks
   if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-    extern_MouseButtonReciever.mouseButton1 = true;
+    g_mouse_button_status.mouseButton1 = true;
   } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-    extern_MouseButtonReciever.mouseButton1 = false;
+    g_mouse_button_status.mouseButton1 = false;
   }
   if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-    extern_MouseButtonReciever.mouseButton2 = true;
+    g_mouse_button_status.mouseButton2 = true;
   } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
-    extern_MouseButtonReciever.mouseButton2 = false;
+    g_mouse_button_status.mouseButton2 = false;
   }
   if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
-    extern_MouseButtonReciever.mouseButton3 = true;
+    g_mouse_button_status.mouseButton3 = true;
   } else if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE) {
-    extern_MouseButtonReciever.mouseButton3 = false;
+    g_mouse_button_status.mouseButton3 = false;
   }
   if (button == GLFW_MOUSE_BUTTON_4 && action == GLFW_PRESS) {
-    extern_MouseButtonReciever.mouseButton4 = true;
+    g_mouse_button_status.mouseButton4 = true;
   } else if (button == GLFW_MOUSE_BUTTON_4 && action == GLFW_RELEASE) {
-    extern_MouseButtonReciever.mouseButton4 = false;
+    g_mouse_button_status.mouseButton4 = false;
   }
   if (button == GLFW_MOUSE_BUTTON_5 && action == GLFW_PRESS) {
-    extern_MouseButtonReciever.mousebutton5 = true;
+    g_mouse_button_status.mousebutton5 = true;
   } else if (button == GLFW_MOUSE_BUTTON_5 && action == GLFW_RELEASE) {
-    extern_MouseButtonReciever.mousebutton5 = false;
+    g_mouse_button_status.mousebutton5 = false;
   }
   if (button == GLFW_MOUSE_BUTTON_6 && action == GLFW_PRESS) {
-    extern_MouseButtonReciever.mouseButton6 = true;
+    g_mouse_button_status.mouseButton6 = true;
   } else if (button == GLFW_MOUSE_BUTTON_6 && action == GLFW_RELEASE) {
-    extern_MouseButtonReciever.mouseButton6 = false;
+    g_mouse_button_status.mouseButton6 = false;
   }
   if (button == GLFW_MOUSE_BUTTON_7 && action == GLFW_PRESS) {
-    extern_MouseButtonReciever.mousebutton7 = true;
+    g_mouse_button_status.mousebutton7 = true;
   } else if (button == GLFW_MOUSE_BUTTON_7 && action == GLFW_RELEASE) {
-    extern_MouseButtonReciever.mousebutton7 = false;
+    g_mouse_button_status.mousebutton7 = false;
   }
   if (button == GLFW_MOUSE_BUTTON_8 && action == GLFW_PRESS) {
-    extern_MouseButtonReciever.mouseButton8 = true;
+    g_mouse_button_status.mouseButton8 = true;
   } else if (button == GLFW_MOUSE_BUTTON_8 && action == GLFW_RELEASE) {
-    extern_MouseButtonReciever.mouseButton8 = false;
+    g_mouse_button_status.mouseButton8 = false;
   }
-  extern_NewKeyReads = true;
+  g_new_key_reads = true;
 }
 
 /*    

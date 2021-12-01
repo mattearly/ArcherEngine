@@ -45,7 +45,7 @@ void AnimProp::SetAnimator(std::shared_ptr<Animation> anim) {
 
 void AnimProp::Draw(const std::shared_ptr<Camera>& cam) {
   OGLShader* shader = nullptr;
-  shader = DefaultShaders::get_phong_3d();
+  shader = DefaultShaders::get_ubershader();
   shader->Use();
   shader->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
   shader->SetMat4("u_view_matrix", cam->mViewMatrix);
