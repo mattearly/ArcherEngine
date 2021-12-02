@@ -1,14 +1,9 @@
 #pragma once
-#include "../Renderer/MeshInfo.h"
 #include "../Base/UniqueInstance.h"
-#include "../Scene/Camera.h"
-#include <glm\gtx\transform.hpp>
-#include <glm\gtx\quaternion.hpp>
-#include <PxRigidDynamic.h>
-#include <vector>
-#include <memory>
-#include <string>
 #include "Spacial3D.h"
+#include "../Renderer/MeshInfo.h"
+#include <vector>
+#include <string>
 
 namespace AA {
 
@@ -20,14 +15,12 @@ public:
   Prop();
   Prop(const char* path);
 
-  virtual void Draw(const std::shared_ptr<Camera>& cam);
+  virtual void Draw();
 
   virtual void RemoveCache();
   virtual void Load(const std::string& path);
 
 protected:
-
-  bool mLit;
 
   Spacial3D spacial_data;
 

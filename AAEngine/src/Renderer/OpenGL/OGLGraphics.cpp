@@ -148,7 +148,7 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<LitVertex>& verts, cons
 /// <param name="verts">vertices to upload</param>
 /// <param name="elems">relevant indicies</param>
 /// <returns>the VAO</returns>
-GLuint OGLGraphics::Upload3DMesh(const std::vector<TanVertex>& verts, const std::vector<GLuint>& elems) {
+GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<TanVertex>& verts, const std::vector<GLuint>& elems) {
   bool use_43 = false;
   if (use_43) {
     // 4.3
@@ -243,7 +243,7 @@ GLuint OGLGraphics::Upload3DMesh(const std::vector<TanVertex>& verts, const std:
 /// <param name="verts">vertices to upload</param>
 /// <param name="elems">relevant indicies</param>
 /// <returns>the VAO</returns>
-GLuint OGLGraphics::Upload3DMesh(const std::vector<AnimVertex>& verts, const std::vector<GLuint>& elems) {
+GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<AnimVertex>& verts, const std::vector<GLuint>& elems) {
     GLuint VAO, VBO, EBO;
     glGenBuffers(1, &VBO);
 

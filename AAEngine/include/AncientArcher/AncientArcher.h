@@ -206,10 +206,9 @@ public:
   /// Adds a Prop.
   /// </summary>
   /// <param name="path">literal path to the resource</param>
-  /// <param name="lit">optional: use lit shader? true if not specified</param>
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <returns>id of the prop</returns>
-  unsigned int AddProp(const char* path, bool lit = true, glm::vec3 location = glm::vec3(0));
+  unsigned int AddProp(const char* path, glm::vec3 location = glm::vec3(0));
 
   /// <summary>
   /// Moves a prop to a location
@@ -237,10 +236,9 @@ public:
   /// Assumes Bones and Animations are included in the file.
   /// </summary>
   /// <param name="path">literal path</param>
-  /// <param name="lit">optional: use lit shader? true if not specified</param>
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <returns>id of the animated prop</returns>
-  unsigned int AddAnimProp(const char* path, bool lit = true, glm::vec3 starting_location = glm::vec3(0));
+  unsigned int AddAnimProp(const char* path, glm::vec3 starting_location = glm::vec3(0));
 
   /// <summary>
   /// Moves a animated prop to a location

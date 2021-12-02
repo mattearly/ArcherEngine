@@ -19,7 +19,7 @@ void setmodels() {
     const int plane_stride = 400;
     for (int i = -plane_stride * half_repeat; i < plane_stride * half_repeat * 2; i += plane_stride) {
       for (int j = -plane_stride * half_repeat; j < plane_stride * half_repeat * 2; j += plane_stride) {
-        int large_green_plane = instance.AddProp("res/large_green_plane.obj", true, glm::vec3(i, -99, j));
+        int large_green_plane = instance.AddProp("res/large_green_plane.obj", glm::vec3(i, -99, j));
       }
     }
   }
@@ -34,7 +34,7 @@ void setmodels() {
     static int v = 0;
 
     static const char* model_path = "E:\\AssetPack\\paladin_j_nordstrom.fbx";
-    static unsigned int model_id = instance.AddAnimProp(model_path, true, base_loc);
+    static unsigned int model_id = instance.AddAnimProp(model_path, base_loc);
 
     static const char* anim_path1 = "E:\\AssetPack\\Mma Kick.fbx";
     static unsigned int anim_id1 = instance.AddAnimation(anim_path1, model_id);

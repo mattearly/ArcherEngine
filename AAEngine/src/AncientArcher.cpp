@@ -136,7 +136,6 @@ void AncientArcher::SetCamMaxRenderDistance(int camId, float amt) {
         amt = abs(amt);
       cam->MaxRenderDistance = amt;
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       return;
     }
   }
@@ -148,9 +147,6 @@ void AncientArcher::SetCamToPerspective(int camId) {
     if (cam->GetUID() == camId) {
       cam->mProjectionType = ProjectionType::PERSPECTIVE;
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      cam->updateViewMatrix();
-      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -162,9 +158,6 @@ void AncientArcher::SetCamToOrtho_testing(int camId) {
     if (cam->GetUID() == camId) {
       cam->mProjectionType = ProjectionType::ORTHO;
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      cam->updateViewMatrix();
-      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
     }
   }
   throw("cam id doesn't exist or is invalid");
@@ -179,7 +172,6 @@ void AncientArcher::SetCamFOV(int camId, float new_fov) {
       if (new_fov > 360.f) new_fov = 360.f;
       cam->FOV = abs(new_fov);
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
       return;
     }
   }
@@ -190,7 +182,6 @@ void AncientArcher::SetCamDimensions_testing(int camId, int w, int h) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-      DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
     }
   }
   throw("cam id doesn't exist or is invalid");
@@ -201,7 +192,6 @@ void AncientArcher::SetCamPosition(int camId, glm::vec3 new_loc) {
     if (cam->GetUID() == camId) {
       cam->Position = new_loc;
       cam->updateCameraVectors();
-      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -217,7 +207,6 @@ void AncientArcher::SetCamPitch(int camId, float new_pitch_degrees) {
         new_pitch_degrees = -89.9f;
       cam->Pitch = new_pitch_degrees;
       cam->updateCameraVectors();
-      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -233,7 +222,6 @@ void AncientArcher::SetCamYaw(int camId, float new_yaw_degrees) {
         new_yaw_degrees += 360.f;
       cam->Yaw = new_yaw_degrees;
       cam->updateCameraVectors();
-      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -245,7 +233,6 @@ void AncientArcher::ShiftCamPosition(int camId, glm::vec3 offset) {
     if (cam->GetUID() == camId) {
       cam->Position += offset;
       cam->updateCameraVectors();
-      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -270,7 +257,6 @@ void AncientArcher::ShiftCamPitchAndYaw(int camId, double pitch_offset_degrees, 
       cam->Yaw = static_cast<float>(new_yaw_degrees);
 
       cam->updateCameraVectors();
-      DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", cam->mViewMatrix);
       return;
     }
   }
@@ -349,9 +335,8 @@ glm::mat4 AncientArcher::GetViewMatrix(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-unsigned int AncientArcher::AddProp(const char* path, bool lit, glm::vec3 location) {
+unsigned int AncientArcher::AddProp(const char* path, glm::vec3 location) {
   mProps.emplace_back(std::make_shared<Prop>(path));
-  mProps.back()->mLit = lit;
   mProps.back()->spacial_data.MoveTo(location);
   return mProps.back()->GetUID();
 }
@@ -383,9 +368,8 @@ void AncientArcher::RotateProp(const unsigned int id, glm::vec3 rot) {
   throw("prop id doesn't exist or is invalid");
 }
 
-unsigned int AncientArcher::AddAnimProp(const char* path, bool lit, glm::vec3 starting_location) {
+unsigned int AncientArcher::AddAnimProp(const char* path, glm::vec3 starting_location) {
   mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
-  mAnimProps.back()->mLit = lit;
   mAnimProps.back()->spacial_data.MoveTo(starting_location);
 #ifdef _DEBUG
   std::cout << "loaded: " << path << ", id: " << mAnimProps.back()->GetUID() << std::endl;
@@ -457,19 +441,18 @@ bool AncientArcher::RemoveAnimation(const unsigned int animation_id) {
 void AncientArcher::SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id) {
   // this is terribly inefficient, but it should work
   for (auto& animprop : mAnimProps) {
-    if (animprop->GetUID() == animprop_id) {
-      // animated prop exists
+    if (animprop->GetUID() == animprop_id) { // animated prop exists
       if (animation_id == -1) { // -1 means reset
         if (animprop->mAnimator) {
           animprop->mAnimator.reset();
         }
         return;  // done
-      }
-      for (auto& animation : mAnimation) {
-        if (animation->GetUID() == animation_id) {
-          // animation exists
-          animprop->SetAnimator(animation);
-          return;
+      } else {  // not trying to reset
+        for (auto& animation : mAnimation) {
+          if (animation->GetUID() == animation_id) { // animation exists
+            animprop->SetAnimator(animation);
+            return;
+          }
         }
       }
     }
@@ -1223,24 +1206,9 @@ void AncientArcher::update() {
 
   // run through every frame update
   for (auto& oDU : onUpdate) { oDU.second(elapsedTime); }
-
-  if (!mCameras.empty()) {
-    if (g_os_window_resized) {
-      int width(mWindow->GetCurrentWidth()), height(mWindow->GetCurrentHeight());
-      for (auto& cam : mCameras) {
-        cam->updateProjectionMatrix(width, height);
-      }
-      g_os_window_resized = false;
-    }
-    DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", mCameras.front()->mProjectionMatrix);
-    DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", mCameras.front()->mViewMatrix);
-  }
-
-  for (auto& p : mProps) {
+  for (auto& p : mProps)
     if (p->spacial_data.modified)
       p->spacial_data.ProcessModifications();
-  }
-
   for (auto& ap : mAnimProps) {
     if (ap->spacial_data.modified)
       ap->spacial_data.ProcessModifications();
@@ -1274,27 +1242,39 @@ void AncientArcher::update() {
 
 // Renders visable props every frame
 void AncientArcher::render() {
+  // Pre-render
+  if (g_os_window_resized) {
+    for (auto& cam : mCameras) {
+      cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
+    }
+    g_os_window_resized = false;
+  }
+
+  for (auto& cam : mCameras) {
+    cam->shaderTick();
+  }
+
   mWindow->clear_screen();
 
   OGLGraphics::SetDepthTest(true);
   OGLGraphics::SetDepthMode(GL_LESS);
 
-  // todo(matt): better way to handle cams 
+  OGLShader* shader = DefaultShaders::get_ubershader();
+
   if (!mCameras.empty()) {
-    DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
     for (auto& p : mProps) {
-      p->Draw(mCameras.front());
+      p->Draw();
     }
     for (auto& ap : mAnimProps) {
-      DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
+      shader->SetBool("isAnimating", false);
       if (ap->mAnimator) {
-        DefaultShaders::get_ubershader()->SetBool("isAnimating", true);
+        shader->SetBool("isAnimating", true);
         auto transforms = ap->mAnimator->GetFinalBoneMatrices();
         for (unsigned int i = 0; i < transforms.size(); ++i) {
-          DefaultShaders::get_ubershader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+          shader->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
         }
       }
-      ap->Draw(mCameras.front());
+      ap->Draw();
     }
     if (mSkybox) {
       mSkybox->Render(mCameras.front());
@@ -1305,7 +1285,6 @@ void AncientArcher::render() {
     std::cout << "0 cameras, skybox and props wont show\n";
   }
 #endif
-
 
   OGLGraphics::SetDepthTest(false);
 

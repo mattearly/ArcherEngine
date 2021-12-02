@@ -1,17 +1,10 @@
 #pragma once
 #include "Prop.h"
 #include "Animator.h"
-#include "../Renderer/MeshInfo.h"
-#include "../Base/UniqueInstance.h"
-#include "../Scene/Camera.h"
-#include <glm\gtx\transform.hpp>
-#include <glm\gtx\quaternion.hpp>
-#include <PxRigidDynamic.h>
+#include "Skeleton.h"
 #include <vector>
 #include <memory>
 #include <string>
-#include <map>
-#include "Skeleton.h"
 
 namespace AA {
 
@@ -27,7 +20,7 @@ public:
 
   virtual void RemoveCache() override;
   virtual void Load(const std::string& path) override;
-  virtual void Draw(const std::shared_ptr<Camera>& cam) override;
+  virtual void Draw() override;
 
   void UpdateAnim(float dt);
 
