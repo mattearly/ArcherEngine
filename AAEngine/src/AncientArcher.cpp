@@ -1212,11 +1212,13 @@ void AncientArcher::update() {
   for (auto& oDU : onUpdate) {
     oDU.second(elapsedTime);
   }
+
   for (auto& p : mProps) {
     if (p->spacial_data.modified) {
       p->spacial_data.ProcessModifications();
     }
   }
+
   for (auto& ap : mAnimProps) {
     if (ap->spacial_data.modified) {
       ap->spacial_data.ProcessModifications();
@@ -1233,7 +1235,7 @@ void AncientArcher::update() {
   if (mMusic) {
     static float music_rebuffer_cd = 0;
     music_rebuffer_cd += elapsedTime;
-    if (music_rebuffer_cd > .5f) {  // todo(maybe): math with file size and stuff to figure out how long this cd should actually be
+    if (music_rebuffer_cd > .5f) {  // todo: math with file size and stuff to figure out how long this cd should actually be
       mMusic->UpdatePlayBuffer();
       music_rebuffer_cd = 0;
     }

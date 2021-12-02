@@ -59,9 +59,7 @@ void main(){
   }
   mat4 viewMatrix = u_view_matrix * u_model_matrix;
   gl_Position = u_projection_matrix * viewMatrix * totalPosition;
-}
-
-)";
+})";
 
   const std::string UBERSHADER_FRAG_CODE = R"(
 #version 430 core
@@ -227,21 +225,16 @@ void main()
   }
   vec3 view_dir = normalize(u_view_pos - pass_Pos);
   vec3 result;
-  if (isDirectionalLightOn > 0)
-    result += CalcDirectionalLight(normal, view_dir);
+  if (isDirectionalLightOn > 0) { result += CalcDirectionalLight(normal, view_dir); }
   int i = 0;
-  for (i; i < NUM_POINT_LIGHTS; i++)
-    result += CalcPointLight(pointLight[i], normal, view_dir);
-  for (i = 0; i < NUM_SPOT_LIGHTS; i++)
-    result += CalcSpotLight(spotLight[i], normal, view_dir);
+  for (i; i < NUM_POINT_LIGHTS; i++) { result += CalcPointLight(pointLight[i], normal, view_dir); }
+  for (i = 0; i < NUM_SPOT_LIGHTS; i++) { result += CalcSpotLight(spotLight[i], normal, view_dir); }
   if (hasEmission > 0) {
     vec3 emission = texture(material.Emission, pass_TexUV).rgb;
     result += emission;
   }
   out_Color = vec4(result, 1.0);
-}
-
-)";
+})";
 
   UBERSHADER = new OGLShader(UBERSHADER_VERT_CODE.c_str(), UBERSHADER_FRAG_CODE.c_str());
 }
