@@ -20,7 +20,6 @@ public:
 
   virtual void RemoveCache() override;
   virtual void Load(const std::string& path) override;
-  virtual void Draw() override;
 
   void UpdateAnim(float dt);
 
