@@ -24,8 +24,10 @@ public:
   void updateCameraVectors();
   void updateProjectionMatrix(int width, int height);
   void updateViewMatrix();
-  void changeProjection(ProjectionType new_type);
+  virtual void shaderTick();
 private:
   void resetViewportVars();
+  bool mViewChanged;
+  bool mProjectionChanged;
 };
 } // end namespace AA

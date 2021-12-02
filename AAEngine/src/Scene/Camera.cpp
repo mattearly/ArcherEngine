@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "../DefaultShaders.h"
 #include <glm\ext\matrix_clip_space.hpp>
 #include <glm\gtx\transform.hpp>
 namespace AA {
@@ -62,16 +63,24 @@ void Camera::updateProjectionMatrix(int width, int height) {
   default:
     break;
   }
+  mProjectionChanged = true;
 }
 
 // update cached view matrix
 // you need to update the shader somewhere else
 void Camera::updateViewMatrix() {
   mViewMatrix = glm::lookAt(Position, Position + Front, Up);
+  mViewChanged = true;
 }
 
-void Camera::changeProjection(ProjectionType choice) {
-  mProjectionType = choice;
+void Camera::shaderTick() {
+  if (mProjectionChanged) {
+    DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", mProjectionMatrix);
+  }
+  if (mViewChanged) {
+    DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", mViewMatrix);
+  }
+  mProjectionChanged = mViewChanged = false;
 }
 
 }  // end namespace AA
