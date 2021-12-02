@@ -24,6 +24,21 @@ void setmodels() {
     }
   }
 
+
+  /// <summary>
+  /// Places a wall of neon cubes
+  /// </summary>
+  {
+    const int scale = 10;
+    const int tall = 4;
+    const int length = 4;
+    for (int i = 0; i < tall; i++) {
+      for (int j = 0; j < length; j++) {
+        instance.AddProp("res/neon_cube.glb", glm::vec3(i*scale*2, -99 + j*scale*2, 0), glm::vec3(scale));
+      }
+    }
+  }
+
   /// <summary>
   /// Animated Model Test
   /// </summary>
