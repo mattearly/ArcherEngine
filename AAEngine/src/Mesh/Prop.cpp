@@ -48,8 +48,8 @@ void Prop::Draw() {
       }
 
       if (texType == "Emission") {
-        shader->SetInt("hasEmission", 1);
-        OGLGraphics::SetTexture(4, texture.first);
+        shader->SetInt("hasEmission", true);
+        OGLGraphics::SetTexture(3, texture.first);
         shader->SetInt(("material." + texType).c_str(), 3);
       }
     }
