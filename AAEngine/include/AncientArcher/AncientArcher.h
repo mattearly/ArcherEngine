@@ -209,8 +209,9 @@ public:
   /// </summary>
   /// <param name="path">literal path to the resource</param>
   /// <param name="location">optional: starting location, default = 0,0,0</param>
+  /// <param name="scale">optional: starting size, default = 1,1,1</param>
   /// <returns>id of the prop</returns>
-  unsigned int AddProp(const char* path, glm::vec3 location = glm::vec3(0));
+  unsigned int AddProp(const char* path, glm::vec3 location = glm::vec3(0), glm::vec3 scale = glm::vec3(1));
 
   /// <summary>
   /// Moves a prop to a location

@@ -339,9 +339,10 @@ glm::mat4 AncientArcher::GetViewMatrix(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-unsigned int AncientArcher::AddProp(const char* path, glm::vec3 location) {
+unsigned int AncientArcher::AddProp(const char* path, glm::vec3 location, glm::vec3 scale) {
   mProps.emplace_back(std::make_shared<Prop>(path));
   mProps.back()->spacial_data.MoveTo(location);
+  mProps.back()->spacial_data.ScaleTo(scale);
   return mProps.back()->GetUID();
 }
 
