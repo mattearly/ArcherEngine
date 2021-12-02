@@ -1272,6 +1272,7 @@ void AncientArcher::render() {
   OGLShader* shader = DefaultShaders::get_ubershader();
 
   if (!mCameras.empty()) {
+    shader->SetBool("isAnimating", false);
     for (auto& p : mProps) {
       p->Draw();
     }
