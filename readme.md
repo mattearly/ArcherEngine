@@ -2,7 +2,6 @@
 
 AncientArcher is a C++ library for game development and simulations.
 
-[front end docs here](https://mattearly.github.io/AncientArcher/index.html)
 ## Project
  
  - AAEngine
@@ -21,6 +20,11 @@ AncientArcher is a C++ library for game development and simulations.
     - Phong GLSL Shaders
     - Cubemap Skyboxes
     - 3D Sound
+
+## Documentation
+
+  - Generate via [Doxygen](https://www.doxygen.nl/index.html)
+  - See header [AncientArcher.h](AAEngine/include/AncientArcher/AncientArcher.h)
 
 ## Compile
 
