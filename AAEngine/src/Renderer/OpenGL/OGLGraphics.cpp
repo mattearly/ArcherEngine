@@ -47,7 +47,7 @@ void OGLGraphics::ClearScreen() noexcept {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-GLuint OGLGraphics::Upload3DMesh(const std::vector<LitVertex>& verts, const std::vector<GLuint>& elems) {
+GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<LitVertex>& verts, const std::vector<GLuint>& elems) {
   bool use_43 = false;
   if (use_43) {
     // 4.3

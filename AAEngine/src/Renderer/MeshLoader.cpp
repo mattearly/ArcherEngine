@@ -169,7 +169,7 @@ MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x
 
   // Step3: Send the vertex data to the graphic memory
   unsigned int vao = 0;
-  vao = OGLGraphics::Upload3DMesh(loaded_vertices, loaded_elements);
+  vao = OGLGraphics::UploadStatic3DMesh(loaded_vertices, loaded_elements);
 
   // Step4: Return this draw data to the user
   return MeshInfo(

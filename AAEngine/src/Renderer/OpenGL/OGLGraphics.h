@@ -16,9 +16,9 @@ public:
   static void SetViewportSize(int x, int y, int w, int h);
   static void SetViewportClearColor(glm::vec3 color) noexcept;
   static void ClearScreen() noexcept;
-  static GLuint Upload3DMesh(const std::vector<LitVertex>& verts, const std::vector<GLuint>& elems);
-  static GLuint Upload3DMesh(const std::vector<TanVertex>& verts, const std::vector<GLuint>& elems);
-  static GLuint Upload3DMesh(const std::vector<AnimVertex>& verts, const std::vector<GLuint>& elems);
+  static GLuint UploadStatic3DMesh(const std::vector<LitVertex>& verts, const std::vector<GLuint>& elems);
+  static GLuint UploadStatic3DMesh(const std::vector<TanVertex>& verts, const std::vector<GLuint>& elems);
+  static GLuint UploadStatic3DMesh(const std::vector<AnimVertex>& verts, const std::vector<GLuint>& elems);
   static GLuint Upload3DPositionsMesh(const float* points, const int num_points, const GLuint* indices, const int ind_count);
   static GLuint Upload2DVerts(const std::vector<glm::vec2>& points);
   static void DeleteMesh(const GLuint& VAO);
