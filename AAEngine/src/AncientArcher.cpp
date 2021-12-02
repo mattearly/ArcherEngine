@@ -58,7 +58,7 @@ bool AncientArcher::Init() {
 }
 
 // Runs the Engine cycle of core routines
-// return: 0 on exit success, -4 on engine not initialized
+// return: 0 on exit success, -4 on engine not initialized, -5 if no window
 // can throw in an extension or user function
 int AncientArcher::Run() {
   if (!isInit) {
@@ -104,6 +104,10 @@ void AncientArcher::SoftReset() noexcept {
 
 // Camera
 unsigned int AncientArcher::AddCamera(const int w, const int h) {
+  if (mCameras.size() > 0) {
+    throw("already has a camera, only one cam supported in this version");
+  }
+
   mCameras.emplace_back(std::move(std::make_shared<Camera>((w < 0) ? 0 : w, (h < 0) ? 0 : h)));
   return mCameras.back()->GetUID();
 }
@@ -1204,16 +1208,21 @@ void AncientArcher::update() {
   elapsedTime = currTime - lastTime;
   lastTime = currTime;
 
-  // run through every frame update
-  for (auto& oDU : onUpdate) { oDU.second(elapsedTime); }
-  for (auto& p : mProps)
-    if (p->spacial_data.modified)
+  for (auto& oDU : onUpdate) {
+    oDU.second(elapsedTime);
+  }
+  for (auto& p : mProps) {
+    if (p->spacial_data.modified) {
       p->spacial_data.ProcessModifications();
+    }
+  }
   for (auto& ap : mAnimProps) {
-    if (ap->spacial_data.modified)
+    if (ap->spacial_data.modified) {
       ap->spacial_data.ProcessModifications();
-    if (ap->mAnimator)
+    }
+    if (ap->mAnimator) {
       ap->UpdateAnim(elapsedTime);
+    }
   }
 
   if (mSimulateWorldPhysics) {
