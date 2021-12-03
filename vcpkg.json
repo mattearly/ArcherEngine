@@ -8,7 +8,10 @@
 		"glad",
 		"openal-soft",
 		"libsndfile",
-		"imgui",
+		{
+			"name": "imgui",
+			"features": [ "glfw-binding", "opengl3-binding" ]
+		},
 		"physx",
 		"stb"
 	]

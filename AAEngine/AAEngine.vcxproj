@@ -133,8 +133,6 @@
     <ClInclude Include="src\Utility\Conversions.h" />
     <ClInclude Include="src\Base\UniqueInstance.h" />
     <ClInclude Include="src\OS\OpenGL\QueryShader.h" />
-    <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h" />
-    <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Mesh\Skeleton.cpp" />
@@ -169,8 +167,6 @@
     <ClCompile Include="src\OS\OpenGL\OGLGraphics.cpp" />
     <ClCompile Include="src\OS\OpenGL\OGLShader.cpp" />
     <ClCompile Include="src\Utility\rand.cpp" />
-    <ClCompile Include="src\vendor\imgui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="src\vendor\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\OS\Vertex.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
