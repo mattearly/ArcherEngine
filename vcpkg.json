@@ -9,6 +9,7 @@
 		"openal-soft",
 		"libsndfile",
 		"imgui",
-		"physx"
+		"physx",
+		"stb"
 	]
 }

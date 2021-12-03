@@ -149,9 +149,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\vendor\stb\stb_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Sound\SoundDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

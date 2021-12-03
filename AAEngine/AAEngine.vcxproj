@@ -171,7 +171,6 @@
     <ClCompile Include="src\Utility\rand.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="src\vendor\stb\stb_image.cpp" />
     <ClCompile Include="src\OS\Vertex.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
