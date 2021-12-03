@@ -1,7 +1,6 @@
 #pragma once
 #include "AncientArcher/AncientArcher.h"
 extern AA::AncientArcher instance;
-
 void setfullscreentoggle() {
   static float full_screen_toggle_timer = 0.f;
   instance.AddToKeyHandling([](AA::KeyboardButtons& kb) {
@@ -12,10 +11,7 @@ void setfullscreentoggle() {
       full_screen_toggle_timer = 0.f;  // reset timer on activation
     }
   });
-  
   instance.AddToUpdate([](float dt){
     full_screen_toggle_timer += dt;  // fullscreen timer
   });
-
-
 }

@@ -1,6 +1,6 @@
 #pragma once
-#include "../Renderer/OpenGL/OGLShader.h"
-#include "../Renderer/MeshInfo.h"
+#include "../OS/OpenGL/OGLShader.h"
+#include "../OS/MeshInfo.h"
 #include "Camera.h"
 #include <vector>
 #include <string>

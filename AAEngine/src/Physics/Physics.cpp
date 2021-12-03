@@ -3,14 +3,13 @@
 namespace AA {
 
 // helper function
-void SetupDefaultRigidDynamic(PxRigidDynamic& body, bool kinematic=false)
-{
+void SetupDefaultRigidDynamic(PxRigidDynamic& body, bool kinematic = false) {
   body.setActorFlag(PxActorFlag::eVISUALIZATION, true);
   body.setAngularDamping(0.5f);
   body.setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, kinematic);
 }
 
-void Physics::addPhysicsActors(PxRigidActor* actor) { 
+void Physics::addPhysicsActors(PxRigidActor* actor) {
   mPhysicsActors.push_back(actor);
 }
 
@@ -37,7 +36,7 @@ PxRigidDynamic* Physics::CreateBox(const PxVec3& pos, const PxVec3& dims, const 
   mScene->addActor(*box);
   addPhysicsActors(box);
 
-  if(linVel)
+  if (linVel)
     box->setLinearVelocity(*linVel);
 
   //createRenderObjectsFromActor(box, material);
@@ -54,7 +53,7 @@ PxRigidDynamic* Physics::CreateSphere(const PxVec3& pos, PxReal radius, const Px
   mScene->addActor(*sphere);
   addPhysicsActors(sphere);
 
-  if(linVel)
+  if (linVel)
     sphere->setLinearVelocity(*linVel);
 
   //createRenderObjectsFromActor(sphere, material);
@@ -74,7 +73,7 @@ PxRigidDynamic* Physics::CreateCapsule(const PxVec3& pos, PxReal radius, PxReal 
   mScene->addActor(*capsule);
   addPhysicsActors(capsule);
 
-  if(linVel)
+  if (linVel)
     capsule->setLinearVelocity(*linVel);
 
   //createRenderObjectsFromActor(capsule, material);
@@ -120,8 +119,7 @@ Physics::Physics() {
 
 void Physics::removeActor(PxRigidActor* actor) {
   std::vector<PxRigidActor*>::iterator actorIter = std::find(mPhysicsActors.begin(), mPhysicsActors.end(), actor);
-  if(actorIter != mPhysicsActors.end())
-  {
+  if (actorIter != mPhysicsActors.end()) {
     mPhysicsActors.erase(actorIter);
     actor->release();
   }

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "Renderer/OpenGL/OGLShader.h"
+#include "OS/OpenGL/OGLShader.h"
 
 namespace AA {
 

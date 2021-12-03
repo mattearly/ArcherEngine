@@ -12,7 +12,7 @@
 #include "Bone.h"
 #include "AnimProp.h"
 #include "../Utility/Conversions.h"
-#include "../Renderer/Vertex.h"
+#include "../OS/Vertex.h"
 #include "../Base/UniqueInstance.h"
 #include "Skeleton.h"
 

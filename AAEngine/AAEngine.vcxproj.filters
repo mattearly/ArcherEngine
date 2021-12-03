@@ -42,28 +42,28 @@
     <ClInclude Include="include\AncientArcher\AncientArcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\OpenGL\OGLGraphics.h">
+    <ClInclude Include="src\OS\OpenGL\OGLGraphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\OpenGL\OGLShader.h">
+    <ClInclude Include="src\OS\OpenGL\OGLShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\MeshInfo.h">
+    <ClInclude Include="src\OS\MeshInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AncientArcher\Utility\SceneCheck.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\Vertex.h">
+    <ClInclude Include="src\OS\Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Lights.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\TextureInfo.h">
+    <ClInclude Include="src\OS\TextureInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\MeshLoader.h">
+    <ClInclude Include="src\OS\MeshLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AncientArcher\Utility\Files.h">
@@ -87,10 +87,10 @@
     <ClInclude Include="src\GUI\PlainGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\TextureLoader.h">
+    <ClInclude Include="src\OS\TextureLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\OpenGL\QueryShader.h">
+    <ClInclude Include="src\OS\OpenGL\QueryShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h">
@@ -105,13 +105,13 @@
     <ClInclude Include="src\Scene\Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\LoadCube.h">
+    <ClInclude Include="src\OS\LoadCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DefaultShaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\LoadPlane.h">
+    <ClInclude Include="src\OS\LoadPlane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AncientArcher\Utility\rand.h">
@@ -123,7 +123,7 @@
     <ClInclude Include="src\Mesh\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\OSInterface\Window.h">
+    <ClInclude Include="src\OS\Interface\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AncientArcher\Controls\Input.h">
@@ -132,7 +132,7 @@
     <ClInclude Include="src\Mesh\AnimProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\AnimMeshLoader.h">
+    <ClInclude Include="src\OS\AnimMeshLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Mesh\Animator.h">
@@ -173,16 +173,16 @@
     <ClCompile Include="src\AncientArcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\OGLGraphics.cpp">
+    <ClCompile Include="src\OS\OpenGL\OGLGraphics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\OGLShader.cpp">
+    <ClCompile Include="src\OS\OpenGL\OGLShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\MeshInfo.cpp">
+    <ClCompile Include="src\OS\MeshInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Vertex.cpp">
+    <ClCompile Include="src\OS\Vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\Lights.cpp">
@@ -197,10 +197,10 @@
     <ClCompile Include="src\GUI\PlainGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\MeshLoader.cpp">
+    <ClCompile Include="src\OS\MeshLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\TextureLoader.cpp">
+    <ClCompile Include="src\OS\TextureLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\vendor\imgui\imgui_impl_glfw.cpp">
@@ -215,10 +215,10 @@
     <ClCompile Include="src\Scene\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\LoadCube.cpp">
+    <ClCompile Include="src\OS\LoadCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\LoadPlane.cpp">
+    <ClCompile Include="src\OS\LoadPlane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utility\rand.cpp">
@@ -230,10 +230,10 @@
     <ClCompile Include="src\Mesh\Animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OSInterface\Callbacks.cpp">
+    <ClCompile Include="src\OS\Interface\Callbacks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OSInterface\Window.cpp">
+    <ClCompile Include="src\OS\Interface\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DefaultShaders.cpp">
@@ -242,7 +242,7 @@
     <ClCompile Include="src\Mesh\AnimProp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\AnimMeshLoader.cpp">
+    <ClCompile Include="src\OS\AnimMeshLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Mesh\Animator.cpp">

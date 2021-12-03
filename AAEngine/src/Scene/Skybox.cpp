@@ -1,8 +1,8 @@
 #include "Skybox.h"
 #include "../../include/AncientArcher/Utility/Files.h"
-#include "../Renderer/OpenGL/OGLGraphics.h"
-#include "../Renderer/LoadCube.h"
-#include "../Renderer/TextureLoader.h"
+#include "../OS/OpenGL/OGLGraphics.h"
+#include "../OS/LoadCube.h"
+#include "../OS/TextureLoader.h"
 #include "../DefaultShaders.h"
 #ifdef _DEBUG
 #include <iostream>

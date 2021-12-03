@@ -1,8 +1,8 @@
 #include "Prop.h"
-#include "../Renderer/OpenGL/OGLGraphics.h"
-#include "../Renderer/OpenGL/OGLShader.h"
-#include "../Renderer/MeshLoader.h"
-#include "../Renderer/LoadCube.h"
+#include "../OS/OpenGL/OGLGraphics.h"
+#include "../OS/OpenGL/OGLShader.h"
+#include "../OS/MeshLoader.h"
+#include "../OS/LoadCube.h"
 #include "../Utility/Conversions.h"
 #include "../DefaultShaders.h"
 

@@ -6,18 +6,17 @@
 #include "Mesh/AnimProp.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
-#include "Renderer/MeshLoader.h"
-#include "Renderer/AnimMeshLoader.h"
-#include "Renderer/TextureLoader.h"
-#include "Renderer/OpenGL/OGLGraphics.h"
-#include "Renderer/OSInterface/Window.h"
+#include "OS/MeshLoader.h"
+#include "OS/AnimMeshLoader.h"
+#include "OS/TextureLoader.h"
+#include "OS/OpenGL/OGLGraphics.h"
+#include "OS/Interface/Window.h"
 #include "Sound/SoundDevice.h"
 #include "Sound/Speaker.h"
 #include "Sound/SoundEffect.h"
 #include "Sound/LongSound.h"
 #include "GUI/imGUI.h"
 #include "DefaultShaders.h"
-
 #include <string>
 #include <sstream>
 #include <utility>

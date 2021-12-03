@@ -1,7 +1,7 @@
 #pragma once
 #include "../Base/UniqueInstance.h"
 #include "Spacial3D.h"
-#include "../Renderer/MeshInfo.h"
+#include "../OS/MeshInfo.h"
 #include <vector>
 #include <string>
 

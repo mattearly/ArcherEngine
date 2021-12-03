@@ -66,16 +66,12 @@ void Window::ApplyChanges() {
     glfwSwapInterval(mWindowOptions->_vsync);
   } else {
     //todo: relaunch window if required (msaa change, render tech is prelaunch only)
-    if (mWindowOptions->_msaa_samples > 0 && prev_window_options._msaa_samples != mWindowOptions->_msaa_samples) 
-    { 
+    if (mWindowOptions->_msaa_samples > 0 && prev_window_options._msaa_samples != mWindowOptions->_msaa_samples) {
       OGLGraphics::SetMultiSampling(true);
       // locking this at a max of 16
-      if (mWindowOptions->_msaa_samples >= 1 && mWindowOptions->_msaa_samples <= 16)
-      {
+      if (mWindowOptions->_msaa_samples >= 1 && mWindowOptions->_msaa_samples <= 16) {
         glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
-      }
-      else 
-      {
+      } else {
         glfwWindowHint(GLFW_SAMPLES, 16);
         mWindowOptions->_msaa_samples = 16;
       }
@@ -95,7 +91,7 @@ void Window::ApplyChanges() {
         (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN
           || mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN_BORDERLESS) ? true : false);
     }
-    
+
     if (prev_window_options._vsync != mWindowOptions->_vsync)
       glfwSwapInterval(mWindowOptions->_vsync);
   }
@@ -133,10 +129,10 @@ int Window::GetCurrentHeight() {
 
 // status[in]: true = fullscreen, false = windowed
 // notes: fullscreen attempts borderless if set to borderless, otherwise classic full screen
-void Window::set_window_fullscreen(const bool status) noexcept  {
+void Window::set_window_fullscreen(const bool status) noexcept {
   auto monitor = glfwGetPrimaryMonitor();
   const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-  if (status) {  
+  if (status) {
     // to fullscreen mode if status == true
     int was_maximized = glfwGetWindowAttrib(mGLFWwindow, GLFW_MAXIMIZED);
     if (was_maximized) glfwRestoreWindow(mGLFWwindow); // turn of maximized before fullscreen (else there is a bug when turning it off)
@@ -214,10 +210,7 @@ void Window::default_init() {
     while (!mGLFWwindow && !try_versions.empty()) {
       glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, try_versions.back().major);
       glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, try_versions.back().minor);
-      mGLFWwindow = glfwCreateWindow(
-        mWindowOptions->_width,
-        mWindowOptions->_height,
-        mWindowOptions->_title.c_str(),
+      mGLFWwindow = glfwCreateWindow(mWindowOptions->_width, mWindowOptions->_height, mWindowOptions->_title.c_str(),
         (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN) ? glfwGetPrimaryMonitor() : nullptr,
         nullptr
       );
@@ -239,14 +232,6 @@ void Window::default_init() {
   set_default_callbacks();
 }
 
-void Window::set_default_callbacks() {
-  glfwSetFramebufferSizeCallback(mGLFWwindow, FRAMEBUFFERSIZESETCALLBACK);
-  glfwSetCursorPosCallback(mGLFWwindow, NORMALMOUSEREPORTINGCALLBACK);
-  glfwSetKeyCallback(mGLFWwindow, KEYCALLBACK);
-  glfwSetMouseButtonCallback(mGLFWwindow, MOUSEBUTTONCALLBACK);
-  glfwSetWindowFocusCallback(mGLFWwindow, ONWINDOWFOCUSCALLBACK);
-}
-
 void Window::default_init(const Window& window) {
   if (mWindowOptions->_windowing_mode == WINDOW_MODE::MAXIMIZED) {
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
@@ -255,135 +240,29 @@ void Window::default_init(const Window& window) {
   if (mWindowOptions->_rendering_tech != RENDER_TECH::OPENGL4) {
     throw("unsupported render tech");  // todo (major): add other render techs
   } else {
-    //// with core profile, you have to create and manage your own VAO's, no default 
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    //// Try the latest version of OpenGL we are allowed, don't use older than 4.3
-    //struct OpenGLVersion {
-    //  OpenGLVersion() {}
-    //  OpenGLVersion(int maj, int min) :major(maj), minor(min) {}
-    //  int major = -1;
-    //  int minor = -1;
-    //};
-    //std::vector<OpenGLVersion> try_versions;
-    //try_versions.reserve(4);
-    //try_versions.push_back(OpenGLVersion(4, 3));
-    //try_versions.push_back(OpenGLVersion(4, 4));
-    //try_versions.push_back(OpenGLVersion(4, 5));
-    //try_versions.push_back(OpenGLVersion(4, 6));
-    //while (!mGLFWwindow && !try_versions.empty()) {
-    //  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, try_versions.back().major);
-    //  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, try_versions.back().minor);
-      mGLFWwindow = glfwCreateWindow(
-        mWindowOptions->_width,
-        mWindowOptions->_height,
-        mWindowOptions->_title.c_str(),
-        (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN) ? glfwGetPrimaryMonitor() : nullptr,
-        window.mGLFWwindow
-      );
-      //if (!mGLFWwindow) {
-      //  try_versions.pop_back();
-      //}
-    }
-    if (!mGLFWwindow) {
-      throw("Unable to init Windwo for OpenGL 4.3+");
-    }
-
-    // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
-    //glfwMakeContextCurrent(mGLFWwindow);
-    OGLGraphics::Proc(glfwGetProcAddress);
-}
-
-/*
-*
-*
-*
-// consideration functions
-
-
-
-// returns the current WindowWidth reported from glfw
-int GetWindowWidth() noexcept {
-  int width, height;
-  glfwGetWindowSize(mWindow, &width, &height);
-  return width;
-}
-
-// returns the current WindowWidth reported from glfw
-int GetWindowHeight() noexcept {
-  int width, height;
-  glfwGetWindowSize(mWindow, &width, &height);
-  return height;
-}
-
-// change the background clear color of our render surface
-void SetWindowClearColor(glm::vec3 color) noexcept {
-  OGLGraphics::SetViewportClearColor(color);
-}
-
-// change the title of the glfw window
-void SetWindowTitle(const char* name) noexcept {
-  glfwSetWindowTitle(mWindow, name);
-}
-
-// @status[in]: force or unforce glfw window into/out of fullscreen mode
-void set_window_fullscreen(const bool status) noexcept {
-  const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-  if (status) {
-    int was_maximized = glfwGetWindowAttrib(mWindow, GLFW_MAXIMIZED);
-    if (was_maximized) glfwRestoreWindow(mWindow); // turn of maximized before fullscreen (else there is a bug when turning it off)
-    glfwSetWindowMonitor(mWindow, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
-  } else {
-    glfwSetWindowMonitor(
-      mWindow,
-      nullptr,
-      static_cast<int>(mode->width / 2.f - Settings::Get()->GetOptions().default_window_width / 2.f),    // These 2 lines should center the screen:
-      static_cast<int>(mode->height / 2.f - Settings::Get()->GetOptions().default_window_height / 2.f),  //  middle of screen then up and to the left half the window size
-      Settings::Get()->GetOptions().default_window_width,
-      Settings::Get()->GetOptions().default_window_height,
-      GLFW_DONT_CARE);
+    mGLFWwindow = glfwCreateWindow(
+      mWindowOptions->_width,
+      mWindowOptions->_height,
+      mWindowOptions->_title.c_str(),
+      (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN) ? glfwGetPrimaryMonitor() : nullptr,
+      window.mGLFWwindow
+    );
   }
+  if (!mGLFWwindow) {
+    throw("Unable to init Windwo for OpenGL 4.3+");
+  }
+
+  // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
+  //glfwMakeContextCurrent(mGLFWwindow);
+  OGLGraphics::Proc(glfwGetProcAddress);
 }
 
-
-// If you only wish the cursor to become hidden when it is over a window but still want it to behave normally
-// overrides SetMouseToDisabled or SetMouseToNormal
-void SetMouseToHidden() noexcept {
-  if (glfwGetInputMode(mWindow, GLFW_CURSOR) == GLFW_CURSOR_HIDDEN)
-    return;  //already hidden, do nothing
-  glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+void Window::set_default_callbacks() {
+  glfwSetFramebufferSizeCallback(mGLFWwindow, FRAMEBUFFERSIZESETCALLBACK);
+  glfwSetCursorPosCallback(mGLFWwindow, NORMALMOUSEREPORTINGCALLBACK);
+  glfwSetKeyCallback(mGLFWwindow, KEYCALLBACK);
+  glfwSetMouseButtonCallback(mGLFWwindow, MOUSEBUTTONCALLBACK);
+  glfwSetWindowFocusCallback(mGLFWwindow, ONWINDOWFOCUSCALLBACK);
 }
-
-// If you wish to implement mouse motion based camera controls or other input schemes that require unlimited mouse movement, set the cursor mode to GLFW_CURSOR_DISABLED.
-// overrides SetMouseToHidden or SetMouseToNormal
-void SetMouseToDisabled() noexcept {
-  if (glfwGetInputMode(mWindow, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
-    return;  //already disabled, do nothing
-  glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-}
-
-// To exit out of either of these special modes, restore the GLFW_CURSOR_NORMAL cursor mode.
-void SetMouseToNormal() noexcept {
-  if (glfwGetInputMode(mWindow, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
-    return;  //already normal, do nothing
-  glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-}
-
-
-
-//void AncientArcher::SetMouseToHidden() noexcept { core_impl->SetMouseToHidden(); };
-//void AncientArcher::SetMouseToDisabled() noexcept { core_impl->SetMouseToDisabled(); };
-//void AncientArcher::SetMouseToNormal() noexcept { core_impl->SetMouseToNormal(); };
-//void AncientArcher::SetMouseReadToPerspectiveLookAround() noexcept { core_impl->SetMouseReadToPerspectiveLookAround(); };
-//void AncientArcher::SetMouseReadToNormal() noexcept { core_impl->SetMouseReadToNormal(); };
-//void AncientArcher::SetMouseFPPSensitivity(float sensitivity) noexcept {
-//  mFPPMouseSensitivity = sensitivity;
-//}
-//float AncientArcher::GetMouseFPPSensitivity() noexcept {
-//  return mFPPMouseSensitivity;
-//}
-
-
-end consideration functions */
 
 }  // end namespace AA
