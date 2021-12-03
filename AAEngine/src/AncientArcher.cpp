@@ -411,7 +411,7 @@ void AncientArcher::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
 unsigned int AncientArcher::GetAnimPropBoneCount_testing(const unsigned int anim_prop_id) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == anim_prop_id)
-      return prop->m_Skeleton.m_Bones.size();
+      return (unsigned int)prop->m_Skeleton.m_Bones.size();
   }
   return 0;
 }
