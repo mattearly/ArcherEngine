@@ -15,13 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="game\setup\setskybox.h">
+    <ClInclude Include="game\setup\setskylight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\setup\setmusic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\setup\setdirlight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\setup\setmodels.h">
@@ -46,6 +43,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\setup\setphysxmodels.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\Stats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

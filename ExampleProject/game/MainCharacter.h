@@ -39,7 +39,7 @@ static struct MoveBlock {
 static double lastX{ 0 }, lastY{ 0 };
 static bool re_entering_fpp = true;
 
-struct MainCharacter : public Player {
+struct MainCharacter {
 public:
   void Setup() {
     if (isInitialized) return;
@@ -84,19 +84,19 @@ public:
           instance.SetCursorToNormal();
           if (inventory_gui_id == -1) {
             inventory_gui_id = instance.AddToImGuiUpdate([]() {
-                  ImGui::Begin("Inventory");
-                  ImGui::TextColored(ImVec4(1,1,0,1), "All Items");
+              ImGui::Begin("Inventory");
+              ImGui::TextColored(ImVec4(1, 1, 0, 1), "All Items");
 
-                  glm::vec3 camera_pos = instance.GetCamPosition(character_cam);
+              glm::vec3 camera_pos = instance.GetCamPosition(character_cam);
 
-                  ImGui::Text("Pos: %.1f, %.1f, %.1f", camera_pos.x, camera_pos.y, camera_pos.z);
+              ImGui::Text("Pos: %.1f, %.1f, %.1f", camera_pos.x, camera_pos.y, camera_pos.z);
 
 
-                  ImGui::BeginChild("Scrolling");
-                  for (int n = 0; n < 5; n++)
-                    ImGui::Text("Item %04d", n);
-                  ImGui::EndChild();
-                  ImGui::End();
+              ImGui::BeginChild("Scrolling");
+              for (int n = 0; n < 5; n++)
+                ImGui::Text("Item %04d", n);
+              ImGui::EndChild();
+              ImGui::End();
             });
           }
           instance.PlaySoundEffect(open_sound_id);

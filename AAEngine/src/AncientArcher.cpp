@@ -470,20 +470,32 @@ void AncientArcher::AddPropPhysics(const int prop_id, const COLLIDERTYPE type) {
     if (p->GetUID() == prop_id) {
       switch (type) {
       case COLLIDERTYPE::BOX:
-        p->mMeshes.front().physicsBody = Physics::Get()->CreateBox(
-          physx::PxVec3(p->mMeshes.front().local_transform[3][0], p->mMeshes.front().local_transform[3][1], p->mMeshes.front().local_transform[3][2]),
-          physx::PxVec3(1, 1, 1));
+        p->spacial_data.physicsBody = 
+          Physics::Get()->CreateBox(
+            physx::PxVec3(
+              p->spacial_data.mFinalModelMatrix[3][0], 
+              p->spacial_data.mFinalModelMatrix[3][1], 
+              p->spacial_data.mFinalModelMatrix[3][2]),
+            physx::PxVec3(1, 1, 1));
         break;
       case COLLIDERTYPE::SPHERE:
-        p->mMeshes.front().physicsBody = Physics::Get()->CreateSphere(
-          physx::PxVec3(p->mMeshes.front().local_transform[3][0], p->mMeshes.front().local_transform[3][1], p->mMeshes.front().local_transform[3][2]),
-          1.f);
+        p->spacial_data.physicsBody = 
+          Physics::Get()->CreateSphere(
+            physx::PxVec3(
+              p->spacial_data.mFinalModelMatrix[3][0], 
+              p->spacial_data.mFinalModelMatrix[3][1], 
+              p->spacial_data.mFinalModelMatrix[3][2]),
+            1.f);
         break;
       case COLLIDERTYPE::CAPSULE:
-        p->mMeshes.front().physicsBody = Physics::Get()->CreateCapsule(
-          physx::PxVec3(p->mMeshes.front().local_transform[3][0], p->mMeshes.front().local_transform[3][1], p->mMeshes.front().local_transform[3][2]),
-          1.f,
-          2.f);
+        p->spacial_data.physicsBody = 
+          Physics::Get()->CreateCapsule(
+            physx::PxVec3(
+              p->spacial_data.mFinalModelMatrix[3][0], 
+              p->spacial_data.mFinalModelMatrix[3][1], 
+              p->spacial_data.mFinalModelMatrix[3][2]),
+            1.f,
+            2.f);
         break;
       }
       return;
@@ -505,7 +517,12 @@ void AncientArcher::SetSkybox(std::vector<std::string> incomingSkymapFiles) noex
     return;  // already set
   if (incomingSkymapFiles.size() != 6)
     return;  // invalid size for a skybox
-  mSkybox = new Skybox(incomingSkymapFiles);
+  mSkybox = std::make_shared<Skybox>(incomingSkymapFiles);
+}
+
+void AncientArcher::RemoveSkybox() noexcept {
+  if (mSkybox)
+    mSkybox.reset();
 }
 
 void AncientArcher::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
@@ -1212,7 +1229,14 @@ void AncientArcher::update() {
     oDU.second(elapsedTime);
   }
 
+  if (mSimulateWorldPhysics) {
+    Physics::Get()->StepPhysics(elapsedTime);
+  }
+  
   for (auto& p : mProps) {
+    if (p->spacial_data.physicsBody) {
+      
+    }
     if (p->spacial_data.modified) {
       p->spacial_data.ProcessModifications();
     }
@@ -1227,9 +1251,7 @@ void AncientArcher::update() {
     }
   }
 
-  if (mSimulateWorldPhysics) {
-    Physics::Get()->StepPhysics(elapsedTime);
-  }
+
 
   if (mMusic) {
     static float music_rebuffer_cd = 0;

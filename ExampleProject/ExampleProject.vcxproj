@@ -94,12 +94,12 @@
     <ClInclude Include="game\MainCharacter.h" />
     <ClInclude Include="game\MainGame.h" />
     <ClInclude Include="game\setup\setfullscreentoggle.h" />
-    <ClInclude Include="game\setup\setdirlight.h" />
     <ClInclude Include="game\setup\setgui.h" />
     <ClInclude Include="game\setup\setmodels.h" />
-    <ClInclude Include="game\setup\setskybox.h" />
+    <ClInclude Include="game\setup\setskylight.h" />
     <ClInclude Include="game\setup\setmusic.h" />
     <ClInclude Include="game\setup\setphysxmodels.h" />
+    <ClInclude Include="game\Stats.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AAEngine\AAEngine.vcxproj">

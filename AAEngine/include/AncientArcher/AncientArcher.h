@@ -319,6 +319,13 @@ public:
   /// <param name="incomingSkymapFiles">6 textures</param>
   void SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept;
 
+
+  /// <summary>
+  /// Removes current skybox. You will see the clear screen color instead.
+  /// Call SetSkybox with new parameters to set up the skybox again.
+  /// </summary>
+  void RemoveSkybox() noexcept;
+  
   /// <summary>
   /// Sets the directional light on the default lit shader.
   /// Only one directional light is currently supported.
@@ -646,7 +653,7 @@ private:
 
   std::vector<std::shared_ptr<Animation> > mAnimation;
 
-  Skybox* mSkybox;
+  std::shared_ptr<Skybox> mSkybox;
 
   std::shared_ptr<DirectionalLight> mDirectionalLight;
 

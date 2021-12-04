@@ -26,18 +26,21 @@ void setmodels() {
 
 
   /// <summary>
-  /// Places a wall of neon cubes
+  /// Places a wall of neon cubes with physics
   /// </summary>
   {
     const int scale = 10;
-    const int tall = 4;
-    const int length = 4;
+    const int tall = 10;
+    const int length = 10;
     for (int i = 0; i < tall; i++) {
       for (int j = 0; j < length; j++) {
-        instance.AddProp("res/neon_cube.glb", glm::vec3(i*scale*2, -99 + j*scale*2, 0), glm::vec3(scale));
+        auto tmp_id = instance.AddProp("res/neon_cube.glb", glm::vec3(i*scale*2.f, -99 + j*scale*2.f, 0), glm::vec3(scale*0.75f));
+        instance.AddPropPhysics(tmp_id);
       }
     }
+    instance.SimulateWorldPhysics(true);
   }
+  
 
   /// <summary>
   /// Animated Model Test
