@@ -186,6 +186,8 @@ public:
 
     });
 
+    // default on flashlight
+    flashlight.turn_on();
     // SETUP FLASHLIGHT TOGGLE
     instance.AddToKeyHandling([](AA::KeyboardButtons& kb) {
       const float cd = .25f;

@@ -5,7 +5,7 @@
 #include <AncientArcher/AncientArcher.h>
 extern AA::AncientArcher instance;
 static bool is_skylight_setup = false;
-static bool is_skylight_on = true;
+static bool is_skylight_on = false;
 static glm::vec3 dir_light_direction = glm::vec3(.55f, -.75f, 1.f);
 static glm::vec3 dir_light_ambient = glm::vec3(.04f);
 static glm::vec3 dir_light_diff = glm::vec3(.37f);
