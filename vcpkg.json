@@ -4,6 +4,7 @@
 	"dependencies": [
 		"glm",
 		"assimp",
+		"entt",
 		"glfw3",
 		"glad",
 		"openal-soft",

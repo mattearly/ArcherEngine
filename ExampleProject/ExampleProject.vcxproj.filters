@@ -42,9 +42,6 @@
     <ClInclude Include="game\setup\setfullscreentoggle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\setup\setphysxmodels.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\Stats.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -9,11 +9,11 @@ struct FlashLight {
   int       id = -1;
   glm::vec3 position = glm::vec3(0);
   glm::vec3 direction = glm::vec3(0, -1, 0);
-  float     inner_radius = glm::cos(glm::radians(4.09f));
-  float     outer_radius = glm::cos(glm::radians(18.09f));
+  float     inner_radius = glm::cos(glm::radians(6.09f));
+  float     outer_radius = glm::cos(glm::radians(21.09f));
   float     constant = 1.f;
-  float     linear = 0.00015f;
-  float     quad = 0.000035f;
+  float     linear = 0.00006999f;
+  float     quad = 0.00001399f;
   glm::vec3 ambient = glm::vec3(1.f);
   glm::vec3 diffuse = glm::vec3(1.f);
   glm::vec3 specular = glm::vec3(1.f);
@@ -24,7 +24,7 @@ struct FlashLight {
     if (flashlightsoundid == -1)  // lazy init
     {
       flashlightsoundid = instance.AddSoundEffect("res/flashlightclick.wav");
-      instance.SetSoundEffectVolume(flashlightsoundid, .15f);
+      instance.SetSoundEffectVolume(flashlightsoundid, .1998f);
     }
     id = instance.AddSpotLight(position, direction, inner_radius, outer_radius, constant, linear, quad, ambient, diffuse, specular);
     isOn = true;

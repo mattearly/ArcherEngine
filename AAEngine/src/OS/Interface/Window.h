@@ -9,7 +9,6 @@
 
 namespace AA {
 
-
 enum class WINDOW_MODE { FULLSCREEN, WINDOWED, FULLSCREEN_BORDERLESS, MAXIMIZED };
 enum class RENDER_TECH { OPENGL4, D3D11, VULKAN1 };
 // hidden is the same as normal, just not drawn
@@ -18,13 +17,13 @@ enum class CURSOR_MODE { HIDDEN = 0x00034002, DISABLED = 0x00034003, NORMAL = 0x
 
 struct WindowOptions final {
   WindowOptions();
-  int _width, _height;
+  int         _width, _height;
   std::string _title;
   WINDOW_MODE _windowing_mode;
   RENDER_TECH _rendering_tech;
   CURSOR_MODE _cursor_mode;
-  int _msaa_samples;  // GLFW_DONT_CARE
-  bool _vsync;
+  int         _msaa_samples;
+  bool        _vsync;
 };
 
 class Window final {
@@ -62,7 +61,9 @@ private:
   WindowOptions prev_window_options;
 
   // @status[in]: force or unforce glfw window into/out of fullscreen mode
-  void set_window_fullscreen(const bool status) noexcept;
+  void set_window_fullscreen_broken(const bool status) noexcept;
+
+  void apply_based_window_size() noexcept;
 
   void clear_screen();
   void swap_buffers();

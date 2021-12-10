@@ -5,38 +5,45 @@
 namespace AA {
 
 Spacial3D::Spacial3D() {
-  curr_loc = glm::vec3(0);
-  curr_rot = glm::vec3(0);
-  curr_scale = glm::vec3(1);
+  mCurrentLocation = glm::vec3(0);
+  mCurrentRot = glm::vec3(0);
+  mCurrentScale = glm::vec3(1);
   mFinalModelMatrix = glm::mat4(1);
-  modified = true;
+  has_unprocessed_modifications = true;
 }
 void Spacial3D::MoveTo(glm::vec3 location) {
-  curr_loc = location;
-  modified = true;
+  mCurrentLocation = location;
+  has_unprocessed_modifications = true;
 }
 
 void Spacial3D::ScaleTo(glm::vec3 scale) {
-  curr_scale = scale;
-  modified = true;
+  mCurrentScale = scale;
+  has_unprocessed_modifications = true;
 }
 
 // rotates on respective xyz axii by radian amounts given in rot
 void Spacial3D::RotateTo(glm::vec3 rot) {
-  curr_rot = rot;
-  modified = true;
+  mCurrentRot = rot;
+  has_unprocessed_modifications = true;
 }
 void Spacial3D::ProcessModifications() {
-  mFinalModelMatrix = glm::mat4(1);
-  mFinalModelMatrix = glm::translate(mFinalModelMatrix, curr_loc);
-  mFinalModelMatrix = glm::scale(mFinalModelMatrix, curr_scale);
+  if (has_unprocessed_modifications) {
+    mFinalModelMatrix = glm::mat4(1);
+    mFinalModelMatrix = glm::translate(mFinalModelMatrix, mCurrentLocation);
+    mFinalModelMatrix = glm::scale(mFinalModelMatrix, mCurrentScale);
 
-  // best order to avoid gimble lock the majority of the time https://youtu.be/zc8b2Jo7mno?t=449
-  mFinalModelMatrix = glm::rotate(mFinalModelMatrix, curr_rot.y, glm::vec3(0, 1, 0));
-  mFinalModelMatrix = glm::rotate(mFinalModelMatrix, curr_rot.z, glm::vec3(0, 0, 1));
-  mFinalModelMatrix = glm::rotate(mFinalModelMatrix, curr_rot.x, glm::vec3(1, 0, 0));
+    // best order to avoid gimble lock the majority of the time https://youtu.be/zc8b2Jo7mno?t=449
+    mFinalModelMatrix = glm::rotate(mFinalModelMatrix, mCurrentRot.y, glm::vec3(0, 1, 0));
+    mFinalModelMatrix = glm::rotate(mFinalModelMatrix, mCurrentRot.z, glm::vec3(0, 0, 1));
+    mFinalModelMatrix = glm::rotate(mFinalModelMatrix, mCurrentRot.x, glm::vec3(1, 0, 0));
 
-  modified = false;
+    has_unprocessed_modifications = false;
+  }
+  //else std::cout << "no modifications to process\n";
+}
+
+void Spacial3D::ApplyPhysx(glm::mat4 changes) {
+ //todo
 }
 
 

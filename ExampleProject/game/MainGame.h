@@ -4,6 +4,7 @@
 #include "setup/setskylight.h"
 #include "setup/setmodels.h"
 #include "setup/setfullscreentoggle.h"
+#include "setup/setmusic.h"
 
 MainCharacter my_character;
 
@@ -31,6 +32,8 @@ struct MainGame {
     setskylight();
     
     setfullscreentoggle();
+
+    setmusic();
   };
 
   void Update(float dt) {

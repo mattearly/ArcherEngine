@@ -3,6 +3,7 @@
 #include <AncientArcher/Utility/SceneCheck.h>
 #include <glm/glm.hpp>
 #include <imgui.h>
+
 extern AA::AncientArcher instance;
 
 bool is_models_set = false;
@@ -24,7 +25,6 @@ void setmodels() {
     }
   }
 
-
   /// <summary>
   /// Places a wall of neon cubes with physics
   /// </summary>
@@ -34,13 +34,12 @@ void setmodels() {
     const int length = 10;
     for (int i = 0; i < tall; i++) {
       for (int j = 0; j < length; j++) {
-        auto tmp_id = instance.AddProp("res/neon_cube.glb", glm::vec3(i*scale*2.f, -99 + j*scale*2.f, 0), glm::vec3(scale*0.75f));
+        auto tmp_id = instance.AddProp("res/neon_cube.glb", glm::vec3(i * scale * 2.f, -99 + j * scale * 2.f, 0), glm::vec3(scale * 0.75f));
         instance.AddPropPhysics(tmp_id);
       }
     }
     instance.SimulateWorldPhysics(true);
   }
-  
 
   /// <summary>
   /// Animated Model Test
@@ -49,37 +48,36 @@ void setmodels() {
     static glm::vec3 base_loc = glm::vec3(0, -99, 350);
     static float base_scale = 1;
     static glm::vec3 base_rot = { 0, 0, 0 };
-    static int v = 0;
+    static int curr_anim = 1;
 
-    static const char* model_path = "E:\\AssetPack\\paladin_j_nordstrom.fbx";
-    static unsigned int model_id = instance.AddAnimProp(model_path, base_loc);
+    static const char* model_path0 = "E:\\AssetPack\\paladin_j_nordstrom.fbx";
+    static unsigned int model_id = instance.AddAnimProp(model_path0, base_loc);
 
-    static const char* anim_path1 = "E:\\AssetPack\\Mma Kick.fbx";
+    static const char* anim_path0 = "E:\\AssetPack\\Mma Kick.fbx";
+    static unsigned int anim_id0 = instance.AddAnimation(anim_path0, model_id);
+
+    static const char* anim_path1 = "E:\\AssetPack\\Standard Walk.fbx";
     static unsigned int anim_id1 = instance.AddAnimation(anim_path1, model_id);
 
-    static const char* anim_path2 = "E:\\AssetPack\\Standard Walk.fbx";
-    static unsigned int anim_id2 = instance.AddAnimation(anim_path2, model_id);
+    switch (curr_anim) {
+    case 1: instance.SetAnimationOnAnimProp(anim_id0, model_id); break;
+    case 2: instance.SetAnimationOnAnimProp(anim_id1, model_id); break;
+    default: break;
+    }
 
     instance.AddToImGuiUpdate([]() {
-      ImGui::Begin(model_path);
+      ImGui::Begin(model_path0);
       ImGui::SliderFloat3("loc", &base_loc[0], -1000.f, 2000.f);
       ImGui::SliderFloat3("rot", &base_rot[0], -3.14f, 3.14f);
       ImGui::SliderFloat("sca", &base_scale, 1.f, 200.f);
-      if (ImGui::RadioButton("none", &v, 0)) { instance.SetAnimationOnAnimProp(-1, model_id); }
-      if (ImGui::RadioButton("walk", &v, 1)) {
-        instance.SetAnimationOnAnimProp(anim_id2, model_id);
-      }
-      if (ImGui::RadioButton("kick", &v, 2)) {
-        instance.SetAnimationOnAnimProp(anim_id1, model_id);
-      }
-
+      if (ImGui::RadioButton("none", &curr_anim, 0)) { instance.SetAnimationOnAnimProp(-1, model_id); }
+      if (ImGui::RadioButton("kick", &curr_anim, 1)) { instance.SetAnimationOnAnimProp(anim_id0, model_id); }
+      if (ImGui::RadioButton("walk", &curr_anim, 2)) { instance.SetAnimationOnAnimProp(anim_id1, model_id); }
       ImGui::End();
-
       instance.MoveAnimProp(model_id, base_loc);
       instance.ScaleAnimProp(model_id, glm::vec3(base_scale));
       instance.RotateAnimProp(model_id, base_rot);
     });
-
   }
 }
 

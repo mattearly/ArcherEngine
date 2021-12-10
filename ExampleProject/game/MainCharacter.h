@@ -30,6 +30,7 @@ static float sprint_bonus = DEFAULTMOVESPEED * 2;
 static float current_move_speed = DEFAULTMOVESPEED;
 static float prevFlySpeed = current_move_speed;
 static glm::vec3 moveDir = glm::vec3(0.f);
+
 static struct MoveBlock {
   bool forward = 0, backwards = 0, left = 0, right = 0;
   bool sprint = 0;

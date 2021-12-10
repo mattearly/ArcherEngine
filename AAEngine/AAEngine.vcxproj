@@ -91,6 +91,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\ECS\entt.h" />
     <ClInclude Include="src\Mesh\Skeleton.h" />
     <ClInclude Include="src\Mesh\Bone.h" />
     <ClInclude Include="src\Mesh\Animator.h" />
@@ -100,7 +101,7 @@
     <ClInclude Include="src\OS\Interface\Window.h" />
     <ClInclude Include="src\Mesh\Animation.h" />
     <ClInclude Include="include\AncientArcher\Utility\rand.h" />
-    <ClInclude Include="src\Physics\Physics.h" />
+    <ClInclude Include="src\Physics\NVidiaPhysx.h" />
     <ClInclude Include="src\DefaultShaders.h" />
     <ClInclude Include="src\GUI\imGUI.h" />
     <ClInclude Include="src\OS\LoadCube.h" />
@@ -135,6 +136,7 @@
     <ClInclude Include="src\OS\OpenGL\QueryShader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ECS\entt.cpp" />
     <ClCompile Include="src\Mesh\Skeleton.cpp" />
     <ClCompile Include="src\Mesh\Bone.cpp" />
     <ClCompile Include="src\Mesh\Animator.cpp" />
@@ -144,7 +146,7 @@
     <ClCompile Include="src\OS\Interface\Callbacks.cpp" />
     <ClCompile Include="src\OS\Interface\Window.cpp" />
     <ClCompile Include="src\Mesh\Animation.cpp" />
-    <ClCompile Include="src\Physics\Physics.cpp" />
+    <ClCompile Include="src\Physics\NVidiaPhysx.cpp" />
     <ClCompile Include="src\GUI\imGUI.cpp" />
     <ClCompile Include="src\OS\LoadCube.cpp" />
     <ClCompile Include="src\OS\MeshLoader.cpp" />

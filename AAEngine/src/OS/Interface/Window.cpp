@@ -60,11 +60,12 @@ std::shared_ptr<WindowOptions> Window::GetModifiableWindowOptions() {
 
 void Window::ApplyChanges() {
   if (!settings_applied_at_least_once) {
-    glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
     glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
-    set_window_fullscreen((mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN || mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN_BORDERLESS) ? true : false);
+    glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
     glfwSwapInterval(mWindowOptions->_vsync);
+    apply_based_window_size();
   } else {
+
     //todo: relaunch window if required (msaa change, render tech is prelaunch only)
     if (mWindowOptions->_msaa_samples > 0 && prev_window_options._msaa_samples != mWindowOptions->_msaa_samples) {
       OGLGraphics::SetMultiSampling(true);
@@ -80,20 +81,23 @@ void Window::ApplyChanges() {
 
     // update things that have changed
     if (mWindowOptions->_cursor_mode != prev_window_options._cursor_mode)
+    {
       glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
-
-    if (mWindowOptions->_title != prev_window_options._title)
-      glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
-
-    // set window if mode changed
-    if (prev_window_options._windowing_mode != mWindowOptions->_windowing_mode || prev_window_options._width != mWindowOptions->_width || prev_window_options._height != mWindowOptions->_height) {
-      set_window_fullscreen(
-        (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN
-          || mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN_BORDERLESS) ? true : false);
     }
 
-    if (prev_window_options._vsync != mWindowOptions->_vsync)
+    if (mWindowOptions->_title != prev_window_options._title)  {
+      glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
+    }
+
+    // set window if mode changed
+    if (prev_window_options._windowing_mode != mWindowOptions->_windowing_mode) {
+      apply_based_window_size();
+    }
+
+    if (prev_window_options._vsync != mWindowOptions->_vsync)   {
       glfwSwapInterval(mWindowOptions->_vsync);
+    }
+
   }
 }
 void Window::Close() {
@@ -129,7 +133,7 @@ int Window::GetCurrentHeight() {
 
 // status[in]: true = fullscreen, false = windowed
 // notes: fullscreen attempts borderless if set to borderless, otherwise classic full screen
-void Window::set_window_fullscreen(const bool status) noexcept {
+void Window::set_window_fullscreen_broken(const bool status) noexcept {
   auto monitor = glfwGetPrimaryMonitor();
   const GLFWvidmode* mode = glfwGetVideoMode(monitor);
   if (status) {
@@ -169,6 +173,29 @@ void Window::set_window_fullscreen(const bool status) noexcept {
       mWindowOptions->_width = GetCurrentWidth();
       mWindowOptions->_height = GetCurrentHeight();
     }
+  }
+}
+
+
+void Window::apply_based_window_size() noexcept {
+  auto monitor = glfwGetPrimaryMonitor();
+  const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+  switch (mWindowOptions->_windowing_mode) {
+  case WINDOW_MODE::MAXIMIZED:
+    glfwMaximizeWindow(mGLFWwindow);
+    break;
+  case WINDOW_MODE::WINDOWED:
+    glfwSetWindowMonitor(mGLFWwindow, nullptr, 
+    /*center width*/  mode->width/2.f - mWindowOptions->_width/2.f,  
+    /*center height*/ mode->height/2.f - mWindowOptions->_height/2.f, 
+    mWindowOptions->_width, mWindowOptions->_height, GLFW_DONT_CARE);
+    break;
+  case WINDOW_MODE::FULLSCREEN_BORDERLESS:
+  case WINDOW_MODE::FULLSCREEN:
+    glfwRestoreWindow(mGLFWwindow); // in case of maximized
+    glfwSetWindowMonitor(mGLFWwindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+    break;
   }
 }
 
@@ -249,7 +276,7 @@ void Window::default_init(const Window& window) {
     );
   }
   if (!mGLFWwindow) {
-    throw("Unable to init Windwo for OpenGL 4.3+");
+    throw("Unable to init Window for OpenGL 4.3+");
   }
 
   // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524

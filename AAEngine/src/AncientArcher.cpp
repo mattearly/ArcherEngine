@@ -1,6 +1,6 @@
 #include "../include/AncientArcher/AncientArcher.h"
 #include "../include/AncientArcher/Version.h"
-#include "Physics/Physics.h"
+#include "Physics/NVidiaPhysx.h"
 #include "Scene/Camera.h"
 #include "Mesh/Prop.h"
 #include "Mesh/AnimProp.h"
@@ -50,7 +50,7 @@ bool AncientArcher::Init() {
   SoundDevice::Init();
 
   // lazy init physics
-  Physics::Get();  // returns a pointer to implementation, ignored here
+  NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
 
   isInit = true;
   return true;
@@ -470,29 +470,29 @@ void AncientArcher::AddPropPhysics(const int prop_id, const COLLIDERTYPE type) {
     if (p->GetUID() == prop_id) {
       switch (type) {
       case COLLIDERTYPE::BOX:
-        p->spacial_data.physicsBody = 
-          Physics::Get()->CreateBox(
+        p->spacial_data.mRigidBody =
+          NVidiaPhysx::Get()->CreateBox(
             physx::PxVec3(
-              p->spacial_data.mFinalModelMatrix[3][0], 
-              p->spacial_data.mFinalModelMatrix[3][1], 
+              p->spacial_data.mFinalModelMatrix[3][0],
+              p->spacial_data.mFinalModelMatrix[3][1],
               p->spacial_data.mFinalModelMatrix[3][2]),
             physx::PxVec3(1, 1, 1));
         break;
       case COLLIDERTYPE::SPHERE:
-        p->spacial_data.physicsBody = 
-          Physics::Get()->CreateSphere(
+        p->spacial_data.mRigidBody =
+          NVidiaPhysx::Get()->CreateSphere(
             physx::PxVec3(
-              p->spacial_data.mFinalModelMatrix[3][0], 
-              p->spacial_data.mFinalModelMatrix[3][1], 
+              p->spacial_data.mFinalModelMatrix[3][0],
+              p->spacial_data.mFinalModelMatrix[3][1],
               p->spacial_data.mFinalModelMatrix[3][2]),
             1.f);
         break;
       case COLLIDERTYPE::CAPSULE:
-        p->spacial_data.physicsBody = 
-          Physics::Get()->CreateCapsule(
+        p->spacial_data.mRigidBody =
+          NVidiaPhysx::Get()->CreateCapsule(
             physx::PxVec3(
-              p->spacial_data.mFinalModelMatrix[3][0], 
-              p->spacial_data.mFinalModelMatrix[3][1], 
+              p->spacial_data.mFinalModelMatrix[3][0],
+              p->spacial_data.mFinalModelMatrix[3][1],
               p->spacial_data.mFinalModelMatrix[3][2]),
             1.f,
             2.f);
@@ -505,7 +505,7 @@ void AncientArcher::AddPropPhysics(const int prop_id, const COLLIDERTYPE type) {
 }
 
 void AncientArcher::AddGroundPlane(const glm::vec3 norm, float distance) {
-  Physics::Get()->CreateGroundPlane(physx::PxVec3(norm.x, norm.y, norm.z), distance);
+  NVidiaPhysx::Get()->CreateGroundPlane(physx::PxVec3(norm.x, norm.y, norm.z), distance);
 }
 
 void AncientArcher::SimulateWorldPhysics(bool status) {
@@ -1230,22 +1230,18 @@ void AncientArcher::update() {
   }
 
   if (mSimulateWorldPhysics) {
-    Physics::Get()->StepPhysics(elapsedTime);
+    NVidiaPhysx::Get()->StepPhysics(elapsedTime);
   }
-  
+
   for (auto& p : mProps) {
-    if (p->spacial_data.physicsBody) {
+    if (p->spacial_data.mRigidBody) {
       
     }
-    if (p->spacial_data.modified) {
-      p->spacial_data.ProcessModifications();
-    }
+    p->spacial_data.ProcessModifications();
   }
 
   for (auto& ap : mAnimProps) {
-    if (ap->spacial_data.modified) {
-      ap->spacial_data.ProcessModifications();
-    }
+    ap->spacial_data.ProcessModifications();
     if (ap->mAnimator) {
       ap->UpdateAnim(elapsedTime);
     }

@@ -15,7 +15,6 @@ struct MeshInfo {
   unsigned int numElements = 0;
   float shininess = 1.0f;
   glm::mat4 local_transform = glm::mat4(1.0f);
-  physx::PxRigidDynamic* physicsBody = NULL;
   bool backface_culled = true;
 };
 }  // end namespace AA

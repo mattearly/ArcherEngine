@@ -1,17 +1,24 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <PxPhysics.h>
 namespace AA {
-struct Spacial3D {
+class Spacial3D final {
+public:
   Spacial3D();
-  glm::vec3 curr_loc;
-  glm::vec3 curr_scale;
-  glm::vec3 curr_rot;  // expressed as 3 radians that corrispond to xyz rotation amounts
-  bool modified;
-  void ProcessModifications();
-  glm::mat4 mFinalModelMatrix;
   void MoveTo(glm::vec3 location);
   void ScaleTo(glm::vec3 scale);
   void RotateTo(glm::vec3 rot);
+  void ProcessModifications();
+  void ApplyPhysx(glm::mat4 changes);
+private: 
+  physx::PxRigidDynamic* mRigidBody;
+  glm::vec3 mCurrentLocation;
+  glm::vec3 mCurrentScale;
+  glm::vec3 mCurrentRot;  // expressed as 3 radians that corrispond to xyz rotation amounts
+  bool has_unprocessed_modifications;
+  glm::mat4 mFinalModelMatrix;
+  friend class AncientArcher;
+  friend class Prop;
 };
 
 }

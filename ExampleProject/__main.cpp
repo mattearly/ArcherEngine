@@ -10,6 +10,7 @@ AA::AncientArcher instance;
 
 int main(int argc, char** argv) {
   instance.Init();
+  instance.SetWindowTitle("ExampleProject");
   myGame.Setup();
   instance.AddToUpdate([](float dt) { myGame.Update(dt); });
   instance.AddToOnTeardown([]() { myGame.Teardown(); });

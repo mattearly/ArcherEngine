@@ -169,7 +169,6 @@ void AnimMeshLoader::recursive_processNode(AnimProp& out_model, aiNode* node, co
 
     tmp_mesh.backface_culled = false;
     tmp_mesh.local_transform = aiMat4_to_glmMat4(node->mTransformation);
-    tmp_mesh.physicsBody = nullptr;
     tmp_mesh.shininess = 1.f;
     tmp_mesh.vao = OGLGraphics::UploadStatic3DMesh(loaded_verts, loaded_indices);  // upload for rendering capabilites
     tmp_mesh.numElements = static_cast<unsigned int>(loaded_indices.size());

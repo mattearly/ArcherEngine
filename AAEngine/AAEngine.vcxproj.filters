@@ -111,7 +111,7 @@
     <ClInclude Include="include\AncientArcher\Utility\rand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Physics\Physics.h">
+    <ClInclude Include="src\Physics\NVidiaPhysx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Mesh\Animation.h">
@@ -139,6 +139,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Mesh\Skeleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\entt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -209,7 +212,7 @@
     <ClCompile Include="src\Utility\rand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Physics\Physics.cpp">
+    <ClCompile Include="src\Physics\NVidiaPhysx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Mesh\Animation.cpp">
@@ -240,6 +243,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Mesh\Skeleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\entt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
