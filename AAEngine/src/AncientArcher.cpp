@@ -1090,9 +1090,11 @@ void AncientArcher::ToggleWindowFullscreen(bool try_borderless) noexcept {
     } else {
       temp->_windowing_mode = WINDOW_MODE::FULLSCREEN;
     }
-  } else {
+  } else {  // turn off fullscreen
     temp->_windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
   }
+
+
   mWindow->ApplyChanges();
 }
 

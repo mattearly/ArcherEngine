@@ -1,7 +1,6 @@
 #include "Window.h"
 #include "../OpenGL/OGLGraphics.h"
 #include <memory>
-//#include <iostream>
 
 namespace AA {
 
@@ -16,7 +15,7 @@ void g_poll_input_events() {
 KeyboardButtons  g_keyboard_input_status;
 MouseScrollWheel g_scroll_input_status;
 MouseCursorPos   g_mouse_input_status;
-MouseButtons     g_mouse_button_status; 
+MouseButtons     g_mouse_button_status;
 
 void GLFWERRORCALLBACK(int e, const char* msg) {
   if (e != GLFW_NO_ERROR) {
@@ -534,136 +533,5 @@ void MOUSEBUTTONCALLBACK(GLFWwindow* w, int button, int action, int mods) {
   }
   g_new_key_reads = true;
 }
-
-/*    
-*   LEGACY FUNCTIONS FROM V005
-* 
-* 
-// Switches To First Person Perspective Mouse Reporting Style 
-// disabled/hidden cursor - calls SetMouseToDisabled()
-// repeated offset from center with mFPPMouseSensitivity applied to onMouseHandling funcs
-// notes: overrides any previous glfwSetCursorPosCallback callback settings
-void SetMouseReadToPerspectiveLookAround() noexcept {
-  if (mMouseReporting == MouseReporting::PERSPECTIVE)
-    return;  // already in perspective handling
-  mMouseReporting = MouseReporting::PERSPECTIVE;
-  SetMouseToDisabled();
-  static double lastX{ 0 }, lastY{ 0 };
-  static double xDelta{ 0 }, yDelta{ 0 };
-  glfwSetCursorPos(mGLFWwindow, 0, 0);
-  mMousePosition.xOffset = 0;
-  mMousePosition.yOffset = 0;
-  lastX = 0;
-  lastY = 0;
-
-  // will be called anytime the mouse moves
-  ::glfwSetCursorPosCallback(mGLFWwindow, [](GLFWwindow* window, double x, double y) {
-    // reset 
-    xDelta = 0, yDelta = 0;
-    // get change
-    xDelta = x - lastX;
-    yDelta = lastY - y;
-    // hold result
-    lastX = x;
-    lastY = y;
-    // get a percent of the actual offset
-    xDelta *= mFPPMouseSensitivity;
-    yDelta *= mFPPMouseSensitivity;
-    // apply it to our mouse position
-    mMousePosition.xOffset = xDelta;
-    mMousePosition.yOffset = yDelta;
-    // have your functions handle this mouse calculation
-    for (auto& oMH : onMouseHandling) { oMH.second(mMousePosition); }
-    // recenter your mouse position after it has been handled
-    mMousePosition.xOffset = 0;
-    mMousePosition.yOffset = 0;
-  });
-}
-
-
-// Switches To Normal Cursor Mouse Handling Style
-// sets cursor to normal mode - calls SetMouseToNormal()
-// updates mouse on mGUI_testing shader
-// mouse pos reported on onMouseHandling funcs
-void SetMouseReadToNormal() noexcept {
-  if (mMouseReporting == MouseReporting::STANDARD)  // already standard
-    return;
-  mMouseReporting = MouseReporting::STANDARD;
-
-  SetMouseToNormal();
-  ::glfwSetCursorPosCallback(mGLFWwindow, [](GLFWwindow* window, double xpos, double ypos) {
-    mMousePosition.xOffset = xpos;
-    mMousePosition.yOffset = ypos;
-    if (mGUI_testing) {
-      mGUI_testing->UpdateMouseLoc(vec2(mMousePosition.xOffset, mMousePosition.yOffset));
-    }
-    for (auto& oMH : onMouseHandling) { oMH.second(mMousePosition); }
-  });
-}
-
-
-// drag and drop will only work if you have it enabled and there is at least 1 camera
-
-::glfwSetDropCallback(mGLFWwindow, [](GLFWwindow* w, int count, const char** paths) {
-// todo: fix
-//if (!Settings::Get()->GetOptions().drag_and_drop_files_support)
-//  return;
-//if (mCameras.empty())
-//  return;
-//int i;
-//for (i = 0; i < count; i++) {
-//  std::string proc_ = paths[i];
-//  std::size_t the_last_slash = proc_.find_last_of("/\\") + 1;
-//  std::size_t the_last_dot = proc_.find_last_of(".");
-//  //std::string path_to = proc_.substr(0, the_last_slash);  // path to filename's dir
-//  std::string file_extension = proc_.substr(
-//    static_cast<std::basic_string<char,
-//    std::char_traits<char>,
-//    std::allocator<char>>::size_type>(the_last_dot) + 1);  // get the file extension (type of file)
-//  if (file_extension == "fbx" || file_extension == "FBX" ||
-//    file_extension == "obj" || file_extension == "OBJ" ||
-//    file_extension == "dae" || file_extension == "DAE" ||
-//    file_extension == "glb" || file_extension == "gltf"
-//    ) {
-//    int added_prop = AddProp(paths[i]);
-//  }
-//}
-});
-
-
-::glfwSetFramebufferSizeCallback(mGLFWwindow, [](GLFWwindow* window, int w, int h) {
-OGLGraphics::SetViewportSize(0, 0, w, h);
-if (mCameras.empty())
-return;
-
-for (auto& cam : mCameras) {
-cam.updateProjectionMatrix(w, h);
-}
-if (mDiffShader) {
-mDiffShader->Use();
-mDiffShader->SetMat4("u_projection_matrix", mCameras.front().mProjectionMatrix);
-}
-if (mLitShader) {
-mLitShader->Use();
-mLitShader->SetMat4("u_projection_matrix", mCameras.front().mProjectionMatrix);
-}
-if (mSkybox) {
-mSkybox->SetProjectionMatrix(mCameras.front().mProjectionMatrix);
-}
-
-});
-
-::glfwSetScrollCallback(mGLFWwindow, [](GLFWwindow* w, double x, double y) {
-mMouseWheelScroll.xOffset = x;
-mMouseWheelScroll.yOffset = y;
-// process scroll wheel and reset back to 0
-for (const auto& oSH : onScrollHandling) { oSH.second(mMouseWheelScroll); }
-mMouseWheelScroll.yOffset = 0;
-mMouseWheelScroll.xOffset = 0;
-});
-
-
-
- END LEGACY FUNCTIONS */
 
 }  // end namespace AA

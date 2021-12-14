@@ -63,7 +63,7 @@ void Window::ApplyChanges() {
     glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
     glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
     glfwSwapInterval(mWindowOptions->_vsync);
-    apply_based_window_size();
+    apply_window_sizings_from_current_options();
   } else {
 
     //todo: relaunch window if required (msaa change, render tech is prelaunch only)
@@ -90,7 +90,7 @@ void Window::ApplyChanges() {
 
     // set window if mode changed
     if (prev_window_options._windowing_mode != mWindowOptions->_windowing_mode) {
-      apply_based_window_size();
+      apply_window_sizings_from_current_options();
     }
 
     if (prev_window_options._vsync != mWindowOptions->_vsync) {
@@ -129,54 +129,7 @@ int Window::GetCurrentHeight() {
   return height;
 }
 
-
-// status[in]: true = fullscreen, false = windowed
-// notes: fullscreen attempts borderless if set to borderless, otherwise classic full screen
-void Window::set_window_fullscreen_broken(const bool status) noexcept {
-  auto monitor = glfwGetPrimaryMonitor();
-  const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-  if (status) {
-    // to fullscreen mode if status == true
-    int was_maximized = glfwGetWindowAttrib(mGLFWwindow, GLFW_MAXIMIZED);
-    if (was_maximized) glfwRestoreWindow(mGLFWwindow); // turn of maximized before fullscreen (else there is a bug when turning it off)
-    if (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN) {
-      glfwSetWindowMonitor(mGLFWwindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-    } else if (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN_BORDERLESS) {
-      glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-      glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-      glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-      glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-      if (!mGLFWwindow) {
-        // new window creation fullscreen borderless
-        mGLFWwindow = glfwCreateWindow(mode->width, mode->height, mWindowOptions->_title.c_str(), monitor, NULL);
-      } else {
-        // from windowed to fullscreen borderless
-        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-        glfwSetWindowMonitor(mGLFWwindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-      }
-    }
-  } else {
-    // to windowed mode if status == false
-    glfwSetWindowMonitor(
-      mGLFWwindow,
-      nullptr,
-      static_cast<int>(mode->width / 2.f - mWindowOptions->_width / 2.f),    // These 2 lines should center the screen:
-      static_cast<int>(mode->height / 2.f - mWindowOptions->_height / 2.f),  //  middle of screen then up and to the left half the window size
-      mWindowOptions->_width,
-      mWindowOptions->_height,
-      GLFW_DONT_CARE);
-
-    // if the window with is greater size than the actual window, set it to maximized & update the cached w/h
-    if (mode->width <= mWindowOptions->_width || mode->height <= mWindowOptions->_height) {
-      glfwMaximizeWindow(mGLFWwindow);
-      mWindowOptions->_width = GetCurrentWidth();
-      mWindowOptions->_height = GetCurrentHeight();
-    }
-  }
-}
-
-
-void Window::apply_based_window_size() noexcept {
+void Window::apply_window_sizings_from_current_options() noexcept {
   auto monitor = glfwGetPrimaryMonitor();
   const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
@@ -187,8 +140,8 @@ void Window::apply_based_window_size() noexcept {
 
   case WINDOW_MODE::WINDOWED:
     glfwSetWindowMonitor(mGLFWwindow, nullptr,
-      /*center width*/  mode->width / 2.f - mWindowOptions->_width / 2.f,
-      /*center height*/ mode->height / 2.f - mWindowOptions->_height / 2.f,
+      /*center width*/  (int)(mode->width / 2.f - mWindowOptions->_width / 2.f),
+      /*center height*/ (int)(mode->height / 2.f - mWindowOptions->_height / 2.f),
       mWindowOptions->_width, mWindowOptions->_height, GLFW_DONT_CARE);
     break;
 
@@ -196,8 +149,8 @@ void Window::apply_based_window_size() noexcept {
     mWindowOptions->_width = 800;
     mWindowOptions->_height = 600;
     glfwSetWindowMonitor(mGLFWwindow, nullptr,
-      /*center width*/  mode->width / 2.f - mWindowOptions->_width / 2.f,
-      /*center height*/ mode->height / 2.f - mWindowOptions->_height / 2.f,
+      /*center width*/  (int)(mode->width / 2.f - mWindowOptions->_width / 2.f),
+      /*center height*/ (int)(mode->height / 2.f - mWindowOptions->_height / 2.f),
       mWindowOptions->_width, mWindowOptions->_height, GLFW_DONT_CARE);
     mWindowOptions->_windowing_mode = WINDOW_MODE::WINDOWED;
     break;
@@ -209,6 +162,9 @@ void Window::apply_based_window_size() noexcept {
     glfwSetWindowMonitor(mGLFWwindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
     break;
   }
+
+  // lock in with previous after this
+  prev_window_options._windowing_mode = mWindowOptions->_windowing_mode;
 }
 
 void Window::clear_screen() {

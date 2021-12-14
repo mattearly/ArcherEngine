@@ -60,10 +60,7 @@ private:
   // used for comparisons when applying new changes, updates on GetModifiableWindowOptions
   WindowOptions prev_window_options;
 
-  // @status[in]: force or unforce glfw window into/out of fullscreen mode
-  void set_window_fullscreen_broken(const bool status) noexcept;
-
-  void apply_based_window_size() noexcept;
+  void apply_window_sizings_from_current_options() noexcept;
 
   void clear_screen();
   void swap_buffers();

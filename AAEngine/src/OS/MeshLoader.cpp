@@ -1,7 +1,7 @@
 #include "MeshLoader.h"
 #include "TextureLoader.h"
 #include "Vertex.h"
-#include "../Utility/Conversions.h"
+#include "../Math/Conversions.h"
 #include "OpenGL/OGLGraphics.h"
 
 #include <assimp/Importer.hpp>
