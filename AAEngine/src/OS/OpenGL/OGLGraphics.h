@@ -32,6 +32,7 @@ public:
   static void SetDepthMode(int mode);
   static void SetMultiSampling(const bool enabled);
   static void Proc(void* proc);
+  static GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height);
 private:
   OGLGraphics() = delete;
 };

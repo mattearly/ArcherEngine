@@ -458,4 +458,28 @@ void OGLGraphics::Proc(void* proc) {
   }
 }
 
+/// <summary>
+/// Buffers and depth map of the specified width and height
+/// </summary>
+/// <param name="shadow_width"></param>
+/// <param name="shadow_height"></param>
+/// <returns>depth map FBO</returns>
+GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height) {
+  GLuint depthMapFBO;
+  glGenFramebuffers(1, &depthMapFBO);  
+
+  const GLuint SHADOW_WIDTH = shadow_width, SHADOW_HEIGHT = shadow_height;
+
+  GLuint depthMap;
+  glGenTextures(1, &depthMap);
+  glBindTexture(GL_TEXTURE_2D, depthMap);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  
+
+  return depthMapFBO;
+}
+
 }  // end namespace AA
