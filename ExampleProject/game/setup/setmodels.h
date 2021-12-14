@@ -34,7 +34,7 @@ void setmodels() {
     const int length = 10;
     for (int i = 0; i < tall; i++) {
       for (int j = 0; j < length; j++) {
-        auto tmp_id = instance.AddProp("res/neon_cube.glb", glm::vec3(i * scale * 2.f, -99 + j * scale * 2.f, 0), glm::vec3(scale * 0.75f));
+        auto tmp_id = instance.AddProp("res/neon_cube.glb", glm::vec3(i * scale * 2.f, -99 + ((j * scale) * 2.f) + (scale/2.f), 0), glm::vec3(scale * .5f));
         instance.AddPropPhysics(tmp_id);
       }
     }
