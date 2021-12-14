@@ -136,6 +136,7 @@
     <ClInclude Include="src\OS\OpenGL\QueryShader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AncientArcherRuntime.cpp" />
     <ClCompile Include="src\ECS\entt.cpp" />
     <ClCompile Include="src\Mesh\Skeleton.cpp" />
     <ClCompile Include="src\Mesh\Bone.cpp" />
