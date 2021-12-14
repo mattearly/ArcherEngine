@@ -129,6 +129,12 @@ int Window::GetCurrentHeight() {
   return height;
 }
 
+
+/// <summary>
+/// This will attempt to apply the window sizing and lock in the updates.
+/// The end user mainly will handle this on their own, except for toggling fullscreen
+/// and the way the window is initialized if passed custom options
+/// </summary>
 void Window::apply_window_sizings_from_current_options() noexcept {
   auto monitor = glfwGetPrimaryMonitor();
   const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -157,6 +163,8 @@ void Window::apply_window_sizings_from_current_options() noexcept {
 
 
   case WINDOW_MODE::FULLSCREEN_BORDERLESS:
+    
+
   case WINDOW_MODE::FULLSCREEN:
     glfwRestoreWindow(mGLFWwindow); // in case of maximized
     glfwSetWindowMonitor(mGLFWwindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
