@@ -1,6 +1,5 @@
 #include "MeshInfo.h"
 #include <glm\gtc\matrix_transform.hpp>
-#include "../Utility/Conversions.h"
 namespace AA {
 MeshInfo::MeshInfo(unsigned int a, unsigned int elcount)
   : vao(a), numElements(elcount) {}

@@ -3,7 +3,7 @@
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/MeshLoader.h"
 #include "../OS/LoadCube.h"
-#include "../Utility/Conversions.h"
+#include "../Math/Conversions.h"
 #include "../DefaultShaders.h"
 
 namespace AA {

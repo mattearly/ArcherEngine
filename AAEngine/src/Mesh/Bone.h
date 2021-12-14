@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <assimp/scene.h>
-#include "../Utility/Conversions.h"
+#include "../Math/Conversions.h"
 namespace AA {
 
 struct KeyPosition {

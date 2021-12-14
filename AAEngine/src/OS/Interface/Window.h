@@ -9,7 +9,7 @@
 
 namespace AA {
 
-enum class WINDOW_MODE { FULLSCREEN, WINDOWED, FULLSCREEN_BORDERLESS, MAXIMIZED };
+enum class WINDOW_MODE { FULLSCREEN, WINDOWED, WINDOWED_DEFAULT, FULLSCREEN_BORDERLESS, MAXIMIZED };
 enum class RENDER_TECH { OPENGL4, D3D11, VULKAN1 };
 // hidden is the same as normal, just not drawn
 // disabled is raw motion (doesn't apply desktop cursor settings) - check if it is supported with glfwRawMouseMotionSupported()

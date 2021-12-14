@@ -131,7 +131,7 @@
     <ClInclude Include="src\OS\Vertex.h" />
     <ClInclude Include="src\Sound\SoundDevice.h" />
     <ClInclude Include="src\Sound\Speaker.h" />
-    <ClInclude Include="src\Utility\Conversions.h" />
+    <ClInclude Include="src\Math\Conversions.h" />
     <ClInclude Include="src\Base\UniqueInstance.h" />
     <ClInclude Include="src\OS\OpenGL\QueryShader.h" />
   </ItemGroup>

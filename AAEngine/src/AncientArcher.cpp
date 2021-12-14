@@ -13,8 +13,8 @@
 #include "Sound/LongSound.h"
 #include "GUI/imGUI.h"
 #include "DefaultShaders.h"
-//#include <string>
-//#include <sstream>
+#include <string>
+#include <sstream>
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
@@ -1080,10 +1080,10 @@ void AncientArcher::SetWindowTitle(const char* name) noexcept {
 }
 
 // toggles fullscreen as expected, does nothign if window is null
-void AncientArcher::ToggleFullscreen(bool try_borderless) noexcept {
+void AncientArcher::ToggleWindowFullscreen(bool try_borderless) noexcept {
   if (!mWindow) return;
-  // todo: improve efficiency
   auto temp = mWindow->GetModifiableWindowOptions();
+
   if (temp->_windowing_mode == WINDOW_MODE::WINDOWED) {
     if (try_borderless) {
       temp->_windowing_mode = WINDOW_MODE::FULLSCREEN_BORDERLESS;
@@ -1091,7 +1091,7 @@ void AncientArcher::ToggleFullscreen(bool try_borderless) noexcept {
       temp->_windowing_mode = WINDOW_MODE::FULLSCREEN;
     }
   } else {
-    temp->_windowing_mode = WINDOW_MODE::WINDOWED;
+    temp->_windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
   }
   mWindow->ApplyChanges();
 }

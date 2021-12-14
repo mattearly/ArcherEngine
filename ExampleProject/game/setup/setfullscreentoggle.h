@@ -7,7 +7,7 @@ void setfullscreentoggle() {
     const float cd = .7f;
     // toggle fullscreen if alt+enter (or f11) and cd ready
     if (((kb.enter && (kb.leftAlt || kb.rightAlt)) || kb.f11) && full_screen_toggle_timer > cd) {
-      instance.ToggleFullscreen(true);
+      instance.ToggleWindowFullscreen(false);
       full_screen_toggle_timer = 0.f;  // reset timer on activation
     }
   });

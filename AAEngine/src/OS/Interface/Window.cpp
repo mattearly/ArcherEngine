@@ -80,12 +80,11 @@ void Window::ApplyChanges() {
     }
 
     // update things that have changed
-    if (mWindowOptions->_cursor_mode != prev_window_options._cursor_mode)
-    {
+    if (mWindowOptions->_cursor_mode != prev_window_options._cursor_mode) {
       glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
     }
 
-    if (mWindowOptions->_title != prev_window_options._title)  {
+    if (mWindowOptions->_title != prev_window_options._title) {
       glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
     }
 
@@ -94,7 +93,7 @@ void Window::ApplyChanges() {
       apply_based_window_size();
     }
 
-    if (prev_window_options._vsync != mWindowOptions->_vsync)   {
+    if (prev_window_options._vsync != mWindowOptions->_vsync) {
       glfwSwapInterval(mWindowOptions->_vsync);
     }
 
@@ -185,12 +184,25 @@ void Window::apply_based_window_size() noexcept {
   case WINDOW_MODE::MAXIMIZED:
     glfwMaximizeWindow(mGLFWwindow);
     break;
+
   case WINDOW_MODE::WINDOWED:
-    glfwSetWindowMonitor(mGLFWwindow, nullptr, 
-    /*center width*/  mode->width/2.f - mWindowOptions->_width/2.f,  
-    /*center height*/ mode->height/2.f - mWindowOptions->_height/2.f, 
-    mWindowOptions->_width, mWindowOptions->_height, GLFW_DONT_CARE);
+    glfwSetWindowMonitor(mGLFWwindow, nullptr,
+      /*center width*/  mode->width / 2.f - mWindowOptions->_width / 2.f,
+      /*center height*/ mode->height / 2.f - mWindowOptions->_height / 2.f,
+      mWindowOptions->_width, mWindowOptions->_height, GLFW_DONT_CARE);
     break;
+
+  case WINDOW_MODE::WINDOWED_DEFAULT:
+    mWindowOptions->_width = 800;
+    mWindowOptions->_height = 600;
+    glfwSetWindowMonitor(mGLFWwindow, nullptr,
+      /*center width*/  mode->width / 2.f - mWindowOptions->_width / 2.f,
+      /*center height*/ mode->height / 2.f - mWindowOptions->_height / 2.f,
+      mWindowOptions->_width, mWindowOptions->_height, GLFW_DONT_CARE);
+    mWindowOptions->_windowing_mode = WINDOW_MODE::WINDOWED;
+    break;
+
+
   case WINDOW_MODE::FULLSCREEN_BORDERLESS:
   case WINDOW_MODE::FULLSCREEN:
     glfwRestoreWindow(mGLFWwindow); // in case of maximized

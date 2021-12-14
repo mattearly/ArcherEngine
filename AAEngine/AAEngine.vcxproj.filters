@@ -72,7 +72,7 @@
     <ClInclude Include="src\Sound\ErrorCheck.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\Conversions.h">
+    <ClInclude Include="src\Math\Conversions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Base\UniqueInstance.h">

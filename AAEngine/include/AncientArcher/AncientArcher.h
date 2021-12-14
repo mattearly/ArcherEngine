@@ -555,7 +555,7 @@ public:
   /// Toggles fullscreen.
   /// </summary>
   /// <param name="try_borderless">attempts borderless fullscreen if true</param>
-  void ToggleFullscreen(bool try_borderless = false) noexcept;
+  void ToggleWindowFullscreen(bool try_borderless = false) noexcept;
 
   /// <summary>
   /// add a function that runs once at start.
