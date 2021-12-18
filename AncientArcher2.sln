@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleProject", "ExamplePr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{5FCDFD4C-90B2-4F37-BEFC-761FB3CDDCF1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleECS", "ExampleECS\ExampleECS.vcxproj", "{860599ED-898E-4785-88CD-50F7B26C0BF1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -29,10 +27,6 @@ Global
 		{5FCDFD4C-90B2-4F37-BEFC-761FB3CDDCF1}.Debug|x64.Build.0 = Debug|x64
 		{5FCDFD4C-90B2-4F37-BEFC-761FB3CDDCF1}.Release|x64.ActiveCfg = Release|x64
 		{5FCDFD4C-90B2-4F37-BEFC-761FB3CDDCF1}.Release|x64.Build.0 = Release|x64
-		{860599ED-898E-4785-88CD-50F7B26C0BF1}.Debug|x64.ActiveCfg = Debug|x64
-		{860599ED-898E-4785-88CD-50F7B26C0BF1}.Debug|x64.Build.0 = Debug|x64
-		{860599ED-898E-4785-88CD-50F7B26C0BF1}.Release|x64.ActiveCfg = Release|x64
-		{860599ED-898E-4785-88CD-50F7B26C0BF1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
