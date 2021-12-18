@@ -91,6 +91,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\AncientArcher\WindowOptions.h" />
     <ClInclude Include="src\ECS\entt.h" />
     <ClInclude Include="src\Mesh\Skeleton.h" />
     <ClInclude Include="src\Mesh\Bone.h" />

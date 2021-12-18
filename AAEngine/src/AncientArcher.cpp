@@ -22,24 +22,34 @@
 namespace AA {
 
 bool AncientArcher::Init() {
-  if (isInit) {
+  if (isInit)
     return false;
-  }
-
-  // create a new window with the default options
-  // todo (matt): allow custom option init
   mWindow = new Window();
   SetIMGUI(true);
-
-  // start base default shaders
-  DefaultShaders::init_ubershader();
-
-  // lazy init sound
   SoundDevice::Init();
+  auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
+  isInit = true;
+  return true;
+}
 
-  // lazy init physics
-  NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
+bool AncientArcher::Init(const WindowOptions& winopts) {
+  if (isInit)
+    return false;
+  mWindow = new Window(winopts);
+  SetIMGUI(true);
+  SoundDevice::Init();
+  auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
+  isInit = true;
+  return true;
+}
 
+bool AncientArcher::Init(std::shared_ptr<WindowOptions> winopts) {
+  if (isInit)
+    return false;
+  mWindow = new Window(winopts);
+  SetIMGUI(true);
+  SoundDevice::Init();
+  auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
   isInit = true;
   return true;
 }
@@ -52,7 +62,7 @@ int AncientArcher::Run() {
     return -4;  // not init
   }
   if (!mWindow) {
-    return -5; // no window init yet on this instance
+    return -5;  // no window init yet on this instance
   }
   begin();
   while (!mWindow->GetShouldClose()) {

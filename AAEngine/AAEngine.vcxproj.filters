@@ -144,6 +144,9 @@
     <ClInclude Include="src\ECS\entt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\AncientArcher\WindowOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sound\SoundDevice.cpp">

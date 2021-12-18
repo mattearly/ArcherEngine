@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "../../../include/AncientArcher/Version.h"
+#include "../../../include/AncientArcher/WindowOptions.h"
 #include "../OpenGL/OGLGraphics.h"
 namespace AA {
 
@@ -13,23 +14,50 @@ extern void KEYCALLBACK(GLFWwindow* w, int key, int scancode, int action, int mo
 extern void MOUSEBUTTONCALLBACK(GLFWwindow* w, int button, int action, int mods);
 extern void ONWINDOWFOCUSCALLBACK(GLFWwindow* window, int focused);
 
-WindowOptions::WindowOptions() {
-  _width = 800;
-  _height = 600;
-  _title = "AncientArcher v" + std::to_string(ENGINEVERSIONMAJOR) + '.' + std::to_string(ENGINEVERSIONMINOR) + '.' + std::to_string(ENGINEVERSIONPATCH) + " : window #" + std::to_string(window_instance_count);
-  _windowing_mode = WINDOW_MODE::WINDOWED;
-  _rendering_tech = RENDER_TECH::OPENGL4;
-  _cursor_mode = CURSOR_MODE::NORMAL;
-  _msaa_samples = -1;  // GLFW_DONT_CARE
-  _vsync = false;
-}
-
+/// <summary>
+/// default init
+/// </summary>
 Window::Window() {
   if (!glfw_is_init) {
     glfwInit();
     glfw_is_init = true;
   }
-  mWindowOptions = std::make_shared<WindowOptions>();      // start with default options
+
+  // start with default options
+  WindowOptions Options;
+
+  SetDefaults(Options);
+
+  mWindowOptions = std::make_shared<WindowOptions>(Options);    
+  default_init();
+  window_instance_count++;
+}
+
+/// <summary>
+/// Use custom init options
+/// </summary>
+/// <param name="winopts">copies from current values of this</param>
+Window::Window(WindowOptions winopts) {
+  if (!glfw_is_init) {
+    glfwInit();
+    glfw_is_init = true;
+  }
+  mWindowOptions = std::make_shared<WindowOptions>(winopts);    
+  default_init();
+  window_instance_count++;
+
+}
+
+/// <summary>
+/// Use custom init options.
+/// </summary>
+/// <param name="winopts">shared ptr to winopts so sync with</param>
+Window::Window(std::shared_ptr<WindowOptions> winopts) {
+  if (!glfw_is_init) {
+    glfwInit();
+    glfw_is_init = true;
+  }
+  mWindowOptions = winopts;    
   default_init();
   window_instance_count++;
 }
@@ -99,6 +127,14 @@ void Window::ApplyChanges() {
 
   }
 }
+void Window::SetViewportToWindowSize() noexcept {
+  switch (mWindowOptions->_rendering_tech) {
+  case RENDER_TECH::OPENGL4:
+    OGLGraphics::SetViewportSize(0, 0, GetCurrentWidth(), GetCurrentHeight());
+  }
+}
+
+
 void Window::Close() {
   glfwSetWindowShouldClose(mGLFWwindow, 1);
 }
@@ -163,7 +199,7 @@ void Window::apply_window_sizings_from_current_options() noexcept {
 
 
   case WINDOW_MODE::FULLSCREEN_BORDERLESS:
-    
+
 
   case WINDOW_MODE::FULLSCREEN:
     glfwRestoreWindow(mGLFWwindow); // in case of maximized
@@ -175,12 +211,12 @@ void Window::apply_window_sizings_from_current_options() noexcept {
   prev_window_options._windowing_mode = mWindowOptions->_windowing_mode;
 }
 
-void Window::clear_screen() {
-  switch (mWindowOptions->_rendering_tech) {
-  case RENDER_TECH::OPENGL4:
-    OGLGraphics::ClearScreen();
-  }
-}
+//void Window::clear_screen() {
+//  switch (mWindowOptions->_rendering_tech) {
+//  case RENDER_TECH::OPENGL4:
+//    OGLGraphics::ClearScreenColorAndDepth();
+//  }
+//}
 
 void Window::swap_buffers() {
   glfwSwapBuffers(mGLFWwindow);
@@ -222,7 +258,7 @@ void Window::default_init() {
       }
     }
     if (!mGLFWwindow) {
-      throw("Unable to init Windwo for OpenGL 4.3+");
+      throw("Unable to init Window for OpenGL 4.3+");
     }
 
     // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524

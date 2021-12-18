@@ -10,6 +10,7 @@
 
 // internal
 #include "Controls/Input.h"
+#include "WindowOptions.h"
 
 namespace AA {
 
@@ -27,18 +28,37 @@ class LongSound;
 class SoundEffect;
 class Speaker;
 
-class AncientArcher {
+class AncientArcher final {
 public:
 
   /// <summary>
-  /// Prints Engine Version if in Debug.
-  /// Creates a Default Window and Renderer
-  /// Initializes IMGUI
+  /// Init Window and Renderer with Default Options.
+  /// Initializes IMGUI.
   /// Creates a Default Sound Device.
   /// Initializes Physx.
   /// </summary>
-  /// <returns>true if successful, false if already initialized.</returns>
+  /// <returns>True if successful, False if already initialized.</returns>
   bool Init();
+
+  /// <summary>
+  /// Init Window and Renderer with user specificed WindowOptions to copy over.
+  /// Initializes IMGUI.
+  /// Creates a Default Sound Device.
+  /// Initializes Physx.
+  /// </summary>
+  /// <param name="winopts"></param>
+  /// <returns>True if successful, False if already initialized.</returns>
+  bool Init(const WindowOptions& winopts);
+
+  /// <summary>
+  /// Init Window and Renderer with user specificed WindowOptions to share.
+  /// Initializes IMGUI.
+  /// Creates a Default Sound Device.
+  /// Initializes Physx.
+  /// </summary>
+  /// <param name="winopts"></param>
+  /// <returns>True if successful, False if already initialized.</returns>
+  bool Init(std::shared_ptr<WindowOptions> winopts);
 
   /// <summary>
   /// Runs an initialized media instance.
@@ -272,14 +292,18 @@ public:
   unsigned int GetAnimPropBoneCount_testing(const unsigned int anim_prop_id);
 
   /// <summary>
-  /// 
+  /// Adds Skeletal Animation Data to the memory bank of a Animated Prop.
   /// </summary>
-  /// <param name="path"></param>
-  /// <param name="anim_prop_id"></param>
-  /// <returns></returns>
+  /// <param name="path">path to a file (fbx tested, but should handle any file that assimp can load</param>
+  /// <param name="anim_prop_id">The Unique ID of the animated prop to apply this animation to.</param>
+  /// <returns>The Unique ID to access this animation.</returns>
   unsigned int AddAnimation(const char* path, const unsigned int anim_prop_id);
 
-
+  /// <summary>
+  /// Remvoes animation from memory bank.
+  /// </summary>
+  /// <param name="animation_id">id of animation to remove</param>
+  /// <returns>True if succeeded on remove, False otherwise.</returns>
   bool RemoveAnimation(const unsigned int animation_id);
 
   /// <summary>
@@ -288,7 +312,6 @@ public:
   /// <param name="animation_id">id of the animation or -1 to turn off animation</param>
   /// <param name="animprop_id">id of the prop</param>
   void SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id);
-
 
   enum class COLLIDERTYPE { BOX, SPHERE, CAPSULE };
 
@@ -388,7 +411,6 @@ public:
   void ChangePointLight(int which, glm::vec3 new_pos, float new_constant, float new_linear, float new_quad,
     glm::vec3 new_amb, glm::vec3 new_diff, glm::vec3 new_spec);
 
-
   /// <summary>
   /// Adds a Spot light (flashlight style) to the default lit shader.
   /// Manages its own unique ids so you can add/remove at will (limited by shader).
@@ -441,7 +463,6 @@ public:
   void ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir, float new_inner,
     float new_outer, float new_constant, float new_linear, float new_quad, glm::vec3 new_amb,
     glm::vec3 new_diff, glm::vec3 new_spec);
-
 
   /// <summary>
   /// Adds a sound effect to the playable bank. 
