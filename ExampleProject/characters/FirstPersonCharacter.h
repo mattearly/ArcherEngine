@@ -14,7 +14,7 @@ FlashLight flashlight;
 unsigned int footstepId[4];
 static glm::vec3 frontFacingDir;
 static glm::vec3 rightFacingDir;
-extern AA::AncientArcher instance;
+extern AA::AncientArcher Engine;
 static float inventory_toggle_timer = 0.f;
 static int inventory_gui_id = -1;
 static int camera_radius_light = -1;
@@ -44,10 +44,10 @@ struct MainCharacter {
 public:
   void Setup() {
     if (isInitialized) return;
-    character_cam = instance.AddCamera();
-    instance.SetCamMaxRenderDistance(character_cam, 6000.f);
-    instance.SetCamPosition(character_cam, glm::vec3(-10.0f, 85.0f, 1000.0f));
-    instance.SetCursorToDisabled(); // disabled to hide for first person
+    character_cam = Engine.AddCamera();
+    Engine.SetCamMaxRenderDistance(character_cam, 6000.f);
+    Engine.SetCamPosition(character_cam, glm::vec3(-10.0f, 85.0f, 1000.0f));
+    Engine.SetCursorToDisabled(); // disabled to hide for first person
 
     // SETUP RADIUS LIGHT AROUND CAMERA
     //camera_radius_light = AA::AddPointLight(glm::vec3(0, 100, 400),
@@ -60,63 +60,66 @@ public:
 
     //flashlight.turn_on();
 
-    footstepId[0] = instance.AddSoundEffect("../ExampleProject/res/footstep_1.wav");
-    footstepId[1] = instance.AddSoundEffect("../ExampleProject/res/footstep_2.wav");
-    footstepId[2] = instance.AddSoundEffect("../ExampleProject/res/footstep_3.wav");
-    footstepId[3] = instance.AddSoundEffect("../ExampleProject/res/footstep_4.wav");
-    instance.SetSoundEffectVolume(footstepId[0], .4f);
-    instance.SetSoundEffectVolume(footstepId[1], .4f);
-    instance.SetSoundEffectVolume(footstepId[2], .4f);
-    instance.SetSoundEffectVolume(footstepId[3], .4f);
+    footstepId[0] = Engine.AddSoundEffect("../ExampleProject/res/footstep_1.wav");
+    footstepId[1] = Engine.AddSoundEffect("../ExampleProject/res/footstep_2.wav");
+    footstepId[2] = Engine.AddSoundEffect("../ExampleProject/res/footstep_3.wav");
+    footstepId[3] = Engine.AddSoundEffect("../ExampleProject/res/footstep_4.wav");
+
+    Engine.SetSoundEffectVolume(footstepId[0], 0.5f);
+    Engine.SetSoundEffectVolume(footstepId[1], 0.5f);
+    Engine.SetSoundEffectVolume(footstepId[2], 0.5f);
+    Engine.SetSoundEffectVolume(footstepId[3], 0.5f);
 
     // SETUP MOVEMENT SYSTEM
-    frontFacingDir = instance.GetCamFront(character_cam);
-    rightFacingDir = instance.GetCamRight(character_cam);
+    frontFacingDir = Engine.GetCamFront(character_cam);
+    rightFacingDir = Engine.GetCamRight(character_cam);
 
     // SETUP INVENTORY SYSTEM
-    open_sound_id = instance.AddSoundEffect("res/open_inv.ogg");
-    close_sound_id = instance.AddSoundEffect("res/close_inv.ogg");
+    open_sound_id = Engine.AddSoundEffect("res/open_inv.ogg");
+    close_sound_id = Engine.AddSoundEffect("res/close_inv.ogg");
 
-    instance.AddToKeyHandling([](AA::KeyboardButtons& kb) { // set TAB to open/close Inventory
+    Engine.AddToKeyHandling([](AA::KeyboardButtons& kb) { // set TAB to open/close Inventory
       const float cd = .5f;
       if (kb.tab && inventory_toggle_timer > cd) {
-        if (!is_inventory_open) {                   // Open Inventory
+
+        // Open Inventory
+        if (!is_inventory_open) {
           is_inventory_open = true;
-          instance.SetCursorToNormal();
+          Engine.SetCursorToNormal();
           if (inventory_gui_id == -1) {
-            inventory_gui_id = instance.AddToImGuiUpdate([]() {
-              ImGui::Begin("Inventory");
+            inventory_gui_id = Engine.AddToImGuiUpdate([]() {
+              ImGui::Begin("Inventory Menu Example");
               ImGui::TextColored(ImVec4(1, 1, 0, 1), "All Items");
-
-              glm::vec3 camera_pos = instance.GetCamPosition(character_cam);
-
+              glm::vec3 camera_pos = Engine.GetCamPosition(character_cam);
               ImGui::Text("Pos: %.1f, %.1f, %.1f", camera_pos.x, camera_pos.y, camera_pos.z);
-
-
               ImGui::BeginChild("Scrolling");
               for (int n = 0; n < 5; n++)
-                ImGui::Text("Item %04d", n);
+                ImGui::Text("Sample Item %04d", n);
               ImGui::EndChild();
               ImGui::End();
             });
           }
-          instance.PlaySoundEffect(open_sound_id);
-        } else {                                    // Close Inventory
+          Engine.PlaySoundEffect(open_sound_id);
+
+        // Close Inventory
+        } else {
           is_inventory_open = false;
-          instance.SetCursorToDisabled();
+          Engine.SetCursorToDisabled();
           if (inventory_gui_id != -1) {
-            instance.RemoveFromImGuiUpdate(inventory_gui_id);
+            Engine.RemoveFromImGuiUpdate(inventory_gui_id);
             inventory_gui_id = -1;
           }
           re_entering_fpp = true;
-          instance.PlaySoundEffect(close_sound_id);
+          Engine.PlaySoundEffect(close_sound_id);
         }
-        inventory_toggle_timer = 0.f; // reset timer
+
+        // Reset timer
+        inventory_toggle_timer = 0.f;
       }
     });
 
     // set WASD key first person movement function
-    instance.AddToKeyHandling([](AA::KeyboardButtons& key) {
+    Engine.AddToKeyHandling([](AA::KeyboardButtons& key) {
       if (key.w) {
         move.forward = true;
       } else if (!key.w) {
@@ -150,7 +153,7 @@ public:
     });
 
     // add first person mouse movement to change our view direction
-    instance.AddToMouseHandling([](AA::MouseCursorPos& cursor) {
+    Engine.AddToMouseHandling([](AA::MouseCursorPos& cursor) {
       if (is_inventory_open)
         return;
 
@@ -175,10 +178,10 @@ public:
       xDelta *= SENSITIVITY;
       yDelta *= SENSITIVITY;
 
-      instance.ShiftCamPitchAndYaw(character_cam, yDelta, xDelta);
+      Engine.ShiftCamPitchAndYaw(character_cam, yDelta, xDelta);
 
-      frontFacingDir = instance.GetCamFront(character_cam);
-      rightFacingDir = instance.GetCamRight(character_cam);
+      frontFacingDir = Engine.GetCamFront(character_cam);
+      rightFacingDir = Engine.GetCamRight(character_cam);
 
       if (flashlight.isOn) {
         flashlight.direction = frontFacingDir;
@@ -188,9 +191,9 @@ public:
     });
 
     // default on flashlight
-    flashlight.turn_on();
+    //flashlight.turn_on();
     // SETUP FLASHLIGHT TOGGLE
-    instance.AddToKeyHandling([](AA::KeyboardButtons& kb) {
+    Engine.AddToKeyHandling([](AA::KeyboardButtons& kb) {
       const float cd = .25f;
       if (kb.f && flashlight_toggle_timer > cd) {
         if (flashlight.isOn) {
@@ -225,10 +228,10 @@ public:
     if (move.forward || move.backwards || move.right || move.left) {
       moveDir.y = 0.f;
       float frame_calculated_velocity = dt * (move.sprint) ? sprint_bonus + current_move_speed : current_move_speed;
-      instance.ShiftCamPosition(character_cam, moveDir * frame_calculated_velocity);
-      glm::vec3 cam_loc = instance.GetCamPosition(character_cam);
+      Engine.ShiftCamPosition(character_cam, moveDir * frame_calculated_velocity);
+      glm::vec3 cam_loc = Engine.GetCamPosition(character_cam);
       if (camera_radius_light != -1) {
-        instance.MovePointLight(camera_radius_light, cam_loc);
+        Engine.MovePointLight(camera_radius_light, cam_loc);
       }
       if (flashlight.isOn) {
         flashlight.position = cam_loc;
@@ -236,7 +239,7 @@ public:
       }
       if (footstepCooldown > FOOTSTEPPLAYINTERVAL) {
         unsigned int random_index = AA::NTKR(0, 3);
-        instance.PlaySoundEffect(footstepId[random_index], true);
+        Engine.PlaySoundEffect(footstepId[random_index], true);
         footstepCooldown = 0.f;
       }
     }

@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 static int flashlightsoundid = -1;
 extern int character_cam;
-extern AA::AncientArcher instance;
+extern AA::AncientArcher Engine;
 struct FlashLight {
   bool      isOn = false;
   int       id = -1;
@@ -18,31 +18,31 @@ struct FlashLight {
   glm::vec3 diffuse = glm::vec3(1.f);
   glm::vec3 specular = glm::vec3(1.f);
   void turn_on() {
-    position = instance.GetCamPosition(character_cam);
-    direction = instance.GetCamFront(character_cam);
+    position = Engine.GetCamPosition(character_cam);
+    direction = Engine.GetCamFront(character_cam);
     if (isOn) return;
     if (flashlightsoundid == -1)  // lazy init
     {
-      flashlightsoundid = instance.AddSoundEffect("res/flashlightclick.wav");
-      instance.SetSoundEffectVolume(flashlightsoundid, .1998f);
+      flashlightsoundid = Engine.AddSoundEffect("res/flashlightclick.wav");
+      Engine.SetSoundEffectVolume(flashlightsoundid, .1998f);
     }
-    id = instance.AddSpotLight(position, direction, inner_radius, outer_radius, constant, linear, quad, ambient, diffuse, specular);
+    id = Engine.AddSpotLight(position, direction, inner_radius, outer_radius, constant, linear, quad, ambient, diffuse, specular);
     isOn = true;
-    instance.PlaySoundEffect(flashlightsoundid, true);
+    Engine.PlaySoundEffect(flashlightsoundid, true);
   };
   void turn_off() {
     if (!isOn) return;
-    instance.RemoveSpotLight(id);
+    Engine.RemoveSpotLight(id);
     id = -1;
     isOn = false;
-    instance.PlaySoundEffect(flashlightsoundid, true);
+    Engine.PlaySoundEffect(flashlightsoundid, true);
   };
   void lock_in_new_params() {
     if (id != -1)
-      instance.ChangeSpotLight(id, position, direction, inner_radius, outer_radius, constant, linear, quad, ambient, diffuse, specular);
+      Engine.ChangeSpotLight(id, position, direction, inner_radius, outer_radius, constant, linear, quad, ambient, diffuse, specular);
   }
   void lock_in_movement() {
     if (id != -1)
-      instance.MoveSpotLight(id, position, direction);
+      Engine.MoveSpotLight(id, position, direction);
   }
 };

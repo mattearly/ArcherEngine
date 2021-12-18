@@ -3,16 +3,26 @@
 * */
 
 #include <AncientArcher/AncientArcher.h>
-#include "game/MainGame.h"
+#include <AncientArcher/WindowOptions.h>
+#include "Manager.h"
 
-MainGame myGame;
-AA::AncientArcher instance;
+AA::AncientArcher Engine;
 
 int main(int argc, char** argv) {
-  instance.Init();
-  instance.SetWindowTitle("ExampleProject");
-  myGame.Setup();
-  instance.AddToUpdate([](float dt) { myGame.Update(dt); });
-  instance.AddToOnTeardown([]() { myGame.Teardown(); });
-  return instance.Run();
+
+  AA::WindowOptions winopts;
+  winopts._title = "ExampleProject";
+#ifdef _DEBUG
+  winopts._windowing_mode = AA::WINDOW_MODE::WINDOWED_DEFAULT;
+#else
+  winopts._windowing_mode = AA::WINDOW_MODE::FULLSCREEN;
+#endif
+  Engine.Init(winopts);
+
+  static Manager manager;
+  Engine.AddToUpdate([](float dt){
+    manager.tick(dt);
+  });
+
+  return Engine.Run();
 }

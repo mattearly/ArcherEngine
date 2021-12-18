@@ -89,16 +89,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="game\Player.h" />
-    <ClInclude Include="game\FlashLight.h" />
-    <ClInclude Include="game\MainCharacter.h" />
-    <ClInclude Include="game\MainGame.h" />
-    <ClInclude Include="game\setup\setfullscreentoggle.h" />
-    <ClInclude Include="game\setup\setgui.h" />
-    <ClInclude Include="game\setup\setmodels.h" />
-    <ClInclude Include="game\setup\setskylight.h" />
-    <ClInclude Include="game\setup\setmusic.h" />
-    <ClInclude Include="game\Stats.h" />
+    <ClInclude Include="characters\Player.h" />
+    <ClInclude Include="characters\FlashLight.h" />
+    <ClInclude Include="characters\FirstPersonCharacter.h" />
+    <ClInclude Include="Manager.h" />
+    <ClInclude Include="setup\setmodels.h" />
+    <ClInclude Include="setup\setskylight.h" />
+    <ClInclude Include="setup\setmusic.h" />
+    <ClInclude Include="characters\Stats.h" />
+    <ClInclude Include="scenes\Character.h" />
+    <ClInclude Include="scenes\Intro.h" />
+    <ClInclude Include="scenes\Level1.h" />
+    <ClInclude Include="scenes\Menu.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AAEngine\AAEngine.vcxproj">
