@@ -135,14 +135,21 @@ void AncientArcher::render() {
     if (mSkybox) {
       mSkybox->Render(mCameras.front());
     }
-  }
+
+    OGLGraphics::SetDepthTest(false);
+
+#ifdef _DEBUG
+    if (mSimulateWorldPhysics) {
+      NVidiaPhysx::Get()->DrawDebug(mCameras.front());
+    }
+#endif
+
+  }  // endif !mCamera.empty()
 #ifdef _DEBUG
   else {
     std::cout << "0 cameras, skybox and props wont show\n";
   }
 #endif
-
-  OGLGraphics::SetDepthTest(false);
 
   if (mIMGUI) {
     mIMGUI->NewFrame();
