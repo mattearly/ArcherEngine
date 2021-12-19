@@ -19,7 +19,7 @@ void TickIntro(const float& dt) {
   if (logo_id != -1) {
     static float curr_rot = 0.f;
     curr_rot += dt * 1.5;
-    Engine.RotateProp(logo_id, glm::vec3(curr_rot));
+    Engine.RotateProp(logo_id, glm::vec3(0, curr_rot, 0));
   }
 }
 
