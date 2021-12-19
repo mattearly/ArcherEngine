@@ -11,7 +11,7 @@ namespace AA {
 
 
 const char* OGLShader::get_glsl_version() {
-    return (char*)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS);
+  return (char*)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS);
 }
 OGLShader::OGLShader(const char* vert_src, const char* frag_src) {
 #ifdef _DEBUG
@@ -110,8 +110,8 @@ void OGLShader::loadShader(const char* vert_source, const char* frag_source) {
 #ifdef _DEBUG
     char v_infoLog[512];
     glGetShaderInfoLog(vertexShader, 512, nullptr, v_infoLog);
-    throw(v_infoLog);
     std::cout << "error in vertex shader, compilation failed: " << v_infoLog << std::endl;
+    throw(v_infoLog);
     char a;
     std::cin >> a;
 #endif

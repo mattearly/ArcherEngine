@@ -6,6 +6,17 @@ using namespace physx;
 
 namespace AA {
 
+
+// Singleton Implementation
+[[nodiscard]] NVidiaPhysx* NVidiaPhysx::Get() {
+  static NVidiaPhysx* physics_singleton_impl = nullptr;
+  if (!physics_singleton_impl) {
+    physics_singleton_impl = new NVidiaPhysx();
+  }
+  return physics_singleton_impl;
+}
+
+
 // helper function
 void SetupDefaultRigidDynamic(PxRigidDynamic& body, bool kinematic = false) {
   body.setActorFlag(PxActorFlag::eVISUALIZATION, true);
@@ -158,7 +169,7 @@ void NVidiaPhysx::DrawDebug(const std::shared_ptr<Camera> cam) {
 in(location=0) vec3 inPos;
 uniform mat4 u_projection_matrix;
 uniform mat4 u_view_matrix;
-unifomr mat4 u_model_matrix;
+uniform mat4 u_model_matrix;
 void main() {
   gl_Position = u_projection_matrix * u_view_matrix * u_model_matrix * vec4(inPos, 1.0);
 })";
@@ -183,14 +194,6 @@ void NVidiaPhysx::addPhysicsActors(PxRigidActor* actor) {
   mPhysicsActors.push_back(actor);
 }
 
-// Singleton Implementation
-NVidiaPhysx* NVidiaPhysx::Get() {
-  static NVidiaPhysx* physics_singleton_impl = nullptr;
-  if (!physics_singleton_impl) {
-    physics_singleton_impl = new NVidiaPhysx();
-  }
-  return physics_singleton_impl;
-}
 
 }  // end namespace AA
 

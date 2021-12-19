@@ -14,8 +14,8 @@ namespace AA {
 /// </summary>
 class NVidiaPhysx {
 public:
-  
-  static NVidiaPhysx* Get();
+
+  static [[nodiscard]] NVidiaPhysx* Get();
 
   void StepPhysics(float dt);
 
