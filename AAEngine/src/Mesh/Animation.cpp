@@ -6,11 +6,16 @@ namespace AA {
 
 Animation::Animation() = default;
 
+/// <summary>
+/// Loads the first animation in the file (todo: multiload). 
+/// Applies Missing Bones to animated prop
+/// </summary>
+/// <param name="animationPath">path to file</param>
+/// <param name="anim_prop">shared pointer to animated prop</param>
 Animation::Animation(const std::string& animationPath, std::shared_ptr<AnimProp> anim_prop) {
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
   assert(scene && scene->mRootNode);
-  // todo: consider loading other animations than just the first one
   auto animation = scene->mAnimations[0];
   m_Duration = static_cast<float>(animation->mDuration);
   m_TicksPerSecond = static_cast<float>(animation->mTicksPerSecond);
