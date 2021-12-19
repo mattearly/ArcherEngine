@@ -28,7 +28,7 @@ Window::Window() {
 
   SetDefaults(Options);
 
-  mWindowOptions = std::make_shared<WindowOptions>(Options);    
+  mWindowOptions = std::make_shared<WindowOptions>(Options);
   default_init();
   window_instance_count++;
 }
@@ -42,7 +42,7 @@ Window::Window(WindowOptions winopts) {
     glfwInit();
     glfw_is_init = true;
   }
-  mWindowOptions = std::make_shared<WindowOptions>(winopts);    
+  mWindowOptions = std::make_shared<WindowOptions>(winopts);
   default_init();
   window_instance_count++;
 
@@ -57,7 +57,7 @@ Window::Window(std::shared_ptr<WindowOptions> winopts) {
     glfwInit();
     glfw_is_init = true;
   }
-  mWindowOptions = winopts;    
+  mWindowOptions = winopts;
   default_init();
   window_instance_count++;
 }
@@ -87,45 +87,41 @@ std::shared_ptr<WindowOptions> Window::GetModifiableWindowOptions() {
 }
 
 void Window::ApplyChanges() {
-  if (!settings_applied_at_least_once) {
-    glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
-    glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
-    glfwSwapInterval(mWindowOptions->_vsync);
-    apply_window_sizings_from_current_options();
-  } else {
 
-    //todo: relaunch window if required (msaa change, render tech is prelaunch only)
-    if (mWindowOptions->_msaa_samples > 0 && prev_window_options._msaa_samples != mWindowOptions->_msaa_samples) {
-      OGLGraphics::SetMultiSampling(true);
-      // locking this at a max of 16
-      if (mWindowOptions->_msaa_samples >= 1 && mWindowOptions->_msaa_samples <= 16) {
-        glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
-      } else {
-        glfwWindowHint(GLFW_SAMPLES, 16);
-        mWindowOptions->_msaa_samples = 16;
-      }
-      // todo: relaunch window
+  //todo: relaunch window if required (msaa change, render tech is prelaunch only)
+  if (mWindowOptions->_msaa_samples > 0 && prev_window_options._msaa_samples != mWindowOptions->_msaa_samples) {
+    OGLGraphics::SetMultiSampling(true);
+    // locking this at a max of 16
+    if (mWindowOptions->_msaa_samples >= 1 && mWindowOptions->_msaa_samples <= 16) {
+      glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
+    } else {
+      glfwWindowHint(GLFW_SAMPLES, 16);
+      mWindowOptions->_msaa_samples = 16;
     }
-
-    // update things that have changed
-    if (mWindowOptions->_cursor_mode != prev_window_options._cursor_mode) {
-      glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
-    }
-
-    if (mWindowOptions->_title != prev_window_options._title) {
-      glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
-    }
-
-    // set window if mode changed
-    if (prev_window_options._windowing_mode != mWindowOptions->_windowing_mode) {
-      apply_window_sizings_from_current_options();
-    }
-
-    if (prev_window_options._vsync != mWindowOptions->_vsync) {
-      glfwSwapInterval(mWindowOptions->_vsync);
-    }
-
+    // todo: relaunch window
   }
+
+  // update things that have changed
+  if (mWindowOptions->_cursor_mode != prev_window_options._cursor_mode) {
+    glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
+  }
+
+  if (mWindowOptions->_title != prev_window_options._title) {
+    glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
+  }
+
+  // set window if mode changed
+  if (prev_window_options._windowing_mode != mWindowOptions->_windowing_mode) {
+    apply_window_sizings_from_current_options();
+  }
+
+  if (prev_window_options._vsync != mWindowOptions->_vsync) {
+    glfwSwapInterval(mWindowOptions->_vsync);
+  }
+
+  // note applied settings
+  prev_window_options = *mWindowOptions;
+
 }
 void Window::SetViewportToWindowSize() noexcept {
   switch (mWindowOptions->_rendering_tech) {
@@ -172,7 +168,7 @@ int Window::GetCurrentHeight() {
 /// and the way the window is initialized if passed custom options
 /// </summary>
 void Window::apply_window_sizings_from_current_options() noexcept {
-  auto monitor = glfwGetPrimaryMonitor();
+  const auto monitor = glfwGetPrimaryMonitor();
   const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
   switch (mWindowOptions->_windowing_mode) {
@@ -200,23 +196,24 @@ void Window::apply_window_sizings_from_current_options() noexcept {
 
   case WINDOW_MODE::FULLSCREEN_BORDERLESS:
 
+    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+    glfwSetWindowMonitor(mGLFWwindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+    break;
 
   case WINDOW_MODE::FULLSCREEN:
     glfwRestoreWindow(mGLFWwindow); // in case of maximized
     glfwSetWindowMonitor(mGLFWwindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+    mWindowOptions->_width = mode->width;
+    mWindowOptions->_height = mode->height;
     break;
   }
 
   // lock in with previous after this
   prev_window_options._windowing_mode = mWindowOptions->_windowing_mode;
 }
-
-//void Window::clear_screen() {
-//  switch (mWindowOptions->_rendering_tech) {
-//  case RENDER_TECH::OPENGL4:
-//    OGLGraphics::ClearScreenColorAndDepth();
-//  }
-//}
 
 void Window::swap_buffers() {
   glfwSwapBuffers(mGLFWwindow);
@@ -249,14 +246,29 @@ void Window::default_init() {
     while (!mGLFWwindow && !try_versions.empty()) {
       glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, try_versions.back().major);
       glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, try_versions.back().minor);
-      mGLFWwindow = glfwCreateWindow(mWindowOptions->_width, mWindowOptions->_height, mWindowOptions->_title.c_str(),
-        (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN) ? glfwGetPrimaryMonitor() : nullptr,
-        nullptr
-      );
+      if (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN) {
+        const auto monitor = glfwGetPrimaryMonitor();
+        const auto video_mode = glfwGetVideoMode(monitor);
+        mGLFWwindow = glfwCreateWindow(video_mode->width, video_mode->height, mWindowOptions->_title.c_str(), monitor, nullptr);
+      } else if (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN_BORDERLESS) {
+        const auto monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+        mGLFWwindow = glfwCreateWindow(mode->width, mode->height, mWindowOptions->_title.c_str(), monitor, nullptr);
+      } else {
+        mGLFWwindow = glfwCreateWindow(mWindowOptions->_width, mWindowOptions->_height, mWindowOptions->_title.c_str(), nullptr, nullptr);
+      }
       if (!mGLFWwindow) {
         try_versions.pop_back();
       }
     }
+
+    glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
+    glfwSwapInterval(mWindowOptions->_vsync);
+
     if (!mGLFWwindow) {
       throw("Unable to init Window for OpenGL 4.3+");
     }
