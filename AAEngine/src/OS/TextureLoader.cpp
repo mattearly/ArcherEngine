@@ -194,7 +194,7 @@ unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& s
   }
   unsigned int return_id = OGLGraphics::UploadCubeMapTex(data, width, height, nrChannel == 4);
 #ifdef _DEBUG
-  printf("LoadedCubeMap(id:%i)\n", return_id);
+  printf("LoadedCubeMapTextures(id:%i)\n", return_id);
 #endif
   return return_id;
 }
@@ -213,8 +213,6 @@ void TextureLoader::UnloadTexture(const std::unordered_map<unsigned int, std::st
     // sync local textures list
     AllLoadedTextures.remove_if([](const TextureInfo& ti) -> bool { return (ti.ref_count == 0) ? true : false; });
   }
-
-
 }
 
 int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* mat, aiTextureType type, std::string typeName, std::string orginalFilePath, std::unordered_map<unsigned int, std::string>& out_texInfo) {
