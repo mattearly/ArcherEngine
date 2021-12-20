@@ -233,6 +233,9 @@ public:
   /// <returns>id of the prop</returns>
   unsigned int AddProp(const char* path, glm::vec3 location = glm::vec3(0), glm::vec3 scale = glm::vec3(1));
 
+  
+  bool RemoveProp(const unsigned int id);
+
   /// <summary>
   /// Moves a prop to a location
   /// </summary>

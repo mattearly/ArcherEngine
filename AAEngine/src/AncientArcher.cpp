@@ -342,6 +342,35 @@ unsigned int AncientArcher::AddProp(const char* path, glm::vec3 location, glm::v
   return mProps.back()->GetUID();
 }
 
+bool AncientArcher::RemoveProp(const unsigned int id) {
+
+
+  // remove cache (or decrement count of laoded ifn multilo9aded0
+  for (auto& prop : mProps) {
+    if (prop->GetUID() == id) {
+      prop->RemoveCache();
+    }
+  }
+
+
+  // the actual remove
+  auto before_size = mProps.size();
+
+  auto ret_it = mProps.erase(
+    std::remove_if(
+      mProps.begin(),
+      mProps.end(),
+      [&](auto& prop) { return prop->GetUID() == id; }),
+    mProps.end());
+
+  auto after_size = mProps.size();
+
+  // return true if successful removal, false otherwise
+  return (before_size != after_size);
+
+
+}
+
 void AncientArcher::MoveProp(const unsigned int id, glm::vec3 loc) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
