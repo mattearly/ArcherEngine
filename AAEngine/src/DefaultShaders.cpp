@@ -4,6 +4,8 @@ namespace AA {
 OGLShader* UBERSHADER;
 
 OGLShader* DefaultShaders::get_ubershader() {
+  if (!UBERSHADER)
+    init_ubershader();
   UBERSHADER->Use();
   return UBERSHADER;
 }
