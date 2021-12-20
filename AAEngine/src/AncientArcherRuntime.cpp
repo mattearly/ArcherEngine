@@ -93,10 +93,7 @@ void AncientArcher::update() {
 
   for (auto& oMH : onMouseHandling) { oMH.second(g_mouse_input_status); }
   for (auto& oSH : onScrollHandling) { oSH.second(g_scroll_input_status); }
-}
 
-// Renders visable props every frame
-void AncientArcher::render() {
   // Pre-render
   if (g_os_window_resized) {
     for (auto& cam : mCameras) {
@@ -113,6 +110,10 @@ void AncientArcher::render() {
   OGLGraphics::SetDepthTest(true);
   OGLGraphics::SetDepthMode(GL_LESS);
 
+}
+
+// Renders visable props every frame
+void AncientArcher::render() {
   OGLShader* shader = DefaultShaders::get_ubershader();
 
   if (!mCameras.empty()) {
