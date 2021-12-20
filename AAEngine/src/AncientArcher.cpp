@@ -344,14 +344,12 @@ unsigned int AncientArcher::AddProp(const char* path, glm::vec3 location, glm::v
 
 bool AncientArcher::RemoveProp(const unsigned int id) {
 
-
-  // remove cache (or decrement count of laoded ifn multilo9aded0
+  // remove cache (or decrement count of loaded in when multiloading)
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       prop->RemoveCache();
     }
   }
-
 
   // the actual remove
   auto before_size = mProps.size();

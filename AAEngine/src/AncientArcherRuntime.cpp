@@ -60,9 +60,6 @@ void AncientArcher::update() {
   }
 
   for (auto& p : mProps) {
-    if (p->spacial_data.mRigidBody) {
-
-    }
     p->spacial_data.ProcessModifications();
   }
 
@@ -72,8 +69,6 @@ void AncientArcher::update() {
       ap->UpdateAnim(elapsedTime);
     }
   }
-
-
 
   if (mMusic) {
     static float music_rebuffer_cd = 0;

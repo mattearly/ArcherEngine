@@ -233,7 +233,11 @@ public:
   /// <returns>id of the prop</returns>
   unsigned int AddProp(const char* path, glm::vec3 location = glm::vec3(0), glm::vec3 scale = glm::vec3(1));
 
-  
+  /// <summary>
+  /// Removes a prop. Calls remove cache on model data to keep track of instance count.
+  /// </summary>
+  /// <param name="id">id of the prop to remove</param>
+  /// <returns>true if successful, false otherwise</returns>
   bool RemoveProp(const unsigned int id);
 
   /// <summary>
