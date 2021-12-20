@@ -109,8 +109,7 @@ void AncientArcher::render() {
     cam->shaderTick();
   }
 
-  mWindow->clear_screen();
-
+  OGLGraphics::ClearScreen();
   OGLGraphics::SetDepthTest(true);
   OGLGraphics::SetDepthMode(GL_LESS);
 
