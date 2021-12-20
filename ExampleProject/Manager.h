@@ -2,6 +2,7 @@
 #include <AncientArcher/AncientArcher.h>
 #include <imgui.h>
 #include "scenes/Intro.h"
+#include "scenes/Menu.h"
 
 extern AA::AncientArcher Engine;
 
@@ -38,19 +39,23 @@ struct Manager {
   enum class SCENE { INTRO, MAIN_MENU, CHARACTER, LEVEL1 } scene;
 
   void tick(const float& dt) {
+    static float timer = 0;
+    timer += dt;
     if (state == STATE::PLAY_SCENE) {
       switch (scene) {
       case SCENE::INTRO:
-        TickIntro(dt);
+        if (timer <= 3.f) {
+          TickIntro(dt);
+        } else {
+          scene_switch(SCENE::MAIN_MENU);
+        }
         break;
       case SCENE::MAIN_MENU:
-        //PlayMenu();
+        TickMenu(dt);
         break;
       case SCENE::CHARACTER:
-        //PlayCharacter();
         break;
       case SCENE::LEVEL1:
-        //PlayLevel1();
         break;
       }
     } else {
@@ -60,48 +65,40 @@ struct Manager {
 
 
   void scene_switch(const SCENE& to) {
-    static bool first_time = true;
-    if (scene == to && !first_time) {
-      return; // already on this scene
+    static bool first_time = true;  // default true
+
+    // unload the current (prev) scene
+    if (!first_time) {
+      switch (scene) {
+      case SCENE::INTRO:
+        UnloadIntro();
+        break;
+      case SCENE::MAIN_MENU:
+        UnloadMenu();
+        break;
+      case SCENE::CHARACTER:
+        break;
+      case SCENE::LEVEL1:
+        break;
+      }
     }
 
-    // LOAD NEW SCENE
+
+    // load the new scene
     switch (to) {
     case SCENE::INTRO:
       LoadIntro();
       break;
     case SCENE::MAIN_MENU:
-      //PlayMenu();
+      LoadMenu();
       break;
     case SCENE::CHARACTER:
-      //PlayCharacter();
       break;
     case SCENE::LEVEL1:
-      //PlayLevel1();
       break;
     }
 
-    if (!first_time) {
-      // UNLOAD OLD SCENE
-      switch (scene) {
-      case SCENE::INTRO:
-        break;
-      case SCENE::MAIN_MENU:
-        //PlayMenu();
-        break;
-      case SCENE::CHARACTER:
-        //PlayCharacter();
-        break;
-      case SCENE::LEVEL1:
-        //PlayLevel1();
-        break;
-      }
-    }
-
-    if (first_time) {
-      first_time = false;
-    }
-
+    first_time = false;
     scene = to;
   }
 
