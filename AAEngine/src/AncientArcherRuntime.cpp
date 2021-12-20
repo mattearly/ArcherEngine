@@ -189,8 +189,7 @@ void AncientArcher::teardown() {
   mSoundEffects.clear();
 
   if (mMusic) {
-    delete mMusic;
-    mMusic = nullptr;
+    RemoveMusic();
   }
 
   isInit = false;
