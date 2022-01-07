@@ -1,4 +1,4 @@
-#include "../include/AncientArcher/AncientArcher.h"
+#include "../include/AAEngine/Interface.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Scene/Camera.h"
 #include "Mesh/Prop.h"
@@ -21,7 +21,7 @@
 
 namespace AA {
 
-bool AncientArcher::Init() {
+bool Interface::Init() {
   if (isInit)
     return false;
   mWindow = new Window();
@@ -32,7 +32,7 @@ bool AncientArcher::Init() {
   return true;
 }
 
-bool AncientArcher::Init(const WindowOptions& winopts) {
+bool Interface::Init(const WindowOptions& winopts) {
   if (isInit)
     return false;
   mWindow = new Window(winopts);
@@ -43,7 +43,7 @@ bool AncientArcher::Init(const WindowOptions& winopts) {
   return true;
 }
 
-bool AncientArcher::Init(std::shared_ptr<WindowOptions> winopts) {
+bool Interface::Init(std::shared_ptr<WindowOptions> winopts) {
   if (isInit)
     return false;
   mWindow = new Window(winopts);
@@ -57,7 +57,7 @@ bool AncientArcher::Init(std::shared_ptr<WindowOptions> winopts) {
 // Runs the Engine cycle of core routines
 // return: 0 on exit success, -4 on engine not initialized, -5 if no window
 // can throw in an extension or user function
-int AncientArcher::Run() {
+int Interface::Run() {
   if (!isInit) {
     return -4;  // not init
   }
@@ -74,7 +74,7 @@ int AncientArcher::Run() {
 }
 
 // Sets the window to close on the next given chance (probably next frame)
-void AncientArcher::Shutdown() noexcept {
+void Interface::Shutdown() noexcept {
   if (mWindow)
     mWindow->Close();
   else
@@ -82,7 +82,7 @@ void AncientArcher::Shutdown() noexcept {
 }
 
 // resets all vars but leaves the window alone
-void AncientArcher::SoftReset() noexcept {
+void Interface::SoftReset() noexcept {
   teardown();
 
   mCameras.clear();
@@ -99,7 +99,7 @@ void AncientArcher::SoftReset() noexcept {
 }
 
 // Camera
-unsigned int AncientArcher::AddCamera(const int w, const int h) {
+unsigned int Interface::AddCamera(const int w, const int h) {
   if (mCameras.size() > 0) {
     throw("already has a camera, only one cam supported in this version");
   }
@@ -108,7 +108,7 @@ unsigned int AncientArcher::AddCamera(const int w, const int h) {
   return mCameras.back()->GetUID();
 }
 
-bool AncientArcher::RemoveCamera(const int camId) {
+bool Interface::RemoveCamera(const int camId) {
   if (mCameras.empty())
     return false;
 
@@ -126,7 +126,7 @@ bool AncientArcher::RemoveCamera(const int camId) {
   return false;   // fail remove
 }
 
-void AncientArcher::SetCamMaxRenderDistance(int camId, float amt) {
+void Interface::SetCamMaxRenderDistance(int camId, float amt) {
   if (amt == 0.f)
     throw("can't set render distance to 0");
 
@@ -142,7 +142,7 @@ void AncientArcher::SetCamMaxRenderDistance(int camId, float amt) {
   throw("cam id doesn't exist or is invalid");
 }
 
-void AncientArcher::SetCamToPerspective(int camId) {
+void Interface::SetCamToPerspective(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       cam->mProjectionType = ProjectionType::PERSPECTIVE;
@@ -153,7 +153,7 @@ void AncientArcher::SetCamToPerspective(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-void AncientArcher::SetCamToOrtho_testing(int camId) {
+void Interface::SetCamToOrtho_testing(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       cam->mProjectionType = ProjectionType::ORTHO;
@@ -163,7 +163,7 @@ void AncientArcher::SetCamToOrtho_testing(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-void AncientArcher::SetCamFOV(int camId, float new_fov) {
+void Interface::SetCamFOV(int camId, float new_fov) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       if (cam->mProjectionType != ProjectionType::PERSPECTIVE)
@@ -178,7 +178,7 @@ void AncientArcher::SetCamFOV(int camId, float new_fov) {
   throw("cam id doesn't exist or is invalid");
 }
 
-void AncientArcher::SetCamDimensions_testing(int camId, int w, int h) {
+void Interface::SetCamDimensions_testing(int camId, int w, int h) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
@@ -187,7 +187,7 @@ void AncientArcher::SetCamDimensions_testing(int camId, int w, int h) {
   throw("cam id doesn't exist or is invalid");
 }
 
-void AncientArcher::SetCamPosition(int camId, glm::vec3 new_loc) {
+void Interface::SetCamPosition(int camId, glm::vec3 new_loc) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       cam->Position = new_loc;
@@ -198,7 +198,7 @@ void AncientArcher::SetCamPosition(int camId, glm::vec3 new_loc) {
   throw("cam id doesn't exist or is invalid");
 }
 
-void AncientArcher::SetCamPitch(int camId, float new_pitch_degrees) {
+void Interface::SetCamPitch(int camId, float new_pitch_degrees) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       if (new_pitch_degrees > 89.9f)
@@ -213,7 +213,7 @@ void AncientArcher::SetCamPitch(int camId, float new_pitch_degrees) {
   throw("cam id doesn't exist or is invalid");
 }
 
-void AncientArcher::SetCamYaw(int camId, float new_yaw_degrees) {
+void Interface::SetCamYaw(int camId, float new_yaw_degrees) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       if (new_yaw_degrees > 360.0f)
@@ -228,7 +228,7 @@ void AncientArcher::SetCamYaw(int camId, float new_yaw_degrees) {
   throw("cam id doesn't exist or is invalid");
 }
 
-void AncientArcher::ShiftCamPosition(int camId, glm::vec3 offset) {
+void Interface::ShiftCamPosition(int camId, glm::vec3 offset) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       cam->Position += offset;
@@ -239,7 +239,7 @@ void AncientArcher::ShiftCamPosition(int camId, glm::vec3 offset) {
   throw("cam id doesn't exist or is invalid");
 }
 
-void AncientArcher::ShiftCamPitchAndYaw(int camId, double pitch_offset_degrees, double yaw_offset_degrees) {
+void Interface::ShiftCamPitchAndYaw(int camId, double pitch_offset_degrees, double yaw_offset_degrees) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       double new_pitch_degrees = cam->Pitch + pitch_offset_degrees;
@@ -263,7 +263,7 @@ void AncientArcher::ShiftCamPitchAndYaw(int camId, double pitch_offset_degrees, 
   throw("cam id doesn't exist or is invalid");
 }
 
-glm::vec3 AncientArcher::GetCamFront(int camId) {
+glm::vec3 Interface::GetCamFront(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam->Front;
@@ -272,7 +272,7 @@ glm::vec3 AncientArcher::GetCamFront(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-glm::vec3 AncientArcher::GetCamRight(int camId) {
+glm::vec3 Interface::GetCamRight(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam->Right;
@@ -281,7 +281,7 @@ glm::vec3 AncientArcher::GetCamRight(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-glm::vec3 AncientArcher::GetCamPosition(int camId) {
+glm::vec3 Interface::GetCamPosition(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam->Position;
@@ -290,7 +290,7 @@ glm::vec3 AncientArcher::GetCamPosition(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-float AncientArcher::GetCamPitch(int camId) {
+float Interface::GetCamPitch(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam->Pitch;
@@ -299,7 +299,7 @@ float AncientArcher::GetCamPitch(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-float AncientArcher::GetCamYaw(int camId) {
+float Interface::GetCamYaw(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam->Yaw;
@@ -308,7 +308,7 @@ float AncientArcher::GetCamYaw(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-glm::vec2 AncientArcher::GetPitchAndYaw(int camId) {
+glm::vec2 Interface::GetPitchAndYaw(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return glm::vec2(cam->Pitch, cam->Yaw);
@@ -317,7 +317,7 @@ glm::vec2 AncientArcher::GetPitchAndYaw(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-glm::mat4 AncientArcher::GetProjectionMatrix(int camId) {
+glm::mat4 Interface::GetProjectionMatrix(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam->mProjectionMatrix;
@@ -326,7 +326,7 @@ glm::mat4 AncientArcher::GetProjectionMatrix(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-glm::mat4 AncientArcher::GetViewMatrix(int camId) {
+glm::mat4 Interface::GetViewMatrix(int camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam->mViewMatrix;
@@ -335,14 +335,14 @@ glm::mat4 AncientArcher::GetViewMatrix(int camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
-unsigned int AncientArcher::AddProp(const char* path, glm::vec3 location, glm::vec3 scale) {
+unsigned int Interface::AddProp(const char* path, glm::vec3 location, glm::vec3 scale) {
   mProps.emplace_back(std::make_shared<Prop>(path));
   mProps.back()->spacial_data.MoveTo(location);
   mProps.back()->spacial_data.ScaleTo(scale);
   return mProps.back()->GetUID();
 }
 
-bool AncientArcher::RemoveProp(const unsigned int id) {
+bool Interface::RemoveProp(const unsigned int id) {
 
   // remove cache (or decrement count of loaded in when multiloading)
   for (auto& prop : mProps) {
@@ -369,7 +369,7 @@ bool AncientArcher::RemoveProp(const unsigned int id) {
 
 }
 
-void AncientArcher::MoveProp(const unsigned int id, glm::vec3 loc) {
+void Interface::MoveProp(const unsigned int id, glm::vec3 loc) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       return prop->spacial_data.MoveTo(loc);
@@ -378,7 +378,7 @@ void AncientArcher::MoveProp(const unsigned int id, glm::vec3 loc) {
   throw("prop id doesn't exist or is invalid");
 }
 
-void AncientArcher::ScaleProp(const unsigned int id, glm::vec3 scale) {
+void Interface::ScaleProp(const unsigned int id, glm::vec3 scale) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       return prop->spacial_data.ScaleTo(scale);
@@ -387,7 +387,7 @@ void AncientArcher::ScaleProp(const unsigned int id, glm::vec3 scale) {
   throw("prop id doesn't exist or is invalid");
 }
 
-void AncientArcher::RotateProp(const unsigned int id, glm::vec3 rot) {
+void Interface::RotateProp(const unsigned int id, glm::vec3 rot) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       return prop->spacial_data.RotateTo(rot);
@@ -396,7 +396,7 @@ void AncientArcher::RotateProp(const unsigned int id, glm::vec3 rot) {
   throw("prop id doesn't exist or is invalid");
 }
 
-unsigned int AncientArcher::AddAnimProp(const char* path, glm::vec3 starting_location) {
+unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location) {
   mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
   mAnimProps.back()->spacial_data.MoveTo(starting_location);
 #ifdef _DEBUG
@@ -405,7 +405,7 @@ unsigned int AncientArcher::AddAnimProp(const char* path, glm::vec3 starting_loc
   return mAnimProps.back()->GetUID();
 }
 
-void AncientArcher::MoveAnimProp(const unsigned int id, glm::vec3 loc) {
+void Interface::MoveAnimProp(const unsigned int id, glm::vec3 loc) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       return prop->spacial_data.MoveTo(loc);
@@ -414,7 +414,7 @@ void AncientArcher::MoveAnimProp(const unsigned int id, glm::vec3 loc) {
   throw("anim prop id doesn't exist or is invalid");
 }
 
-void AncientArcher::ScaleAnimProp(const unsigned int id, glm::vec3 scale) {
+void Interface::ScaleAnimProp(const unsigned int id, glm::vec3 scale) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       return prop->spacial_data.ScaleTo(scale);
@@ -423,7 +423,7 @@ void AncientArcher::ScaleAnimProp(const unsigned int id, glm::vec3 scale) {
   throw("anim prop id doesn't exist or is invalid");
 }
 
-void AncientArcher::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
+void Interface::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       return prop->spacial_data.RotateTo(rot);
@@ -432,7 +432,7 @@ void AncientArcher::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
   throw("anim prop id doesn't exist or is invalid");
 }
 
-unsigned int AncientArcher::GetAnimPropBoneCount_testing(const unsigned int anim_prop_id) {
+unsigned int Interface::GetAnimPropBoneCount_testing(const unsigned int anim_prop_id) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == anim_prop_id)
       return (unsigned int)prop->m_Skeleton.m_Bones.size();
@@ -440,7 +440,7 @@ unsigned int AncientArcher::GetAnimPropBoneCount_testing(const unsigned int anim
   return 0;
 }
 
-unsigned int AncientArcher::AddAnimation(const char* path, const unsigned int anim_prop_id) {
+unsigned int Interface::AddAnimation(const char* path, const unsigned int anim_prop_id) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == anim_prop_id) {
       mAnimation.emplace_back(std::make_shared<Animation>(path, prop));
@@ -450,7 +450,7 @@ unsigned int AncientArcher::AddAnimation(const char* path, const unsigned int an
   throw("prop id doesn't exist");
 }
 
-bool AncientArcher::RemoveAnimation(const unsigned int animation_id) {
+bool Interface::RemoveAnimation(const unsigned int animation_id) {
   auto before_size = mAnimation.size();
 
   auto ret_it = mAnimation.erase(
@@ -466,7 +466,7 @@ bool AncientArcher::RemoveAnimation(const unsigned int animation_id) {
   return (before_size != after_size);
 }
 
-void AncientArcher::SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id) {
+void Interface::SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id) {
   // this is terribly inefficient, but it should work
   for (auto& animprop : mAnimProps) {
     if (animprop->GetUID() == animprop_id) { // animated prop exists
@@ -488,7 +488,7 @@ void AncientArcher::SetAnimationOnAnimProp(const unsigned int animation_id, cons
   throw("invalid animation id or animated prop id");
 }
 
-void AncientArcher::AddPropPhysics(const int prop_id, const COLLIDERTYPE type) {
+void Interface::AddPropPhysics(const int prop_id, const COLLIDERTYPE type) {
   // todo: fix
   for (auto& p : mProps) {
     if (p->GetUID() == prop_id) {
@@ -528,15 +528,15 @@ void AncientArcher::AddPropPhysics(const int prop_id, const COLLIDERTYPE type) {
   throw("prop id does not exist");
 }
 
-void AncientArcher::AddGroundPlane(const glm::vec3 norm, float distance) {
+void Interface::AddGroundPlane(const glm::vec3 norm, float distance) {
   NVidiaPhysx::Get()->CreateGroundPlane(physx::PxVec3(norm.x, norm.y, norm.z), distance);
 }
 
-void AncientArcher::SimulateWorldPhysics(bool status) {
+void Interface::SimulateWorldPhysics(bool status) {
   mSimulateWorldPhysics = status;
 }
 
-void AncientArcher::SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept {
+void Interface::SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept {
   if (mSkybox)
     return;  // already set
   if (incomingSkymapFiles.size() != 6)
@@ -544,12 +544,12 @@ void AncientArcher::SetSkybox(std::vector<std::string> incomingSkymapFiles) noex
   mSkybox = std::make_shared<Skybox>(incomingSkymapFiles);
 }
 
-void AncientArcher::RemoveSkybox() noexcept {
+void Interface::RemoveSkybox() noexcept {
   if (mSkybox)
     mSkybox.reset();
 }
 
-void AncientArcher::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
+void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
   if (!mDirectionalLight) {
     mDirectionalLight = std::make_shared<DirectionalLight>(dir, amb, diff, spec);
   } else {
@@ -570,7 +570,7 @@ void AncientArcher::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 
   }
 }
 
-void AncientArcher::RemoveDirectionalLight() {
+void Interface::RemoveDirectionalLight() {
   assert(DefaultShaders::get_ubershader());
   DefaultShaders::get_ubershader()->Use();
   DefaultShaders::get_ubershader()->SetInt("isDirectionalLightOn", 0);
@@ -578,7 +578,7 @@ void AncientArcher::RemoveDirectionalLight() {
 }
 
 // Point Light
-int AncientArcher::AddPointLight(glm::vec3 pos, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
+int Interface::AddPointLight(glm::vec3 pos, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
   if (mPointLights.size() >= MAXPOINTLIGHTS)
     throw("too many point lights");
 
@@ -627,7 +627,7 @@ int AncientArcher::AddPointLight(glm::vec3 pos, float constant, float linear, fl
   return mPointLights.back()->id;  // unique id
 }
 
-bool AncientArcher::RemovePointLight(int which_by_id) {
+bool Interface::RemovePointLight(int which_by_id) {
   // returns true if successfully removed the point light, false otherwise
   if (mPointLights.empty())
     return false;
@@ -662,7 +662,7 @@ bool AncientArcher::RemovePointLight(int which_by_id) {
     return false;
 }
 
-void AncientArcher::MovePointLight(int which, glm::vec3 new_pos) {
+void Interface::MovePointLight(int which, glm::vec3 new_pos) {
   if (which < 0)
     throw("dont");
 
@@ -682,7 +682,7 @@ void AncientArcher::MovePointLight(int which, glm::vec3 new_pos) {
   throw("u messed up");
 }
 
-void AncientArcher::ChangePointLight(int which, glm::vec3 new_pos, float new_constant, float new_linear, float new_quad,
+void Interface::ChangePointLight(int which, glm::vec3 new_pos, float new_constant, float new_linear, float new_quad,
   glm::vec3 new_amb, glm::vec3 new_diff, glm::vec3 new_spec) {
   if (which < 0)
     throw("dont");
@@ -741,7 +741,7 @@ void AncientArcher::ChangePointLight(int which, glm::vec3 new_pos, float new_con
   throw("u messed up");
 }
 
-int AncientArcher::AddSpotLight(
+int Interface::AddSpotLight(
   glm::vec3 pos, glm::vec3 dir, float inner, float outer, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
   if (mSpotLights.size() == MAXSPOTLIGHTS) {
     throw("too many spot lights");
@@ -804,7 +804,7 @@ int AncientArcher::AddSpotLight(
   return mSpotLights.back()->id;  // unique id
 }
 
-bool AncientArcher::RemoveSpotLight(int which_by_id) {
+bool Interface::RemoveSpotLight(int which_by_id) {
   // returns true if it removed the spot light, false otherwise
   if (mSpotLights.empty())
     return false;
@@ -842,7 +842,7 @@ bool AncientArcher::RemoveSpotLight(int which_by_id) {
     return false;
 }
 
-void AncientArcher::MoveSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir) {
+void Interface::MoveSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir) {
   if (which < 0)
     throw("dont");
 
@@ -865,7 +865,7 @@ void AncientArcher::MoveSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_di
   throw("u messed up");
 }
 
-void AncientArcher::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir, float new_inner,
+void Interface::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir, float new_inner,
   float new_outer, float new_constant, float new_linear, float new_quad, glm::vec3 new_amb,
   glm::vec3 new_diff, glm::vec3 new_spec) {
   if (which < 0)
@@ -941,7 +941,7 @@ void AncientArcher::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_
 }
 
 // Sound Effects
-unsigned int AncientArcher::AddSoundEffect(const char* path) {
+unsigned int Interface::AddSoundEffect(const char* path) {
   // make sure the sound effect hasn't already been loaded
   for (const auto& pl : mSoundEffects) {
     if (path == pl->_FilePath.c_str())
@@ -962,7 +962,7 @@ unsigned int AncientArcher::AddSoundEffect(const char* path) {
   return mSpeakers.back()->GetUID();
 }
 
-void AncientArcher::SetSoundEffectVolume(int sound_id, float new_vol) {
+void Interface::SetSoundEffectVolume(int sound_id, float new_vol) {
   for (auto& se : mSpeakers) {
     if (se == NULL)
       continue;
@@ -975,7 +975,7 @@ void AncientArcher::SetSoundEffectVolume(int sound_id, float new_vol) {
   throw("sound effect volume speaker id not found");
 }
 
-void AncientArcher::RemoveSoundEffect(int soundId) {
+void Interface::RemoveSoundEffect(int soundId) {
   if (mSoundEffects.empty())
     throw("no sounds exist, nothing to remove");
 
@@ -987,7 +987,7 @@ void AncientArcher::RemoveSoundEffect(int soundId) {
     throw("didn't remove anything");
 }
 
-void AncientArcher::PlaySoundEffect(int id, bool interrupt) {
+void Interface::PlaySoundEffect(int id, bool interrupt) {
   if (mSpeakers.empty())
     throw("no speakers");
 
@@ -1004,7 +1004,7 @@ void AncientArcher::PlaySoundEffect(int id, bool interrupt) {
   throw("speaker not found");
 }
 
-void AncientArcher::AddMusic(const char* path) {
+void Interface::AddMusic(const char* path) {
   if (!mMusic) {
     mMusic = new LongSound(path);
     return;
@@ -1012,7 +1012,7 @@ void AncientArcher::AddMusic(const char* path) {
   throw("music already loaded, use remove music first");
 }
 
-void AncientArcher::RemoveMusic() {
+void Interface::RemoveMusic() {
   if (mMusic) {
     delete mMusic;
     mMusic = NULL;
@@ -1021,7 +1021,7 @@ void AncientArcher::RemoveMusic() {
   throw("no music to remove");
 }
 
-void AncientArcher::PlayMusic() {
+void Interface::PlayMusic() {
   if (mMusic) {
     mMusic->Play();
     return;
@@ -1029,7 +1029,7 @@ void AncientArcher::PlayMusic() {
   throw("no music to play");
 }
 
-void AncientArcher::PauseMusic() {
+void Interface::PauseMusic() {
   if (mMusic) {
     mMusic->Pause();
     return;
@@ -1037,7 +1037,7 @@ void AncientArcher::PauseMusic() {
   throw("no music loaded");
 }
 
-void AncientArcher::ResumeMusic() {
+void Interface::ResumeMusic() {
   if (mMusic) {
     mMusic->Resume();
     return;
@@ -1045,14 +1045,14 @@ void AncientArcher::ResumeMusic() {
   throw("no music loaded");
 }
 
-void AncientArcher::StopMusic() {
+void Interface::StopMusic() {
   if (mMusic) {
     mMusic->Stop();
     return;
   }
   throw("no music loaded");
 }
-void AncientArcher::SetMusicVolume(float new_vol) {
+void Interface::SetMusicVolume(float new_vol) {
   if (mMusic) {
     mMusic->SetVolume(new_vol);
     return;
@@ -1060,22 +1060,22 @@ void AncientArcher::SetMusicVolume(float new_vol) {
   throw("no music loaded");
 }
 
-void AncientArcher::SetCursorToHidden() noexcept {
+void Interface::SetCursorToHidden() noexcept {
   if (mWindow)
     mWindow->SetCursorToHidden();
 }
 
-void AncientArcher::SetCursorToDisabled() noexcept {
+void Interface::SetCursorToDisabled() noexcept {
   if (mWindow)
     mWindow->SetCursorToDisabled();
 }
 
-void AncientArcher::SetCursorToNormal() noexcept {
+void Interface::SetCursorToNormal() noexcept {
   if (mWindow)
     mWindow->SetCursorToNormal();
 }
 
-void AncientArcher::SetIMGUI(const bool value) {
+void Interface::SetIMGUI(const bool value) {
   if (!value) {
     if (mIMGUI) {
       delete mIMGUI;
@@ -1091,24 +1091,24 @@ void AncientArcher::SetIMGUI(const bool value) {
   }
 }
 
-void AncientArcher::SetWindowClearColor(glm::vec3 color) noexcept {
+void Interface::SetWindowClearColor(glm::vec3 color) noexcept {
   OGLGraphics::SetViewportClearColor(color);
 }
 
 // returns -1 if there is no window
-int AncientArcher::GetWindowWidth() noexcept {
+int Interface::GetWindowWidth() noexcept {
   if (!mWindow) return -1;
   return mWindow->GetCurrentWidth();
 }
 
 // returns -1 if there is no window
-int AncientArcher::GetWindowHeight() noexcept {
+int Interface::GetWindowHeight() noexcept {
   if (!mWindow) return -1;
   return mWindow->GetCurrentHeight();
 }
 
 // changes the window title, does nothing if window is null
-void AncientArcher::SetWindowTitle(const char* name) noexcept {
+void Interface::SetWindowTitle(const char* name) noexcept {
   if (!mWindow) return;
   // todo: improve efficiency
   auto temp = mWindow->GetModifiableWindowOptions();
@@ -1117,7 +1117,7 @@ void AncientArcher::SetWindowTitle(const char* name) noexcept {
 }
 
 // toggles fullscreen as expected, does nothign if window is null
-void AncientArcher::ToggleWindowFullscreen(bool try_borderless) noexcept {
+void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
   if (!mWindow) return;
   auto temp = mWindow->GetModifiableWindowOptions();
 
@@ -1135,7 +1135,7 @@ void AncientArcher::ToggleWindowFullscreen(bool try_borderless) noexcept {
   mWindow->ApplyChanges();
 }
 
-unsigned int AncientArcher::AddToOnBegin(void(*function)()) {
+unsigned int Interface::AddToOnBegin(void(*function)()) {
   static unsigned int next_begin_id = 0;
   next_begin_id++;
   //onStart.emplace(next_begin_id, function);
@@ -1143,84 +1143,84 @@ unsigned int AncientArcher::AddToOnBegin(void(*function)()) {
   return next_begin_id;
 }
 
-unsigned int AncientArcher::AddToUpdate(void(*function)(float)) {
+unsigned int Interface::AddToUpdate(void(*function)(float)) {
   static unsigned int next_deltaupdate_id = 0;
   next_deltaupdate_id++;
   onUpdate.emplace(next_deltaupdate_id, function);
   return next_deltaupdate_id;
 }
 
-unsigned int AncientArcher::AddToImGuiUpdate(void(*function)()) {
+unsigned int Interface::AddToImGuiUpdate(void(*function)()) {
   static unsigned int next_imgui_id = 0;
   next_imgui_id++;
   onImGuiUpdate.emplace(next_imgui_id, function);
   return next_imgui_id;
 }
 
-unsigned int AncientArcher::AddToScrollHandling(void(*function)(MouseScrollWheel&)) {
+unsigned int Interface::AddToScrollHandling(void(*function)(MouseScrollWheel&)) {
   static unsigned int next_scrollhandling_id = 0;
   next_scrollhandling_id++;
   onScrollHandling.emplace(next_scrollhandling_id, function);
   return next_scrollhandling_id;
 }
 
-unsigned int AncientArcher::AddToKeyHandling(void(*function)(KeyboardButtons&)) {
+unsigned int Interface::AddToKeyHandling(void(*function)(KeyboardButtons&)) {
   static unsigned int next_keyhandling_id = 0;
   next_keyhandling_id++;
   onKeyHandling.emplace(next_keyhandling_id, function);
   return next_keyhandling_id;
 }
 
-unsigned int AncientArcher::AddToMouseHandling(void(*function)(MouseCursorPos&)) {
+unsigned int Interface::AddToMouseHandling(void(*function)(MouseCursorPos&)) {
   static unsigned int next_mousehandling_id = 0;
   next_mousehandling_id++;
   onMouseHandling.emplace(next_mousehandling_id, function);
   return next_mousehandling_id;
 }
 
-unsigned int AncientArcher::AddToMouseButtonHandling(void(*function)(MouseButtons&)) {
+unsigned int Interface::AddToMouseButtonHandling(void(*function)(MouseButtons&)) {
   static unsigned int next_mouseButtonhandling_id = 0;
   next_mouseButtonhandling_id++;
   onMouseButtonHandling.emplace(next_mouseButtonhandling_id, function);
   return next_mouseButtonhandling_id;
 }
 
-unsigned int AncientArcher::AddToOnTeardown(void(*function)()) {
+unsigned int Interface::AddToOnTeardown(void(*function)()) {
   static unsigned int next_teardown_id = 0;
   next_teardown_id++;
   onQuit.emplace(next_teardown_id, function);
   return next_teardown_id;
 }
 
-bool AncientArcher::RemoveFromOnBegin(unsigned int r_id) {
+bool Interface::RemoveFromOnBegin(unsigned int r_id) {
   return static_cast<bool>(onStart.erase(r_id));
 }
 
-bool AncientArcher::RemoveFromUpdate(unsigned int r_id) {
+bool Interface::RemoveFromUpdate(unsigned int r_id) {
   return static_cast<bool>(onUpdate.erase(r_id));
 }
 
-bool AncientArcher::RemoveFromImGuiUpdate(unsigned int r_id) {
+bool Interface::RemoveFromImGuiUpdate(unsigned int r_id) {
   return static_cast<bool>(onImGuiUpdate.erase(r_id));
 }
 
-bool AncientArcher::RemoveFromScrollHandling(unsigned int r_id) {
+bool Interface::RemoveFromScrollHandling(unsigned int r_id) {
   return static_cast<bool>(onScrollHandling.erase(r_id));
 }
 
-bool AncientArcher::RemoveFromKeyHandling(unsigned int r_id) {
+bool Interface::RemoveFromKeyHandling(unsigned int r_id) {
   return static_cast<bool>(onKeyHandling.erase(r_id));
 }
 
-bool AncientArcher::RemoveFromMouseHandling(unsigned int r_id) {
+bool Interface::RemoveFromMouseHandling(unsigned int r_id) {
   return static_cast<bool>(onMouseHandling.erase(r_id));
 }
 
-bool AncientArcher::RemoveFromMouseButtonHandling(unsigned int r_id) {
+bool Interface::RemoveFromMouseButtonHandling(unsigned int r_id) {
   return static_cast<bool>(onMouseButtonHandling.erase(r_id));
 }
 
-bool AncientArcher::RemoveFromTeardown(unsigned int r_id) {
+bool Interface::RemoveFromTeardown(unsigned int r_id) {
   return static_cast<bool>(onQuit.erase(r_id));
 }
 

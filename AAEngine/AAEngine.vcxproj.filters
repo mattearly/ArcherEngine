@@ -39,7 +39,7 @@
     <ClInclude Include="src\Scene\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AncientArcher\AncientArcher.h">
+    <ClInclude Include="include\AAEngine\Interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\OS\OpenGL\OGLGraphics.h">
@@ -51,7 +51,7 @@
     <ClInclude Include="src\OS\MeshInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AncientArcher\Utility\SceneCheck.h">
+    <ClInclude Include="include\AAEngine\Utility\SceneCheck.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\OS\Vertex.h">
@@ -66,7 +66,7 @@
     <ClInclude Include="src\OS\MeshLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AncientArcher\Utility\Files.h">
+    <ClInclude Include="include\AAEngine\Utility\Files.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Sound\ErrorCheck.h">
@@ -81,7 +81,7 @@
     <ClInclude Include="src\Sound\SoundEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AncientArcher\Version.h">
+    <ClInclude Include="include\AAEngine\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\PlainGUI.h">
@@ -108,7 +108,7 @@
     <ClInclude Include="src\OS\LoadPlane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AncientArcher\Utility\rand.h">
+    <ClInclude Include="include\AAEngine\Utility\rand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Physics\NVidiaPhysx.h">
@@ -120,7 +120,7 @@
     <ClInclude Include="src\OS\Interface\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AncientArcher\Controls\Input.h">
+    <ClInclude Include="include\AAEngine\Controls\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Mesh\AnimProp.h">
@@ -144,7 +144,7 @@
     <ClInclude Include="src\ECS\entt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AncientArcher\WindowOptions.h">
+    <ClInclude Include="include\AAEngine\WindowOptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -167,7 +167,7 @@
     <ClCompile Include="src\Mesh\Prop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\AncientArcher.cpp">
+    <ClCompile Include="src\Interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\OpenGL\OGLGraphics.cpp">
@@ -251,7 +251,7 @@
     <ClCompile Include="src\ECS\entt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\AncientArcherRuntime.cpp">
+    <ClCompile Include="src\InterfaceRuntime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

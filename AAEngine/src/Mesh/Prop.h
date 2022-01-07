@@ -26,7 +26,7 @@ protected:
 
   std::vector<MeshInfo> mMeshes;
 
-  friend class AncientArcher;
+  friend class Interface;
   friend class MeshLoader;
 
 };

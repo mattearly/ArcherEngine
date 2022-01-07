@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../include/AncientArcher/Controls/Input.h"
-#include "../../../include/AncientArcher/WindowOptions.h"
+#include "../../../include/AAEngine/Controls/Input.h"
+#include "../../../include/AAEngine/WindowOptions.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <vector>
@@ -60,7 +60,7 @@ private:
   friend void ONWINDOWFOCUSCALLBACK(GLFWwindow* window, int focused);
 
   // the Instance class is a controller of this class
-  friend class AncientArcher;
+  friend class Interface;
 
 };
 

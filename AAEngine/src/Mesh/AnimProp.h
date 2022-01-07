@@ -32,7 +32,7 @@ public:
   Skeleton m_Skeleton;
 
   friend class AnimMeshLoader;
-  friend class AncientArcher;
+  friend class Interface;
 
 };
 

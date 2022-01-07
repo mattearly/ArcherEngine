@@ -1,4 +1,4 @@
-#include "../include/AncientArcher/AncientArcher.h"
+#include "../include/AAEngine/Interface.h"
 #include "OS/Interface/Window.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Scene/Camera.h"
@@ -31,14 +31,14 @@ extern MouseCursorPos g_mouse_input_status;
 extern MouseButtons g_mouse_button_status;
 
 // runs once after a new run start
-void AncientArcher::begin() {
+void Interface::begin() {
   for (const auto& oB : onStart) {
     oB.second();
   }
 }
 
 // Runs core and all user defined functionality
-void AncientArcher::update() {
+void Interface::update() {
   g_poll_input_events();
 
   // init delta clock on first tap into update
@@ -108,7 +108,7 @@ void AncientArcher::update() {
 }
 
 // Renders visable props every frame
-void AncientArcher::render() {
+void Interface::render() {
   OGLShader* shader = DefaultShaders::get_ubershader();
 
   if (!mCameras.empty()) {
@@ -158,7 +158,7 @@ void AncientArcher::render() {
 }
 
 // Runs Once on Engine Shutdown
-void AncientArcher::teardown() {
+void Interface::teardown() {
   // run user preferred functions first
   for (auto& oTD : onQuit) {
     oTD.second();

@@ -28,7 +28,7 @@ class LongSound;
 class SoundEffect;
 class Speaker;
 
-class AncientArcher final {
+class Interface final {
 public:
 
   /// <summary>

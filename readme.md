@@ -48,9 +48,9 @@ glm, assimp, glfw3, glad, OpenAL-Soft, sndfile, imgui
 ## Sample usage code
 
 ```cpp
-#include <AncientArcher/AncientArcher.h>
+#include <AAEngine/Interface.h>
 
-AA::AncientArcher instance;
+AA::Interface instance;
 
 int main(int argc, char** argv) {
   instance.Init();

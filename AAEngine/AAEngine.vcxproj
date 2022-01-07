@@ -91,24 +91,24 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\AncientArcher\WindowOptions.h" />
+    <ClInclude Include="include\AAEngine\WindowOptions.h" />
     <ClInclude Include="src\ECS\entt.h" />
     <ClInclude Include="src\Mesh\Skeleton.h" />
     <ClInclude Include="src\Mesh\Bone.h" />
     <ClInclude Include="src\Mesh\Animator.h" />
     <ClInclude Include="src\OS\AnimMeshLoader.h" />
     <ClInclude Include="src\Mesh\AnimProp.h" />
-    <ClInclude Include="include\AncientArcher\Controls\Input.h" />
+    <ClInclude Include="include\AAEngine\Controls\Input.h" />
     <ClInclude Include="src\OS\Interface\Window.h" />
     <ClInclude Include="src\Mesh\Animation.h" />
-    <ClInclude Include="include\AncientArcher\Utility\rand.h" />
+    <ClInclude Include="include\AAEngine\Utility\rand.h" />
     <ClInclude Include="src\Physics\NVidiaPhysx.h" />
     <ClInclude Include="src\DefaultShaders.h" />
     <ClInclude Include="src\GUI\imGUI.h" />
     <ClInclude Include="src\OS\LoadCube.h" />
     <ClInclude Include="src\OS\LoadPlane.h" />
     <ClInclude Include="src\OS\TextureLoader.h" />
-    <ClInclude Include="include\AncientArcher\Version.h" />
+    <ClInclude Include="include\AAEngine\Version.h" />
     <ClInclude Include="src\GUI\PlainGUI.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
     <ClInclude Include="src\Mesh\Spacial3D.h" />
@@ -120,12 +120,12 @@
     <ClInclude Include="src\Sound\ErrorCheck.h" />
     <ClInclude Include="src\Sound\SoundListener.h" />
     <ClInclude Include="src\Sound\LongSound.h" />
-    <ClInclude Include="include\AncientArcher\Utility\Files.h" />
+    <ClInclude Include="include\AAEngine\Utility\Files.h" />
     <ClInclude Include="KHR\khrplatform.h" />
     <ClInclude Include="src\OS\MeshLoader.h" />
-    <ClInclude Include="include\AncientArcher\AncientArcher.h" />
+    <ClInclude Include="include\AAEngine\Interface.h" />
     <ClInclude Include="src\OS\MeshInfo.h" />
-    <ClInclude Include="include\AncientArcher\Utility\SceneCheck.h" />
+    <ClInclude Include="include\AAEngine\Utility\SceneCheck.h" />
     <ClInclude Include="src\OS\OpenGL\OGLGraphics.h" />
     <ClInclude Include="src\Scene\Lights.h" />
     <ClInclude Include="src\OS\OpenGL\OGLShader.h" />
@@ -137,7 +137,7 @@
     <ClInclude Include="src\OS\OpenGL\QueryShader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\AncientArcherRuntime.cpp" />
+    <ClCompile Include="src\InterfaceRuntime.cpp" />
     <ClCompile Include="src\ECS\entt.cpp" />
     <ClCompile Include="src\Mesh\Skeleton.cpp" />
     <ClCompile Include="src\Mesh\Bone.cpp" />
@@ -166,7 +166,7 @@
     <ClCompile Include="src\Sound\SoundDevice.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Mesh\Prop.cpp" />
-    <ClCompile Include="src\AncientArcher.cpp" />
+    <ClCompile Include="src\Interface.cpp" />
     <ClCompile Include="src\OS\MeshInfo.cpp" />
     <ClCompile Include="src\OS\OpenGL\OGLGraphics.cpp" />
     <ClCompile Include="src\OS\OpenGL\OGLShader.cpp" />
