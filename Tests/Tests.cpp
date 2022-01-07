@@ -2,17 +2,15 @@
 #include "CppUnitTest.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-
 namespace CoreTests {
-
-static AA::AncientArcher instance;
+static AA::Interface instance;
 
 TEST_CLASS(CoreTests) {
 public:
   TEST_METHOD(A_BaseWindow) {
     instance.Init();
     instance.SetWindowTitle("A_BaseWindow");
-    instance.AddToImGuiUpdate([](){
+    instance.AddToImGuiUpdate([]() {
       ImGui::Begin("Base Run Test");
       ImGui::Text("Click \"ok\" to continue");
       bool result = ImGui::Button("ok");
