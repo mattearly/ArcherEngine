@@ -1,6 +1,6 @@
 #pragma once
-#include <AncientArcher/AncientArcher.h>
-extern AA::AncientArcher Engine;
+#include "../Manager.h"
+extern AA::Interface Engine;
 
 // local to this file
 static bool menu_loaded = false;

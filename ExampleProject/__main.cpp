@@ -2,11 +2,9 @@
 * What is this?  Just me playing around with a sample usage of AAEngine. - Matt
 * */
 
-#include <AncientArcher/AncientArcher.h>
-#include <AncientArcher/WindowOptions.h>
 #include "Manager.h"
 
-AA::AncientArcher Engine;
+AA::Interface Engine;
 
 static bool init_aa_engine_helper();
 
@@ -14,15 +12,12 @@ int main(int argc, char** argv) {
   if (!init_aa_engine_helper()) {
     return -999;
   }
-
   static Manager manager;
-  Engine.AddToUpdate([](float dt){
+  Engine.AddToUpdate([](float dt) {
     manager.tick(dt);
   });
-
   return Engine.Run();
 }
-
 
 static bool init_aa_engine_helper() {
   AA::WindowOptions winopts;
@@ -32,7 +27,5 @@ static bool init_aa_engine_helper() {
 #else
   winopts._windowing_mode = AA::WINDOW_MODE::FULLSCREEN_BORDERLESS;
 #endif
-
-
   return Engine.Init(winopts);
 }

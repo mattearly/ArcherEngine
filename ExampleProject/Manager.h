@@ -1,35 +1,26 @@
 #pragma once
-#include <AncientArcher/AncientArcher.h>
+#include <AAEngine/Interface.h>
+#include <AAEngine/WindowOptions.h>
+#include <AAEngine/Utility/rand.h>
+#include <AAEngine/Utility/SceneCheck.h>
+
 #include <imgui.h>
+#include <glm/glm.hpp>
+
+#include <string>
+#include <vector>
+#include <memory>
+#include <algorithm>
+
 #include "scenes/Intro.h"
 #include "scenes/Menu.h"
+#include "scenes/Character.h"
+#include "scenes/Level1.h"
 
-extern AA::AncientArcher Engine;
+extern AA::Interface Engine;
 
 struct Manager {
-
   Manager() {
-    // helper show keybindings
-    //Engine.AddToImGuiUpdate([]() {
-    //  ImGui::Begin("Keybindings");
-    //  ImGui::Text("wasd - walk");
-    //  ImGui::Text("tab - inventory/mouse control");
-    //  ImGui::Text("shift - run");
-    //  ImGui::Text("f - toggle flashlight");
-    //  ImGui::Text("f1 - toggle sunlight");
-    //  ImGui::Text("f11 - toggle fullscreen");
-    //  ImGui::End();
-    //});
-
-    //my_character.Setup();
-
-    //setmodels();
-
-    //setskylight();
-
-    //setfullscreentoggle();
-
-    //setmusic();
     state = STATE::PLAY_SCENE;
     scene_switch(SCENE::INTRO);
   }
@@ -44,25 +35,37 @@ struct Manager {
     if (state == STATE::PLAY_SCENE) {
       switch (scene) {
       case SCENE::INTRO:
-        if (timer <= 3.f) {
+        if (timer <= 8.f) {
           TickIntro(dt);
         } else {
           scene_switch(SCENE::MAIN_MENU);
         }
         break;
       case SCENE::MAIN_MENU:
-        TickMenu(dt);
-        break;
+        if (timer <= 10.f) {
+          TickMenu(dt);
+        } else {
+          scene_switch(SCENE::CHARACTER);
+        }        break;
       case SCENE::CHARACTER:
+        if (timer <= 15.f) {
+          TickCharacter(dt);
+        } else {
+          scene_switch(SCENE::LEVEL1);
+        }
         break;
       case SCENE::LEVEL1:
+        if (timer <= 20.f) {
+          TickLevel1(dt);
+        } else {
+          Engine.Shutdown();
+        }
         break;
       }
     } else {
       Engine.Shutdown();
     }
   }
-
 
   void scene_switch(const SCENE& to) {
     static bool first_time = true;  // default true
@@ -77,12 +80,13 @@ struct Manager {
         UnloadMenu();
         break;
       case SCENE::CHARACTER:
+        UnloadCharacter();
         break;
       case SCENE::LEVEL1:
+        UnloadLevel1();
         break;
       }
     }
-
 
     // load the new scene
     switch (to) {
@@ -93,13 +97,14 @@ struct Manager {
       LoadMenu();
       break;
     case SCENE::CHARACTER:
+      LoadCharacter();
       break;
     case SCENE::LEVEL1:
+      LoadLevel1();
       break;
     }
 
     first_time = false;
     scene = to;
   }
-
 };

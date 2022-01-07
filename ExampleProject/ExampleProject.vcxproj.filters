@@ -24,19 +24,13 @@
     <ClInclude Include="setup\setmodels.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="characters\Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="characters\FirstPersonCharacter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="characters\FlashLight.h">
+    <ClInclude Include="elements\Loadout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="characters\Stats.h">
+    <ClInclude Include="elements\Stats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scenes\Intro.h">
@@ -49,6 +43,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scenes\Character.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="elements\Item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="elements\Inventory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

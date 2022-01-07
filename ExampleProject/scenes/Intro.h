@@ -1,6 +1,6 @@
 #pragma once
-#include <AncientArcher/AncientArcher.h>
-extern AA::AncientArcher Engine;
+#include "../Manager.h"
+extern AA::Interface Engine;
 
 // local to this file
 static bool intro_loaded = false;
@@ -12,7 +12,7 @@ static int intro_cam_id = -1;
 void LoadIntro() {
   Engine.AddMusic(intro_music_path);
   intro_cam_id = Engine.AddCamera(Engine.GetWindowWidth(), Engine.GetWindowHeight());
-  Engine.SetCamPosition(intro_cam_id, glm::vec3(0,0,40));
+  Engine.SetCamPosition(intro_cam_id, glm::vec3(0, 0, 40));
   intro_logo_id = Engine.AddProp(intro_logo_path);
   intro_loaded = true;
   Engine.PlayMusic();
