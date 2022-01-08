@@ -42,20 +42,21 @@ struct Manager {
         }
         break;
       case SCENE::MAIN_MENU:
-        if (timer <= 10.f) {
+        if (timer <= 16.f) {
           TickMenu(dt);
         } else {
           scene_switch(SCENE::CHARACTER);
-        }        break;
+        }
+        break;
       case SCENE::CHARACTER:
-        if (timer <= 15.f) {
+        if (timer <= 24.f) {
           TickCharacter(dt);
         } else {
           scene_switch(SCENE::LEVEL1);
         }
         break;
       case SCENE::LEVEL1:
-        if (timer <= 20.f) {
+        if (timer <= 32.f) {
           TickLevel1(dt);
         } else {
           Engine.Shutdown();
@@ -70,7 +71,7 @@ struct Manager {
   void scene_switch(const SCENE& to) {
     static bool first_time = true;  // default true
 
-    // unload the current (prev) scene
+    // unload the current (prev) scene if one is loaded
     if (!first_time) {
       switch (scene) {
       case SCENE::INTRO:
