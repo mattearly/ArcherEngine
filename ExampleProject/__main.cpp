@@ -4,7 +4,8 @@
 
 #include "Manager.h"
 
-AA::Interface Engine;
+AA::Interface g_engine;
+SCENE g_next_scene;
 
 static bool init_aa_engine_helper();
 
@@ -13,10 +14,10 @@ int main(int argc, char** argv) {
     return -999;
   }
   static Manager manager;
-  Engine.AddToUpdate([](float dt) {
+  g_engine.AddToUpdate([](float dt) {
     manager.tick(dt);
   });
-  return Engine.Run();
+  return g_engine.Run();
 }
 
 static bool init_aa_engine_helper() {
@@ -27,5 +28,5 @@ static bool init_aa_engine_helper() {
 #else
   winopts._windowing_mode = AA::WINDOW_MODE::FULLSCREEN_BORDERLESS;
 #endif
-  return Engine.Init(winopts);
+  return g_engine.Init(winopts);
 }

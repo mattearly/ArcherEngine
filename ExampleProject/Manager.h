@@ -12,68 +12,61 @@
 #include <memory>
 #include <algorithm>
 
+#include "GameStates.h"
 #include "scenes/Intro.h"
 #include "scenes/Menu.h"
 #include "scenes/Character.h"
 #include "scenes/Level1.h"
 
-extern AA::Interface Engine;
+extern AA::Interface g_engine;
+extern SCENE g_next_scene;
 
 struct Manager {
+private:
+  STATE current_state;
+  SCENE current_scene;
+
+public:
   Manager() {
-    state = STATE::PLAY_SCENE;
+    current_state = STATE::PLAY_SCENE;
     scene_switch(SCENE::INTRO);
   }
-
-  enum class STATE { OFF, PLAY_SCENE } state;
-
-  enum class SCENE { INTRO, MAIN_MENU, CHARACTER, LEVEL1 } scene;
 
   void tick(const float& dt) {
     static float timer = 0;
     timer += dt;
-    if (state == STATE::PLAY_SCENE) {
-      switch (scene) {
+    if (current_state == STATE::PLAY_SCENE) {
+
+      if (current_scene != g_next_scene) {
+        scene_switch(g_next_scene);
+      }
+
+      switch (current_scene) {
       case SCENE::INTRO:
-        if (timer <= 8.f) {
-          TickIntro(dt);
-        } else {
-          scene_switch(SCENE::MAIN_MENU);
-        }
+        TickIntro(dt);
         break;
       case SCENE::MAIN_MENU:
-        if (timer <= 16.f) {
-          TickMenu(dt);
-        } else {
-          scene_switch(SCENE::CHARACTER);
-        }
+        TickMenu(dt);
         break;
       case SCENE::CHARACTER:
-        if (timer <= 24.f) {
-          TickCharacter(dt);
-        } else {
-          scene_switch(SCENE::LEVEL1);
-        }
+        TickCharacter(dt);
         break;
       case SCENE::LEVEL1:
-        if (timer <= 32.f) {
-          TickLevel1(dt);
-        } else {
-          Engine.Shutdown();
-        }
+        TickLevel1(dt);
         break;
       }
     } else {
-      Engine.Shutdown();
+      g_engine.Shutdown();
     }
   }
 
   void scene_switch(const SCENE& to) {
+
     static bool first_time = true;  // default true
 
-    // unload the current (prev) scene if one is loaded
+    // unload the current (prev) current_scene if one is loaded
     if (!first_time) {
-      switch (scene) {
+      switch (current_scene) {
       case SCENE::INTRO:
         UnloadIntro();
         break;
@@ -89,7 +82,7 @@ struct Manager {
       }
     }
 
-    // load the new scene
+    // load the new current_scene
     switch (to) {
     case SCENE::INTRO:
       LoadIntro();
@@ -106,6 +99,6 @@ struct Manager {
     }
 
     first_time = false;
-    scene = to;
+    current_scene = to;
   }
 };

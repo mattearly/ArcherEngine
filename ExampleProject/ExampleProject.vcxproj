@@ -92,10 +92,8 @@
     <ClInclude Include="elements\Inventory.h" />
     <ClInclude Include="elements\Item.h" />
     <ClInclude Include="elements\Loadout.h" />
+    <ClInclude Include="GameStates.h" />
     <ClInclude Include="Manager.h" />
-    <ClInclude Include="setup\setmodels.h" />
-    <ClInclude Include="setup\setskylight.h" />
-    <ClInclude Include="setup\setmusic.h" />
     <ClInclude Include="elements\Stats.h" />
     <ClInclude Include="scenes\Character.h" />
     <ClInclude Include="scenes\Intro.h" />

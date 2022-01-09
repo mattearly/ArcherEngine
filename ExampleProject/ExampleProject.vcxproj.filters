@@ -15,15 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="setup\setskylight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="setup\setmusic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="setup\setmodels.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="elements\Loadout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -49,6 +40,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="elements\Inventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
