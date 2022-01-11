@@ -23,14 +23,14 @@ AncientArcher is a C++ library for game development and simulations.
 
 ## Documentation
 
-  - Generate via [Doxygen](https://www.doxygen.nl/index.html)
-  - See header [AncientArcher.h](AAEngine/include/AncientArcher/AncientArcher.h)
+  - Generate via Doxygen
+  - See header [Interface.h](AAEngine/include/AncientArcher/AncientArcher.h)
 
 ## Compile
 
 Recommended: 
  - OS: Windows 10.
- - IDE: MSVC16, x64. Visual Studio 2019 Community Edition.
+ - IDE: MSVC17, x64. Visual Studio 2022 Community Edition.
 
 *While AncientArcher code is generally designed to be crossplatform, at this stage the build system is handled via Visual Studio Solution file. Converting it to CMake will be done at some point. If you are just using some of the code and not the whole project it should work the same on any OS.*
 
