@@ -1,5 +1,6 @@
 #include "imGUI.h"
 #include "../OS/OpenGL/OGLShader.h"
+#include "../OS/OpenGL/OGLGraphics.h"
 namespace AA {
 imGUI::imGUI() {
   isInit = false;
@@ -34,8 +35,10 @@ void imGUI::NewFrame() {
 //}
 
 void imGUI::Render() {
+  OGLGraphics::SetDepthTest(false);
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  OGLGraphics::SetDepthTest(true);
 }
 
 
