@@ -1,12 +1,12 @@
 #include "../include/AAEngine/Interface.h"
 #include "OS/Interface/Window.h"
+#include "OS/OpenGL/OGLGraphics.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Scene/Camera.h"
 #include "Mesh/Prop.h"
 #include "Mesh/AnimProp.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
-#include "OS/OpenGL/OGLGraphics.h"
 #include "Sound/SoundDevice.h"
 #include "Sound/Speaker.h"
 #include "Sound/SoundEffect.h"
@@ -18,7 +18,6 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
-
 
 namespace AA {
 
@@ -101,18 +100,19 @@ void Interface::update() {
     cam->shaderTick();
   }
 
-  OGLGraphics::ClearScreen();
-  OGLGraphics::SetDepthTest(true);
-  OGLGraphics::SetDepthMode(GL_LESS);
 
 }
 
 // Renders visable props every frame
 void Interface::render() {
-  OGLShader* shader = DefaultShaders::get_ubershader();
 
+  OGLGraphics::ClearScreen();
+  OGLGraphics::SetDepthTest(true);
+  OGLGraphics::SetDepthMode(GL_LESS);
+
+  OGLShader* shader = DefaultShaders::get_ubershader();
+  shader->SetBool("isAnimating", false);
   if (!mCameras.empty()) {
-    shader->SetBool("isAnimating", false);
     for (auto& p : mProps) {
       p->Draw();
     }
@@ -130,15 +130,11 @@ void Interface::render() {
     if (mSkybox) {
       mSkybox->Render(mCameras.front());
     }
-
-    OGLGraphics::SetDepthTest(false);
-
 #ifdef _DEBUG
     if (mSimulateWorldPhysics) {
       NVidiaPhysx::Get()->DrawDebug(mCameras.front());
     }
 #endif
-
   }  // endif !mCamera.empty()
 #ifdef _DEBUG
   else {
