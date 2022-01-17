@@ -63,15 +63,15 @@ Window::Window(std::shared_ptr<WindowOptions> winopts) {
 }
 
 // shares context with a previous window
-Window::Window(const Window& window) {
-  if (!glfw_is_init) {
-    glfwInit();
-    glfw_is_init = true;
-  }
-  mWindowOptions = std::make_shared<WindowOptions>();      // start with default options
-  default_init(window);
-  window_instance_count++;
-}
+//Window::Window(const Window& window) {
+//  if (!glfw_is_init) {
+//    glfwInit();
+//    glfw_is_init = true;
+//  }
+//  mWindowOptions = std::make_shared<WindowOptions>();      // start with default options
+//  default_init(window);
+//  window_instance_count++;
+//}
 
 Window::~Window() {
   if (mGLFWwindow)
@@ -101,6 +101,16 @@ void Window::ApplyChanges() {
     // todo: relaunch window
   }
 
+  if (prev_window_options._stencil_bits != mWindowOptions->_stencil_bits) {
+    glfwWindowHint(GLFW_STENCIL_BITS, mWindowOptions->_stencil_bits);
+    if (mWindowOptions->_stencil_bits > 0) {
+      OGLGraphics::SetStencil(true);
+    } else {
+      OGLGraphics::SetStencil(false);
+    }
+  }
+
+
   // update things that have changed
   if (mWindowOptions->_cursor_mode != prev_window_options._cursor_mode) {
     glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
@@ -110,10 +120,13 @@ void Window::ApplyChanges() {
     glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
   }
 
+
+
   // set window if mode changed
   if (prev_window_options._windowing_mode != mWindowOptions->_windowing_mode) {
     apply_window_sizings_from_current_options();
   }
+
 
   if (prev_window_options._vsync != mWindowOptions->_vsync) {
     glfwSwapInterval(mWindowOptions->_vsync);
@@ -230,6 +243,7 @@ void Window::default_init() {
     // with core profile, you have to create and manage your own VAO's, no default 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_STENCIL_BITS, mWindowOptions->_stencil_bits);
     // Try the latest version of OpenGL we are allowed, don't use older than 4.3
     struct OpenGLVersion {
       OpenGLVersion() {}
@@ -278,35 +292,39 @@ void Window::default_init() {
     OGLGraphics::Proc(glfwGetProcAddress);
   }
 
+  if (mWindowOptions->_stencil_bits > 0)
+    OGLGraphics::SetStencil(true);
+  else
+    OGLGraphics::SetStencil(false);
 
   glfwSetWindowUserPointer(mGLFWwindow, this);  // window pointer goes to this class
   set_default_callbacks();
 }
 
-void Window::default_init(const Window& window) {
-  if (mWindowOptions->_windowing_mode == WINDOW_MODE::MAXIMIZED) {
-    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-  }
-  glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
-  if (mWindowOptions->_rendering_tech != RENDER_TECH::OPENGL4) {
-    throw("unsupported render tech");  // todo (major): add other render techs
-  } else {
-    mGLFWwindow = glfwCreateWindow(
-      mWindowOptions->_width,
-      mWindowOptions->_height,
-      mWindowOptions->_title.c_str(),
-      (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN) ? glfwGetPrimaryMonitor() : nullptr,
-      window.mGLFWwindow
-    );
-  }
-  if (!mGLFWwindow) {
-    throw("Unable to init Window for OpenGL 4.3+");
-  }
-
-  // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
-  //glfwMakeContextCurrent(mGLFWwindow);
-  OGLGraphics::Proc(glfwGetProcAddress);
-}
+//void Window::default_init(const Window& window) {
+//  if (mWindowOptions->_windowing_mode == WINDOW_MODE::MAXIMIZED) {
+//    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+//  }
+//  glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
+//  if (mWindowOptions->_rendering_tech != RENDER_TECH::OPENGL4) {
+//    throw("unsupported render tech");  // todo (major): add other render techs
+//  } else {
+//    mGLFWwindow = glfwCreateWindow(
+//      mWindowOptions->_width,
+//      mWindowOptions->_height,
+//      mWindowOptions->_title.c_str(),
+//      (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN) ? glfwGetPrimaryMonitor() : nullptr,
+//      window.mGLFWwindow
+//    );
+//  }
+//  if (!mGLFWwindow) {
+//    throw("Unable to init Window for OpenGL 4.3+");
+//  }
+//
+//  // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
+//  //glfwMakeContextCurrent(mGLFWwindow);
+//  OGLGraphics::Proc(glfwGetProcAddress);
+//}
 
 void Window::set_default_callbacks() {
   glfwSetFramebufferSizeCallback(mGLFWwindow, FRAMEBUFFERSIZESETCALLBACK);

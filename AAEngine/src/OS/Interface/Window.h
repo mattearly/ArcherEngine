@@ -17,7 +17,7 @@ public:
   Window();
   Window(WindowOptions winopts);
   Window(std::shared_ptr<WindowOptions> winopts);
-  Window(const Window& window);
+  //Window(const Window& window); // todo: shared context
   ~Window();
   
   std::shared_ptr<WindowOptions> GetModifiableWindowOptions();
@@ -38,7 +38,7 @@ public:
 private:
 
   void default_init();
-  void default_init(const Window& window);
+  //void default_init(const Window& window);
   void set_default_callbacks();
 
   GLFWwindow* mGLFWwindow;
