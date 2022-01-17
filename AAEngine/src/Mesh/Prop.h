@@ -20,7 +20,12 @@ public:
   virtual void RemoveCache();
   virtual void Load(const std::string& path);
 
+  //void SetStencilColor(const glm::vec3 color);
+
 protected:
+
+  bool stenciled;
+  glm::vec3 stencil_color;
 
   Spacial3D spacial_data;
 

@@ -365,14 +365,13 @@ bool Interface::RemoveProp(const unsigned int id) {
 
   // return true if successful removal, false otherwise
   return (before_size != after_size);
-
-
 }
 
 void Interface::MoveProp(const unsigned int id, glm::vec3 loc) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
-      return prop->spacial_data.MoveTo(loc);
+      prop->spacial_data.MoveTo(loc);
+      return;
     }
   }
   throw("prop id doesn't exist or is invalid");
@@ -381,7 +380,8 @@ void Interface::MoveProp(const unsigned int id, glm::vec3 loc) {
 void Interface::ScaleProp(const unsigned int id, glm::vec3 scale) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
-      return prop->spacial_data.ScaleTo(scale);
+      prop->spacial_data.ScaleTo(scale);
+      return;
     }
   }
   throw("prop id doesn't exist or is invalid");
@@ -390,7 +390,29 @@ void Interface::ScaleProp(const unsigned int id, glm::vec3 scale) {
 void Interface::RotateProp(const unsigned int id, glm::vec3 rot) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
-      return prop->spacial_data.RotateTo(rot);
+      prop->spacial_data.RotateTo(rot);
+      return;
+    }
+  }
+  throw("prop id doesn't exist or is invalid");
+}
+
+void Interface::StencilProp(const unsigned int id, const bool tf) {
+  for (auto& prop : mProps) {
+    if (prop->GetUID() == id) {
+      prop->stenciled = tf;
+      return;
+    }
+  }
+  throw("prop id doesn't exist or is invalid");
+}
+
+void Interface::StencilPropColor(const unsigned int id, const glm::vec3 color)
+{
+  for (auto& prop : mProps) {
+    if (prop->GetUID() == id) {
+      prop->stencil_color = color;
+      return;
     }
   }
   throw("prop id doesn't exist or is invalid");
@@ -475,7 +497,8 @@ void Interface::SetAnimationOnAnimProp(const unsigned int animation_id, const un
           animprop->mAnimator.reset();
         }
         return;  // done
-      } else {  // not trying to reset
+      }
+      else {  // not trying to reset
         for (auto& animation : mAnimation) {
           if (animation->GetUID() == animation_id) { // animation exists
             animprop->SetAnimator(animation);
@@ -552,7 +575,8 @@ void Interface::RemoveSkybox() noexcept {
 void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
   if (!mDirectionalLight) {
     mDirectionalLight = std::make_shared<DirectionalLight>(dir, amb, diff, spec);
-  } else {
+  }
+  else {
     mDirectionalLight->Direction = dir;
     mDirectionalLight->Ambient = amb;
     mDirectionalLight->Diffuse = diff;
@@ -658,7 +682,8 @@ bool Interface::RemovePointLight(int which_by_id) {
       );
     }
     return true;
-  } else
+  }
+  else
     return false;
 }
 
@@ -838,7 +863,8 @@ bool Interface::RemoveSpotLight(int which_by_id) {
       );
     }
     return true;
-  } else
+  }
+  else
     return false;
 }
 
@@ -1081,10 +1107,12 @@ void Interface::SetIMGUI(const bool value) {
       delete mIMGUI;
       mIMGUI = NULL;
     }
-  } else {
+  }
+  else {
     if (mIMGUI) {
       return;
-    } else {
+    }
+    else {
       mIMGUI = new imGUI();
       mIMGUI->InitOpenGL(mWindow->mGLFWwindow);
     }
@@ -1124,10 +1152,12 @@ void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
   if (temp->_windowing_mode == WINDOW_MODE::WINDOWED) {
     if (try_borderless) {
       temp->_windowing_mode = WINDOW_MODE::FULLSCREEN_BORDERLESS;
-    } else {
+    }
+    else {
       temp->_windowing_mode = WINDOW_MODE::FULLSCREEN;
     }
-  } else {  // turn off fullscreen
+  }
+  else {  // turn off fullscreen
     temp->_windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
   }
 

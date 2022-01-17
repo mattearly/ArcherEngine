@@ -261,6 +261,12 @@ public:
   /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
   void RotateProp(const unsigned int id, glm::vec3 rot);
 
+
+  void StencilProp(const unsigned int id, const bool tf);
+
+
+  void StencilPropColor(const unsigned int id, const glm::vec3 color);
+
   /// <summary>
   /// Adds a Animated Prop.
   /// Assumes Bones and Animations are included in the file.

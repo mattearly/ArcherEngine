@@ -50,14 +50,12 @@ void main(){
 
   const std::string FRAG_CODE = R"(#version 430
 out vec4 FragColor;
-void main()
-{
-  FragColor = vec4(0.04, 0.28, 0.26, 1.0);
+uniform vec3 u_stencil_color;
+void main() {
+  FragColor = vec4(u_stencil_color, 1.0);
 })";
 
-
   STENCILSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());
-
 }
 
 OGLShader* DefaultShaders::get_stencilshader() {

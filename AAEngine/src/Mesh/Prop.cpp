@@ -13,6 +13,9 @@ Prop::Prop() {}
 Prop::Prop(const char* path) {
   if (MeshLoader::LoadGameObjectFromFile(*this, path) == -1)
     throw ("failed to load path");
+
+  stenciled = false;
+  stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
 }
 
 void Prop::Draw() {
