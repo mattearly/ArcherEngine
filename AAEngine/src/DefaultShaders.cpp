@@ -39,9 +39,7 @@ void main(){
       vec4 localPosition = finalBonesMatrices[inBoneIds[i]] * vec4(inPos,1.0);
       totalPosition += localPosition * inWeights[i];
     }
-    pass_Pos = (u_model_matrix * totalPosition).xyz;
   } else {  // Not Animating
-    pass_Pos = (u_model_matrix * vec4(inPos, 1.0)).xyz;
     totalPosition = vec4(inPos, 1.0);
   }
   mat4 viewMatrix = u_view_matrix * u_model_matrix;
