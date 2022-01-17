@@ -16,6 +16,7 @@ Prop::Prop(const char* path) {
 }
 
 void Prop::Draw() {
+
   OGLShader* shader = DefaultShaders::get_ubershader();
   shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
 
@@ -48,12 +49,11 @@ void Prop::Draw() {
       }
 
       if (texType == "Emission") {
-        shader->SetInt("hasEmission", true);
+        shader->SetBool("hasEmission", true);
         OGLGraphics::SetTexture(3, texture.first);
         shader->SetInt(("material." + texType).c_str(), 3);
       }
     }
-
 
     OGLGraphics::SetCullFace(m.backface_culled);
     OGLGraphics::RenderElements(m.vao, m.numElements);
