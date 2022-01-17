@@ -16,6 +16,9 @@ void LoadCharacter() {
   character_cam_id = g_engine.AddCamera(g_engine.GetWindowWidth(), g_engine.GetWindowHeight());
   g_engine.SetCamPosition(character_cam_id, glm::vec3(0, 0, 30));
   character_model_id = g_engine.AddProp(character_logo_path);
+  g_engine.StencilProp(character_model_id, true);
+  g_engine.StencilPropWithNormals(character_model_id, true);
+  g_engine.StencilPropScale(character_model_id, 1.35f);
   g_engine.MoveProp(character_model_id, glm::vec3(0, -11, 0));
   g_engine.ScaleProp(character_model_id, glm::vec3(.1f));
   character_spotlight_id = g_engine.AddSpotLight(glm::vec3(0), glm::vec3(0, -1, 0), 3.0f, 8.0f, 1.f, 0.045f, 0.0075f, glm::vec3(0.1f), glm::vec3(0.6f), glm::vec3(1));

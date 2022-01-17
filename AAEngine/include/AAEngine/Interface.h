@@ -261,11 +261,33 @@ public:
   /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
   void RotateProp(const unsigned int id, glm::vec3 rot);
 
-
+  /// <summary>
+  /// Sets whether the prop should have a stencil around it.
+  /// </summary>
+  /// <param name="id">id of the prop to effect</param>
+  /// <param name="tf">true or false for on or off</param>
   void StencilProp(const unsigned int id, const bool tf);
 
-
+  /// <summary>
+  /// Sets the color of the stencil.
+  /// </summary>
+  /// <param name="id">id of the prop to effect</param>
+  /// <param name="color">stencil color in rgb</param>
   void StencilPropColor(const unsigned int id, const glm::vec3 color);
+
+  /// <summary>
+  /// Calculate stencil with Normals or Not. Normals work better for objects that do not have a centered origin.
+  /// </summary>
+  /// <param name="id">id of the prop to effect</param>
+  /// <param name="tf">true to calculate stencil with normal, false to calculate normally. If the stencil is offcentered, try true.</param>
+  void StencilPropWithNormals(const unsigned int id, const bool tf);
+
+  /// <summary>
+  /// Scale of the stencil. These scale differently depending on whether calculated with Normals or not.
+  /// </summary>
+  /// <param name="id">id of the prop to effect</param>
+  /// <param name="scale">scale should be > 1 or you probably won't see the stencil</param>
+  void StencilPropScale(const unsigned int id, const float scale);
 
   /// <summary>
   /// Adds a Animated Prop.
@@ -296,6 +318,34 @@ public:
   /// <param name="id">id of the animated prop to effect</param>
   /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
   void RotateAnimProp(const unsigned int id, glm::vec3 rot);
+
+  /// <summary>
+  /// Sets whether the animated prop should have a stencil around it.
+  /// </summary>
+  /// <param name="id">id of the animated prop to effect</param>
+  /// <param name="tf">true or false for on or off</param>
+  void StencilAnimProp(const unsigned int id, const bool tf);
+
+  /// <summary>
+  /// Sets the color of the stencil.
+  /// </summary>
+  /// <param name="id">id of the animated prop to effect</param>
+  /// <param name="color">stencil color in rgb</param>
+  void StencilAnimPropColor(const unsigned int id, const glm::vec3 color);
+
+  /// <summary>
+  /// Calculate stencil with Normals or Not. Normals work better for objects that do not have a centered origin.
+  /// </summary>
+  /// <param name="id">id of the animated prop to effect</param>
+  /// <param name="tf">true to calculate stencil with normal, false to calculate normally. If the stencil is offcentered, try true.</param>
+  void StencilAnimPropWithNormals(const unsigned int id, const bool tf);
+
+  /// <summary>
+  /// Scale of the stencil. These scale differently depending on whether calculated with Normals or not.
+  /// </summary>
+  /// <param name="id">id of the animated prop to effect</param>
+  /// <param name="scale">scale should be > 1 or you probably won't see the stencil</param>
+  void StencilAnimPropScale(const unsigned int id, const float scale);
 
   /// <summary>
   /// Returns the bone count.
@@ -354,7 +404,6 @@ public:
   /// </summary>
   /// <param name="incomingSkymapFiles">6 textures</param>
   void SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept;
-
 
   /// <summary>
   /// Removes current skybox. You will see the clear screen color instead.

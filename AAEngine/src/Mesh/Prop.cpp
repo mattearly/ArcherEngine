@@ -8,13 +8,20 @@
 
 namespace AA {
 
-Prop::Prop() {}
+Prop::Prop() {
+  stenciled = false;
+  stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
+  stenciled_with_normals = false;
+  stencil_scale = 1.1f;
+}
 
 Prop::Prop(const char* path) {
   if (MeshLoader::LoadGameObjectFromFile(*this, path) == -1)
     throw ("failed to load path");
   stenciled = false;
   stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
+  stenciled_with_normals = false;
+  stencil_scale = 1.1f;
 }
 
 void Prop::Draw() {
@@ -62,9 +69,16 @@ void Prop::Draw() {
     OGLGraphics::SetStencilMask(false);
     OGLGraphics::SetDepthTest(false);
     OGLShader* stencil_shader = DefaultShaders::get_stencilshader();
-    float scale = 1.1f;
-    glm::mat4 model_matrix = glm::scale(spacial_data.mFinalModelMatrix, glm::vec3(scale));
-    stencil_shader->SetMat4("u_model_matrix", model_matrix);
+    if (stenciled_with_normals) {
+      stencil_shader->SetBool("u_stencil_with_normals", true);
+      stencil_shader->SetFloat("u_stencil_scale", stencil_scale);
+      stencil_shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
+    } else {
+      stencil_shader->SetBool("u_stencil_with_normals", false);
+      // if stencil scale is less than 1.0 in this case, you won't be able to see it.
+      glm::mat4 scaled_stencil_model_matrix = glm::scale(spacial_data.mFinalModelMatrix, glm::vec3(stencil_scale));
+      stencil_shader->SetMat4("u_model_matrix", scaled_stencil_model_matrix);
+    }
     stencil_shader->SetVec3("u_stencil_color", stencil_color);
     for (MeshInfo& m : mMeshes) {
       OGLGraphics::SetCullFace(m.backface_culled);

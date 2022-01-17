@@ -20,6 +20,8 @@ void LoadIntro() {
   intro_logo_id = g_engine.AddProp(intro_logo_path);
   g_engine.StencilProp(intro_logo_id, true);
   g_engine.StencilPropColor(intro_logo_id, glm::vec3(1.f, 0.f, 0.f));
+  //g_engine.StencilPropWithNormals(intro_logo_id, false);  // defaults to false, no need to set
+  g_engine.StencilPropScale(intro_logo_id, 1.05f);
   intro_loaded = true;
   g_engine.PlayMusic();
 }
@@ -27,8 +29,9 @@ void LoadIntro() {
 void TickIntro(const float& dt) {
   if (intro_logo_id != -1) {
     static float curr_rot = 0.f;
-    curr_rot += dt * 1.5f;
-    g_engine.RotateProp(intro_logo_id, glm::vec3(0, curr_rot, 0));
+    curr_rot += dt * 1.1f;
+    g_engine.RotateProp(intro_logo_id, glm::vec3(curr_rot, curr_rot, 0));
+    g_engine.ScaleProp(intro_logo_id, glm::vec3(curr_rot));
   }
 
   intro_timer += dt;

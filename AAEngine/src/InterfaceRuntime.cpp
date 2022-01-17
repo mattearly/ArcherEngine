@@ -122,14 +122,16 @@ void Interface::render() {
     }
 
     //----------
-    OGLShader* shader = DefaultShaders::get_ubershader();
     for (auto& ap : mAnimProps) {
-      shader->SetBool("isAnimating", false);
+      DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
+      DefaultShaders::get_stencilshader()->SetBool("isAnimating", false);
       if (ap->mAnimator) {
-        shader->SetBool("isAnimating", true);
+        DefaultShaders::get_ubershader()->SetBool("isAnimating", true);
+        DefaultShaders::get_stencilshader()->SetBool("isAnimating", true);
         auto transforms = ap->mAnimator->GetFinalBoneMatrices();
         for (unsigned int i = 0; i < transforms.size(); ++i) {
-          shader->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+          DefaultShaders::get_ubershader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+          DefaultShaders::get_stencilshader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
         }
       }
       ap->Draw();

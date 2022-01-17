@@ -418,6 +418,28 @@ void Interface::StencilPropColor(const unsigned int id, const glm::vec3 color)
   throw("prop id doesn't exist or is invalid");
 }
 
+void Interface::StencilPropWithNormals(const unsigned int id, const bool tf)
+{
+  for (auto& prop : mProps) {
+    if (prop->GetUID() == id) {
+      prop->stenciled_with_normals = tf;
+      return;
+    }
+  }
+  throw("prop id doesn't exist or is invalid");
+}
+
+void Interface::StencilPropScale(const unsigned int id, const float scale)
+{
+  for (auto& prop : mProps) {
+    if (prop->GetUID() == id) {
+      prop->stencil_scale = scale;
+      return;
+    }
+  }
+  throw("prop id doesn't exist or is invalid");
+}
+
 unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location) {
   mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
   mAnimProps.back()->spacial_data.MoveTo(starting_location);
@@ -452,6 +474,50 @@ void Interface::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
     }
   }
   throw("anim prop id doesn't exist or is invalid");
+}
+
+void Interface::StencilAnimProp(const unsigned int id, const bool tf)
+{
+  for (auto& prop : mAnimProps) {
+    if (prop->GetUID() == id) {
+      prop->stenciled = tf;
+      return;
+    }
+  }
+  throw("prop id doesn't exist or is invalid");
+}
+
+void Interface::StencilAnimPropColor(const unsigned int id, const glm::vec3 color)
+{
+  for (auto& prop : mAnimProps) {
+    if (prop->GetUID() == id) {
+      prop->stencil_color = color;
+      return;
+    }
+  }
+  throw("prop id doesn't exist or is invalid");
+}
+
+void Interface::StencilAnimPropWithNormals(const unsigned int id, const bool tf)
+{
+  for (auto& prop : mAnimProps) {
+    if (prop->GetUID() == id) {
+      prop->stenciled_with_normals = tf;
+      return;
+    }
+  }
+  throw("prop id doesn't exist or is invalid");
+}
+
+void Interface::StencilAnimPropScale(const unsigned int id, const float scale)
+{
+  for (auto& prop : mAnimProps) {
+    if (prop->GetUID() == id) {
+      prop->stencil_scale = scale;
+      return;
+    }
+  }
+  throw("prop id doesn't exist or is invalid");
 }
 
 unsigned int Interface::GetAnimPropBoneCount_testing(const unsigned int anim_prop_id) {

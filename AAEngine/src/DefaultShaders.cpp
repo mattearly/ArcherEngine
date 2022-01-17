@@ -4,20 +4,13 @@ namespace AA {
 OGLShader* UBERSHADER;
 OGLShader* STENCILSHADER;
 
-OGLShader* DefaultShaders::get_ubershader() {
-  if (!UBERSHADER)
-    init_ubershader();
-  UBERSHADER->Use();
-  return UBERSHADER;
-}
-
-void DefaultShaders::init_stencilshader()
-{
+void DefaultShaders::init_stencilshader() {
   if (STENCILSHADER)
     return;
 
   const std::string VERT_CODE = R"(#version 430 core
 layout(location=0)in vec3 inPos;
+layout(location=2)in vec3 inNorm;
 layout(location=3)in ivec4 inBoneIds;
 layout(location=4)in vec4 inWeights;
 const int MAX_BONES = 100;
@@ -26,6 +19,8 @@ uniform mat4 u_projection_matrix;
 uniform mat4 u_view_matrix;
 uniform mat4 u_model_matrix;
 uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform int u_stencil_with_normals;
+uniform float u_stencil_scale;
 uniform int isAnimating;
 void main(){
   vec4 totalPosition = vec4(0.0);
@@ -43,7 +38,11 @@ void main(){
     totalPosition = vec4(inPos, 1.0);
   }
   mat4 viewMatrix = u_view_matrix * u_model_matrix;
-  gl_Position = u_projection_matrix * viewMatrix * totalPosition;
+  if (u_stencil_with_normals > 0) {
+    gl_Position = u_projection_matrix * viewMatrix * vec4(totalPosition.xyz + inNorm * (u_stencil_scale - 1.0), 1.0);
+  } else {
+    gl_Position = u_projection_matrix * viewMatrix * totalPosition;
+  }
 })";
 
   const std::string FRAG_CODE = R"(#version 430
@@ -56,12 +55,6 @@ void main() {
   STENCILSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());
 }
 
-OGLShader* DefaultShaders::get_stencilshader() {
-  if (!STENCILSHADER)
-    init_stencilshader();
-  STENCILSHADER->Use();
-  return STENCILSHADER;
-}
 
 void DefaultShaders::init_ubershader() {
   if (UBERSHADER)
@@ -291,6 +284,21 @@ void main()
 })";
 
   UBERSHADER = new OGLShader(UBERSHADER_VERT_CODE.c_str(), UBERSHADER_FRAG_CODE.c_str());
+}
+
+
+OGLShader* DefaultShaders::get_ubershader() {
+  if (!UBERSHADER)
+    init_ubershader();
+  UBERSHADER->Use();
+  return UBERSHADER;
+}
+
+OGLShader* DefaultShaders::get_stencilshader() {
+  if (!STENCILSHADER)
+    init_stencilshader();
+  STENCILSHADER->Use();
+  return STENCILSHADER;
 }
 
 }  // end namespace AA

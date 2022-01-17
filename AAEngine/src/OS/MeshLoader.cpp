@@ -88,6 +88,7 @@ int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path)
     //#endif
     //aiProcess_PreTransformVertices |
     //aiProcess_CalcTangentSpace |
+    aiProcess_GenNormals |  // can't be used with gensmoothnormals
     //aiProcess_GenSmoothNormals |
     //aiProcess_FixInfacingNormals |
     //aiProcess_FindInvalidData |
