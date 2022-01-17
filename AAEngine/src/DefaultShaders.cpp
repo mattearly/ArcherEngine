@@ -2,12 +2,69 @@
 namespace AA {
 
 OGLShader* UBERSHADER;
+OGLShader* STENCILSHADER;
 
 OGLShader* DefaultShaders::get_ubershader() {
   if (!UBERSHADER)
     init_ubershader();
   UBERSHADER->Use();
   return UBERSHADER;
+}
+
+void DefaultShaders::init_stencilshader()
+{
+  if (STENCILSHADER)
+    return;
+
+  const std::string VERT_CODE = R"(#version 430 core
+layout(location=0)in vec3 inPos;
+layout(location=3)in ivec4 inBoneIds;
+layout(location=4)in vec4 inWeights;
+const int MAX_BONES = 100;
+const int MAX_BONE_INFLUENCE = 4;
+uniform mat4 u_projection_matrix;
+uniform mat4 u_view_matrix;
+uniform mat4 u_model_matrix;
+uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform int isAnimating;
+void main(){
+  vec4 totalPosition = vec4(0.0);
+  if (isAnimating > 0) {
+    for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++) {
+      if(inBoneIds[i] == -1) continue;
+      if(inBoneIds[i] >= MAX_BONES) {
+          totalPosition = vec4(inPos, 1.0f);
+          break;
+      }
+      vec4 localPosition = finalBonesMatrices[inBoneIds[i]] * vec4(inPos,1.0);
+      totalPosition += localPosition * inWeights[i];
+    }
+    pass_Pos = (u_model_matrix * totalPosition).xyz;
+  } else {  // Not Animating
+    pass_Pos = (u_model_matrix * vec4(inPos, 1.0)).xyz;
+    totalPosition = vec4(inPos, 1.0);
+  }
+  mat4 viewMatrix = u_view_matrix * u_model_matrix;
+  gl_Position = u_projection_matrix * viewMatrix * totalPosition;
+})";
+
+  const std::string FRAG_CODE = R"(#version 430
+out vec4 FragColor;
+void main()
+{
+  FragColor = vec4(0.04, 0.28, 0.26, 1.0);
+})";
+
+
+  STENCILSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());
+
+}
+
+OGLShader* DefaultShaders::get_stencilshader() {
+  if (!STENCILSHADER)
+    init_stencilshader();
+  STENCILSHADER->Use();
+  return STENCILSHADER;
 }
 
 void DefaultShaders::init_ubershader() {
@@ -26,13 +83,12 @@ layout(location=0)out vec3 pass_Pos;
 layout(location=1)out vec2 pass_TexUV;
 layout(location=2)out vec3 pass_Norm;
 
-uniform mat4 u_projection_matrix;
-uniform mat4 u_view_matrix;
-uniform mat4 u_model_matrix;
-
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
 
+uniform mat4 u_projection_matrix;
+uniform mat4 u_view_matrix;
+uniform mat4 u_model_matrix;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 uniform int isAnimating;
 
