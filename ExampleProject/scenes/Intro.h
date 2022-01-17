@@ -18,6 +18,8 @@ void LoadIntro() {
   intro_cam_id = g_engine.AddCamera(g_engine.GetWindowWidth(), g_engine.GetWindowHeight());
   g_engine.SetCamPosition(intro_cam_id, glm::vec3(0, 0, 40));
   intro_logo_id = g_engine.AddProp(intro_logo_path);
+  g_engine.StencilProp(intro_logo_id, true);
+  g_engine.StencilPropColor(intro_logo_id, glm::vec3(1.f, 0.f, 0.f));
   intro_loaded = true;
   g_engine.PlayMusic();
 }

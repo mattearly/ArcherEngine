@@ -109,13 +109,20 @@ void Interface::render() {
   OGLGraphics::ClearScreen();
   OGLGraphics::SetDepthTest(true);
   OGLGraphics::SetDepthMode(GL_LESS);
+  if (mWindow->mWindowOptions->_stencil_bits > 0) {
+    OGLGraphics::SetStencilFuncToNotEqual();
+    OGLGraphics::SetStencilOpDepthPassToReplace();
+  }
 
-  OGLShader* shader = DefaultShaders::get_ubershader();
-  shader->SetBool("isAnimating", false);
+  DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
+  DefaultShaders::get_stencilshader()->SetBool("isAnimating", false);
   if (!mCameras.empty()) {
     for (auto& p : mProps) {
       p->Draw();
     }
+
+    //----------
+    OGLShader* shader = DefaultShaders::get_ubershader();
     for (auto& ap : mAnimProps) {
       shader->SetBool("isAnimating", false);
       if (ap->mAnimator) {
