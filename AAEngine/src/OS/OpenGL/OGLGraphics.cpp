@@ -44,7 +44,7 @@ void OGLGraphics::SetViewportClearColor(glm::vec3 color) noexcept {
 /// pre-render function that clears the current context
 /// </summary>
 void OGLGraphics::ClearScreen() noexcept {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<LitVertex>& verts, const std::vector<GLuint>& elems) {
@@ -64,19 +64,19 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<LitVertex>& verts, cons
 
     /* REFERENCE
     void glVertexAttribFormat(	GLuint attribindex,
- 	                GLint size,
- 	                GLenum type,
- 	                GLboolean normalized,
- 	                GLuint relativeoffset);
+                  GLint size,
+                  GLenum type,
+                  GLboolean normalized,
+                  GLuint relativeoffset);
 
     void glVertexAttribBinding(	GLuint attribindex,
                   GLuint bindingindex);
 
     void glBindVertexBuffer(	GLuint bindingindex,
- 	                GLuint buffer,
- 	                GLintptr offset,
- 	                GLsizei stride);
-    
+                  GLuint buffer,
+                  GLintptr offset,
+                  GLsizei stride);
+
     void glEnableVertexAttribArray(	GLuint index);
     END REFERENCE */
 
@@ -108,7 +108,8 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<LitVertex>& verts, cons
 
     return vaoHandle;
 
-  } else {
+  }
+  else {
     // old version 3.3
     GLuint VAO, VBO, EBO;
 
@@ -172,7 +173,7 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<TanVertex>& verts, cons
     // TEXCOORDS
     glVertexAttribFormat(1, 2, GL_FLOAT, GL_FALSE, offsetof(TanVertex, TexCoords));
     glVertexAttribBinding(1, 1);
-    glBindVertexBuffer(1, vboHandle,0, stride_size);
+    glBindVertexBuffer(1, vboHandle, 0, stride_size);
     glEnableVertexAttribArray(1);
 
     // NORMAL
@@ -202,7 +203,8 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<TanVertex>& verts, cons
     glBindVertexArray(0);
 
     return vaoHandle;
-  } else {
+  }
+  else {
     // old version 3.3
     GLuint VAO, VBO, EBO;
     glGenBuffers(1, &VBO);
@@ -244,36 +246,36 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<TanVertex>& verts, cons
 /// <param name="elems">relevant indicies</param>
 /// <returns>the VAO</returns>
 GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<AnimVertex>& verts, const std::vector<GLuint>& elems) {
-    GLuint VAO, VBO, EBO;
-    glGenBuffers(1, &VBO);
+  GLuint VAO, VBO, EBO;
+  glGenBuffers(1, &VBO);
 
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(AnimVertex), &verts[0], GL_STATIC_DRAW);
+  glGenVertexArrays(1, &VAO);
+  glBindVertexArray(VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(AnimVertex), &verts[0], GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(AnimVertex), (const void*)offsetof(AnimVertex, Position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(AnimVertex), (const void*)offsetof(AnimVertex, TexCoords));
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(AnimVertex), (const void*)offsetof(AnimVertex, Normal));
-    glVertexAttribIPointer(3, MAX_BONE_INFLUENCE, GL_INT, sizeof(AnimVertex), (void*)offsetof(AnimVertex, m_BoneIDs));
-    glVertexAttribPointer(4, MAX_BONE_INFLUENCE, GL_FLOAT, GL_FALSE, sizeof(AnimVertex), (const void*)offsetof(AnimVertex, m_Weights));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(AnimVertex), (const void*)offsetof(AnimVertex, Position));
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(AnimVertex), (const void*)offsetof(AnimVertex, TexCoords));
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(AnimVertex), (const void*)offsetof(AnimVertex, Normal));
+  glVertexAttribIPointer(3, MAX_BONE_INFLUENCE, GL_INT, sizeof(AnimVertex), (void*)offsetof(AnimVertex, m_BoneIDs));
+  glVertexAttribPointer(4, MAX_BONE_INFLUENCE, GL_FLOAT, GL_FALSE, sizeof(AnimVertex), (const void*)offsetof(AnimVertex, m_Weights));
 
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-    glEnableVertexAttribArray(3);
-    glEnableVertexAttribArray(4);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glEnableVertexAttribArray(3);
+  glEnableVertexAttribArray(4);
 
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, elems.size() * sizeof(GLuint), &elems[0], GL_STATIC_DRAW);
+  glGenBuffers(1, &EBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, elems.size() * sizeof(GLuint), &elems[0], GL_STATIC_DRAW);
 
-    glBindVertexArray(0);
+  glBindVertexArray(0);
 
-    //glDeleteBuffers(1, &VBO);
-    //glDeleteBuffers(1, &EBO);
+  //glDeleteBuffers(1, &VBO);
+  //glDeleteBuffers(1, &EBO);
 
-    return VAO;
+  return VAO;
 }
 
 GLuint OGLGraphics::Upload3DPositionsMesh(const float* points, const int num_points, const GLuint* indices, const int ind_count) {
@@ -369,7 +371,8 @@ GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int he
   if (hasAlpha) {
     //https://youtu.be/n4k7ANAFsIQ?t=910
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, /*border*/0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
-  } else {
+  }
+  else {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, /*border*/0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
   }
 
@@ -397,7 +400,8 @@ GLuint OGLGraphics::UploadCubeMapTex(std::vector<unsigned char*> tex_data, int w
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data[i]);
       }
     }
-  } else {
+  }
+  else {
     for (auto i = 0; i < 6; ++i) {
       if (tex_data[i]) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data[i]);
@@ -417,7 +421,8 @@ void OGLGraphics::SetBlend(const bool enabled) {
     //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-  } else {
+  }
+  else {
     glDisable(GL_BLEND);
   }
 }
@@ -436,7 +441,8 @@ void OGLGraphics::SetCullMode(int mode) {
 void OGLGraphics::SetDepthTest(const bool enabled) {
   if (enabled) {
     glEnable(GL_DEPTH_TEST);
-  } else {
+  }
+  else {
     glDisable(GL_DEPTH_TEST);
   }
 }
@@ -448,7 +454,7 @@ void OGLGraphics::SetDepthMode(int mode) {
 void OGLGraphics::SetMultiSampling(const bool enabled) {
   if (enabled)
     glEnable(GL_MULTISAMPLE);
-  else 
+  else
     glDisable(GL_MULTISAMPLE);
 }
 
@@ -466,7 +472,7 @@ void OGLGraphics::Proc(void* proc) {
 /// <returns>depth map FBO</returns>
 GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height) {
   GLuint depthMapFBO;
-  glGenFramebuffers(1, &depthMapFBO);  
+  glGenFramebuffers(1, &depthMapFBO);
 
   const GLuint SHADOW_WIDTH = shadow_width, SHADOW_HEIGHT = shadow_height;
 
@@ -476,16 +482,50 @@ GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height) {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);  
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   return depthMapFBO;
+}
+//Note that this only has effect if depth testing is enabled. 
+void OGLGraphics::SetDepthMask(const bool enabled) {
+  if (enabled)
+    glDepthMask(GL_FALSE);
+  else
+    glDepthMask(GL_TRUE);
+}
+
+void OGLGraphics::SetStencil(const bool enabled) {
+  if (enabled)
+    glEnable(GL_STENCIL_TEST);
+  else
+    glDisable(GL_STENCIL_TEST);
+}
+
+// enable or disable writes
+void OGLGraphics::SetStencilMask(const bool enabled) {
+  if (enabled)
+    glStencilMask(0xFF); // enable writes
+  else
+    glStencilMask(0x00); // disable writes
+}
+
+void OGLGraphics::SetStencilOpDepthPassToReplace() {
+  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+}
+
+void OGLGraphics::SetStencilFuncToAlways() {
+  glStencilFunc(GL_ALWAYS, 1, 0xFF);
+}
+
+void OGLGraphics::SetStencilFuncToNotEqual() {
+  glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 }
 
 }  // end namespace AA
