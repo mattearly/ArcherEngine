@@ -292,10 +292,13 @@ void Window::default_init() {
     OGLGraphics::Proc(glfwGetProcAddress);
   }
 
-  if (mWindowOptions->_stencil_bits > 0)
+  if (mWindowOptions->_stencil_bits > 0) {
     OGLGraphics::SetStencil(true);
-  else
+    OGLGraphics::SetStencilFuncToNotEqual();
+    OGLGraphics::SetStencilOpDepthPassToReplace();
+  } else {
     OGLGraphics::SetStencil(false);
+  }
 
   glfwSetWindowUserPointer(mGLFWwindow, this);  // window pointer goes to this class
   set_default_callbacks();
