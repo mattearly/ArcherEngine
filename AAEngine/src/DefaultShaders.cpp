@@ -68,9 +68,11 @@ layout(location=2)in vec3 inNorm;
 layout(location=3)in ivec4 inBoneIds;
 layout(location=4)in vec4 inWeights;
 
-layout(location=0)out vec3 pass_Pos;
-layout(location=1)out vec2 pass_TexUV;
-layout(location=2)out vec3 pass_Norm;
+out VS_OUT {
+  vec3 Pos;
+  vec2 TexUV;
+  vec3 Norm;
+} vs_out;
 
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
@@ -82,7 +84,7 @@ uniform mat4 finalBonesMatrices[MAX_BONES];
 uniform int isAnimating;
 
 void main(){
-  pass_TexUV = inTexUV;
+  vs_out.TexUV = inTexUV;
   vec4 totalPosition = vec4(0.0);
 
   if (isAnimating > 0) {
@@ -97,11 +99,11 @@ void main(){
       totalPosition += localPosition * inWeights[i];
       //totalNormal += mat3(finalBonesMatrices[inBoneIds[i]]) * inNorm;
     }
-    pass_Pos = (u_model_matrix * totalPosition).xyz;
+    vs_out.Pos = (u_model_matrix * totalPosition).xyz;
   } else {  // Not Animating
     mat3 normal_matrix = transpose(inverse(mat3(u_model_matrix)));
-    pass_Norm = normalize(normal_matrix * inNorm);
-    pass_Pos = (u_model_matrix * vec4(inPos, 1.0)).xyz;
+    vs_out.Norm = normalize(normal_matrix * inNorm);
+    vs_out.Pos = (u_model_matrix * vec4(inPos, 1.0)).xyz;
     totalPosition = vec4(inPos, 1.0);
   }
   mat4 viewMatrix = u_view_matrix * u_model_matrix;
@@ -110,9 +112,14 @@ void main(){
 
   const std::string UBERSHADER_FRAG_CODE = R"(
 #version 430 core
-layout(location=0)in vec3 pass_Pos;
-layout(location=1)in vec2 pass_TexUV;
-layout(location=2)in vec3 pass_Norm;
+
+in VS_OUT
+{
+  vec3 Pos;
+  vec2 TexUV;
+  vec3 Norm;
+} fs_in;
+
 
 layout(location=0)out vec4 out_Color;
 
@@ -172,14 +179,14 @@ vec3 CalcDirectionalLight(vec3 normal, vec3 viewDir) {
   vec3 ambient;
   vec3 diffuse;
   if (hasAlbedo > 0) { 
-    ambient = directionalLight.Ambient * texture(material.Albedo, pass_TexUV).rgb;
-    diffuse = directionalLight.Diffuse * diff * texture(material.Albedo, pass_TexUV).rgb;
+    ambient = directionalLight.Ambient * texture(material.Albedo, fs_in.TexUV).rgb;
+    diffuse = directionalLight.Diffuse * diff * texture(material.Albedo, fs_in.TexUV).rgb;
   } else {
     ambient = directionalLight.Ambient * default_color;
     diffuse = directionalLight.Diffuse * diff * default_color;
   }
   if (hasSpecular > 0) {
-    vec3 specular = directionalLight.Specular * spec * texture(material.Specular, pass_TexUV).rgb;
+    vec3 specular = directionalLight.Specular * spec * texture(material.Specular, fs_in.TexUV).rgb;
     return(ambient + diffuse + specular);
   } else {
     return(ambient + diffuse);
@@ -187,7 +194,7 @@ vec3 CalcDirectionalLight(vec3 normal, vec3 viewDir) {
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
-  vec3 lightDir = normalize(light.Position - pass_Pos);
+  vec3 lightDir = normalize(light.Position - fs_in.Pos);
   // diffuse shading
   float diff = max(dot(normal, lightDir), 0.0);
   // specular shading
@@ -197,14 +204,14 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
     spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
   }
   // attenuation
-  float dist = length(light.Position - pass_Pos);
+  float dist = length(light.Position - fs_in.Pos);
   float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * (dist * dist));
   // combine results
   vec3 ambient;
   vec3 diffuse;
   if (hasAlbedo > 0) {
-    ambient = light.Ambient * texture(material.Albedo, pass_TexUV).rgb;
-    diffuse = light.Diffuse * diff * texture(material.Albedo, pass_TexUV).rgb;
+    ambient = light.Ambient * texture(material.Albedo, fs_in.TexUV).rgb;
+    diffuse = light.Diffuse * diff * texture(material.Albedo, fs_in.TexUV).rgb;
   } else {
     ambient = light.Ambient * default_color;
     diffuse = light.Diffuse * diff * default_color;
@@ -213,7 +220,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
   diffuse *= attenuation;
   vec3 specular;
   if (hasSpecular > 0) {
-    specular = light.Specular * spec * texture(material.Specular, pass_TexUV).rgb;
+    specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).rgb;
   } else {
     specular = vec3(1,1,1);
   }
@@ -222,7 +229,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
 }
 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
-  vec3 lightDir = normalize(light.Position - pass_Pos);
+  vec3 lightDir = normalize(light.Position - fs_in.Pos);
   // diffuse shading
   float diff = max(dot(normal, lightDir), 0.0);
   // specular shaing
@@ -232,7 +239,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
     spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
   }
   // attenuation
-  float dist = length(light.Position - pass_Pos);
+  float dist = length(light.Position - fs_in.Pos);
   float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * (dist * dist));
   // cone of light
   float theta = dot(lightDir, normalize(-light.Direction));
@@ -242,14 +249,14 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
    vec3 ambient;
    vec3 diffuse;
   if (hasAlbedo > 0) {
-    ambient = light.Ambient * texture(material.Albedo, pass_TexUV).rgb;
-    diffuse = light.Diffuse * diff * texture(material.Albedo, pass_TexUV).rgb;
+    ambient = light.Ambient * texture(material.Albedo, fs_in.TexUV).rgb;
+    diffuse = light.Diffuse * diff * texture(material.Albedo, fs_in.TexUV).rgb;
   } else {
     ambient = light.Ambient * default_color;
     diffuse = light.Diffuse * diff * default_color;
   }
   if (hasSpecular > 0) {
-    vec3 specular = light.Specular * spec * texture(material.Specular, pass_TexUV).rgb;
+    vec3 specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).rgb;
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
@@ -265,19 +272,19 @@ void main()
 {
   vec3 normal;
   if (hasNormal > 0) {
-    normal = texture(material.Normal, pass_TexUV).rgb;
+    normal = texture(material.Normal, fs_in.TexUV).rgb;
     normal = normalize(normal * 2.0 - 1.0);
   } else {
-    normal = normalize(pass_Norm * 2.0 - 1.0);
+    normal = normalize(fs_in.Norm * 2.0 - 1.0);
   }
-  vec3 view_dir = normalize(u_view_pos - pass_Pos);
+  vec3 view_dir = normalize(u_view_pos - fs_in.Pos);
   vec3 result;
   if (isDirectionalLightOn > 0) { result += CalcDirectionalLight(normal, view_dir); }
   int i = 0;
   for (i; i < NUM_POINT_LIGHTS; i++) { result += CalcPointLight(pointLight[i], normal, view_dir); }
   for (i = 0; i < NUM_SPOT_LIGHTS; i++) { result += CalcSpotLight(spotLight[i], normal, view_dir); }
   if (hasEmission > 0) {
-    vec3 emission = texture(material.Emission, pass_TexUV).rgb;
+    vec3 emission = texture(material.Emission, fs_in.TexUV).rgb;
     result += emission;
   }
   out_Color = vec4(result, 1.0);
