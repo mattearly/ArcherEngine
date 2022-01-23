@@ -4,6 +4,7 @@ namespace AA {
 OGLShader* UBERSHADER;
 OGLShader* STENCILSHADER;
 
+//todo: optimization - uniform buffers https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
 void DefaultShaders::init_stencilshader() {
   if (STENCILSHADER)
     return;
@@ -15,9 +16,11 @@ layout(location=3)in ivec4 inBoneIds;
 layout(location=4)in vec4 inWeights;
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
+
 uniform mat4 u_projection_matrix;
 uniform mat4 u_view_matrix;
 uniform mat4 u_model_matrix;
+
 uniform mat4 finalBonesMatrices[MAX_BONES];
 uniform int u_stencil_with_normals;
 uniform float u_stencil_scale;
@@ -80,6 +83,7 @@ const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 u_projection_matrix;
 uniform mat4 u_view_matrix;
 uniform mat4 u_model_matrix;
+
 uniform mat4 finalBonesMatrices[MAX_BONES];
 uniform int isAnimating;
 
