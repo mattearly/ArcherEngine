@@ -75,10 +75,30 @@ public:
   /// <param name="yaw_offset"></param>
   void ShiftPitchAndYaw(double pitch_offset, double yaw_offset);
 
+  /// <summary>
+  /// set to true to make the camera auto-snap its viewport to the size of the window
+  /// </summary>
+  /// <param name="tf">true or false</param>
   void SetKeepCameraToWindowSize(bool tf);
 
+  /// <summary>
+  /// Sets the render order.
+  /// </summary>
+  /// <param name="new_depth">depth of the cam</param>
+  void SetRenderDepth(int new_depth);
+
+  /// <summary>
+  /// gets the render order number
+  /// </summary>
+  /// <returns>render depth variable</returns>
+  int GetRenderDepth();
+
+  /// <summary>
+  /// Gets the snapping current option
+  /// </summary>
+  /// <returns>true or false</returns>
   bool GetIsAlwaysScreenSize();
-  
+
   /// <summary>
   /// Gets a copy of the front vec3
   /// </summary>
@@ -127,8 +147,6 @@ public:
   /// <returns>mat4 copy of the view</returns>
   glm::mat4 GetViewMatrix();
 
-
-
 protected:
   glm::vec2        BottomLeft;
   int              Width;
@@ -145,6 +163,7 @@ protected:
   glm::mat4        mViewMatrix;
   ProjectionType   mProjectionType;
   bool             isAlwaysScreenSize;
+  int              RenderDepth;  // lower renders first
 
 private:
   void resetViewportVars();

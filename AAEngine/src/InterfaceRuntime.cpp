@@ -106,55 +106,53 @@ void Interface::render() {
   DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
   DefaultShaders::get_stencilshader()->SetBool("isAnimating", false);
   if (!mCameras.empty()) {
-    if (mCameras.front()->isAlwaysScreenSize) {
-      // Pre-render
-      // todo: multi-camera support
-      if (g_os_window_resized) {
-        mCameras.front()->SetBottomLeft(0, 0);
-        mCameras.front()->SetDimensions_testing(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-        mCameras.front()->updateProjectionMatrix();
-        g_os_window_resized = false;
-      }
-
-    }
     for (auto& cam : mCameras) {
-      cam->shaderTick();
-    }
-
-    OGLGraphics::SetViewportSize(
-        (GLint)mCameras.front()->BottomLeft.x,
-        (GLint)mCameras.front()->BottomLeft.y,
-        (GLsizei)mCameras.front()->Width,
-        (GLsizei)mCameras.front()->Height);
-   
-
-    for (auto& p : mProps) {
-      p->Draw();
-    }
-
-    //----------
-    for (auto& ap : mAnimProps) {
-      DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
-      DefaultShaders::get_stencilshader()->SetBool("isAnimating", false);
-      if (ap->mAnimator) {
-        DefaultShaders::get_ubershader()->SetBool("isAnimating", true);
-        DefaultShaders::get_stencilshader()->SetBool("isAnimating", true);
-        auto transforms = ap->mAnimator->GetFinalBoneMatrices();
-        for (unsigned int i = 0; i < transforms.size(); ++i) {
-          DefaultShaders::get_ubershader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-          DefaultShaders::get_stencilshader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+      if (cam->isAlwaysScreenSize) {
+        if (g_os_window_resized) {
+          cam->SetBottomLeft(0, 0);
+          cam->SetDimensions_testing(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
+          cam->updateProjectionMatrix();
+          g_os_window_resized = false;
         }
       }
-      ap->Draw();
-    }
-    if (mSkybox) {
-      mSkybox->Render(mCameras.front());
-    }
+
+      cam->shaderTick();
+
+      OGLGraphics::SetViewportSize(
+        (GLint)cam->BottomLeft.x,
+        (GLint)cam->BottomLeft.y,
+        (GLsizei)cam->Width,
+        (GLsizei)cam->Height);
+
+
+      for (auto& p : mProps) {
+        p->Draw();
+      }
+
+      //----------
+      for (auto& ap : mAnimProps) {
+        DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
+        DefaultShaders::get_stencilshader()->SetBool("isAnimating", false);
+        if (ap->mAnimator) {
+          DefaultShaders::get_ubershader()->SetBool("isAnimating", true);
+          DefaultShaders::get_stencilshader()->SetBool("isAnimating", true);
+          auto transforms = ap->mAnimator->GetFinalBoneMatrices();
+          for (unsigned int i = 0; i < transforms.size(); ++i) {
+            DefaultShaders::get_ubershader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+            DefaultShaders::get_stencilshader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+          }
+        }
+        ap->Draw();
+      }
+      if (mSkybox) {
+        mSkybox->Render(cam);
+      }
 #ifdef _DEBUG
-    if (mSimulateWorldPhysics) {
-      NVidiaPhysx::Get()->DrawDebug(mCameras.front());
-    }
+      if (mSimulateWorldPhysics) {
+        NVidiaPhysx::Get()->DrawDebug(cam);
+      }
 #endif
+    }
   }  // endif !mCamera.empty()
 #ifdef _DEBUG
   else {

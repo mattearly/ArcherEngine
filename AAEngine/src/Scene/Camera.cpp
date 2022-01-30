@@ -111,6 +111,16 @@ void Camera::SetKeepCameraToWindowSize(bool tf)
   isAlwaysScreenSize = tf;
 }
 
+void Camera::SetRenderDepth(int new_depth)
+{
+  RenderDepth = new_depth;
+}
+
+int Camera::GetRenderDepth()
+{
+  return RenderDepth;
+}
+
 bool Camera::GetIsAlwaysScreenSize() {
   return isAlwaysScreenSize;
 }
@@ -175,6 +185,8 @@ void Camera::resetViewportVars() {
   MaxRenderDistance = 3000.f;
   mProjectionType = ProjectionType::PERSPECTIVE;
   isAlwaysScreenSize = false;
+  static int LastRenderDepth = 0;
+  RenderDepth = LastRenderDepth++;
   updateCameraVectors();
 }
 
@@ -222,11 +234,11 @@ void Camera::shaderTick() {
     DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", mProjectionMatrix);
     DefaultShaders::get_stencilshader()->SetMat4("u_projection_matrix", mProjectionMatrix);
   }
-  if (mViewChanged) {
+  //if (mViewChanged) {
     DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", mViewMatrix);
     DefaultShaders::get_stencilshader()->SetMat4("u_view_matrix", mViewMatrix);
-  }
-  mProjectionChanged = mViewChanged = false;
+  //}
+  mProjectionChanged = /*mViewChanged = */false;
 }
 
 }  // end namespace AA
