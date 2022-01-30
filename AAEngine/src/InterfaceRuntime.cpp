@@ -1,8 +1,8 @@
 #include "../include/AAEngine/Interface.h"
+#include "../include/AAEngine/Scene/Camera.h"
 #include "OS/Interface/Window.h"
 #include "OS/OpenGL/OGLGraphics.h"
 #include "Physics/NVidiaPhysx.h"
-#include "Scene/Camera.h"
 #include "Mesh/Prop.h"
 #include "Mesh/AnimProp.h"
 #include "Scene/Lights.h"
@@ -89,12 +89,13 @@ void Interface::update() {
   for (auto& oSH : onScrollHandling) { oSH.second(g_scroll_input_status); }
 
   // Pre-render
-  if (g_os_window_resized) {
-    for (auto& cam : mCameras) {
-      cam->updateProjectionMatrix(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-    }
-    g_os_window_resized = false;
-  }
+  // todo: consider resizing camera base on % change of window
+  //if (g_os_window_resized) {
+  //  for (auto& cam : mCameras) {
+  //    cam->updateProjectionMatrix();
+  //  }
+  //  g_os_window_resized = false;
+  //}
 
   for (auto& cam : mCameras) {
     cam->shaderTick();

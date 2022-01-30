@@ -10,12 +10,12 @@
 
 // internal
 #include "Controls/Input.h"
+#include "Scene/Camera.h"
 #include "WindowOptions.h"
 
 namespace AA {
 
 class Window;
-class Camera;
 class Skybox;
 class imGUI;
 class Prop;
@@ -96,133 +96,11 @@ public:
   /// <returns>true if removal was successful, otherwise false</returns>
   bool RemoveCamera(int camId);
 
-  /// <summary>
-  /// Set the Render Distance on a camera.
-  /// </summary>
-  /// <param name="camId">id to the camera you want to change</param>
-  /// <param name="amt">a positive value to set the render distance to. negatives will be treated as a positive via absolute value.</param>
-  void SetCamMaxRenderDistance(int camId, float amt);
+  //// REFACTOR CAMERA START
 
-  /// <summary>
-  /// Change camera to perspective view mode.
-  /// </summary>
-  /// <param name="camId">id of the camera to effect</param>
-  void SetCamToPerspective(int camId);
+  std::shared_ptr<Camera> GetCamera(uidtype camId);
 
-  /// <summary>
-  /// Change camera to orthographic mode. 
-  /// Note that this doesn't work as expect sometimes and needs work.
-  /// </summary>
-  /// <param name="camId">id of the camera to effect</param>
-  void SetCamToOrtho_testing(int camId);
-
-  /// <summary>
-  /// Changes the field of view of a camera.
-  /// </summary>
-  /// <param name="camId">id of the camera to effect</param>
-  /// <param name="new_fov">positive value field of view to set. Bound between 1 and 360.</param>
-  void SetCamFOV(int camId, float new_fov);
-
-  /// <summary>
-  /// Sets the camera width and height.
-  /// Note: Camera and projection may snap to screen size on screen resize.
-  /// </summary>
-  /// <param name="camId">id of the camera to effect</param>
-  /// <param name="w">desired width</param>
-  /// <param name="h">desired height</param>
-  void SetCamDimensions_testing(int camId, int w, int h);
-
-  /// <summary>
-  /// Moves the camera to the coordinates
-  /// </summary>
-  /// <param name="camId">id of the camera to effect</param>
-  /// <param name="new_loc">desired location</param>
-  void SetCamPosition(int camId, glm::vec3 new_loc);
-
-  /// <summary>
-  /// Set the pitch of a camera
-  /// </summary>
-  /// <param name="camId">id of the camera to effect</param>
-  /// <param name="new_pitch_degrees">pitch in degrees</param>
-  void SetCamPitch(int camId, float new_pitch_degrees);
-
-  /// <summary>
-  /// Set the yaw of a camera
-  /// </summary>
-  /// <param name="camId">id of the camera to effect</param>
-  /// <param name="new_yaw_degrees">yaw in degrees</param>
-  void SetCamYaw(int camId, float new_yaw_degrees);
-
-  /// <summary>
-  /// Moves the camera to an offset of its current location
-  /// </summary>
-  /// <param name="camId">id of the camera to effect</param>
-  /// <param name="offset">offset to apply</param>
-  void ShiftCamPosition(int camId, glm::vec3 offset);
-
-  /// <summary>
-  /// Rotates the Camera by an offset.
-  /// </summary>
-  /// <param name="camId">id of the camera to effect</param>
-  /// <param name="pitch_offset"></param>
-  /// <param name="yaw_offset"></param>
-  void ShiftCamPitchAndYaw(int camId, double pitch_offset, double yaw_offset);
-
-  /// <summary>
-  /// Gets a copy of the front vec3
-  /// </summary>
-  /// <param name="camId">id of the camera to get from</param>
-  /// <returns>front vec3 copy</returns>
-  glm::vec3 GetCamFront(int camId);
-
-  /// <summary>
-  /// Gets a copy of the right vec3
-  /// </summary>
-  /// <param name="camId">id of the camera to get from</param>
-  /// <returns>right vec3 copy</returns>
-  glm::vec3 GetCamRight(int camId);
-
-  /// <summary>
-  /// Gets a copy of the cam position vec3
-  /// </summary>
-  /// <param name="camId">id of the camera to get from</param>
-  /// <returns>location vec3 copy</returns>
-  glm::vec3 GetCamPosition(int camId);
-
-  /// <summary>
-  /// Get a copy of the cam pitch.
-  /// </summary>
-  /// <param name="camId">id of the camera to get from</param>
-  /// <returns>camera pitch</returns>
-  float GetCamPitch(int camId);
-
-  /// <summary>
-  /// Get a copy of the camera yaw
-  /// </summary>
-  /// <param name="camId">id of the camera to get from</param>
-  /// <returns>camera yaw</returns>
-  float GetCamYaw(int camId);
-
-  /// <summary>
-  /// Get a vec2 of the pitch and yaw.
-  /// </summary>
-  /// <param name="camId">id of the camera to get from</param>
-  /// <returns>vec2 pitch,yaw</returns>
-  glm::vec2 GetPitchAndYaw(int camId);
-
-  /// <summary>
-  /// Get the projection matrix of a camera
-  /// </summary>
-  /// <param name="camId">id of the camera to get from</param>
-  /// <returns>mat4 copy of the projection</returns>
-  glm::mat4 GetProjectionMatrix(int camId);
-
-  /// <summary>
-  /// Get the view matrix of a camera
-  /// </summary>
-  /// <param name="camId">id of the camera to get from</param>
-  /// <returns>mat4 copy of the view</returns>
-  glm::mat4 GetViewMatrix(int camId);
+  //// END CAMERA REFACTOR
 
   /// <summary>
   /// Adds a Prop.

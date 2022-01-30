@@ -13,7 +13,7 @@
 #include "AnimProp.h"
 #include "../Math/Conversions.h"
 #include "../OS/Vertex.h"
-#include "../Base/UniqueInstance.h"
+#include "../../include/AAEngine/Base/UniqueInstance.h"
 #include "Skeleton.h"
 
 namespace AA {

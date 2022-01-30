@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 #ifdef _DEBUG
-#include "../Scene/Camera.h"
+#include "../../include/AAEngine/Scene/Camera.h"
 #endif
 namespace AA {
 

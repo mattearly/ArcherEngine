@@ -36,7 +36,7 @@
     <ClInclude Include="src\Mesh\Prop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Camera.h">
+    <ClInclude Include="include\AAEngine\Scene\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AAEngine\Interface.h">
@@ -75,7 +75,7 @@
     <ClInclude Include="src\Math\Conversions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Base\UniqueInstance.h">
+    <ClInclude Include="include\AAEngine\Base\UniqueInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Sound\SoundEffect.h">

@@ -1,10 +1,14 @@
 #pragma once
+#include <cstdint>
 namespace AA {
+
+typedef uint32_t uidtype;
+
 class UniqueInstance {
 public:
-  virtual unsigned int GetUID() const noexcept;
+  virtual uidtype GetUID() const noexcept;
   UniqueInstance();
 private:
-  unsigned int UniqueID;
+  uidtype UniqueID;
 };
 }  // end namespace AA

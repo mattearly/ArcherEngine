@@ -15,7 +15,8 @@ void LoadLevel1() {
   g_engine.SetWindowClearColor(glm::vec3(.1f, .1f, .67f));
   g_engine.AddMusic(level1_music_path);
   level1_cam_id = g_engine.AddCamera(g_engine.GetWindowWidth(), g_engine.GetWindowHeight());
-  g_engine.SetCamPosition(level1_cam_id, glm::vec3(0, 0, 100));
+  auto cam = g_engine.GetCamera(level1_cam_id);
+  cam->SetPosition(glm::vec3(0, 0, 100));  
   level1_logo_id = g_engine.AddAnimProp(level1_logo_path);
   punching_anim_id = g_engine.AddAnimation(level1_logo_path, level1_logo_id);
   g_engine.SetAnimationOnAnimProp(punching_anim_id, level1_logo_id);

@@ -23,8 +23,8 @@ Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
 }
 
 void Skybox::Render(const std::shared_ptr<Camera>& cam) {
-  SetViewMatrix(cam->mViewMatrix);
-  SetProjectionMatrix(cam->mProjectionMatrix);  // todo (matt): unhack. not set this every frame but only when it changes
+  SetViewMatrix(cam->GetProjectionMatrix());
+  SetProjectionMatrix(cam->GetProjectionMatrix());  // todo (matt): unhack. not set this every frame but only when it changes
   OGLGraphics::SetDepthTest(true); // should usually already be true
   OGLGraphics::SetDepthMode(GL_LEQUAL);
   OGLGraphics::SetSamplerCube(0, mCubemapTexId);

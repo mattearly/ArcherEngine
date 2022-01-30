@@ -1,7 +1,7 @@
-#include "UniqueInstance.h"
+#include "../../include/AAEngine/Base/UniqueInstance.h"
 namespace AA {
-static unsigned int next_uid = 0;
-unsigned int UniqueInstance::GetUID() const noexcept { return UniqueID; }
+static uidtype next_uid = 0;
+uidtype UniqueInstance::GetUID() const noexcept { return UniqueID; }
 UniqueInstance::UniqueInstance() {
   UniqueID = ++next_uid;
 };

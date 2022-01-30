@@ -160,8 +160,8 @@ NVidiaPhysx::~NVidiaPhysx() {
 static OGLShader* physics_debug_shader = NULL;
 void NVidiaPhysx::DrawDebug(const std::shared_ptr<Camera> cam) {
   if (physics_debug_shader) {
-    physics_debug_shader->SetMat4("u_projection_matrix", cam->mProjectionMatrix);
-    physics_debug_shader->SetMat4("u_view_matrix", cam->mViewMatrix);
+    physics_debug_shader->SetMat4("u_projection_matrix", cam->GetProjectionMatrix());
+    physics_debug_shader->SetMat4("u_view_matrix", cam->GetProjectionMatrix());
 
   } else {
     const std::string vert = R"(

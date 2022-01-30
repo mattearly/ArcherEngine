@@ -114,7 +114,7 @@
     <ClInclude Include="src\Mesh\Spacial3D.h" />
     <ClInclude Include="src\Sound\SoundEffect.h" />
     <ClInclude Include="src\OS\TextureInfo.h" />
-    <ClInclude Include="src\Scene\Camera.h" />
+    <ClInclude Include="include\AAEngine\Scene\Camera.h" />
     <ClInclude Include="src\Mesh\Prop.h" />
     <ClInclude Include="glad\glad.h" />
     <ClInclude Include="src\Sound\ErrorCheck.h" />
@@ -133,7 +133,7 @@
     <ClInclude Include="src\Sound\SoundDevice.h" />
     <ClInclude Include="src\Sound\Speaker.h" />
     <ClInclude Include="src\Math\Conversions.h" />
-    <ClInclude Include="src\Base\UniqueInstance.h" />
+    <ClInclude Include="include\AAEngine\Base\UniqueInstance.h" />
     <ClInclude Include="src\OS\OpenGL\QueryShader.h" />
   </ItemGroup>
   <ItemGroup>
