@@ -59,7 +59,7 @@ void UnloadIntro() {
   intro_logo_id = -1;
   g_engine.RemoveCamera(intro_cam_id);
   intro_cam_id = -1;
-  g_engine.RemoveFromMouseHandling(intro_mb_id);
+  g_engine.RemoveFromMouseButtonHandling(intro_mb_id);
   intro_mb_id = -1;
   intro_loaded = false;
 }
