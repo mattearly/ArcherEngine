@@ -27,7 +27,7 @@ void OGLGraphics::RenderStrip(unsigned int vao, const int& count) {
   glBindVertexArray(0);
 }
 
-void OGLGraphics::SetViewportSize(int x, int y, int w, int h) {
+void OGLGraphics::SetViewportSize(GLint x, GLint y, GLsizei w, GLsizei h) {
   glViewport(x, y, w, h);
 }
 

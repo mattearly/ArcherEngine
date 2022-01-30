@@ -26,7 +26,7 @@ public:
   static void SetTexture(int which, const int& textureID);
   static void RenderElements(unsigned int vao, unsigned int numElements);
   static void RenderStrip(unsigned int vao, const int& count);
-  static void SetViewportSize(int x, int y, int w, int h);
+  static void SetViewportSize(GLint x, GLint y, GLsizei w, GLsizei h);
   static void SetViewportClearColor(glm::vec3 color) noexcept;
 
   static void ClearScreen() noexcept;
