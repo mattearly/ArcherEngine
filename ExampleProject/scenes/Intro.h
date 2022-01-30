@@ -12,6 +12,7 @@ static const char* intro_logo_path = "res/neon_cube.glb";
 static int intro_logo_id = -1;
 static int intro_cam_id = -1;
 static float intro_timer = 0.f;
+static int intro_mb_id = -1;
 
 void LoadIntro() {
   intro_timer = 0.f;
@@ -27,6 +28,11 @@ void LoadIntro() {
   g_engine.StencilPropScale(intro_logo_id, 1.05f);
   intro_loaded = true;
   g_engine.PlayMusic();
+  intro_mb_id = g_engine.AddToMouseButtonHandling([](AA::MouseButtons& mb) {
+    if (mb.mouseButton1) {
+      g_next_scene = SCENE::MAIN_MENU;
+    }
+    });
 }
 
 void TickIntro(const float& dt) {
@@ -53,5 +59,7 @@ void UnloadIntro() {
   intro_logo_id = -1;
   g_engine.RemoveCamera(intro_cam_id);
   intro_cam_id = -1;
+  g_engine.RemoveFromMouseHandling(intro_mb_id);
+  intro_mb_id = -1;
   intro_loaded = false;
 }
