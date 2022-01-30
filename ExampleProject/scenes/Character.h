@@ -16,6 +16,8 @@ void LoadCharacter() {
   character_cam_id = g_engine.AddCamera(g_engine.GetWindowWidth(), g_engine.GetWindowHeight());
   auto cam = g_engine.GetCamera(character_cam_id);
   cam->SetPosition(glm::vec3(0, 0, 30));
+  cam->SetKeepCameraToWindowSize(true);
+
   character_model_id = g_engine.AddProp(character_logo_path);
   g_engine.StencilProp(character_model_id, true);
   g_engine.StencilPropWithNormals(character_model_id, true);

@@ -19,6 +19,7 @@ void LoadIntro() {
   intro_cam_id = g_engine.AddCamera(g_engine.GetWindowWidth(), g_engine.GetWindowHeight());
   auto cam = g_engine.GetCamera(intro_cam_id);
   cam->SetPosition(glm::vec3(0, 0, 40));
+  cam->SetKeepCameraToWindowSize(true);
   intro_logo_id = g_engine.AddProp(intro_logo_path);
   g_engine.StencilProp(intro_logo_id, true);
   g_engine.StencilPropColor(intro_logo_id, glm::vec3(1.f, 0.f, 0.f));

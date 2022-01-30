@@ -1,5 +1,4 @@
 #include "Window.h"
-#include "../OpenGL/OGLGraphics.h"
 #include <memory>
 
 namespace AA {
@@ -29,17 +28,7 @@ void FRAMEBUFFERSIZESETCALLBACK(GLFWwindow* window, int w, int h) {
   self->mWindowOptions->_width = w;
   self->mWindowOptions->_height = h;
 
-  // Update Graphics Viewport
-  switch (self->mWindowOptions->_rendering_tech) {
-  case RENDER_TECH::OPENGL4:
-    OGLGraphics::SetViewportSize(0, 0, w, h);
-    break;
-  case RENDER_TECH::D3D11:
-  case RENDER_TECH::VULKAN1:
-    throw("Render Tech Not Supported");
-    break;
-  }
-  // Update Projection Matricies
+  // Flag to Update Projection Matricies and Cameras that are snapped to screen size
   g_os_window_resized = true;
 }
 

@@ -9,6 +9,13 @@ public:
   Camera(int width, int height);
 
   /// <summary>
+  /// Sets where the viewport starts starting from the bottom left.
+  /// </summary>
+  /// <param name="x">x location</param>
+  /// <param name="y">y location</param>
+  void SetBottomLeft(int x, int y);
+
+  /// <summary>
   /// Set the Render Distance on a camera.
   /// </summary>
   /// <param name="amt">a positive value to set the render distance to. negatives will be treated as a positive via absolute value.</param>
@@ -68,6 +75,10 @@ public:
   /// <param name="yaw_offset"></param>
   void ShiftPitchAndYaw(double pitch_offset, double yaw_offset);
 
+  void SetKeepCameraToWindowSize(bool tf);
+
+  bool GetIsAlwaysScreenSize();
+  
   /// <summary>
   /// Gets a copy of the front vec3
   /// </summary>
@@ -116,7 +127,10 @@ public:
   /// <returns>mat4 copy of the view</returns>
   glm::mat4 GetViewMatrix();
 
+
+
 protected:
+  glm::vec2        BottomLeft;
   int              Width;
   int              Height;
   glm::vec3        Front;
@@ -130,6 +144,7 @@ protected:
   glm::mat4        mProjectionMatrix;
   glm::mat4        mViewMatrix;
   ProjectionType   mProjectionType;
+  bool             isAlwaysScreenSize;
 
 private:
   void resetViewportVars();

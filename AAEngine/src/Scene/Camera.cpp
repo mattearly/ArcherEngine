@@ -13,6 +13,11 @@ Camera::Camera(int width, int height) {
   updateProjectionMatrix();
 }
 
+void Camera::SetBottomLeft(int x, int y)
+{
+  BottomLeft = glm::vec2(x, y);
+}
+
 void Camera::SetMaxRenderDistance(float amt)
 {
   if (amt < 0.f)
@@ -101,6 +106,15 @@ void Camera::ShiftPitchAndYaw(double pitch_offset_degrees, double yaw_offset_deg
   updateCameraVectors();
 }
 
+void Camera::SetKeepCameraToWindowSize(bool tf)
+{
+  isAlwaysScreenSize = tf;
+}
+
+bool Camera::GetIsAlwaysScreenSize() {
+  return isAlwaysScreenSize;
+}
+
 glm::vec3 Camera::GetFront()
 {
   return Front;
@@ -153,12 +167,14 @@ void Camera::updateCameraVectors() {
 }
 
 void Camera::resetViewportVars() {
+  BottomLeft = glm::vec2(0, 0);
   Position = glm::vec3(0.f);
   FOV = 45.f;
   Yaw = -90.f;  // look down the -z axis
   Pitch = 0.f;
   MaxRenderDistance = 3000.f;
   mProjectionType = ProjectionType::PERSPECTIVE;
+  isAlwaysScreenSize = false;
   updateCameraVectors();
 }
 

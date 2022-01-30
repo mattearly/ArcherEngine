@@ -88,19 +88,6 @@ void Interface::update() {
   for (auto& oMH : onMouseHandling) { oMH.second(g_mouse_input_status); }
   for (auto& oSH : onScrollHandling) { oSH.second(g_scroll_input_status); }
 
-  // Pre-render
-  // todo: consider resizing camera base on % change of window
-  //if (g_os_window_resized) {
-  //  for (auto& cam : mCameras) {
-  //    cam->updateProjectionMatrix();
-  //  }
-  //  g_os_window_resized = false;
-  //}
-
-  for (auto& cam : mCameras) {
-    cam->shaderTick();
-  }
-
 
 }
 
@@ -118,6 +105,28 @@ void Interface::render() {
   DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
   DefaultShaders::get_stencilshader()->SetBool("isAnimating", false);
   if (!mCameras.empty()) {
+    if (mCameras.front()->isAlwaysScreenSize) {
+      // Pre-render
+      // todo: multi-camera support
+      if (g_os_window_resized) {
+        mCameras.front()->SetBottomLeft(0, 0);
+        mCameras.front()->SetDimensions_testing(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
+        mCameras.front()->updateProjectionMatrix();
+        g_os_window_resized = false;
+      }
+
+    }
+    for (auto& cam : mCameras) {
+      cam->shaderTick();
+    }
+
+    OGLGraphics::SetViewportSize(
+        (GLint)mCameras.front()->BottomLeft.x,
+        (GLint)mCameras.front()->BottomLeft.y,
+        (GLsizei)mCameras.front()->Width,
+        (GLsizei)mCameras.front()->Height);
+   
+
     for (auto& p : mProps) {
       p->Draw();
     }

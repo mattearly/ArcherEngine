@@ -28,6 +28,8 @@ void LoadMenu() {
   menu_cam_id = g_engine.AddCamera(g_engine.GetWindowWidth(), g_engine.GetWindowHeight());
   auto cam = g_engine.GetCamera(menu_cam_id);
   cam->SetPosition(glm::vec3(0, 0, 40));
+  cam->SetKeepCameraToWindowSize(true);
+
   menu_logo_id = g_engine.AddProp(menu_logo_path);
   menu_loaded = true;
   g_engine.PlayMusic();
