@@ -12,6 +12,7 @@ extern void FRAMEBUFFERSIZESETCALLBACK(GLFWwindow* window, int w, int h);
 extern void NORMALMOUSEREPORTINGCALLBACK(GLFWwindow* window, double xpos, double ypos);
 extern void KEYCALLBACK(GLFWwindow* w, int key, int scancode, int action, int mods);
 extern void MOUSEBUTTONCALLBACK(GLFWwindow* w, int button, int action, int mods);
+extern void MOUSESCROLLWHEELCALLBACK(GLFWwindow* w, double xoffset, double yoffset);
 extern void ONWINDOWFOCUSCALLBACK(GLFWwindow* window, int focused);
 
 /// <summary>
@@ -334,6 +335,7 @@ void Window::set_default_callbacks() {
   glfwSetCursorPosCallback(mGLFWwindow, NORMALMOUSEREPORTINGCALLBACK);
   glfwSetKeyCallback(mGLFWwindow, KEYCALLBACK);
   glfwSetMouseButtonCallback(mGLFWwindow, MOUSEBUTTONCALLBACK);
+  glfwSetScrollCallback(mGLFWwindow, MOUSESCROLLWHEELCALLBACK);
   glfwSetWindowFocusCallback(mGLFWwindow, ONWINDOWFOCUSCALLBACK);
 }
 

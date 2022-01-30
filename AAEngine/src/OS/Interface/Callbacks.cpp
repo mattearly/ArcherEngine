@@ -36,7 +36,6 @@ void NORMALMOUSEREPORTINGCALLBACK(GLFWwindow* window, double xpos, double ypos) 
   // Update Cached Position
   g_mouse_input_status.xOffset = xpos;
   g_mouse_input_status.yOffset = ypos;
-  //std::cout << "Mouse Pos: " << xpos << " " << ypos << '\n';
 }
 
 void ONWINDOWFOCUSCALLBACK(GLFWwindow* window, int focused) {
@@ -523,4 +522,9 @@ void MOUSEBUTTONCALLBACK(GLFWwindow* w, int button, int action, int mods) {
   g_new_key_reads = true;
 }
 
+void MOUSESCROLLWHEELCALLBACK(GLFWwindow* w, double xoffset, double yoffset) {
+  g_scroll_input_status.xOffset = xoffset;
+  g_scroll_input_status.yOffset = yoffset;
+  g_new_key_reads = true;
+}
 }  // end namespace AA
