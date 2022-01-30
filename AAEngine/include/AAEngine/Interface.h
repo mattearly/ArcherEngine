@@ -96,11 +96,12 @@ public:
   /// <returns>true if removal was successful, otherwise false</returns>
   bool RemoveCamera(int camId);
 
-  //// REFACTOR CAMERA START
-
+  /// <summary>
+  /// Access Camera by Id
+  /// </summary>
+  /// <param name="camId">id that was returned by AddCamera()</param>
+  /// <returns></returns>
   std::shared_ptr<Camera> GetCamera(uidtype camId);
-
-  //// END CAMERA REFACTOR
 
   /// <summary>
   /// Adds a Prop.
