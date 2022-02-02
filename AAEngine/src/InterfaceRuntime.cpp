@@ -81,8 +81,8 @@ void Interface::update() {
   if (g_new_key_reads) {
     for (auto& oKH : onKeyHandling) { oKH.second(g_keyboard_input_status); }
     for (auto& oMH : onMouseButtonHandling) { oMH.second(g_mouse_button_status); }
-    for (auto& oSH : onScrollHandling) { 
-      oSH.second(g_scroll_input_status); 
+    for (auto& oSH : onScrollHandling) {
+      oSH.second(g_scroll_input_status);
       g_scroll_input_status.yOffset = 0;
       g_scroll_input_status.xOffset = 0;
     }
@@ -94,7 +94,6 @@ void Interface::update() {
 
 // Renders visable props every frame
 void Interface::render() {
-
   OGLGraphics::ClearScreen();
   OGLGraphics::SetDepthTest(true);
   OGLGraphics::SetDepthMode(GL_LESS);
@@ -117,19 +116,8 @@ void Interface::render() {
       }
 
       cam->shaderTick();
-
-      OGLGraphics::SetViewportSize(
-        (GLint)cam->BottomLeft.x,
-        (GLint)cam->BottomLeft.y,
-        (GLsizei)cam->Width,
-        (GLsizei)cam->Height);
-
-
-      for (auto& p : mProps) {
-        p->Draw();
-      }
-
-      //----------
+      OGLGraphics::SetViewportSize((GLint)cam->BottomLeft.x, (GLint)cam->BottomLeft.y, (GLsizei)cam->Width, (GLsizei)cam->Height);
+      for (auto& p : mProps) { p->Draw(); }
       for (auto& ap : mAnimProps) {
         DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
         DefaultShaders::get_stencilshader()->SetBool("isAnimating", false);
@@ -144,30 +132,20 @@ void Interface::render() {
         }
         ap->Draw();
       }
-      if (mSkybox) {
-        mSkybox->Render(cam);
-      }
+      if (mSkybox) { mSkybox->Render(cam); }
 #ifdef _DEBUG
-      if (mSimulateWorldPhysics) {
-        NVidiaPhysx::Get()->DrawDebug(cam);
-      }
+      if (mSimulateWorldPhysics) { NVidiaPhysx::Get()->DrawDebug(cam); }
 #endif
     }
-  }  // endif !mCamera.empty()
-#ifdef _DEBUG
-  else {
-    std::cout << "0 cameras, skybox and props wont show\n";
   }
+#ifdef _DEBUG
+  else { std::cout << "0 cameras, skybox and props wont show\n"; }
 #endif
-
   if (mIMGUI) {
     mIMGUI->NewFrame();
-    for (auto& oIU : onImGuiUpdate) {
-      oIU.second();
-    }
+    for (auto& oIU : onImGuiUpdate) { oIU.second(); }
     mIMGUI->Render();
   }
-
   mWindow->swap_buffers();
 }
 

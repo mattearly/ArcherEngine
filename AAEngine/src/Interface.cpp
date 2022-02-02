@@ -134,8 +134,9 @@ bool Interface::RemoveCamera(const int camId) {
 
   auto after_size = mCameras.size();
 
-  if (before_size != after_size)
+  if (before_size != after_size) {
     return true;  // success remove
+  }
 
   return false;   // fail remove
 }

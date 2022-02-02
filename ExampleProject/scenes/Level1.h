@@ -22,7 +22,7 @@ void LoadLevel1() {
   cam->SetPosition(glm::vec3(0, 0, 100));
   cam->SetKeepCameraToWindowSize(true);
 
-  level1_reverse_cam_id = g_engine.AddCamera(300,200);
+  level1_reverse_cam_id = g_engine.AddCamera(300, 200);
   auto cam2 = g_engine.GetCamera(level1_reverse_cam_id);
   cam2->SetPosition(glm::vec3(0, 0, 100));
   cam2->ShiftPitchAndYaw(0.f, 180.f);
@@ -37,7 +37,6 @@ void LoadLevel1() {
     }
     });
 
-
   // first model
   level1_zombie_model_id = g_engine.AddAnimProp(level1_logo_path);
   punching_anim_id = g_engine.AddAnimation(level1_logo_path, level1_zombie_model_id);
@@ -50,7 +49,7 @@ void LoadLevel1() {
 
   // second model
   level1_sphere_model_id = g_engine.AddProp(level1_sphere_model_path);
-  g_engine.MoveProp(level1_sphere_model_id, glm::vec3(0, 0,160));
+  g_engine.MoveProp(level1_sphere_model_id, glm::vec3(0, 0, 160));
   //todo: fix texture issue
 
 
@@ -65,7 +64,7 @@ void TickLevel1(const float& dt) {
     static float curr_scale = 1.f;
     static float grow = true;
     if (grow) {
-      curr_scale += dt*2;
+      curr_scale += dt * 2;
       if (curr_scale > 30.f)
         grow = false;
     }
@@ -76,12 +75,6 @@ void TickLevel1(const float& dt) {
     }
     g_engine.ScaleProp(level1_sphere_model_id, glm::vec3(curr_scale));
   }
-
-
-
-
-
-
   //if (level1_logo_id != -1) {
   //  static float curr_scale = 1.f;
   //  static float grow = true;
