@@ -114,7 +114,8 @@ void Interface::render() {
           g_os_window_resized = false;
         }
       }
-
+      cam->updateViewMatrix();
+      cam->updateProjectionMatrix();
       cam->shaderTick();
       OGLGraphics::SetViewportSize((GLint)cam->BottomLeft.x, (GLint)cam->BottomLeft.y, (GLsizei)cam->Width, (GLsizei)cam->Height);
       for (auto& p : mProps) { p->Draw(); }
