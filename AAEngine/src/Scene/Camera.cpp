@@ -234,11 +234,11 @@ void Camera::shaderTick() {
     DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", mProjectionMatrix);
     DefaultShaders::get_stencilshader()->SetMat4("u_projection_matrix", mProjectionMatrix);
   }
-  //if (mViewChanged) {
+  if (mViewChanged) {
     DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", mViewMatrix);
     DefaultShaders::get_stencilshader()->SetMat4("u_view_matrix", mViewMatrix);
-  //}
-  mProjectionChanged = /*mViewChanged = */false;
+  }
+  mProjectionChanged = mViewChanged = false;
 }
 
 }  // end namespace AA
