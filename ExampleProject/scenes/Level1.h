@@ -13,6 +13,8 @@ static int punching_anim_id = -1;
 static int level1_cam_id = -1;
 static int level1_reverse_cam_id = -1;
 static int level1_spotlight_id = -1;
+static int level1_stencil_highlight_mb_func_id = -1;
+static int level1_second_cam_center_kb_func_id = -1;
 
 void LoadLevel1() {
   g_engine.SetWindowClearColor(glm::vec3(.1f, .1f, .67f));
@@ -30,7 +32,7 @@ void LoadLevel1() {
   // set to middle of screen viewport
   cam2->SetBottomLeft((int)((g_engine.GetWindowWidth() / 2.f) - 150), (int)((g_engine.GetWindowHeight() / 2.f) - 100));
 
-  g_engine.AddToKeyHandling([](AA::KeyboardButtons& kb) {
+  level1_second_cam_center_kb_func_id = g_engine.AddToKeyHandling([](AA::KeyboardButtons& kb) {
     if (kb.spacebar) {
       auto cam2_live = g_engine.GetCamera(level1_reverse_cam_id);
       cam2_live->SetBottomLeft((int)((g_engine.GetWindowWidth() / 2.f) - 150), (int)((g_engine.GetWindowHeight() / 2.f) - 100));
@@ -42,10 +44,19 @@ void LoadLevel1() {
   punching_anim_id = g_engine.AddAnimation(level1_logo_path, level1_zombie_model_id);
   g_engine.SetAnimationOnAnimProp(punching_anim_id, level1_zombie_model_id);
   g_engine.MoveAnimProp(level1_zombie_model_id, glm::vec3(0, -20, -5));
-  g_engine.StencilAnimProp(level1_zombie_model_id, true);
+  static bool is_zombie_stenciled = true;
+  g_engine.StencilAnimProp(level1_zombie_model_id, is_zombie_stenciled);
   g_engine.StencilAnimPropWithNormals(level1_zombie_model_id, true);
   g_engine.StencilAnimPropScale(level1_zombie_model_id, 1.45f);
   g_engine.ScaleAnimProp(level1_zombie_model_id, glm::vec3(.3f));
+
+
+  level1_stencil_highlight_mb_func_id = g_engine.AddToMouseButtonHandling([](AA::MouseButtons& mb) {
+    if (mb.mouseButton3) {
+      g_engine.StencilAnimProp(level1_zombie_model_id, !is_zombie_stenciled);
+      is_zombie_stenciled = !is_zombie_stenciled;
+    };
+    });
 
   // second model
   level1_sphere_model_id = g_engine.AddProp(level1_sphere_model_path);
@@ -75,20 +86,6 @@ void TickLevel1(const float& dt) {
     }
     g_engine.ScaleProp(level1_sphere_model_id, glm::vec3(curr_scale));
   }
-  //if (level1_logo_id != -1) {
-  //  static float curr_scale = 1.f;
-  //  static float grow = true;
-  //  if (grow) {
-  //    curr_scale += dt;
-  //    if (curr_scale > 3.f)
-  //      grow = false;
-  //  } else {
-  //    curr_scale -= dt;
-  //    if (curr_scale < 1.f)
-  //      grow = true;
-  //  }
-  //  g_engine.ScaleAnimProp(level1_logo_id, glm::vec3(curr_scale));
-  //}
 }
 
 void UnloadLevel1() {
@@ -99,11 +96,17 @@ void UnloadLevel1() {
   g_engine.RemoveMusic();
   g_engine.RemoveProp(level1_zombie_model_id);
   level1_zombie_model_id = -1;
+  g_engine.RemoveProp(level1_sphere_model_id);
+  level1_sphere_model_id = -1;
   g_engine.RemoveCamera(level1_cam_id);
   level1_cam_id = -1;
   g_engine.RemoveCamera(level1_reverse_cam_id);
   level1_reverse_cam_id = -1;
   g_engine.RemoveSpotLight(level1_spotlight_id);
   level1_spotlight_id = -1;
+  g_engine.RemoveFromMouseButtonHandling(level1_stencil_highlight_mb_func_id);
+  level1_stencil_highlight_mb_func_id = -1;
+  g_engine.RemoveFromKeyHandling(level1_second_cam_center_kb_func_id);
+  level1_second_cam_center_kb_func_id = -1;
   level1_loaded = false;
 }
