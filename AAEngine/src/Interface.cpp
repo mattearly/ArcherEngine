@@ -1032,7 +1032,7 @@ void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
   if (!mWindow) return;
   auto temp = mWindow->GetModifiableWindowOptions();
 
-  if (temp->_windowing_mode == WINDOW_MODE::WINDOWED) {
+  if (temp->_windowing_mode == WINDOW_MODE::WINDOWED || temp->_windowing_mode == WINDOW_MODE::MAXIMIZED || temp->_windowing_mode == WINDOW_MODE::WINDOWED_DEFAULT) {
     if (try_borderless) {
       temp->_windowing_mode = WINDOW_MODE::FULLSCREEN_BORDERLESS;
     }
@@ -1043,7 +1043,6 @@ void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
   else {  // turn off fullscreen
     temp->_windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
   }
-
 
   mWindow->ApplyChanges();
 }

@@ -26,9 +26,7 @@ Window::Window() {
 
   // start with default options
   WindowOptions Options;
-
   SetDefaults(Options);
-
   mWindowOptions = std::make_shared<WindowOptions>(Options);
   default_init();
   window_instance_count++;
@@ -46,7 +44,6 @@ Window::Window(WindowOptions winopts) {
   mWindowOptions = std::make_shared<WindowOptions>(winopts);
   default_init();
   window_instance_count++;
-
 }
 
 /// <summary>
@@ -83,67 +80,67 @@ Window::~Window() {
 // note: saved prev_window_options on each call, must be carefully managed 
 //       or ApplyChanges might not work as expected
 std::shared_ptr<WindowOptions> Window::GetModifiableWindowOptions() {
-  prev_window_options = *mWindowOptions.get();  // copy to prev window options
+  mPrevWindowOptions = *mWindowOptions;  // copy to prev window options
   return mWindowOptions;
 }
 
 void Window::ApplyChanges() {
-
   //todo: relaunch window if required (msaa change, render tech is prelaunch only)
-  if (mWindowOptions->_msaa_samples > 0 && prev_window_options._msaa_samples != mWindowOptions->_msaa_samples) {
+  if (mWindowOptions->_msaa_samples > 0 && mPrevWindowOptions._msaa_samples != mWindowOptions->_msaa_samples) {
     OGLGraphics::SetMultiSampling(true);
     // locking this at a max of 16
     if (mWindowOptions->_msaa_samples >= 1 && mWindowOptions->_msaa_samples <= 16) {
       glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
-    } else {
+    }
+    else {
       glfwWindowHint(GLFW_SAMPLES, 16);
       mWindowOptions->_msaa_samples = 16;
     }
     // todo: relaunch window
   }
 
-  if (prev_window_options._stencil_bits != mWindowOptions->_stencil_bits) {
+  if (mPrevWindowOptions._stencil_bits != mWindowOptions->_stencil_bits) {
     glfwWindowHint(GLFW_STENCIL_BITS, mWindowOptions->_stencil_bits);
     if (mWindowOptions->_stencil_bits > 0) {
       OGLGraphics::SetStencil(true);
-    } else {
+    }
+    else {
       OGLGraphics::SetStencil(false);
     }
   }
 
-
   // update things that have changed
-  if (mWindowOptions->_cursor_mode != prev_window_options._cursor_mode) {
+  if (mWindowOptions->_cursor_mode != mPrevWindowOptions._cursor_mode) {
     glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
   }
 
-  if (mWindowOptions->_title != prev_window_options._title) {
+  if (mWindowOptions->_title != mPrevWindowOptions._title) {
     glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
   }
 
-
-
   // set window if mode changed
-  if (prev_window_options._windowing_mode != mWindowOptions->_windowing_mode) {
+  if (mPrevWindowOptions._windowing_mode != mWindowOptions->_windowing_mode) {
+    apply_window_sizings_from_current_options();
+  }
+  else if (mWindowOptions->_windowing_mode == WINDOW_MODE::WINDOWED_DEFAULT) {
     apply_window_sizings_from_current_options();
   }
 
-
-  if (prev_window_options._vsync != mWindowOptions->_vsync) {
+  if (mPrevWindowOptions._vsync != mWindowOptions->_vsync) {
     glfwSwapInterval(mWindowOptions->_vsync);
   }
 
   // note applied settings
-  prev_window_options = *mWindowOptions;
+  mPrevWindowOptions = *mWindowOptions;
 
 }
+
 void Window::SetViewportToWindowSize() noexcept {
   switch (mWindowOptions->_rendering_tech) {
   case RENDER_TECH::OPENGL4:
     OGLGraphics::SetViewportSize(0, 0, GetCurrentWidth(), GetCurrentHeight());
   }
 }
-
 
 void Window::Close() {
   glfwSetWindowShouldClose(mGLFWwindow, 1);
@@ -225,8 +222,8 @@ void Window::apply_window_sizings_from_current_options() noexcept {
     break;
   }
 
-  // lock in with previous after this
-  prev_window_options._windowing_mode = mWindowOptions->_windowing_mode;
+  //// lock in with previous after this
+  //mPrevWindowOptions._windowing_mode = mWindowOptions->_windowing_mode;
 }
 
 void Window::swap_buffers() {
@@ -265,7 +262,8 @@ void Window::default_init() {
         const auto monitor = glfwGetPrimaryMonitor();
         const auto video_mode = glfwGetVideoMode(monitor);
         mGLFWwindow = glfwCreateWindow(video_mode->width, video_mode->height, mWindowOptions->_title.c_str(), monitor, nullptr);
-      } else if (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN_BORDERLESS) {
+      }
+      else if (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN_BORDERLESS) {
         const auto monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
         glfwWindowHint(GLFW_RED_BITS, mode->redBits);
@@ -273,7 +271,8 @@ void Window::default_init() {
         glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
         glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
         mGLFWwindow = glfwCreateWindow(mode->width, mode->height, mWindowOptions->_title.c_str(), monitor, nullptr);
-      } else {
+      }
+      else {
         mGLFWwindow = glfwCreateWindow(mWindowOptions->_width, mWindowOptions->_height, mWindowOptions->_title.c_str(), nullptr, nullptr);
       }
       if (!mGLFWwindow) {
@@ -282,7 +281,7 @@ void Window::default_init() {
     }
 
     glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
-    glfwSwapInterval(mWindowOptions->_vsync);
+    glfwSwapInterval((mWindowOptions->_vsync) ? 1 : 0);
 
     if (!mGLFWwindow) {
       throw("Unable to init Window for OpenGL 4.3+");
@@ -291,13 +290,15 @@ void Window::default_init() {
     // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
     glfwMakeContextCurrent(mGLFWwindow);
     OGLGraphics::Proc(glfwGetProcAddress);
+
   }
 
   if (mWindowOptions->_stencil_bits > 0) {
     OGLGraphics::SetStencil(true);
     OGLGraphics::SetStencilFuncToNotEqual();
     OGLGraphics::SetStencilOpDepthPassToReplace();
-  } else {
+  }
+  else {
     OGLGraphics::SetStencil(false);
   }
 

@@ -20,16 +20,14 @@ struct WindowOptions final {
 };
 
 static void SetDefaults(WindowOptions& winopts) {
-
   winopts._width = 800;
   winopts._height = 600;
   winopts._title = "AncientArcher v" + std::to_string(ENGINEVERSIONMAJOR) + '.' + std::to_string(ENGINEVERSIONMINOR) + '.' + std::to_string(ENGINEVERSIONPATCH);
-  winopts._windowing_mode = WINDOW_MODE::WINDOWED;
+  winopts._windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
   winopts._rendering_tech = RENDER_TECH::OPENGL4;
   winopts._cursor_mode = CURSOR_MODE::NORMAL;
   winopts._msaa_samples = -1;  // GLFW_DONT_CARE
   winopts._stencil_bits = 8;
   winopts._vsync = false;
-
 }
 }  // end namespace

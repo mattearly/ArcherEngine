@@ -46,7 +46,7 @@ private:
   std::shared_ptr<WindowOptions> mWindowOptions;
 
   // used for comparisons when applying new changes, updates on GetModifiableWindowOptions
-  WindowOptions prev_window_options;
+  WindowOptions mPrevWindowOptions;
 
   void apply_window_sizings_from_current_options() noexcept;
 
