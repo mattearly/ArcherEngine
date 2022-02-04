@@ -890,6 +890,7 @@ void Interface::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir,
 }
 
 // Sound Effects
+// todo: rework so we can remove them properly
 unsigned int Interface::AddSoundEffect(const char* path) {
   // make sure the sound effect hasn't already been loaded
   for (const auto& pl : mSoundEffects) {
@@ -924,11 +925,16 @@ void Interface::SetSoundEffectVolume(int sound_id, float new_vol) {
   throw("sound effect volume speaker id not found");
 }
 
+// todo: rework so we can remove them properly
 void Interface::RemoveSoundEffect(int soundId) {
+  throw("oh noes! this doesn't actually work yet");
+
   if (mSoundEffects.empty())
     throw("no sounds exist, nothing to remove");
 
   auto before_size = mSoundEffects.size();
+
+
 
   auto after_size = mSoundEffects.size();
 
