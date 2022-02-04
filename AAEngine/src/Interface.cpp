@@ -81,16 +81,54 @@ void Interface::Shutdown() noexcept {
     exit(-1);  // probabably shouldn't do this, but its a rare case anyways
 }
 
-// resets all vars but leaves the window alone
+// resets all vars but 
+// not the window,
+// base shaders,
+// and renderer
 void Interface::SoftReset() noexcept {
-  teardown();
+  // run user preferred functions first
+  for (auto& oTD : onQuit) {
+    oTD.second();
+  }
+
+  mSimulateWorldPhysics = false;
 
   mCameras.clear();
 
+  // delete all the meshes and textures from GPU memory
+  for (const auto& p : mProps) {
+    p->RemoveCache();
+  }
+  mProps.clear();
+  for (const auto& ap : mAnimProps) {
+    ap->RemoveCache();
+  }
+  mAnimProps.clear();
+  mAnimation.clear();
+
+  RemoveSkybox();
+
+  RemoveDirectionalLight();
+
+  for (auto& pointlight : mPointLights) {
+    RemovePointLight(pointlight->id);
+  }
+
+  for (auto& spotlight : mSpotLights) {
+    RemoveSpotLight(spotlight->id);
+  }
+
+  if (mMusic) {
+    RemoveMusic();
+  }
+
+  mSoundEffects.clear();
+  mSpeakers.clear();
+
   onStart.clear();
   onUpdate.clear();
-  onKeyHandling.clear();
   onScrollHandling.clear();
+  onKeyHandling.clear();
   onMouseHandling.clear();
   onMouseButtonHandling.clear();
   onQuit.clear();
