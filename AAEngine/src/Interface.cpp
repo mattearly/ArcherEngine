@@ -516,10 +516,12 @@ void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff
 }
 
 void Interface::RemoveDirectionalLight() {
-  assert(DefaultShaders::get_ubershader());
-  DefaultShaders::get_ubershader()->Use();
-  DefaultShaders::get_ubershader()->SetInt("isDirectionalLightOn", 0);
-  mDirectionalLight.reset();
+  if (mDirectionalLight) {
+    assert(DefaultShaders::get_ubershader());
+    DefaultShaders::get_ubershader()->Use();
+    DefaultShaders::get_ubershader()->SetInt("isDirectionalLightOn", 0);
+    mDirectionalLight.reset();
+  }
 }
 
 // Point Light
