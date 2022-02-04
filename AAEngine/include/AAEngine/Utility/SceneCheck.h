@@ -4,7 +4,6 @@
 #include <assimp/postprocess.h>
 #include <vector>
 #include <string>
-#include <iostream>
 namespace AA {
 struct SceneHeader {
   std::string sceneLoadPath;

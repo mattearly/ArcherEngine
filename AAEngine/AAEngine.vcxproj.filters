@@ -84,13 +84,7 @@
     <ClInclude Include="include\AAEngine\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\PlainGUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\OS\TextureLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\QueryShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\imGUI.h">
@@ -189,9 +183,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Sound\SoundEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\PlainGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\MeshLoader.cpp">

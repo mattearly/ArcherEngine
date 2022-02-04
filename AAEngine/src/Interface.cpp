@@ -138,23 +138,13 @@ void Interface::SoftReset() noexcept {
 
 // Camera
 unsigned int Interface::AddCamera(const int w, const int h) {
-  //if (mCameras.size() > 0) {
-  //  throw("already has a camera, only one cam supported in this version");
-  //}
-
-  mCameras.emplace_back(std::move(std::make_shared<Camera>((w < 0) ? 0 : w, (h < 0) ? 0 : h)));
+  mCameras.emplace_back(std::move(std::make_shared<Camera>((w <= 0) ? 0 : w, (h <= 0) ? 0 : h)));
 
   // sort by render depth if there is more than 1 camera
   if (mCameras.size() > 1) {
     std::sort(mCameras.begin(), mCameras.end(), [](auto a, auto b) {
       return (a->GetRenderDepth() < b->GetRenderDepth());
       });
-#ifdef _DEBUG
-    std::cout << "check render depth orders\n";
-    for (auto& cam : mCameras) {
-      std::cout << cam->GetRenderDepth() << '\n';
-    }
-#endif 
   }
 
   return mCameras.back()->GetUID();
@@ -298,9 +288,6 @@ void Interface::StencilPropScale(const unsigned int id, const float scale)
 unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location) {
   mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
   mAnimProps.back()->spacial_data.MoveTo(starting_location);
-#ifdef _DEBUG
-  std::cout << "loaded: " << path << ", id: " << mAnimProps.back()->GetUID() << std::endl;
-#endif
   return mAnimProps.back()->GetUID();
 }
 

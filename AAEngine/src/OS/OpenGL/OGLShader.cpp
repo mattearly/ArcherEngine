@@ -2,10 +2,6 @@
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
-#ifdef _DEBUG
-#include <iostream>
-//#include "QueryShader.h"
-#endif
 namespace AA {
 
 
@@ -14,9 +10,6 @@ const char* OGLShader::get_glsl_version() {
   return (char*)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS);
 }
 OGLShader::OGLShader(const char* vert_src, const char* frag_src) {
-#ifdef _DEBUG
-  std::cout << "SHADER ADDED (vert/frag)\n";
-#endif
   loadShader(vert_src, frag_src);
 }
 OGLShader::~OGLShader() {
@@ -107,15 +100,9 @@ void OGLShader::loadShader(const char* vert_source, const char* frag_source) {
   int v_success;
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &v_success);
   if (!v_success) {
-#ifdef _DEBUG
     char v_infoLog[512];
     glGetShaderInfoLog(vertexShader, 512, nullptr, v_infoLog);
-    std::cout << "error in vertex shader, compilation failed: " << v_infoLog << std::endl;
     throw(v_infoLog);
-    char a;
-    std::cin >> a;
-#endif
-    //exit(-1);
   }
 
   /* compile fragment shader */
@@ -127,15 +114,9 @@ void OGLShader::loadShader(const char* vert_source, const char* frag_source) {
   int f_success;
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &f_success);
   if (!f_success) {
-#ifdef _DEBUG
     char f_infoLog[512];
     glGetShaderInfoLog(fragmentShader, 512, nullptr, f_infoLog);
     throw(f_infoLog);
-    std::cout << "error in fragment shader, compilation failed: " << f_infoLog << std::endl;
-    char a;
-    std::cin >> a;
-#endif
-    //exit(-1);
   }
 
   /* make the shader program */

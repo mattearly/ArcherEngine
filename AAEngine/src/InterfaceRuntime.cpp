@@ -134,9 +134,7 @@ void Interface::render() {
 #endif
     }
   }
-#ifdef _DEBUG
-  else { std::cout << "0 cameras, skybox and props wont show\n"; }
-#endif
+
   if (mIMGUI) {
     mIMGUI->NewFrame();
     for (auto& oIU : onImGuiUpdate) { oIU.second(); }

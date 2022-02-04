@@ -4,9 +4,6 @@
 #include "../OS/LoadCube.h"
 #include "../OS/TextureLoader.h"
 #include "../DefaultShaders.h"
-#ifdef _DEBUG
-#include <iostream>
-#endif
 namespace AA {
 
 static OGLShader* mSkyboxShader = NULL;  // setup once
@@ -23,7 +20,7 @@ Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
 }
 
 void Skybox::Render(const std::shared_ptr<Camera>& cam) {
-  SetViewMatrix(cam->GetProjectionMatrix());
+  SetViewMatrix(cam->GetViewMatrix());
   SetProjectionMatrix(cam->GetProjectionMatrix());  // todo (matt): unhack. not set this every frame but only when it changes
   OGLGraphics::SetDepthTest(true); // should usually already be true
   OGLGraphics::SetDepthMode(GL_LEQUAL);

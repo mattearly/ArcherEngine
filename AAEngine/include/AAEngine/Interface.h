@@ -78,11 +78,7 @@ public:
   void SoftReset() noexcept;
 
   /// <summary>
-  /// Creates a camera for use. Currently stretchs to screen size 
-  /// and will likely be forced to screen size no matter what 
-  /// you start it as once you resize the window.
-  /// Only one camera is supported currently.
-  /// Will throw if you try to add more than one camera.
+  /// Creates a camera for use.
   /// </summary>
   /// <param name="w">viewport width</param>
   /// <param name="h">viewport height</param>

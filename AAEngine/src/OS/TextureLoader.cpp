@@ -4,9 +4,6 @@
 #include <stb_image.h>
 #include <assimp/Importer.hpp>
 #include <string>
-#ifdef _DEBUG
-#include <iostream>
-#endif
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -173,9 +170,6 @@ unsigned int TextureLoader::LoadTexture(const std::string& texture_path) {
       a_new_texture_info.type = "Albedo";  // todo: make this sync better
       a_new_texture_info.ref_count = 1;
       AllLoadedTextures.push_front(a_new_texture_info);
-#ifdef _DEBUG
-      std::cout << "loaded a new texture @ " << texture_path << "!\n";
-#endif
     }
     stbi_image_free(texture_data);
   }
@@ -272,9 +266,6 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
         // if texture path already loaded, just give the mesh the details
         if (a_tex.path.data() == embedded_filename) {
           out_texInfo.insert(out_texInfo.end(), { a_tex.accessId, a_tex.type });
-#ifdef _DEBUG
-          std::cout << "TEXTURE REUSED embedded (" << a_tex.type << "::" << a_tex.path << ")\n";
-#endif
           a_tex.ref_count++;
           texture_has_loaded = true;
           break;
@@ -300,9 +291,6 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
             AllLoadedTextures.push_front(a_new_texture_info);
             // to return for draw info on this current mesh
             out_texInfo.insert(out_texInfo.end(), { a_new_texture_info.accessId, a_new_texture_info.type });
-#ifdef _DEBUG
-            std::cout << "TEXTURE ADDED\n  - embedded path: " << a_new_texture_info.path << "\n  - type: " << a_new_texture_info.type << "\n";
-#endif
           }
         }
       }
@@ -327,9 +315,6 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
           if (a_tex.path.data() == a_path) {
             // texture already loaded, just give the mesh the details
             out_texInfo.insert(out_texInfo.end(), { a_tex.accessId, a_tex.type });
-#ifdef _DEBUG
-            std::cout << "TEXTURE REUSED (" << a_tex.type << "::" << a_tex.path << ")\n";
-#endif
             a_tex.ref_count++;
             return 0;  // success
           }
@@ -354,9 +339,6 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
             AllLoadedTextures.push_front(a_new_texture_info);
             // to return for draw info on this current mesh
             out_texInfo.insert(out_texInfo.end(), { a_new_texture_info.accessId, a_new_texture_info.type });
-#ifdef _DEBUG
-            std::cout << "TEXTURE ADDED\n  - path: " << a_new_texture_info.path << "\n  - type: " << a_new_texture_info.type << "\n";
-#endif
             break;  // break out of for loop
           }
         }

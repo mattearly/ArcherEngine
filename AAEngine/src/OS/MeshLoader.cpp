@@ -15,9 +15,6 @@
 #include <forward_list>
 #include <unordered_map>
 #include <map>
-#ifdef _DEBUG
-#include <iostream>
-#endif
 
 namespace AA {
 
@@ -45,9 +42,6 @@ bool MeshLoader::CheckIfModelIsAlreadyLoaded(Prop& out_model, const std::string&
     if (model.path == "")
       continue;
     if (path == model.path.data()) {
-#ifdef _DEBUG
-      std::cout << "-> REUSE... PROP: " << path << std::endl;
-#endif
       model.ref_count++;
       TextureLoader::increment_given_texture_ids(model.textureDrawIds);
       out_model.mMeshes.emplace_back(MeshInfo(model.vao, model.numElements, model.textureDrawIds, glm::mat4(1)));
@@ -70,11 +64,6 @@ int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path)
 
   bool already_loaded = CheckIfModelIsAlreadyLoaded(out_model, path);
   if (already_loaded) return 0;
-
-
-#ifdef _DEBUG
-  std::cout << "-> LOAD... PROP: " << path << std::endl;
-#endif
 
   Assimp::Importer importer;
   int post_processing_flags = 0;
@@ -99,10 +88,7 @@ int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path)
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
     if (!scene)
-#ifdef _DEBUG
-      std::cout << "scene loading error: " << importer.GetErrorString() << std::endl;
-#endif
-    return -1;
+      return -1;
     if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
       return -2;
     if (!scene->mRootNode)
