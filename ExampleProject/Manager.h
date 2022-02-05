@@ -2,7 +2,6 @@
 #include <AAEngine/Interface.h>
 #include <AAEngine/WindowOptions.h>
 #include <AAEngine/Utility/rand.h>
-#include <AAEngine/Utility/SceneCheck.h>
 
 #include <imgui.h>
 #include <glm/glm.hpp>
