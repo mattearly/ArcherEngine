@@ -138,7 +138,7 @@ void Interface::SoftReset() noexcept {
 
 // Camera
 unsigned int Interface::AddCamera(const int w, const int h) {
-  mCameras.emplace_back(std::move(std::make_shared<Camera>((w <= 0) ? 0 : w, (h <= 0) ? 0 : h)));
+  mCameras.emplace_back(std::move(std::make_shared<Camera>((w < 0) ? 0 : w, (h < 0) ? 0 : h)));
 
   // sort by render depth if there is more than 1 camera
   if (mCameras.size() > 1) {

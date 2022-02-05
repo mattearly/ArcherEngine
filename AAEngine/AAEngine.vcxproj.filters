@@ -51,9 +51,6 @@
     <ClInclude Include="src\OS\MeshInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AAEngine\Utility\SceneCheck.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\OS\Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
