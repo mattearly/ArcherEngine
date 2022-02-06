@@ -10,7 +10,6 @@
 
 namespace AA {
 
-
 class Window final {
 public:
 

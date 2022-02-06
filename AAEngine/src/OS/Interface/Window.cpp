@@ -15,6 +15,7 @@ extern void MOUSEBUTTONCALLBACK(GLFWwindow* w, int button, int action, int mods)
 extern void MOUSESCROLLWHEELCALLBACK(GLFWwindow* w, double xoffset, double yoffset);
 extern void ONWINDOWFOCUSCALLBACK(GLFWwindow* window, int focused);
 
+
 /// <summary>
 /// default init
 /// </summary>
@@ -116,6 +117,16 @@ void Window::ApplyChanges() {
 
   if (mWindowOptions->_title != mPrevWindowOptions._title) {
     glfwSetWindowTitle(mGLFWwindow, mWindowOptions->_title.c_str());
+  }
+
+  if (mWindowOptions->_min_width != mPrevWindowOptions._min_width || mWindowOptions->_min_height != mPrevWindowOptions._min_height) {
+    // enforce engine limits
+    if (mWindowOptions->_min_width < WindowOptions::_MIN_WIDTH)
+      mWindowOptions->_min_width = WindowOptions::_MIN_WIDTH;
+    if (mWindowOptions->_min_height < WindowOptions::_MIN_HEIGHT)
+      mWindowOptions->_min_height = WindowOptions::_MIN_HEIGHT;
+    // set window mins to new min
+    glfwSetWindowSizeLimits(mGLFWwindow, mWindowOptions->_min_width, mWindowOptions->_min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
   }
 
   // set window if mode changed
@@ -231,6 +242,15 @@ void Window::swap_buffers() {
 }
 
 void Window::default_init() {
+  if (mWindowOptions->_width < 160)
+    mWindowOptions->_width = 160;
+  if (mWindowOptions->_height < 144)
+    mWindowOptions->_height = 144;
+
+
+
+
+
   if (mWindowOptions->_windowing_mode == WINDOW_MODE::MAXIMIZED) {
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
   }
@@ -280,12 +300,14 @@ void Window::default_init() {
       }
     }
 
+    if (!mGLFWwindow) { throw("Unable to init Window for OpenGL 4.3+"); }
+
+    // min size is the size of a gameboy screen
+    // http://www2.hawaii.edu/~dkm/project2/color.html#:~:text=The%20screen%20resolution%20was%20the,communications%20port%20for%20wireless%20linking.
+    glfwSetWindowSizeLimits(mGLFWwindow, mWindowOptions->_min_width, mWindowOptions->_min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
+
     glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
     glfwSwapInterval((mWindowOptions->_vsync) ? 1 : 0);
-
-    if (!mGLFWwindow) {
-      throw("Unable to init Window for OpenGL 4.3+");
-    }
 
     // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
     glfwMakeContextCurrent(mGLFWwindow);

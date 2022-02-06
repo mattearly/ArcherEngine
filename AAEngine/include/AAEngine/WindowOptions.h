@@ -9,6 +9,8 @@ enum class RENDER_TECH { OPENGL4, D3D11, VULKAN1 };
 enum class CURSOR_MODE { HIDDEN = 0x00034002, DISABLED = 0x00034003, NORMAL = 0x00034001 };  //glfw hidden, disabled, normal
 
 struct WindowOptions final {
+  static constexpr int   _MIN_WIDTH = 160, _MIN_HEIGHT = 144;
+  int          _min_width = _MIN_WIDTH, _min_height = _MIN_HEIGHT;
   int          _width = 800, _height = 600;
   std::string  _title = "default title";
   WINDOW_MODE  _windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
@@ -20,6 +22,8 @@ struct WindowOptions final {
 };
 
 static void SetDefaults(WindowOptions& winopts) {
+  winopts._min_width = WindowOptions::_MIN_WIDTH;
+  winopts._min_height = WindowOptions::_MIN_HEIGHT;
   winopts._width = 800;
   winopts._height = 600;
   winopts._title = "AncientArcher v" + std::to_string(ENGINEVERSIONMAJOR) + '.' + std::to_string(ENGINEVERSIONMINOR) + '.' + std::to_string(ENGINEVERSIONPATCH);
