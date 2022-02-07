@@ -35,11 +35,15 @@ public:
   void SetCursorToNormal() noexcept;
 
   void SetNewWidthAndHeight(int w, int h) noexcept;
+  void SetNewMinWidthAndHeight(int w, int h) noexcept;
 
   bool GetShouldClose();
 
   int GetCurrentWidth();
   int GetCurrentHeight();
+
+  int GetCurrentMinWidth();
+  int GetCurrentMinHeight();
 
   void Close();
 

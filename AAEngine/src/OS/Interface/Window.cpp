@@ -178,6 +178,14 @@ void Window::SetNewWidthAndHeight(int w, int h) noexcept
   apply_new_window_option_changes();
 }
 
+void Window::SetNewMinWidthAndHeight(int w, int h) noexcept
+{
+  auto opts = get_and_note_window_options();
+  opts->_min_width = w;
+  opts->_min_height = h;
+  apply_new_window_option_changes();
+}
+
 bool Window::GetShouldClose() {
   return glfwWindowShouldClose(mGLFWwindow);
 }
@@ -191,6 +199,16 @@ int Window::GetCurrentHeight() {
   int width, height;
   glfwGetWindowSize(mGLFWwindow, &width, &height);
   return height;
+}
+
+int Window::GetCurrentMinWidth()
+{
+    return mWindowOptions->_min_width;
+}
+
+int Window::GetCurrentMinHeight()
+{
+  return mWindowOptions->_min_height;
 }
 
 
