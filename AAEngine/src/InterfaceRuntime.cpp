@@ -1,6 +1,6 @@
 #include "../include/AAEngine/Interface.h"
 #include "../include/AAEngine/Scene/Camera.h"
-#include "OS/Interface/Window.h"
+#include "../include/AAEngine/OS/Interface/Window.h"
 #include "OS/OpenGL/OGLGraphics.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Mesh/Prop.h"

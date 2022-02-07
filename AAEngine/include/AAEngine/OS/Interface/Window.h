@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../include/AAEngine/Controls/Input.h"
-#include "../../../include/AAEngine/WindowOptions.h"
+#include "../../Controls/Input.h"
+#include "../../WindowOptions.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <vector>
@@ -16,42 +16,45 @@ public:
   Window();
   Window(WindowOptions winopts);
   Window(std::shared_ptr<WindowOptions> winopts);
-  //Window(const Window& window); // todo: shared context
   ~Window();
-  
-  std::shared_ptr<WindowOptions> GetModifiableWindowOptions();
-  void ApplyChanges();
 
-  void SetViewportToWindowSize() noexcept;
-
+  /// <summary>
+  /// Hides the mouse cursor. 
+  /// Used for when you are drawing your own cursor.
+  /// </summary>
   void SetCursorToHidden() noexcept;
+
+  /// <summary>
+  /// Disables the cursor. See disabled in glfw documentation. https://www.glfw.org/docs/3.3/input_guide.html
+  /// </summary>
   void SetCursorToDisabled() noexcept;
+
+  /// <summary>
+  /// Sets the Cursor the the standard OS Cursor.
+  /// </summary>
   void SetCursorToNormal() noexcept;
 
-  void Close();
+  void SetNewWidthAndHeight(int w, int h) noexcept;
 
   bool GetShouldClose();
+
   int GetCurrentWidth();
   int GetCurrentHeight();
 
+  void Close();
+
 private:
 
+  std::shared_ptr<WindowOptions> get_and_note_window_options();
+  void apply_new_window_option_changes();
   void default_init();
-  //void default_init(const Window& window);
   void set_default_callbacks();
-
-  GLFWwindow* mGLFWwindow;
-
-  std::shared_ptr<WindowOptions> mWindowOptions;
-
-  // used for comparisons when applying new changes, updates on GetModifiableWindowOptions
-  WindowOptions mPrevWindowOptions;
-
   void apply_window_sizings_from_current_options() noexcept;
-
-  //void clear_screen();
   void swap_buffers();
 
+  GLFWwindow* mGLFWwindow = nullptr;
+  std::shared_ptr<WindowOptions> mWindowOptions;
+  WindowOptions mPrevWindowOptions;    // used for comparisons when applying new window options changes
   bool settings_applied_at_least_once = false;
 
   // any callback that casts the glfwwindow to user_ptr and then accesses private members needs to be a friend
@@ -60,7 +63,6 @@ private:
 
   // the Instance class is a controller of this class
   friend class Interface;
-
 };
 
 }  // end namespace AA

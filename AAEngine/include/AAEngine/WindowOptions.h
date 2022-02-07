@@ -9,6 +9,7 @@ enum class RENDER_TECH { OPENGL4, D3D11, VULKAN1 };
 enum class CURSOR_MODE { HIDDEN = 0x00034002, DISABLED = 0x00034003, NORMAL = 0x00034001 };  //glfw hidden, disabled, normal
 
 struct WindowOptions final {
+  // min size is the size of a gameboy screen http://www2.hawaii.edu/~dkm/project2/color.html#:~:text=The%20screen%20resolution%20was%20the,communications%20port%20for%20wireless%20linking.
   static constexpr int   _MIN_WIDTH = 160, _MIN_HEIGHT = 144;
   int          _min_width = _MIN_WIDTH, _min_height = _MIN_HEIGHT;
   int          _width = 800, _height = 600;

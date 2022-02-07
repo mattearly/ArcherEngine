@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "../../../include/AAEngine/OS/Interface/Window.h"
 #include "../../../include/AAEngine/Version.h"
 #include "../../../include/AAEngine/WindowOptions.h"
 #include "../OpenGL/OGLGraphics.h"
@@ -80,12 +80,12 @@ Window::~Window() {
 
 // note: saved prev_window_options on each call, must be carefully managed 
 //       or ApplyChanges might not work as expected
-std::shared_ptr<WindowOptions> Window::GetModifiableWindowOptions() {
+std::shared_ptr<WindowOptions> Window::get_and_note_window_options() {
   mPrevWindowOptions = *mWindowOptions;  // copy to prev window options
   return mWindowOptions;
 }
 
-void Window::ApplyChanges() {
+void Window::apply_new_window_option_changes() {
   //todo: relaunch window if required (msaa change, render tech is prelaunch only)
   if (mWindowOptions->_msaa_samples > 0 && mPrevWindowOptions._msaa_samples != mWindowOptions->_msaa_samples) {
     OGLGraphics::SetMultiSampling(true);
@@ -129,6 +129,16 @@ void Window::ApplyChanges() {
     glfwSetWindowSizeLimits(mGLFWwindow, mWindowOptions->_min_width, mWindowOptions->_min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
   }
 
+  if (mWindowOptions->_width != mPrevWindowOptions._width || mWindowOptions->_height != mPrevWindowOptions._height) {
+    // enforce engine limits
+    if (mWindowOptions->_width < mWindowOptions->_min_width)
+      mWindowOptions->_width = mWindowOptions->_min_width;
+    if (mWindowOptions->_height < mWindowOptions->_min_height)
+      mWindowOptions->_height = mWindowOptions->_min_height;
+
+    glfwSetWindowSize(mGLFWwindow, mWindowOptions->_width, mWindowOptions->_height);
+  }
+
   // set window if mode changed
   if (mPrevWindowOptions._windowing_mode != mWindowOptions->_windowing_mode) {
     apply_window_sizings_from_current_options();
@@ -141,16 +151,8 @@ void Window::ApplyChanges() {
     glfwSwapInterval(mWindowOptions->_vsync);
   }
 
-  // note applied settings
+  // note (copy) applied settings
   mPrevWindowOptions = *mWindowOptions;
-
-}
-
-void Window::SetViewportToWindowSize() noexcept {
-  switch (mWindowOptions->_rendering_tech) {
-  case RENDER_TECH::OPENGL4:
-    OGLGraphics::SetViewportSize(0, 0, GetCurrentWidth(), GetCurrentHeight());
-  }
 }
 
 void Window::Close() {
@@ -168,6 +170,14 @@ void Window::SetCursorToNormal() noexcept {
   mWindowOptions->_cursor_mode = CURSOR_MODE::NORMAL;
   glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
+void Window::SetNewWidthAndHeight(int w, int h) noexcept
+{
+  auto opts = get_and_note_window_options();
+  opts->_width = w;
+  opts->_height = h;
+  apply_new_window_option_changes();
+}
+
 bool Window::GetShouldClose() {
   return glfwWindowShouldClose(mGLFWwindow);
 }
@@ -302,8 +312,6 @@ void Window::default_init() {
 
     if (!mGLFWwindow) { throw("Unable to init Window for OpenGL 4.3+"); }
 
-    // min size is the size of a gameboy screen
-    // http://www2.hawaii.edu/~dkm/project2/color.html#:~:text=The%20screen%20resolution%20was%20the,communications%20port%20for%20wireless%20linking.
     glfwSetWindowSizeLimits(mGLFWwindow, mWindowOptions->_min_width, mWindowOptions->_min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
@@ -327,31 +335,6 @@ void Window::default_init() {
   glfwSetWindowUserPointer(mGLFWwindow, this);  // window pointer goes to this class
   set_default_callbacks();
 }
-
-//void Window::default_init(const Window& window) {
-//  if (mWindowOptions->_windowing_mode == WINDOW_MODE::MAXIMIZED) {
-//    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-//  }
-//  glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
-//  if (mWindowOptions->_rendering_tech != RENDER_TECH::OPENGL4) {
-//    throw("unsupported render tech");  // todo (major): add other render techs
-//  } else {
-//    mGLFWwindow = glfwCreateWindow(
-//      mWindowOptions->_width,
-//      mWindowOptions->_height,
-//      mWindowOptions->_title.c_str(),
-//      (mWindowOptions->_windowing_mode == WINDOW_MODE::FULLSCREEN) ? glfwGetPrimaryMonitor() : nullptr,
-//      window.mGLFWwindow
-//    );
-//  }
-//  if (!mGLFWwindow) {
-//    throw("Unable to init Window for OpenGL 4.3+");
-//  }
-//
-//  // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
-//  //glfwMakeContextCurrent(mGLFWwindow);
-//  OGLGraphics::Proc(glfwGetProcAddress);
-//}
 
 void Window::set_default_callbacks() {
   glfwSetFramebufferSizeCallback(mGLFWwindow, FRAMEBUFFERSIZESETCALLBACK);

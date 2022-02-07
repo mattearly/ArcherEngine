@@ -6,7 +6,7 @@
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
 #include "OS/OpenGL/OGLGraphics.h"
-#include "OS/Interface/Window.h"
+#include "../include/AAEngine/OS/Interface/Window.h"
 #include "Sound/SoundDevice.h"
 #include "Sound/Speaker.h"
 #include "Sound/SoundEffect.h"
@@ -24,7 +24,7 @@ namespace AA {
 bool Interface::Init() {
   if (isInit)
     return false;
-  mWindow = new Window();
+  mWindow = std::make_shared<Window>();
   SetIMGUI(true);
   SoundDevice::Init();
   auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
@@ -35,7 +35,7 @@ bool Interface::Init() {
 bool Interface::Init(const WindowOptions& winopts) {
   if (isInit)
     return false;
-  mWindow = new Window(winopts);
+  mWindow = std::make_shared<Window>(winopts);
   SetIMGUI(true);
   SoundDevice::Init();
   auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
@@ -46,7 +46,7 @@ bool Interface::Init(const WindowOptions& winopts) {
 bool Interface::Init(std::shared_ptr<WindowOptions> winopts) {
   if (isInit)
     return false;
-  mWindow = new Window(winopts);
+  mWindow = std::make_shared<Window>(winopts);
   SetIMGUI(true);
   SoundDevice::Init();
   auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
@@ -133,7 +133,7 @@ void Interface::SoftReset() noexcept {
   onMouseButtonHandling.clear();
   onQuit.clear();
 
-  SetCursorToNormal();
+  mWindow->SetCursorToNormal();
 }
 
 // Camera
@@ -1002,21 +1002,6 @@ void Interface::SetMusicVolume(float new_vol) {
   throw("no music loaded");
 }
 
-void Interface::SetCursorToHidden() noexcept {
-  if (mWindow)
-    mWindow->SetCursorToHidden();
-}
-
-void Interface::SetCursorToDisabled() noexcept {
-  if (mWindow)
-    mWindow->SetCursorToDisabled();
-}
-
-void Interface::SetCursorToNormal() noexcept {
-  if (mWindow)
-    mWindow->SetCursorToNormal();
-}
-
 void Interface::SetIMGUI(const bool value) {
   if (!value) {
     if (mIMGUI) {
@@ -1039,6 +1024,11 @@ void Interface::SetWindowClearColor(glm::vec3 color) noexcept {
   OGLGraphics::SetViewportClearColor(color);
 }
 
+std::shared_ptr<Window> Interface::GetWindow()
+{
+  return mWindow;
+}
+
 // returns -1 if there is no window
 int Interface::GetWindowWidth() noexcept {
   if (!mWindow) return -1;
@@ -1055,15 +1045,15 @@ int Interface::GetWindowHeight() noexcept {
 void Interface::SetWindowTitle(const char* name) noexcept {
   if (!mWindow) return;
   // todo: improve efficiency
-  auto temp = mWindow->GetModifiableWindowOptions();
+  auto temp = mWindow->get_and_note_window_options();
   temp->_title = name;
-  mWindow->ApplyChanges();
+  mWindow->apply_new_window_option_changes();
 }
 
 // toggles fullscreen as expected, does nothign if window is null
 void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
   if (!mWindow) return;
-  auto temp = mWindow->GetModifiableWindowOptions();
+  auto temp = mWindow->get_and_note_window_options();
 
   if (temp->_windowing_mode == WINDOW_MODE::WINDOWED || temp->_windowing_mode == WINDOW_MODE::MAXIMIZED || temp->_windowing_mode == WINDOW_MODE::WINDOWED_DEFAULT) {
     if (try_borderless) {
@@ -1077,7 +1067,7 @@ void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
     temp->_windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
   }
 
-  mWindow->ApplyChanges();
+  mWindow->apply_new_window_option_changes();
 }
 
 unsigned int Interface::AddToOnBegin(void(*function)()) {

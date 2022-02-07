@@ -108,7 +108,7 @@
     <ClInclude Include="src\Mesh\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\Interface\Window.h">
+    <ClInclude Include="include\AAEngine\OS\Interface\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AAEngine\Controls\Input.h">

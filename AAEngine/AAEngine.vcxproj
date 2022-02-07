@@ -99,7 +99,7 @@
     <ClInclude Include="src\OS\AnimMeshLoader.h" />
     <ClInclude Include="src\Mesh\AnimProp.h" />
     <ClInclude Include="include\AAEngine\Controls\Input.h" />
-    <ClInclude Include="src\OS\Interface\Window.h" />
+    <ClInclude Include="include\AAEngine\OS\Interface\Window.h" />
     <ClInclude Include="src\Mesh\Animation.h" />
     <ClInclude Include="include\AAEngine\Utility\rand.h" />
     <ClInclude Include="src\Physics\NVidiaPhysx.h" />

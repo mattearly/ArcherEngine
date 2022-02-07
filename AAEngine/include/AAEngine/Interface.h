@@ -11,6 +11,7 @@
 // internal
 #include "Controls/Input.h"
 #include "Scene/Camera.h"
+#include "OS/Interface/Window.h"
 #include "WindowOptions.h"
 
 namespace AA {
@@ -67,7 +68,7 @@ public:
   int Run();
 
   /// <summary>
-  /// Sets the window to close on the next frame.
+  /// Sets the window to close on the next frame. Same as GetWindow()->Close().
   /// </summary>
   void Shutdown() noexcept;
 
@@ -285,7 +286,7 @@ public:
   /// Call SetSkybox with new parameters to set up the skybox again.
   /// </summary>
   void RemoveSkybox() noexcept;
-  
+
   /// <summary>
   /// Sets the directional light on the default lit shader.
   /// Only one directional light is currently supported.
@@ -470,26 +471,16 @@ public:
   void SetMusicVolume(float new_vol);
 
   /// <summary>
-  /// Hides the mouse cursor. 
-  /// Used for when you are drawing your own cursor.
-  /// </summary>
-  void SetCursorToHidden() noexcept;
-
-  /// <summary>
-  /// Disables the cursor. See disabled in glfw documentation. https://www.glfw.org/docs/3.3/input_guide.html
-  /// </summary>
-  void SetCursorToDisabled() noexcept;
-
-  /// <summary>
-  /// Sets the Cursor the the standard OS Cursor.
-  /// </summary>
-  void SetCursorToNormal() noexcept;
-
-  /// <summary>
   /// Sets the default window clear color on the renderer.
   /// </summary>
   /// <param name="color">RGB color from 0 to 1</param>
   void SetWindowClearColor(glm::vec3 color = glm::vec3(.35f, .15f, .35f)) noexcept;
+
+  /// <summary>
+  /// Get window to access public functions
+  /// </summary>
+  /// <returns>A Shared Pointer to the Window Class</returns>
+  std::shared_ptr<Window> GetWindow();
 
   /// <summary>
   /// Gets the current window Width
@@ -596,7 +587,7 @@ private:
 
   bool isInit;
 
-  Window* mWindow;
+  std::shared_ptr<Window> mWindow;
 
   bool mSimulateWorldPhysics;
 
