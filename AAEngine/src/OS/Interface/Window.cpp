@@ -334,6 +334,8 @@ void Window::default_init() {
 
   glfwSetWindowUserPointer(mGLFWwindow, this);  // window pointer goes to this class
   set_default_callbacks();
+
+  apply_new_window_option_changes();
 }
 
 void Window::set_default_callbacks() {
