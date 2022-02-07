@@ -11,18 +11,64 @@ public:
 
   TEST_METHOD(MainTestMethod)
   {
-    AA::WindowOptions winopts;
-    winopts._vsync = true;
-    bool initSuccess = instance.Init(winopts);
-    Assert::AreEqual(initSuccess, true);
+    {
+      AA::WindowOptions winopts;
+      winopts._vsync = true;
+      winopts._title = "WindowOptions";
+      winopts._cursor_mode = AA::CURSOR_MODE::NORMAL;
+      winopts._height = -1;  // should enfore min size instead of -1
+      winopts._width = -1;
+      winopts._min_width = 500;  // should enfore this instead of engine const _MIN_SIZE
+      winopts._min_height = 500;
+      bool initSuccess = instance.Init(winopts);
+      Assert::AreEqual(initSuccess, true);
+    }
+
+    static bool No = false;
+
     instance.AddToImGuiUpdate([]() {
       ImGui::Begin("Options Test");
       bool doToggleFS = ImGui::Button("ToggleFullscreen");
       if (doToggleFS) { instance.ToggleWindowFullscreen(); };
+
+      bool WinSizeIncr = ImGui::Button("+Width/Height");
+      if (WinSizeIncr) {
+        auto win = instance.GetWindow();
+        int new_width = win->GetCurrentWidth() + 50;
+        int new_height = win->GetCurrentHeight() + 50;
+        win->SetNewWidthAndHeight(new_width, new_height);
+        Assert::AreEqual(win->GetCurrentWidth(), new_width);
+        Assert::AreEqual(win->GetCurrentHeight(), new_height);
+      }
+      bool WinSizeDecr = ImGui::Button("-Width/Height");
+      if (WinSizeDecr) {
+        auto win = instance.GetWindow();
+        int new_width = win->GetCurrentWidth() - 50;
+        int new_height = win->GetCurrentHeight() - 50;
+        win->SetNewWidthAndHeight(new_width, new_height);
+      }
+
+      static int min_w_h[2];
+      bool MinSizeChanged = ImGui::InputInt2("MinWindowWidthHeight", min_w_h);
+      if (!MinSizeChanged) {
+        auto win = instance.GetWindow();
+        win->SetNewMinWidthAndHeight(min_w_h[0], min_w_h[1]);
+        min_w_h[0] = win->GetCurrentMinWidth();
+        min_w_h[1] = win->GetCurrentMinHeight();
+      }
+
+      ImGui::Text("Does Everything Work As Expected?");
+      bool Yes = ImGui::Button("Yes");
+      No = ImGui::Button("No");
+      if (Yes || No) { instance.Shutdown(); };
+
       ImGui::End();
       });
+
     int run_diag = instance.Run();
     Assert::AreEqual(run_diag, 0);
+    Assert::AreEqual(No, false);
+
   }
 };
 }
