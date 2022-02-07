@@ -16,6 +16,7 @@ class NVidiaPhysx {
 public:
 
   static [[nodiscard]] NVidiaPhysx* Get();
+  static void Shutdown();
 
   void StepPhysics(float dt);
 

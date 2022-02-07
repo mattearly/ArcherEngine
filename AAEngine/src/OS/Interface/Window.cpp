@@ -76,6 +76,10 @@ Window::~Window() {
   if (mGLFWwindow)
     glfwDestroyWindow(mGLFWwindow);
   window_instance_count--;
+  if (window_instance_count == 0) {
+    glfwTerminate();
+    glfw_is_init = false;
+  }
 }
 
 // note: saved prev_window_options on each call, must be carefully managed 
