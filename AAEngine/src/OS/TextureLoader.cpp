@@ -294,6 +294,7 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
             out_texInfo.insert(out_texInfo.end(), { a_new_texture_info.accessId, a_new_texture_info.type });
           }
         }
+        stbi_image_free(data);
       }
     }
     // ELSE: textures are not embedded
