@@ -10,13 +10,20 @@ static OGLShader* mSkyboxShader = NULL;  // setup once
 static unsigned int mVAO = 0;  // setup once via load_cube operation
 static const unsigned int mNumElements = 36;
 
-Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
+Skybox::Skybox(std::vector<std::string> incomingSkymapFiles, bool has_alpha) {
   setup_shader();
   setup_cube_geometry();
-  setup_incoming_textures(incomingSkymapFiles);
+  setup_incoming_textures(incomingSkymapFiles, has_alpha);
 
   mSkyboxShader->Use();
   mSkyboxShader->SetInt("skybox", 0);
+}
+
+Skybox::~Skybox()
+{
+  if (mCubemapTexId != 0) {
+    OGLGraphics::DeleteTex(mCubemapTexId);
+  }
 }
 
 void Skybox::Render(const std::shared_ptr<Camera>& cam) {
@@ -79,8 +86,8 @@ void Skybox::setup_cube_geometry() {
   }
 }
 
-void Skybox::setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles) {
-  mCubemapTexId = TextureLoader::LoadCubeMapTexture(incomingSkymapFiles);     // todo: load up debug box if skymap files are wrong
+void Skybox::setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles, bool has_alpha) {
+  mCubemapTexId = TextureLoader::LoadCubeMapTexture(incomingSkymapFiles, has_alpha);     // todo: load up debug box if skymap files are wrong
 }
 
 }  // end namespace AA

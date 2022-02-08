@@ -279,7 +279,8 @@ public:
   /// Sets a skybox with 6 textures
   /// </summary>
   /// <param name="incomingSkymapFiles">6 textures</param>
-  void SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept;
+  /// <param name="has_alpha">true is images have and alpha channel, false otherwise</param>
+  void SetSkybox(std::vector<std::string> incomingSkymapFiles, bool has_alpha) noexcept;
 
   /// <summary>
   /// Removes current skybox. You will see the clear screen color instead.

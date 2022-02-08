@@ -19,7 +19,7 @@ public:
 
   static unsigned int LoadTexture(const std::string& texture_path);
 
-  static unsigned int LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths);
+  static unsigned int LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths, bool has_alpha = true);
 
   static void UnloadTexture(const std::unordered_map<unsigned int, std::string>& texture_draw_ids);
 

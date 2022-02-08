@@ -467,12 +467,12 @@ void Interface::SimulateWorldPhysics(bool status) {
   mSimulateWorldPhysics = status;
 }
 
-void Interface::SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept {
+void Interface::SetSkybox(std::vector<std::string> incomingSkymapFiles, bool has_alpha) noexcept {
   if (mSkybox)
-    return;  // already set
+    RemoveSkybox();
   if (incomingSkymapFiles.size() != 6)
     return;  // invalid size for a skybox
-  mSkybox = std::make_shared<Skybox>(incomingSkymapFiles);
+  mSkybox = std::make_shared<Skybox>(incomingSkymapFiles, has_alpha);
 }
 
 void Interface::RemoveSkybox() noexcept {
