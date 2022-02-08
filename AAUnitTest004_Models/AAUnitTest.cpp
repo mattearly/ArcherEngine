@@ -26,12 +26,21 @@ public:
     std::string my_project_dir = s;
     const char* cubepath = "res/3dmodels/cube.glb";
     std::string fullpath = s + cubepath;
-    instance.AddProp(fullpath.c_str(), glm::vec3(0, 0, -60));
+
+    instance.SetDirectionalLight(glm::vec3(-.3f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f));
+
+    static int id = instance.AddProp(fullpath.c_str(), glm::vec3(0, 0, -10));
+    instance.AddToUpdate([](float dt) {
+      static float accum_time = 0;
+      accum_time += dt;
+      instance.RotateProp(id, glm::vec3(cos(accum_time), sin(accum_time), 0));
+      });
+
 
     static bool No = false;
     instance.AddToImGuiUpdate([]() {
       ImGui::Begin("Run Test");
-      ImGui::Text("Do you see the cube?");
+      ImGui::Text("Do you see the spinning cube?");
       bool Yes = ImGui::Button("Yes");
       No = ImGui::Button("No");
       if (Yes || No) { instance.Shutdown(); };
