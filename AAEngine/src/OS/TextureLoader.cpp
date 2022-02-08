@@ -176,20 +176,18 @@ unsigned int TextureLoader::LoadTexture(const std::string& texture_path) {
   return a_new_texture_info.accessId;
 }
 
+// Note that this only loads up textures that have alpha channels. Todo: make more versions
 unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths) {
   if (six_texture_paths.size() != 6)
     throw("wrong number of textures");
   int width = 0, height = 0, nrChannel = 0;
-  stbi_set_flip_vertically_on_load(0); // tell stb_image.h to not flip loaded texture's on the y-axis.
   std::vector<unsigned char*> data;
   data.resize(6);
+  stbi_set_flip_vertically_on_load(0); // tell stb_image.h to not flip loaded texture's on the y-axis.
   for (auto i = 0; i < 6; ++i) {
     data[i] = stbi_load(six_texture_paths[i].c_str(), &width, &height, &nrChannel, STBI_rgb_alpha);
   }
   unsigned int return_id = OGLGraphics::UploadCubeMapTex(data, width, height, nrChannel == 4);
-#ifdef _DEBUG
-  printf("LoadedCubeMapTextures(id:%i)\n", return_id);
-#endif
   return return_id;
 }
 
