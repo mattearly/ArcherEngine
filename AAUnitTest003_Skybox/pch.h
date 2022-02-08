@@ -10,6 +10,8 @@
 // add headers that you want to pre-compile here
 #include <AAEngine/Interface.h>
 #include <imgui.h>
+#include <vector>
+#include <string>
 
 #define STRINGIFY(x) #x
 #define EXPAND(x) STRINGIFY(x)
