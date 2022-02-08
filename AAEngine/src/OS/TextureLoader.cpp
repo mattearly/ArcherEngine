@@ -188,6 +188,9 @@ unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& s
     data[i] = stbi_load(six_texture_paths[i].c_str(), &width, &height, &nrChannel, (has_alpha) ? STBI_rgb_alpha : STBI_rgb);
   }
   unsigned int return_id = OGLGraphics::UploadCubeMapTex(data, width, height, has_alpha);
+  for (auto i = 0; i < 6; ++i) {
+    stbi_image_free(data[i]);
+  }
   return return_id;
 }
 
