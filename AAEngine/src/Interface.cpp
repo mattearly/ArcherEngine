@@ -1029,18 +1029,6 @@ std::shared_ptr<Window> Interface::GetWindow()
   return mWindow;
 }
 
-// returns -1 if there is no window
-int Interface::GetWindowWidth() noexcept {
-  if (!mWindow) return -1;
-  return mWindow->GetCurrentWidth();
-}
-
-// returns -1 if there is no window
-int Interface::GetWindowHeight() noexcept {
-  if (!mWindow) return -1;
-  return mWindow->GetCurrentHeight();
-}
-
 // changes the window title, does nothing if window is null
 void Interface::SetWindowTitle(const char* name) noexcept {
   if (!mWindow) return;

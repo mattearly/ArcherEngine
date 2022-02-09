@@ -484,18 +484,6 @@ public:
   std::shared_ptr<Window> GetWindow();
 
   /// <summary>
-  /// Gets the current window Width
-  /// </summary>
-  /// <returns>copy of window width</returns>
-  int GetWindowWidth() noexcept;
-
-  /// <summary>
-  /// Gets the current window Height.
-  /// </summary>
-  /// <returns>copy of the window Height</returns>
-  int GetWindowHeight() noexcept;
-
-  /// <summary>
   /// Sets the title of the window.
   /// </summary>
   /// <param name="name">desired window name</param>
