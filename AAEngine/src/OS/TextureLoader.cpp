@@ -42,43 +42,7 @@ std::unordered_map<unsigned int, std::string> TextureLoader::LoadAllTextures(con
 
   std::unordered_map<unsigned int, std::string> all_loaded_textures;
 
-  //#ifdef _DEBUG
-  //   std::cout << "Texture Load Debug::";
-  //  int shading_model;
-  //  ai_material->Get(AI_MATKEY_SHADING_MODEL, shading_model);
-  //  switch (shading_model) {
-  //  case aiShadingMode_Flat:
-  //    std::cout << "Shading mode is aiShadingMode_Flat\n";
-  //    break;
-  //  case aiShadingMode_Gouraud:
-  //    std::cout << "Shading mode is aiShadingMode_Gouraud\n";
-  //    break;
-  //  case aiShadingMode_Phong:
-  //    std::cout << "Shading mode is aiShadingMode_Phong\n";
-  //    break;
-  //  case aiShadingMode_Blinn:
-  //    std::cout << "Shading mode is aiShadingMode_Blinn\n";
-  //    break;
-  //  case aiShadingMode_Toon:
-  //    std::cout << "Shading mode is aiShadingMode_Toon\n";
-  //    break;
-  //  case aiShadingMode_OrenNayar:
-  //    std::cout << "Shading mode is aiShadingMode_OrenNayar\n";
-  //    break;
-  //  case aiShadingMode_Minnaert:
-  //    std::cout << "Shading mode is aiShadingMode_Minnaert\n";
-  //    break;
-  //  case aiShadingMode_NoShading:
-  //    std::cout << "Shading mode is aiShadingMode_NoShading\n";
-  //    break;
-  //  case aiShadingMode_Fresnel:
-  //    std::cout << "Shading mode is aiShadingMode_Fresnel\n";
-  //    break;
-  //  default: break;
-  //  }
-  //#endif
-
-    // get the albedo (diffuse) textures
+  // get the albedo (diffuse) textures
   std::unordered_map<unsigned int, std::string> albedo_textures;
   if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_DIFFUSE, "Albedo", orig_filepath, albedo_textures) == 0) {
     for (auto& a_tex : albedo_textures) {
@@ -116,21 +80,6 @@ std::unordered_map<unsigned int, std::string> TextureLoader::LoadAllTextures(con
       all_loaded_textures.insert(all_loaded_textures.end(), e_tex);
     }
   }
-
-  //  float specStrength = 0.f; // default value, remains unmodified if we fail.
-  //  if (aiGetMaterialFloat(ai_material, AI_MATKEY_SHININESS_STRENGTH, (float*)&specStrength) == AI_FAILURE) 
-  //  {
-  //#ifdef _DEBUG
-  //    std::cout << "specStrength not found\n";
-  //#endif
-  //  }
-
-  //  aiColor4D emissive_color;
-  //  if (aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_EMISSIVE, (aiColor4D*)&emissive_color) == AI_FAILURE) {
-  //#ifdef _DEBUG
-  //    std::cout << "emissive_color not found\n";
-  //#endif
-  //  }
 
   return all_loaded_textures;
 }
@@ -217,6 +166,7 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
   }
 
   auto rgb_type = STBI_rgb_alpha;
+  //auto rgb_type = STBI_rgb;
 
   for (unsigned int i = 0; i < num_textures; ++i) {
     // make sure texture exists
