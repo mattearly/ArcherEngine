@@ -163,16 +163,19 @@ void Window::Close() {
   glfwSetWindowShouldClose(mGLFWwindow, 1);
 }
 void Window::SetCursorToHidden() noexcept {
+  get_and_note_window_options();
   mWindowOptions->_cursor_mode = CURSOR_MODE::HIDDEN;
-  glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+  apply_new_window_option_changes();
 }
 void Window::SetCursorToDisabled() noexcept {
+  get_and_note_window_options();
   mWindowOptions->_cursor_mode = CURSOR_MODE::DISABLED;
-  glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  apply_new_window_option_changes();
 }
 void Window::SetCursorToNormal() noexcept {
+  get_and_note_window_options();
   mWindowOptions->_cursor_mode = CURSOR_MODE::NORMAL;
-  glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+  apply_new_window_option_changes();
 }
 void Window::SetNewWidthAndHeight(int w, int h) noexcept
 {
