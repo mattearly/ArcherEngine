@@ -53,7 +53,8 @@ public: TEST_METHOD(MainTestMethod) {
   Assert::AreEqual(initSuccess, true);
 
   // add a camera that fills full screens
-  static auto cam_id = instance.AddCamera(instance.GetWindowWidth(), instance.GetWindowHeight());
+  auto win = instance.GetWindow();
+  static auto cam_id = instance.AddCamera(win->GetCurrentWidth(), win->GetCurrentHeight());
   auto cam = instance.GetCamera(cam_id);
   cam->SetKeepCameraToWindowSize(true);
   instance.AddToUpdate([](float dt) {
