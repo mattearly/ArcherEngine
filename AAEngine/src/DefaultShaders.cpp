@@ -1,8 +1,8 @@
 #include "DefaultShaders.h"
 namespace AA {
-
-OGLShader* UBERSHADER;
-OGLShader* STENCILSHADER;
+// access given only though getters
+static OGLShader* UBERSHADER = nullptr;
+static OGLShader* STENCILSHADER = nullptr;
 
 //todo: optimization - uniform buffers https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
 void DefaultShaders::init_stencilshader() {
@@ -58,13 +58,12 @@ void main() {
   STENCILSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());
 }
 
-
 void DefaultShaders::init_ubershader() {
   if (UBERSHADER)
     return;
 
-  const std::string UBERSHADER_VERT_CODE = R"(
-#version 430 core
+  const std::string UBERSHADER_VERT_CODE =
+    R"(#version 430 core
 layout(location=0)in vec3 inPos;
 layout(location=1)in vec2 inTexUV;
 layout(location=2)in vec3 inNorm;
@@ -297,19 +296,23 @@ void main()
   UBERSHADER = new OGLShader(UBERSHADER_VERT_CODE.c_str(), UBERSHADER_FRAG_CODE.c_str());
 }
 
-
 OGLShader* DefaultShaders::get_ubershader() {
-  if (!UBERSHADER)
+  if (!UBERSHADER) {
     init_ubershader();
-  UBERSHADER->Use();
+  } else {
+    UBERSHADER->Use();
+  }
   return UBERSHADER;
 }
 
 OGLShader* DefaultShaders::get_stencilshader() {
-  if (!STENCILSHADER)
+  if (!STENCILSHADER) {
     init_stencilshader();
-  STENCILSHADER->Use();
+  } else {
+    STENCILSHADER->Use();
+  }
   return STENCILSHADER;
 }
+
 
 }  // end namespace AA
