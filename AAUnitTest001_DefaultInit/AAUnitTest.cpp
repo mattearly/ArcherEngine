@@ -17,8 +17,10 @@ public:
       ImGui::Begin("default init");
       ImGui::Text("Click \"ok\" to continue");
       bool result = ImGui::Button("ok");
-      if (result) { instance.Shutdown(); };
       ImGui::End();
+
+      // update state
+      if (result) { instance.Shutdown(); };
       });
     int run_diag = instance.Run();
     Assert::AreEqual(run_diag, 0);
