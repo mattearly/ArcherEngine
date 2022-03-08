@@ -132,12 +132,8 @@ void OGLShader::loadShader(const char* vert_source, const char* frag_source) {
 #ifdef _DEBUG
     char p_infoLog[512];
     glGetProgramInfoLog(ID, 512, nullptr, p_infoLog);
-    throw(p_infoLog);
-    //std::cout << "error in ID: " << p_infoLog << std::endl;
-    //char a;
-    //std::cin >> a;
+    throw(std::_Xruntime_error, p_infoLog);
 #endif
-    //exit(-1);
   }
 
   /* we don't need them anymore */
