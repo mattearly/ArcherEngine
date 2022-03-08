@@ -86,8 +86,7 @@ void Prop::Draw() {
     OGLGraphics::SetStencilMask(true);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);  // todo: abstract
     OGLGraphics::SetDepthTest(true);
-  } 
-  else {
+  } else {
     OGLShader* shader = DefaultShaders::get_ubershader();
     shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
     for (MeshInfo& m : mMeshes) {
@@ -140,7 +139,7 @@ void Prop::RemoveCache() {
 void Prop::Load(const std::string& path) {
   if (mMeshes.empty()) {
     if (MeshLoader::LoadGameObjectFromFile(*this, path) == -1) {
-      throw (std::_Xruntime_error, "failed to load path");
+      throw(std::_Xruntime_error, "failed to load path");
     }
   } else {
     throw(std::_Xruntime_error, "Meshes are loaded already. Remove cache first.");
