@@ -14,7 +14,7 @@ class TextureLoader {
 public:
 
   static std::unordered_map<unsigned int, std::string> LoadAllTextures(const aiScene* scene,
-    const aiMaterial* ai_material, const std::string& orig_filepath);
+    const aiMaterial* ai_material, const std::string& orig_filepath, const bool load_alpha = false);
 
   static void increment_given_texture_ids(const std::unordered_map<uint32_t, std::string>& list);
 

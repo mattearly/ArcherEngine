@@ -13,11 +13,11 @@ namespace AA {
 // ModelLoader is pretty specific to opengl currently
 class MeshLoader {
 public:
-  static int LoadGameObjectFromFile(Prop& out_model, const std::string& path);
+  static int LoadGameObjectFromFile(Prop& out_model, const std::string& path, const bool load_alpha = false);
   static void UnloadGameObject(const std::vector<MeshInfo>& toUnload);
 private:
   static void recursive_processNode(aiNode* node, const aiScene* scene, Prop& out_model);
-  static bool CheckIfModelIsAlreadyLoaded(Prop& out_model, const std::string& path);
+  static bool IsAlreadyLoaded(Prop& out_model, const std::string& path);
 
   MeshLoader() = delete;
 };

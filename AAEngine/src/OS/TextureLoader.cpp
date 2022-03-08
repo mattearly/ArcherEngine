@@ -38,27 +38,27 @@ namespace AA {
 // internal saved list of loaded textures to manage
 static std::forward_list<TextureInfo> AllLoadedTextures;
 
-std::unordered_map<unsigned int, std::string> TextureLoader::LoadAllTextures(const aiScene* scene, const aiMaterial* ai_material, const std::string& orig_filepath) {
+std::unordered_map<unsigned int, std::string> TextureLoader::LoadAllTextures(const aiScene* scene, const aiMaterial* ai_material, const std::string& orig_filepath, const bool load_alpha) {
 
   std::unordered_map<unsigned int, std::string> all_loaded_textures;
 
   // get the albedo (diffuse) textures
   std::unordered_map<unsigned int, std::string> albedo_textures;
-  if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_DIFFUSE, "Albedo", orig_filepath, albedo_textures) == 0) {
+  if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_DIFFUSE, "Albedo", orig_filepath, albedo_textures, load_alpha) == 0) {
     for (auto& a_tex : albedo_textures) {
       all_loaded_textures.insert(all_loaded_textures.end(), a_tex);
     }
   }
 
   std::unordered_map<unsigned int, std::string> specular_textures;
-  if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_SPECULAR, "Specular", orig_filepath, specular_textures) == 0) {
+  if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_SPECULAR, "Specular", orig_filepath, specular_textures, load_alpha) == 0) {
     for (auto& s_tex : specular_textures) {
       all_loaded_textures.insert(all_loaded_textures.end(), s_tex);
     }
   }
 
   std::unordered_map<unsigned int, std::string> normal_textures;
-  if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_NORMALS, "Normal", orig_filepath, normal_textures) == 0) {
+  if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_NORMALS, "Normal", orig_filepath, normal_textures, load_alpha) == 0) {
     for (auto& n_tex : normal_textures) {
       all_loaded_textures.insert(all_loaded_textures.end(), n_tex);
     }
@@ -66,7 +66,7 @@ std::unordered_map<unsigned int, std::string> TextureLoader::LoadAllTextures(con
 
   // if finding normal textures failed, see if it is actually called a heightmap (.obj files soemtimes have this according to https://learnopengl.com/Advanced-Lighting/Normal-Mapping)
   if (normal_textures.empty()) {
-    if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_HEIGHT, "Normal", orig_filepath, normal_textures) == 0) {
+    if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_HEIGHT, "Normal", orig_filepath, normal_textures, load_alpha) == 0) {
       for (auto& n_tex : normal_textures) {
         all_loaded_textures.insert(all_loaded_textures.end(), n_tex);
       }
@@ -75,7 +75,7 @@ std::unordered_map<unsigned int, std::string> TextureLoader::LoadAllTextures(con
 
   // emissive textures will glow on the lit shader
   std::unordered_map<unsigned int, std::string> emissive_textures;
-  if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_EMISSIVE, "Emission", orig_filepath, emissive_textures) == 0) {
+  if (TextureLoader::loadMaterialTextures(scene, ai_material, aiTextureType_EMISSIVE, "Emission", orig_filepath, emissive_textures, load_alpha) == 0) {
     for (auto& e_tex : emissive_textures) {
       all_loaded_textures.insert(all_loaded_textures.end(), e_tex);
     }

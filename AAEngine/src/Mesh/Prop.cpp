@@ -15,9 +15,9 @@ Prop::Prop() {
   stencil_scale = 1.1f;
 }
 
-Prop::Prop(const char* path) {
-  if (MeshLoader::LoadGameObjectFromFile(*this, path) == -1)
-    throw ("failed to load path");
+Prop::Prop(const char* path, const bool load_alpha) {
+  if (MeshLoader::LoadGameObjectFromFile(*this, path, load_alpha) == -1)
+    throw(std::_Xruntime_error, "failed to load file path");
   stenciled = false;
   stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
   stenciled_with_normals = false;
@@ -63,7 +63,6 @@ void Prop::Draw() {
       OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::RenderElements(m.vao, m.numElements);
     }
-
     // 2nd pass
     OGLGraphics::SetStencilFuncToNotEqual();
     OGLGraphics::SetStencilMask(false);
@@ -84,12 +83,11 @@ void Prop::Draw() {
       OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::RenderElements(m.vao, m.numElements);
     }
-
     OGLGraphics::SetStencilMask(true);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);  // todo: abstract
     OGLGraphics::SetDepthTest(true);
-
-  } else {
+  } 
+  else {
     OGLShader* shader = DefaultShaders::get_ubershader();
     shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
     for (MeshInfo& m : mMeshes) {
@@ -123,7 +121,11 @@ void Prop::Draw() {
       }
       OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::RenderElements(m.vao, m.numElements);
-      //todo: we should be setting textures back to 0 or the defaults for that type
+      //set textures back to 0 or the defaults for that type
+      OGLGraphics::SetTexture(0, 0);
+      OGLGraphics::SetTexture(1, 0);
+      OGLGraphics::SetTexture(2, 0);
+      OGLGraphics::SetTexture(3, 0);
     }
   }
 }

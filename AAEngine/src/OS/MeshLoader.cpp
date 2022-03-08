@@ -29,7 +29,13 @@ struct RefModelInfo {
   int ref_count = 1;
 };
 
+// keeps track of all the models we have loaded so fars
 static std::forward_list<RefModelInfo> AllLoadedModels;
+
+// this handles passing args
+static struct LOADFLAGS {
+  bool alpha_textures = false;
+} LoadFlags;
 
 /// <summary>
 /// Checks the AllLoadedModels reference list and reuses models that have already been loaded.
@@ -37,7 +43,7 @@ static std::forward_list<RefModelInfo> AllLoadedModels;
 /// <param name="out_model">the model to be populated if successful</param>
 /// <param name="path">full original path</param>
 /// <returns>true if out_model was populated, false if not</returns>
-bool MeshLoader::CheckIfModelIsAlreadyLoaded(Prop& out_model, const std::string& path) {
+bool MeshLoader::IsAlreadyLoaded(Prop& out_model, const std::string& path) {
   for (auto& model : AllLoadedModels) {
     if (model.path == "")
       continue;
@@ -59,11 +65,13 @@ static std::string LastLoadedPath;
 //    -1 = scene was null after attempt to load
 //    -2 = scene has incomplete flag from assimp after attempted to load
 //    -3 = there is no root node on the model
+//    -4 = model is already loaded/cached
 // otherwise returns 0 if the import is successful
-int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path) {
+int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path, const bool load_alpha) {
+  if (IsAlreadyLoaded(out_model, path))
+    return -4;
 
-  bool already_loaded = CheckIfModelIsAlreadyLoaded(out_model, path);
-  if (already_loaded) return 0;
+  LoadFlags.alpha_textures = load_alpha;
 
   Assimp::Importer importer;
   int post_processing_flags = 0;
@@ -162,7 +170,7 @@ MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x
   return MeshInfo(
     vao,
     (unsigned int)loaded_elements.size(),
-    TextureLoader::LoadAllTextures(scene, scene->mMaterials[mesh->mMaterialIndex], LastLoadedPath),  // get all the textures that belong with this mesh
+    TextureLoader::LoadAllTextures(scene, scene->mMaterials[mesh->mMaterialIndex], LastLoadedPath, LoadFlags.alpha_textures),  // get all the textures that belong with this mesh
     aiMat4_to_glmMat4(*trans)
   );
 }

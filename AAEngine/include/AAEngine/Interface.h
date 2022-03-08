@@ -107,7 +107,7 @@ public:
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <param name="scale">optional: starting size, default = 1,1,1</param>
   /// <returns>id of the prop</returns>
-  unsigned int AddProp(const char* path, glm::vec3 location = glm::vec3(0), glm::vec3 scale = glm::vec3(1));
+  unsigned int AddProp(const char* path, const bool load_alpha = false, const glm::vec3 location = glm::vec3(0), const glm::vec3 scale = glm::vec3(1));
 
   /// <summary>
   /// Removes a prop. Calls remove cache on model data to keep track of instance count.

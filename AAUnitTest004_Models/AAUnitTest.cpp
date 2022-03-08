@@ -36,10 +36,10 @@ public:
     setup_fpp_fly(cam_id);
 
     // load models
-    static int cube_id = instance.AddProp(fullcubepath.c_str(), glm::vec3(0, 0, -10));
-    static int groundplane_id = instance.AddProp(fullgroundplane.c_str(), glm::vec3(0, -30.f, 0));
+    static int cube_id = instance.AddProp(fullcubepath.c_str(), false, glm::vec3(0, 0, -10));
+    static int groundplane_id = instance.AddProp(fullgroundplane.c_str(), false, glm::vec3(0, -30.f, 0));
     instance.ScaleProp(groundplane_id, glm::vec3(2));
-    static int peasant_man_id = instance.AddProp(fullpeasant_man.c_str(), glm::vec3(0, -30, -100));
+    static int peasant_man_id = instance.AddProp(fullpeasant_man.c_str(), false, glm::vec3(0, -30, -100));
     instance.ScaleProp(peasant_man_id, glm::vec3(.25f));
 
     instance.AddToUpdate([](float dt) {
@@ -50,10 +50,10 @@ public:
 
     // default light and background
     instance.SetWindowClearColor();
-    static float lightdir[3] = { -.3f,-.3f,-.3f };
-    static float* lightamb = new float(.1f);
-    static float* lightdiff = new float(.6f);
-    static float* lightspec = new float(.6f);
+    static float lightdir[3] = { .21f, .21f, .1f };
+    static float* lightamb = new float(.2f);
+    static float* lightdiff = new float(.7f);
+    static float* lightspec = new float(.7f);
     instance.SetDirectionalLight(
       glm::vec3(lightdir[0], lightdir[1], lightdir[2]),
       glm::vec3(*lightamb),
