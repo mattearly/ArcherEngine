@@ -73,7 +73,7 @@ int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path,
 
   LoadFlags.alpha_textures = load_alpha;
 
-  Assimp::Importer importer;
+  static Assimp::Importer importer;
   int post_processing_flags = 0;
 
   //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
