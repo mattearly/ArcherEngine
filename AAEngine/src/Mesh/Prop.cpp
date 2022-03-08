@@ -140,10 +140,10 @@ void Prop::RemoveCache() {
 void Prop::Load(const std::string& path) {
   if (mMeshes.empty()) {
     if (MeshLoader::LoadGameObjectFromFile(*this, path) == -1) {
-      throw ("failed to load path");
+      throw (std::_Xruntime_error, "failed to load path");
     }
   } else {
-    throw("Meshes are loaded already. Remove cache first.");
+    throw(std::_Xruntime_error, "Meshes are loaded already. Remove cache first.");
   }
 }
 
