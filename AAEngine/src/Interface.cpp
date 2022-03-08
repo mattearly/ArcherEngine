@@ -180,8 +180,8 @@ std::shared_ptr<Camera> Interface::GetCamera(uidtype camId)
   throw("cam id doesn't exist or is invalid");
 }
 
-unsigned int Interface::AddProp(const char* path, glm::vec3 location, glm::vec3 scale) {
-  mProps.emplace_back(std::make_shared<Prop>(path));
+unsigned int Interface::AddProp(const char* path, const bool load_alpha, const glm::vec3 location, const glm::vec3 scale) {
+  mProps.emplace_back(std::make_shared<Prop>(path, load_alpha));
   mProps.back()->spacial_data.MoveTo(location);
   mProps.back()->spacial_data.ScaleTo(scale);
   return mProps.back()->GetUID();
