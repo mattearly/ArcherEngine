@@ -62,22 +62,23 @@ public:
     static bool No = false;
     instance.AddToImGuiUpdate([]() {
       ImGui::Begin("Model Test");
-      ImGui::SliderFloat3("Light Direction", lightdir, -1.f, 1.f, "%f", 1.0f);
-      ImGui::SliderFloat("Light Ambient", lightamb, 0.f, 1.f, "%f", 1.0f);
-      ImGui::SliderFloat("Light Diffuse", lightdiff, 0.f, 1.f, "%f", 1.0f);
-      ImGui::SliderFloat("Light Spec", lightspec, 0.f, 1.f, "%f", 1.0f);
-      bool update_light = ImGui::Button("UpdateLight");
-      if (update_light)
+      bool update_light1 = ImGui::SliderFloat3("Light Direction", lightdir, -1.f, 1.f, "%f", 1.0f);
+      bool update_light2 = ImGui::SliderFloat("Light Ambient", lightamb, 0.f, 1.f, "%f", 1.0f);
+      bool update_light3 = ImGui::SliderFloat("Light Diffuse", lightdiff, 0.f, 1.f, "%f", 1.0f);
+      bool update_light4 = ImGui::SliderFloat("Light Spec", lightspec, 0.f, 1.f, "%f", 1.0f);
+      ImGui::Text("Do you see the spinning cube?");
+      bool Yes = ImGui::Button("Yes");
+      No = ImGui::Button("No");
+      ImGui::End();
+
+      // state update
+      if (update_light1 || update_light2 || update_light3 || update_light4)
         instance.SetDirectionalLight(
           glm::vec3(lightdir[0], lightdir[1], lightdir[2]),
           glm::vec3(*lightamb),
           glm::vec3(*lightdiff),
           glm::vec3(*lightspec));
-      ImGui::Text("Do you see the spinning cube?");
-      bool Yes = ImGui::Button("Yes");
-      No = ImGui::Button("No");
       if (Yes || No) { instance.Shutdown(); };
-      ImGui::End();
       });
     int run_diag = instance.Run();
     Assert::AreEqual(run_diag, 0);
