@@ -172,9 +172,8 @@ void Interface::teardown() {
   if (mMusic) {
     RemoveMusic();
   }
-  
-  mWindow.reset();
 
+  mWindow.reset();
 
   NVidiaPhysx::Shutdown();
 
