@@ -94,7 +94,7 @@ void TextureLoader::increment_given_texture_ids(const std::unordered_map<uint32_
   }
 }
 
-unsigned int TextureLoader::LoadTexture(const std::string& texture_path) {
+unsigned int TextureLoader::LoadTexture(const std::string& texture_path, const bool load_alpha) {
   for (auto& a_tex : AllLoadedTextures) {
     if (texture_path == a_tex.path.data()) {
       // texture already loaded, just give the mesh the details
@@ -103,7 +103,7 @@ unsigned int TextureLoader::LoadTexture(const std::string& texture_path) {
     }
   }
 
-  auto rgb_type = STBI_rgb_alpha;
+  auto rgb_type = ((load_alpha) ? STBI_rgb_alpha : STBI_rgb);
 
   TextureInfo a_new_texture_info;
   unsigned char* texture_data = nullptr;
@@ -112,7 +112,7 @@ unsigned int TextureLoader::LoadTexture(const std::string& texture_path) {
   stbi_set_flip_vertically_on_load(0);
   texture_data = stbi_load(texture_path.c_str(), &width, &height, &nrComponents, rgb_type);
   if (texture_data) {
-    a_new_texture_info.accessId = OGLGraphics::Upload2DTex(texture_data, width, height);
+    a_new_texture_info.accessId = OGLGraphics::Upload2DTex(texture_data, width, height, load_alpha);
     if (a_new_texture_info.accessId != 0) {
       // add the new one to our list of loaded textures
       a_new_texture_info.path = texture_path;
@@ -126,7 +126,7 @@ unsigned int TextureLoader::LoadTexture(const std::string& texture_path) {
 }
 
 // Note that this only loads up textures that have alpha channels. Todo: make more versions
-unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths, bool has_alpha) {
+unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths, bool load_alpha) {
   if (six_texture_paths.size() != 6)
     throw("wrong number of textures");
   int width = 0, height = 0, nrChannel = 0;
@@ -134,9 +134,9 @@ unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& s
   data.resize(6);
   stbi_set_flip_vertically_on_load(0); // tell stb_image.h to not flip loaded texture's on the y-axis.
   for (auto i = 0; i < 6; ++i) {
-    data[i] = stbi_load(six_texture_paths[i].c_str(), &width, &height, &nrChannel, (has_alpha) ? STBI_rgb_alpha : STBI_rgb);
+    data[i] = stbi_load(six_texture_paths[i].c_str(), &width, &height, &nrChannel, (load_alpha) ? STBI_rgb_alpha : STBI_rgb);
   }
-  unsigned int return_id = OGLGraphics::UploadCubeMapTex(data, width, height, has_alpha);
+  unsigned int return_id = OGLGraphics::UploadCubeMapTex(data, width, height, load_alpha);
   for (auto i = 0; i < 6; ++i) {
     stbi_image_free(data[i]);
   }
@@ -159,14 +159,14 @@ void TextureLoader::UnloadTexture(const std::unordered_map<unsigned int, std::st
   }
 }
 
-int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* mat, aiTextureType type, std::string typeName, std::string orginalFilePath, std::unordered_map<unsigned int, std::string>& out_texInfo) {
+int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* mat, aiTextureType type, std::string typeName, std::string orginalFilePath, std::unordered_map<unsigned int, std::string>& out_texInfo, const bool load_alpha) {
   unsigned int num_textures = mat->GetTextureCount(type);
   if (num_textures == 0) {
     return -3;
   }
 
-  auto rgb_type = STBI_rgb_alpha;
-  //auto rgb_type = STBI_rgb;
+  auto rgb_type = ((load_alpha) ? STBI_rgb_alpha : STBI_rgb);
+  int width(0), height(0), nrComponents(0);
 
   for (unsigned int i = 0; i < num_textures; ++i) {
     // make sure texture exists
@@ -227,13 +227,12 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
       if (!texture_has_loaded) {
         TextureInfo a_new_texture_info;
         //bool compressed = (ai_embedded_texture->mHeight == 0) ? true : false;
-        int width, height, nrComponents;
         // for unflipped opengl coords, flip vertically on load to true
         stbi_set_flip_vertically_on_load(0);
         int texture_size = ai_embedded_texture->mWidth * std::max(ai_embedded_texture->mHeight, 1u);
         unsigned char* data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(ai_embedded_texture->pcData), texture_size, &width, &height, &nrComponents, rgb_type);
         if (data) {
-          a_new_texture_info.accessId = OGLGraphics::Upload2DTex(data, width, height);
+          a_new_texture_info.accessId = OGLGraphics::Upload2DTex(data, width, height, load_alpha);
           if (a_new_texture_info.accessId != 0) {
             // add the new one to our list of loaded textures
             a_new_texture_info.path = embedded_filename;
@@ -274,7 +273,6 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
       }
       // wasn't already loaded, lets try to load it
       TextureInfo a_new_texture_info;
-      int width = 0, height = 0, nrComponents = 0;
       // for unflipped opengl coords, flip vertically on load to true
       stbi_set_flip_vertically_on_load(0);
       // try
@@ -283,7 +281,7 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
         data = stbi_load(a_path.c_str(), &width, &height, &nrComponents, rgb_type);
         if (data) {
           // we have data that goes to the graphics card
-          a_new_texture_info.accessId = OGLGraphics::Upload2DTex(data, width, height);
+          a_new_texture_info.accessId = OGLGraphics::Upload2DTex(data, width, height, load_alpha);
           if (a_new_texture_info.accessId != 0) {
             // add the new one to our list of loaded textures for management
             a_new_texture_info.path = a_path;
