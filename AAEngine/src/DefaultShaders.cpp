@@ -189,7 +189,7 @@ vec3 CalcDirectionalLight(vec3 normal, vec3 viewDir) {
     diffuse = directionalLight.Diffuse * diff * default_color;
   }
   if (hasSpecular > 0) {
-    vec3 specular = directionalLight.Specular * spec * texture(material.Specular, fs_in.TexUV).rgb;
+    vec3 specular = directionalLight.Specular * spec * texture(material.Specular, fs_in.TexUV).r;
     return(ambient + diffuse + specular);
   } else {
     return(ambient + diffuse);
@@ -223,7 +223,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
   diffuse *= attenuation;
   vec3 specular;
   if (hasSpecular > 0) {
-    specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).rgb;
+    specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).r;
   } else {
     specular = vec3(1,1,1);
   }
@@ -259,7 +259,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
     diffuse = light.Diffuse * diff * default_color;
   }
   if (hasSpecular > 0) {
-    vec3 specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).rgb;
+    vec3 specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).r;
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
