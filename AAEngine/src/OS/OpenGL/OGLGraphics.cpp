@@ -108,8 +108,7 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<LitVertex>& verts, cons
 
     return vaoHandle;
 
-  }
-  else {
+  } else {
     // old version 3.3
     GLuint VAO, VBO, EBO;
 
@@ -203,8 +202,7 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<TanVertex>& verts, cons
     glBindVertexArray(0);
 
     return vaoHandle;
-  }
-  else {
+  } else {
     // old version 3.3
     GLuint VAO, VBO, EBO;
     glGenBuffers(1, &VBO);
@@ -362,17 +360,18 @@ GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int he
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
   //try: https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
   //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
+  // internal format for GL_RGBA should be GL_RGBA8 for reasons https://youtu.be/n4k7ANAFsIQ?t=910
+  auto internalformat = (format == GL_RGBA) ? GL_RGBA8 : GL_RGB;
+  if (format == GL_RED)
+    internalformat = GL_RED;
 
   if (format == GL_RGBA) {
-    //https://youtu.be/n4k7ANAFsIQ?t=910
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, /*border*/0, format, GL_UNSIGNED_BYTE, tex_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, /*border*/0, format, GL_UNSIGNED_BYTE, tex_data);
   } else {
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, /*border*/0, format, GL_UNSIGNED_BYTE, tex_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, /*border*/0, format, GL_UNSIGNED_BYTE, tex_data);
   }
 
   glGenerateMipmap(GL_TEXTURE_2D);
@@ -422,17 +421,17 @@ void OGLGraphics::SetBlend(const bool enabled) {
     //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-  }
-  else {
+  } else {
     glDisable(GL_BLEND);
   }
 }
 
 void OGLGraphics::SetCullFace(const bool enabled) {
-  if (enabled)
+  if (enabled) {
     glEnable(GL_CULL_FACE);
-  else
+  } else {
     glDisable(GL_CULL_FACE);
+  }
 }
 
 void OGLGraphics::SetCullMode(int mode) {
@@ -442,8 +441,7 @@ void OGLGraphics::SetCullMode(int mode) {
 void OGLGraphics::SetDepthTest(const bool enabled) {
   if (enabled) {
     glEnable(GL_DEPTH_TEST);
-  }
-  else {
+  } else {
     glDisable(GL_DEPTH_TEST);
   }
 }
@@ -453,10 +451,11 @@ void OGLGraphics::SetDepthMode(int mode) {
 }
 
 void OGLGraphics::SetMultiSampling(const bool enabled) {
-  if (enabled)
+  if (enabled) {
     glEnable(GL_MULTISAMPLE);
-  else
+  } else {
     glDisable(GL_MULTISAMPLE);
+  }
 }
 
 void OGLGraphics::Proc(void* proc) {
