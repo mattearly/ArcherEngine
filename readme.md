@@ -36,14 +36,13 @@ Recommended:
 
 ## Dependencies
 
-glm, assimp, glfw3, glad, OpenAL-Soft, sndfile, imgui
+glm, assimp, entt, glfw3, glad, OpenAL-Soft, sndfile, imgui, physx, stb, curl
 
 *managed by vcpkg manifest*
 
 ## Tests and Samples
 
-- CoreTests: base case tests
-- ExampleProject: fpp with walk controls
+- Tests via MicrosoftCPPUnitTests: To Run the tests fully, you must download the RuntimeFiles resources (i.e. run DownloadTestResources and unzip to the RuntimeFiles/ dir).
 
 ## Sample usage code
 

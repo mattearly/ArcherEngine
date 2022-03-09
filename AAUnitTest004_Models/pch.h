@@ -11,7 +11,6 @@
 #include <AAEngine/Interface.h>
 #include <imgui.h>
 
-#define STRINGIFY(x) #x
-#define EXPAND(x) STRINGIFY(x)
+const std::string runtime_dir = "../../RuntimeFiles/";
 
 #endif //PCH_H

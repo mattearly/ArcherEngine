@@ -7,20 +7,15 @@ namespace AAUnitTest {
 TEST_CLASS(AAUnitTest) {
 public: TEST_METHOD(MainTestMethod) {
 
+  // resources
   // load skymap files
   static std::vector<std::string> NightSkyTextures;
   static std::vector<std::string> DaySkyTextures;
   static std::vector<std::string> CaveTextures;
 
-  // https://stackoverflow.com/questions/25150708/how-to-get-the-projectdir-path-in-a-visual-studio-native-c-unit-testing-usi
-  std::string s = EXPAND(UNITTESTPRJ);
-  s.erase(0, 1);          // erase the first quote
-  s.erase(s.size() - 2);  // erase the last quote and the dot
-  std::string my_project_dir = s;
-
   {
     // night time skybox files
-    const std::string skyboxfolder = s + "res/skybox/night/";
+    const std::string skyboxfolder = runtime_dir + "skybox/night/";
     const std::string order[6] = { "right",  "left",  "top", "bottom", "front", "back" };
     const std::string skyboxfileext = ".png";
     NightSkyTextures.reserve(6);
@@ -30,7 +25,7 @@ public: TEST_METHOD(MainTestMethod) {
 
   {
     // day time skybox files
-    const std::string skyboxfolder = s + "res/skybox/day/elyvisions/";
+    const std::string skyboxfolder = runtime_dir + "skybox/day/elyvisions/";
     const std::string order[6] = { "right",  "left",  "top", "bottom", "front", "back" };
     const std::string skyboxfileext = ".png";
     DaySkyTextures.reserve(6);
@@ -40,13 +35,14 @@ public: TEST_METHOD(MainTestMethod) {
 
   {
     // cave skybox files (with no alpha channel)
-    const std::string skyboxfolder = s + "res/skybox/cave/elyvisions/";
+    const std::string skyboxfolder = runtime_dir + "skybox/cave/elyvisions/";
     const std::string order[6] = { "right",  "left",  "top", "bottom", "front", "back" };
     const std::string skyboxfileext = ".png";
     CaveTextures.reserve(6);
     for (int j = 0; j < 6; ++j)
       CaveTextures.emplace_back(skyboxfolder + order[j] + skyboxfileext);
   }
+
 
   // init engine
   bool initSuccess = instance.Init();
@@ -82,11 +78,11 @@ public: TEST_METHOD(MainTestMethod) {
     UserSaidSkyboxFailed = ImGui::Button("No");
     ImGui::End();
     if (Night) {
-      instance.SetSkybox(NightSkyTextures, true);
+      instance.SetSkybox(NightSkyTextures);
     } else if (Day) {
-      instance.SetSkybox(DaySkyTextures, true);
+      instance.SetSkybox(DaySkyTextures);
     } else if (Cave) {
-      instance.SetSkybox(CaveTextures, false);
+      instance.SetSkybox(CaveTextures);
     } else if (Done || UserSaidSkyboxFailed) {
       instance.Shutdown();
     };

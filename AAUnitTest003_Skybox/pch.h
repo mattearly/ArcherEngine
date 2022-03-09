@@ -13,7 +13,6 @@
 #include <vector>
 #include <string>
 
-#define STRINGIFY(x) #x
-#define EXPAND(x) STRINGIFY(x)
+const std::string runtime_dir = "../../RuntimeFiles/";
 
 #endif //PCH_H

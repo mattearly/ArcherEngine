@@ -12,8 +12,8 @@ namespace AAUnitTest
 		
 		TEST_METHOD(MainTestMethod)
 		{
-      const char* zombie_ = "res/3dmodels/Zombie Punching.fbx";
-      std::string fullzombie_ = getProjDir() + zombie_;
+      const char* zombie_ = "3dmodels/Zombie Punching.fbx";
+      std::string fullzombie_ = runtime_dir + zombie_;
       //const char* Walking_man = "res/3dmodels/Walking.dae";
       //std::string fullWalking_man = getProjDir() + Walking_man;
 
@@ -26,7 +26,7 @@ namespace AAUnitTest
       cam->SetKeepCameraToWindowSize(true);
       setup_fpp_fly(cam_id);
 
-      auto animpropid1 = instance.AddAnimProp(fullzombie_.c_str(), glm::vec3(0,-40,-400));
+      auto animpropid1 = instance.AddAnimProp(fullzombie_.c_str(), glm::vec3(0,-40,-400), glm::vec3(.5f));
       auto punchinganim = instance.AddAnimation(fullzombie_.c_str(), animpropid1);
       instance.SetAnimationOnAnimProp(punchinganim, animpropid1);
 
@@ -44,16 +44,31 @@ namespace AAUnitTest
         glm::vec3(*lightdiff),
         glm::vec3(*lightspec));
 
+      static bool No = false;
       instance.AddToImGuiUpdate([]() {
-        ImGui::Begin("Run Test");
-        ImGui::Text("Click \"ok\" to continue");
-        bool result = ImGui::Button("ok");
-        if (result) { instance.Shutdown(); };
+        ImGui::Begin("Animated Model Test");
+        bool update_light1 = ImGui::SliderFloat3("Light Direction", lightdir, -1.f, 1.f, "%f", 1.0f);
+        bool update_light2 = ImGui::SliderFloat("Light Ambient", lightamb, 0.f, 1.f, "%f", 1.0f);
+        bool update_light3 = ImGui::SliderFloat("Light Diffuse", lightdiff, 0.f, 1.f, "%f", 1.0f);
+        bool update_light4 = ImGui::SliderFloat("Light Spec", lightspec, 0.f, 1.f, "%f", 1.0f);
+        ImGui::Text("Does everything look correct?");
+        bool Yes = ImGui::Button("Yes");
+        No = ImGui::Button("No");
         ImGui::End();
+
+        // state update
+        if (update_light1 || update_light2 || update_light3 || update_light4)
+          instance.SetDirectionalLight(
+            glm::vec3(lightdir[0], lightdir[1], lightdir[2]),
+            glm::vec3(*lightamb),
+            glm::vec3(*lightdiff),
+            glm::vec3(*lightspec));
+        if (Yes || No) { instance.Shutdown(); };
         });
 
       int run_diag = instance.Run();
       Assert::AreEqual(run_diag, 0);
+      Assert::AreEqual(No, false);
 		}
 	};
 }
