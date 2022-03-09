@@ -407,6 +407,7 @@ public:
   /// Adds a sound effect to the playable bank. 
   /// Each effect add instantiates a speaker.
   /// It then sets the sound effect just loaded to that speaker.
+  /// Note: Does not work with .mp3 files, as there are some Legal limitations with openAL (https://www.gamedev.net/forums/topic/211901-does-openal-play-mp3/)
   /// </summary>
   /// <param name="path">path to the sound</param>
   /// <returns>id to access the sound (speaker)</returns>
