@@ -107,7 +107,7 @@ public:
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <param name="scale">optional: starting size, default = 1,1,1</param>
   /// <returns>id of the prop</returns>
-  unsigned int AddProp(const char* path, const bool load_alpha = false, const glm::vec3 location = glm::vec3(0), const glm::vec3 scale = glm::vec3(1));
+  unsigned int AddProp(const char* path, const glm::vec3 location = glm::vec3(0), const glm::vec3 scale = glm::vec3(1));
 
   /// <summary>
   /// Removes a prop. Calls remove cache on model data to keep track of instance count.
@@ -172,7 +172,7 @@ public:
   /// <param name="path">literal path</param>
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <returns>id of the animated prop</returns>
-  unsigned int AddAnimProp(const char* path, glm::vec3 starting_location = glm::vec3(0));
+  unsigned int AddAnimProp(const char* path, glm::vec3 starting_location = glm::vec3(0), glm::vec3 starting_scale = glm::vec3(0));
 
   /// <summary>
   /// Moves a animated prop to a location
@@ -280,7 +280,7 @@ public:
   /// </summary>
   /// <param name="incomingSkymapFiles">6 textures</param>
   /// <param name="has_alpha">true is images have and alpha channel, false otherwise</param>
-  void SetSkybox(std::vector<std::string> incomingSkymapFiles, bool has_alpha) noexcept;
+  void SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept;
 
   /// <summary>
   /// Removes current skybox. You will see the clear screen color instead.

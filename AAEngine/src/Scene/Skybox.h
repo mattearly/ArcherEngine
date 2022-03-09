@@ -13,7 +13,7 @@ namespace AA {
 // you may need to adapt accordingly.
 class Skybox {
 public:
-  Skybox(std::vector<std::string> incomingSkymapFiles, bool has_alpha);
+  Skybox(std::vector<std::string> incomingSkymapFiles);
   ~Skybox();
   void Render(const std::shared_ptr<Camera>& cam);
 private:
@@ -22,6 +22,6 @@ private:
   unsigned int mCubemapTexId = 0;
   void setup_shader();
   void setup_cube_geometry();
-  void setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles, bool has_alpha);
+  void setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles);
 };
 }

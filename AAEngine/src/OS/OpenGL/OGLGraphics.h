@@ -16,8 +16,8 @@ public:
   static GLuint Upload2DVerts(const std::vector<glm::vec2>& points); 
   static void DeleteMesh(const GLuint& VAO);
 
-  static GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, bool hasAlpha = true);
-  static GLuint UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, bool hasAlpha = true);
+  static GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int format);
+  static GLuint UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, int format);
   static void DeleteTex(const GLuint& id);
 
   static GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height);

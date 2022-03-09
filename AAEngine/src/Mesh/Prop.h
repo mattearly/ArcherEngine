@@ -13,7 +13,7 @@ namespace AA {
 class Prop : public UniqueInstance {
 public:
   Prop();
-  Prop(const char* path, const bool load_alpha = false);
+  Prop(const char* path);
 
   virtual void Draw();
 

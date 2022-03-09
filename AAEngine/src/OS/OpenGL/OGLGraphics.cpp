@@ -354,7 +354,7 @@ void OGLGraphics::DeleteMesh(const GLuint& VAO) {
   glDeleteBuffers(1, &VAO);
 }
 
-GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int height, bool hasAlpha) {
+GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int height, int format) {
   unsigned int out_texID = 0;
   glGenTextures(1, &out_texID);
   glBindTexture(GL_TEXTURE_2D, out_texID);
@@ -368,12 +368,11 @@ GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int he
 
   //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
 
-  if (hasAlpha) {
+  if (format == GL_RGBA) {
     //https://youtu.be/n4k7ANAFsIQ?t=910
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, /*border*/0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
-  }
-  else {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, /*border*/0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, /*border*/0, format, GL_UNSIGNED_BYTE, tex_data);
+  } else {
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, /*border*/0, format, GL_UNSIGNED_BYTE, tex_data);
   }
 
   glGenerateMipmap(GL_TEXTURE_2D);
@@ -383,7 +382,7 @@ GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int he
   return out_texID;
 }
 
-GLuint OGLGraphics::UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, bool hasAlpha) {
+GLuint OGLGraphics::UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, int format) {
   assert(tex_data.size() == 6);
   GLuint out_texID;
   glGenTextures(1, &out_texID);
@@ -400,8 +399,9 @@ GLuint OGLGraphics::UploadCubeMapTex(std::vector<unsigned char*> tex_data, int w
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
 
-  auto internalformat = (hasAlpha) ? GL_RGBA8 : GL_RGB;
-  auto format = (hasAlpha) ? GL_RGBA : GL_RGB;
+  auto internalformat = (format == GL_RGBA) ? GL_RGBA8 : GL_RGB;
+  if (format == GL_RED)
+    internalformat = GL_RED;
 
   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, tex_data[0]);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, tex_data[1]);

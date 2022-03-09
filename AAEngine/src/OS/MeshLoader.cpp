@@ -32,11 +32,6 @@ struct RefModelInfo {
 // keeps track of all the models we have loaded so fars
 static std::forward_list<RefModelInfo> AllLoadedModels;
 
-// this handles passing args
-static struct LOADFLAGS {
-  bool alpha_textures = false;
-} LoadFlags;
-
 /// <summary>
 /// Checks the AllLoadedModels reference list and reuses models that have already been loaded.
 /// </summary>
@@ -67,11 +62,9 @@ static std::string LastLoadedPath;
 //    -3 = there is no root node on the model
 //    -4 = model is already loaded/cached
 // otherwise returns 0 if the import is successful
-int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path, const bool load_alpha) {
+int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path) {
   if (IsAlreadyLoaded(out_model, path))
     return -4;
-
-  LoadFlags.alpha_textures = load_alpha;
 
   static Assimp::Importer importer;
   int post_processing_flags = 0;
@@ -170,7 +163,7 @@ MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x
   return MeshInfo(
     vao,
     (unsigned int)loaded_elements.size(),
-    TextureLoader::LoadAllTextures(scene, scene->mMaterials[mesh->mMaterialIndex], LastLoadedPath, LoadFlags.alpha_textures),  // get all the textures that belong with this mesh
+    TextureLoader::LoadAllTextures(scene, scene->mMaterials[mesh->mMaterialIndex], LastLoadedPath),  // get all the textures that belong with this mesh
     aiMat4_to_glmMat4(*trans)
   );
 }

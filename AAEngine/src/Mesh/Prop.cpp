@@ -15,9 +15,8 @@ Prop::Prop() {
   stencil_scale = 1.1f;
 }
 
-Prop::Prop(const char* path, const bool load_alpha) {
-  if (MeshLoader::LoadGameObjectFromFile(*this, path, load_alpha) == -1)
-    throw(std::_Xruntime_error, "failed to load file path");
+Prop::Prop(const char* path) {
+  Load(path);
   stenciled = false;
   stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
   stenciled_with_normals = false;

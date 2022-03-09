@@ -14,20 +14,19 @@ class TextureLoader {
 public:
 
   static std::unordered_map<unsigned int, std::string> LoadAllTextures(const aiScene* scene,
-    const aiMaterial* ai_material, const std::string& orig_filepath, const bool load_alpha = false);
+    const aiMaterial* ai_material, const std::string& orig_filepath);
 
   static void increment_given_texture_ids(const std::unordered_map<uint32_t, std::string>& list);
 
-  static unsigned int LoadTexture(const std::string& texture_path, const bool load_alpha = false);
+  static unsigned int LoadTexture(const std::string& texture_path);
 
-  static unsigned int LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths,
-    bool load_alpha = true);
+  static unsigned int LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths);
 
   static void UnloadTexture(const std::unordered_map<unsigned int, std::string>& texture_draw_ids);
 
   static int loadMaterialTextures(const aiScene* scn, const aiMaterial* mat, aiTextureType type,
     std::string typeName, std::string orginalFilePath, std::unordered_map<unsigned int,
-    std::string>& out_texInfo, const bool load_alpha = false);
+    std::string>& out_texInfo);
 
 private:
 
