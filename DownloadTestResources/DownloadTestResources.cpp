@@ -1,4 +1,7 @@
-/*  Written to download the files necesary to run all the tests. - MJE
+/*  Written to download the files necessary to run all the tests.
+    Run this before running all the tests to have it download yoru assest.
+    You then need to unzip the assests into the 'RuntimeFiles' directory.
+- MJE
 */
 
 #include <iostream>
