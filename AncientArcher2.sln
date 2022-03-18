@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AAUnitTest007_SoundEffects"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DownloadTestResources", "DownloadTestResources\DownloadTestResources.vcxproj", "{EB644D33-33F0-4E3C-99D4-81287A4CD5E3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AAUnitTest008_StencilOutline", "AAUnitTest008_StencilOutline\AAUnitTest008_StencilOutline.vcxproj", "{6363275B-AFEC-4AAE-9603-7ABFF96A8304}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -63,6 +65,10 @@ Global
 		{EB644D33-33F0-4E3C-99D4-81287A4CD5E3}.Debug|x64.Build.0 = Debug|x64
 		{EB644D33-33F0-4E3C-99D4-81287A4CD5E3}.Release|x64.ActiveCfg = Release|x64
 		{EB644D33-33F0-4E3C-99D4-81287A4CD5E3}.Release|x64.Build.0 = Release|x64
+		{6363275B-AFEC-4AAE-9603-7ABFF96A8304}.Debug|x64.ActiveCfg = Debug|x64
+		{6363275B-AFEC-4AAE-9603-7ABFF96A8304}.Debug|x64.Build.0 = Debug|x64
+		{6363275B-AFEC-4AAE-9603-7ABFF96A8304}.Release|x64.ActiveCfg = Release|x64
+		{6363275B-AFEC-4AAE-9603-7ABFF96A8304}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
