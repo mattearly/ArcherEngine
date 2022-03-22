@@ -19,6 +19,13 @@ Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
   mSkyboxShader->SetInt("skybox", 0);
 }
 
+Skybox::~Skybox()
+{
+  if (mCubemapTexId != 0) {
+    OGLGraphics::DeleteTex(mCubemapTexId);
+  }
+}
+
 void Skybox::Render(const std::shared_ptr<Camera>& cam) {
   SetViewMatrix(cam->GetViewMatrix());
   SetProjectionMatrix(cam->GetProjectionMatrix());  // todo (matt): unhack. not set this every frame but only when it changes

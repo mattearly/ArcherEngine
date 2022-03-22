@@ -10,9 +10,7 @@
 namespace AA {
 
 AnimProp::AnimProp(const std::string& path) : Prop() {
-  if (mMeshes.empty()) {
-    AnimMeshLoader::LoadGameObjectFromFile(*this, path);
-  }
+  Load(path);
 }
 
 void AnimProp::RemoveCache() {

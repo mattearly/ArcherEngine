@@ -29,6 +29,7 @@ struct RefModelInfo {
   int ref_count = 1;
 };
 
+// keeps track of all the models we have loaded so fars
 static std::forward_list<RefModelInfo> AllLoadedModels;
 
 /// <summary>
@@ -37,7 +38,7 @@ static std::forward_list<RefModelInfo> AllLoadedModels;
 /// <param name="out_model">the model to be populated if successful</param>
 /// <param name="path">full original path</param>
 /// <returns>true if out_model was populated, false if not</returns>
-bool MeshLoader::CheckIfModelIsAlreadyLoaded(Prop& out_model, const std::string& path) {
+bool MeshLoader::IsAlreadyLoaded(Prop& out_model, const std::string& path) {
   for (auto& model : AllLoadedModels) {
     if (model.path == "")
       continue;
@@ -59,13 +60,13 @@ static std::string LastLoadedPath;
 //    -1 = scene was null after attempt to load
 //    -2 = scene has incomplete flag from assimp after attempted to load
 //    -3 = there is no root node on the model
+//    -4 = model is already loaded/cached
 // otherwise returns 0 if the import is successful
 int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path) {
+  if (IsAlreadyLoaded(out_model, path))
+    return -4;
 
-  bool already_loaded = CheckIfModelIsAlreadyLoaded(out_model, path);
-  if (already_loaded) return 0;
-
-  Assimp::Importer importer;
+  static Assimp::Importer importer;
   int post_processing_flags = 0;
 
   //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html

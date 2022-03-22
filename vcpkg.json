@@ -1,6 +1,6 @@
 {
 	"name": "aaengine",
-	"version": "8",
+	"version": "9",
 	"dependencies": [
 		"glm",
 		"assimp",
@@ -11,9 +11,13 @@
 		"libsndfile",
 		{
 			"name": "imgui",
-			"features": [ "glfw-binding", "opengl3-binding" ]
+			"features": [
+				"glfw-binding",
+				"opengl3-binding"
+			]
 		},
 		"physx",
-		"stb"
+		"stb",
+		"curl"
 	]
 }

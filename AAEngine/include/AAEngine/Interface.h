@@ -107,7 +107,7 @@ public:
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <param name="scale">optional: starting size, default = 1,1,1</param>
   /// <returns>id of the prop</returns>
-  unsigned int AddProp(const char* path, glm::vec3 location = glm::vec3(0), glm::vec3 scale = glm::vec3(1));
+  unsigned int AddProp(const char* path, const glm::vec3 location = glm::vec3(0), const glm::vec3 scale = glm::vec3(1));
 
   /// <summary>
   /// Removes a prop. Calls remove cache on model data to keep track of instance count.
@@ -172,7 +172,7 @@ public:
   /// <param name="path">literal path</param>
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <returns>id of the animated prop</returns>
-  unsigned int AddAnimProp(const char* path, glm::vec3 starting_location = glm::vec3(0));
+  unsigned int AddAnimProp(const char* path, glm::vec3 starting_location = glm::vec3(0), glm::vec3 starting_scale = glm::vec3(0));
 
   /// <summary>
   /// Moves a animated prop to a location
@@ -279,6 +279,7 @@ public:
   /// Sets a skybox with 6 textures
   /// </summary>
   /// <param name="incomingSkymapFiles">6 textures</param>
+  /// <param name="has_alpha">true is images have and alpha channel, false otherwise</param>
   void SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept;
 
   /// <summary>
@@ -406,6 +407,7 @@ public:
   /// Adds a sound effect to the playable bank. 
   /// Each effect add instantiates a speaker.
   /// It then sets the sound effect just loaded to that speaker.
+  /// Note: Does not work with .mp3 files, as there are some Legal limitations with openAL (https://www.gamedev.net/forums/topic/211901-does-openal-play-mp3/)
   /// </summary>
   /// <param name="path">path to the sound</param>
   /// <returns>id to access the sound (speaker)</returns>
@@ -481,18 +483,6 @@ public:
   /// </summary>
   /// <returns>A Shared Pointer to the Window Class</returns>
   std::shared_ptr<Window> GetWindow();
-
-  /// <summary>
-  /// Gets the current window Width
-  /// </summary>
-  /// <returns>copy of window width</returns>
-  int GetWindowWidth() noexcept;
-
-  /// <summary>
-  /// Gets the current window Height.
-  /// </summary>
-  /// <returns>copy of the window Height</returns>
-  int GetWindowHeight() noexcept;
 
   /// <summary>
   /// Sets the title of the window.

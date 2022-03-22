@@ -17,7 +17,7 @@ public:
   static void UnloadGameObject(const std::vector<MeshInfo>& toUnload);
 private:
   static void recursive_processNode(aiNode* node, const aiScene* scene, Prop& out_model);
-  static bool CheckIfModelIsAlreadyLoaded(Prop& out_model, const std::string& path);
+  static bool IsAlreadyLoaded(Prop& out_model, const std::string& path);
 
   MeshLoader() = delete;
 };

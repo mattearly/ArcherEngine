@@ -11,7 +11,7 @@ static std::string LastLoadedAnimPath;
 //todo: add refinfo for reusing already loaded models
 
 int AnimMeshLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::string& path) {
-  Assimp::Importer importer;
+  static Assimp::Importer importer;
   int post_processing_flags = 0;
 
   //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html

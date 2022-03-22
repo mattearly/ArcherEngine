@@ -81,15 +81,14 @@ void Interface::update() {
   if (g_new_key_reads) {
     for (auto& oKH : onKeyHandling) { oKH.second(g_keyboard_input_status); }
     for (auto& oMH : onMouseButtonHandling) { oMH.second(g_mouse_button_status); }
-    for (auto& oSH : onScrollHandling) {
-      oSH.second(g_scroll_input_status);
-      g_scroll_input_status.yOffset = 0;
-      g_scroll_input_status.xOffset = 0;
-    }
+    for (auto& oSH : onScrollHandling) { oSH.second(g_scroll_input_status); }
+    g_scroll_input_status.yOffset = g_scroll_input_status.xOffset = 0;
     g_new_key_reads = false;
   }
 
   for (auto& oMH : onMouseHandling) { oMH.second(g_mouse_input_status); }
+
+
 }
 
 // Renders visable props every frame
@@ -173,9 +172,8 @@ void Interface::teardown() {
   if (mMusic) {
     RemoveMusic();
   }
-  
-  mWindow.reset();
 
+  mWindow.reset();
 
   NVidiaPhysx::Shutdown();
 

@@ -108,8 +108,7 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<LitVertex>& verts, cons
 
     return vaoHandle;
 
-  }
-  else {
+  } else {
     // old version 3.3
     GLuint VAO, VBO, EBO;
 
@@ -203,8 +202,7 @@ GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<TanVertex>& verts, cons
     glBindVertexArray(0);
 
     return vaoHandle;
-  }
-  else {
+  } else {
     // old version 3.3
     GLuint VAO, VBO, EBO;
     glGenBuffers(1, &VBO);
@@ -354,7 +352,7 @@ void OGLGraphics::DeleteMesh(const GLuint& VAO) {
   glDeleteBuffers(1, &VAO);
 }
 
-GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int height, bool hasAlpha) {
+GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int height, int format) {
   unsigned int out_texID = 0;
   glGenTextures(1, &out_texID);
   glBindTexture(GL_TEXTURE_2D, out_texID);
@@ -362,18 +360,18 @@ GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int he
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
   //try: https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
   //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
+  // internal format for GL_RGBA should be GL_RGBA8 for reasons https://youtu.be/n4k7ANAFsIQ?t=910
+  auto internalformat = (format == GL_RGBA) ? GL_RGBA8 : GL_RGB;
+  if (format == GL_RED)
+    internalformat = GL_RED;
 
-  if (hasAlpha) {
-    //https://youtu.be/n4k7ANAFsIQ?t=910
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, /*border*/0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
-  }
-  else {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, /*border*/0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
+  if (format == GL_RGBA) {
+    glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, /*border*/0, format, GL_UNSIGNED_BYTE, tex_data);
+  } else {
+    glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, /*border*/0, format, GL_UNSIGNED_BYTE, tex_data);
   }
 
   glGenerateMipmap(GL_TEXTURE_2D);
@@ -383,31 +381,33 @@ GLuint OGLGraphics::Upload2DTex(const unsigned char* tex_data, int width, int he
   return out_texID;
 }
 
-GLuint OGLGraphics::UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, bool hasAlpha) {
-  unsigned int out_texID;
+GLuint OGLGraphics::UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, int format) {
+  assert(tex_data.size() == 6);
+  GLuint out_texID;
   glGenTextures(1, &out_texID);
   glBindTexture(GL_TEXTURE_CUBE_MAP, out_texID);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-  if (hasAlpha) {
-    for (auto i = 0; i < 6; ++i) {
-      if (tex_data[i]) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data[i]);
-      }
-    }
-  }
-  else {
-    for (auto i = 0; i < 6; ++i) {
-      if (tex_data[i]) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data[i]);
-      }
-    }
-  }
+  //https://www.khronos.org/opengl/wiki/Common_Mistakes#Creating_a_Cubemap_Texture
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+
+  auto internalformat = (format == GL_RGBA) ? GL_RGBA8 : GL_RGB;
+  if (format == GL_RED)
+    internalformat = GL_RED;
+
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, tex_data[0]);
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, tex_data[1]);
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, tex_data[2]);
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, tex_data[3]);
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, tex_data[4]);
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, tex_data[5]);
 
   return out_texID;
 }
@@ -421,17 +421,17 @@ void OGLGraphics::SetBlend(const bool enabled) {
     //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-  }
-  else {
+  } else {
     glDisable(GL_BLEND);
   }
 }
 
 void OGLGraphics::SetCullFace(const bool enabled) {
-  if (enabled)
+  if (enabled) {
     glEnable(GL_CULL_FACE);
-  else
+  } else {
     glDisable(GL_CULL_FACE);
+  }
 }
 
 void OGLGraphics::SetCullMode(int mode) {
@@ -441,8 +441,7 @@ void OGLGraphics::SetCullMode(int mode) {
 void OGLGraphics::SetDepthTest(const bool enabled) {
   if (enabled) {
     glEnable(GL_DEPTH_TEST);
-  }
-  else {
+  } else {
     glDisable(GL_DEPTH_TEST);
   }
 }
@@ -452,10 +451,11 @@ void OGLGraphics::SetDepthMode(int mode) {
 }
 
 void OGLGraphics::SetMultiSampling(const bool enabled) {
-  if (enabled)
+  if (enabled) {
     glEnable(GL_MULTISAMPLE);
-  else
+  } else {
     glDisable(GL_MULTISAMPLE);
+  }
 }
 
 void OGLGraphics::Proc(void* proc) {

@@ -180,7 +180,7 @@ std::shared_ptr<Camera> Interface::GetCamera(uidtype camId)
   throw("cam id doesn't exist or is invalid");
 }
 
-unsigned int Interface::AddProp(const char* path, glm::vec3 location, glm::vec3 scale) {
+unsigned int Interface::AddProp(const char* path, const glm::vec3 location, const glm::vec3 scale) {
   mProps.emplace_back(std::make_shared<Prop>(path));
   mProps.back()->spacial_data.MoveTo(location);
   mProps.back()->spacial_data.ScaleTo(scale);
@@ -285,9 +285,10 @@ void Interface::StencilPropScale(const unsigned int id, const float scale)
   throw("prop id doesn't exist or is invalid");
 }
 
-unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location) {
+unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location, glm::vec3 starting_scale) {
   mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
   mAnimProps.back()->spacial_data.MoveTo(starting_location);
+  mAnimProps.back()->spacial_data.ScaleTo(starting_scale);
   return mAnimProps.back()->GetUID();
 }
 
@@ -469,7 +470,7 @@ void Interface::SimulateWorldPhysics(bool status) {
 
 void Interface::SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept {
   if (mSkybox)
-    return;  // already set
+    RemoveSkybox();
   if (incomingSkymapFiles.size() != 6)
     return;  // invalid size for a skybox
   mSkybox = std::make_shared<Skybox>(incomingSkymapFiles);
@@ -1027,18 +1028,6 @@ void Interface::SetWindowClearColor(glm::vec3 color) noexcept {
 std::shared_ptr<Window> Interface::GetWindow()
 {
   return mWindow;
-}
-
-// returns -1 if there is no window
-int Interface::GetWindowWidth() noexcept {
-  if (!mWindow) return -1;
-  return mWindow->GetCurrentWidth();
-}
-
-// returns -1 if there is no window
-int Interface::GetWindowHeight() noexcept {
-  if (!mWindow) return -1;
-  return mWindow->GetCurrentHeight();
 }
 
 // changes the window title, does nothing if window is null
