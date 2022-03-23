@@ -19,17 +19,18 @@ double xDelta{ 0 }, yDelta{ 0 };
 bool UnprocessedMovements = false;
 bool snap_to_center = false;
 
-void setup_fpp_fly(unsigned int cam_id) {
+void setup_fpp_fly(unsigned int cam) {
   if (fly_setup) return;
-  static auto cam = instance.GetCamera(cam_id);
-  static auto win = instance.GetWindow();
+  static auto s_cam_id = cam;
+  //static auto cam = instance.GetCamera(cam_id);
+  //static auto win = instance.GetWindow();
   instance.AddToMouseButtonHandling([](AA::MouseButtons& mb) {
     if (mb.mouseButton2) {
       if (!is_cursor_on) {
-        win->SetCursorToNormal();
+        instance.GetWindow()->SetCursorToNormal();
         is_cursor_on = !is_cursor_on;
       } else {
-        win->SetCursorToDisabled();
+        instance.GetWindow()->SetCursorToDisabled();
         is_cursor_on = !is_cursor_on;
         snap_to_center = true;
       }
@@ -59,7 +60,7 @@ void setup_fpp_fly(unsigned int cam_id) {
     xDelta = cursor.xOffset - lastX;
     yDelta = lastY - cursor.yOffset;
 
-    cam->ShiftPitchAndYaw(yDelta * FPP_SENSITIVITY, xDelta * FPP_SENSITIVITY);
+    instance.GetCamera(s_cam_id)->ShiftPitchAndYaw(yDelta * FPP_SENSITIVITY, xDelta * FPP_SENSITIVITY);
 
     lastX = cursor.xOffset;
     lastY = cursor.yOffset;
@@ -67,24 +68,25 @@ void setup_fpp_fly(unsigned int cam_id) {
     });
 
   instance.AddToUpdate([](float dt) {
+    auto cam_ref = instance.GetCamera(s_cam_id);
     if (move.forward) {
-      move_diff += cam->GetFront();
+      move_diff += cam_ref->GetFront();
       UnprocessedMovements = true;
     }
     if (move.backwards) {
-      move_diff -= cam->GetFront();
+      move_diff -= cam_ref->GetFront();
       UnprocessedMovements = true;
     }
     if (move.left) {
-      move_diff -= cam->GetRight();
+      move_diff -= cam_ref->GetRight();
       UnprocessedMovements = true;
     }
     if (move.right) {
-      move_diff += cam->GetRight();
+      move_diff += cam_ref->GetRight();
       UnprocessedMovements = true;
     }
     if (UnprocessedMovements) {
-      cam->ShiftPosition(glm::vec3(move_diff.x, cam->GetPosition().y, move_diff.z));
+      cam_ref->ShiftPosition(glm::vec3(move_diff.x, cam_ref->GetPosition().y, move_diff.z));
       UnprocessedMovements = !UnprocessedMovements;
       move_diff = glm::vec3(0);
     }
