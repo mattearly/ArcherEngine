@@ -1109,7 +1109,7 @@ unsigned int Interface::AddToMouseButtonHandling(void(*function)(MouseButtons&))
   return next_mouseButtonhandling_id;
 }
 
-unsigned int Interface::AddToOnTeardown(void(*function)()) {
+unsigned int Interface::AddToOnQuit(void(*function)()) {
   static unsigned int next_teardown_id = 0;
   next_teardown_id++;
   onQuit.emplace(next_teardown_id, function);
@@ -1120,7 +1120,7 @@ bool Interface::RemoveFromOnBegin(unsigned int r_id) {
   return static_cast<bool>(onStart.erase(r_id));
 }
 
-bool Interface::RemoveFromUpdate(unsigned int r_id) {
+bool Interface::RemoveFromOnUpdate(unsigned int r_id) {
   return static_cast<bool>(onUpdate.erase(r_id));
 }
 
@@ -1144,8 +1144,19 @@ bool Interface::RemoveFromMouseButtonHandling(unsigned int r_id) {
   return static_cast<bool>(onMouseButtonHandling.erase(r_id));
 }
 
-bool Interface::RemoveFromTeardown(unsigned int r_id) {
+bool Interface::RemoveFromOnQuit(unsigned int r_id) {
   return static_cast<bool>(onQuit.erase(r_id));
+}
+
+void Interface::ClearAllRuntimeLamdaFunctions() {
+  onStart.clear();
+  onUpdate.clear();
+  onImGuiUpdate.clear();
+  onScrollHandling.clear();
+  onKeyHandling.clear();
+  onMouseHandling.clear();
+  onMouseButtonHandling.clear();
+  onQuit.clear();
 }
 
 } // end namespace AA
