@@ -550,7 +550,7 @@ public:
   /// </summary>
   /// <param name="function"></param>
   /// <returns>unique access id</returns>
-  unsigned int AddToOnTeardown(void(*function)());
+  unsigned int AddToOnQuit(void(*function)());
 
   /// <summary>
   /// Removes by id
@@ -559,7 +559,7 @@ public:
   /// <returns>true if successful, false otherwise</returns>
   bool RemoveFromOnBegin(unsigned int r_id);
 
-  bool RemoveFromUpdate(unsigned int r_id);
+  bool RemoveFromOnUpdate(unsigned int r_id);
 
   bool RemoveFromImGuiUpdate(unsigned int r_id);
 
@@ -571,7 +571,14 @@ public:
 
   bool RemoveFromMouseButtonHandling(unsigned int r_id);
 
-  bool RemoveFromTeardown(unsigned int r_id);
+  bool RemoveFromOnQuit(unsigned int r_id);
+
+  /// <summary>
+  // resets all the runtime functions set by:
+  // AddToOnBegin, AddToUpdate, AddToImGuiUpdate, AddToScrollHandling
+  // AddToKeyHandling, AddToMouseHandling, AddToMouseButtonHandling, AddToOnTeardown
+  /// </summary>
+  void ClearAllRuntimeLamdaFunctions();
 
 private:
 

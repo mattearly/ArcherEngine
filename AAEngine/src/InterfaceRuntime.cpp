@@ -149,6 +149,8 @@ void Interface::teardown() {
     oTD.second();
   }
 
+  ClearAllRuntimeLamdaFunctions();
+
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {
     p->RemoveCache();
