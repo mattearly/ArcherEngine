@@ -167,6 +167,8 @@ void Interface::teardown() {
   // delete imgui
   if (mIMGUI) {
     mIMGUI->Shutdown();
+    delete mIMGUI;
+    mIMGUI = nullptr;
   }
 
   mSpeakers.clear();
