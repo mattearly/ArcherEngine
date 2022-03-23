@@ -13,6 +13,7 @@ public:
   static SoundDevice* Get();
   static void Init();
   static void Init(const char* devicename);
+  static void Shutdown();
 
   void SwitchDevice(const char* devicename);
 
@@ -31,8 +32,6 @@ protected:
 private:
 
 
-  ALCdevice* p_ALCDevice;
-  ALCcontext* p_ALCContext;
 
 };
 
