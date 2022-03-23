@@ -314,5 +314,13 @@ OGLShader* DefaultShaders::get_stencilshader() {
   return STENCILSHADER;
 }
 
+void DefaultShaders::de_init_shaders() {
+  if (UBERSHADER) {
+    delete UBERSHADER; UBERSHADER = nullptr;
+  }
+  if (STENCILSHADER) {
+    delete STENCILSHADER; STENCILSHADER = nullptr;
+  }
+}
 
 }  // end namespace AA

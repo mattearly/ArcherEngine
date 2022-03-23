@@ -151,6 +151,8 @@ void Interface::teardown() {
 
   ClearAllRuntimeLamdaFunctions();
 
+  DefaultShaders::de_init_shaders();
+
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {
     p->RemoveCache();
