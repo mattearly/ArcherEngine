@@ -7,9 +7,13 @@ namespace AA {
 #define UP glm::vec3(0,1,0)
 
 Camera::Camera(int width, int height) {
+  if (width == 0 || height == 0) {
+    SetKeepCameraToWindowSize(true);
+  } else {
+    Width = width;
+    Height = height;
+  }
   resetViewportVars();
-  Width = width;
-  Height = height;
   updateProjectionMatrix();
 }
 

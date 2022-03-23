@@ -11,6 +11,7 @@
 // internal
 #include "Controls/Input.h"
 #include "Scene/Camera.h"
+#include "OS/Interface/Window.h"
 #include "WindowOptions.h"
 
 namespace AA {
@@ -67,7 +68,7 @@ public:
   int Run();
 
   /// <summary>
-  /// Sets the window to close on the next frame.
+  /// Sets the window to close on the next frame. Same as GetWindow()->Close().
   /// </summary>
   void Shutdown() noexcept;
 
@@ -78,11 +79,7 @@ public:
   void SoftReset() noexcept;
 
   /// <summary>
-  /// Creates a camera for use. Currently stretchs to screen size 
-  /// and will likely be forced to screen size no matter what 
-  /// you start it as once you resize the window.
-  /// Only one camera is supported currently.
-  /// Will throw if you try to add more than one camera.
+  /// Creates a camera for use.
   /// </summary>
   /// <param name="w">viewport width</param>
   /// <param name="h">viewport height</param>
@@ -110,7 +107,7 @@ public:
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <param name="scale">optional: starting size, default = 1,1,1</param>
   /// <returns>id of the prop</returns>
-  unsigned int AddProp(const char* path, glm::vec3 location = glm::vec3(0), glm::vec3 scale = glm::vec3(1));
+  unsigned int AddProp(const char* path, const glm::vec3 location = glm::vec3(0), const glm::vec3 scale = glm::vec3(1));
 
   /// <summary>
   /// Removes a prop. Calls remove cache on model data to keep track of instance count.
@@ -175,7 +172,7 @@ public:
   /// <param name="path">literal path</param>
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <returns>id of the animated prop</returns>
-  unsigned int AddAnimProp(const char* path, glm::vec3 starting_location = glm::vec3(0));
+  unsigned int AddAnimProp(const char* path, glm::vec3 starting_location = glm::vec3(0), glm::vec3 starting_scale = glm::vec3(0));
 
   /// <summary>
   /// Moves a animated prop to a location
@@ -282,6 +279,7 @@ public:
   /// Sets a skybox with 6 textures
   /// </summary>
   /// <param name="incomingSkymapFiles">6 textures</param>
+  /// <param name="has_alpha">true is images have and alpha channel, false otherwise</param>
   void SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept;
 
   /// <summary>
@@ -289,7 +287,7 @@ public:
   /// Call SetSkybox with new parameters to set up the skybox again.
   /// </summary>
   void RemoveSkybox() noexcept;
-  
+
   /// <summary>
   /// Sets the directional light on the default lit shader.
   /// Only one directional light is currently supported.
@@ -409,6 +407,7 @@ public:
   /// Adds a sound effect to the playable bank. 
   /// Each effect add instantiates a speaker.
   /// It then sets the sound effect just loaded to that speaker.
+  /// Note: Does not work with .mp3 files, as there are some Legal limitations with openAL (https://www.gamedev.net/forums/topic/211901-does-openal-play-mp3/)
   /// </summary>
   /// <param name="path">path to the sound</param>
   /// <returns>id to access the sound (speaker)</returns>
@@ -474,38 +473,16 @@ public:
   void SetMusicVolume(float new_vol);
 
   /// <summary>
-  /// Hides the mouse cursor. 
-  /// Used for when you are drawing your own cursor.
-  /// </summary>
-  void SetCursorToHidden() noexcept;
-
-  /// <summary>
-  /// Disables the cursor. See disabled in glfw documentation. https://www.glfw.org/docs/3.3/input_guide.html
-  /// </summary>
-  void SetCursorToDisabled() noexcept;
-
-  /// <summary>
-  /// Sets the Cursor the the standard OS Cursor.
-  /// </summary>
-  void SetCursorToNormal() noexcept;
-
-  /// <summary>
   /// Sets the default window clear color on the renderer.
   /// </summary>
   /// <param name="color">RGB color from 0 to 1</param>
   void SetWindowClearColor(glm::vec3 color = glm::vec3(.35f, .15f, .35f)) noexcept;
 
   /// <summary>
-  /// Gets the current window Width
+  /// Get window to access public functions
   /// </summary>
-  /// <returns>copy of window width</returns>
-  int GetWindowWidth() noexcept;
-
-  /// <summary>
-  /// Gets the current window Height.
-  /// </summary>
-  /// <returns>copy of the window Height</returns>
-  int GetWindowHeight() noexcept;
+  /// <returns>A Shared Pointer to the Window Class</returns>
+  std::shared_ptr<Window> GetWindow();
 
   /// <summary>
   /// Sets the title of the window.
@@ -573,7 +550,7 @@ public:
   /// </summary>
   /// <param name="function"></param>
   /// <returns>unique access id</returns>
-  unsigned int AddToOnTeardown(void(*function)());
+  unsigned int AddToOnQuit(void(*function)());
 
   /// <summary>
   /// Removes by id
@@ -582,7 +559,7 @@ public:
   /// <returns>true if successful, false otherwise</returns>
   bool RemoveFromOnBegin(unsigned int r_id);
 
-  bool RemoveFromUpdate(unsigned int r_id);
+  bool RemoveFromOnUpdate(unsigned int r_id);
 
   bool RemoveFromImGuiUpdate(unsigned int r_id);
 
@@ -594,13 +571,20 @@ public:
 
   bool RemoveFromMouseButtonHandling(unsigned int r_id);
 
-  bool RemoveFromTeardown(unsigned int r_id);
+  bool RemoveFromOnQuit(unsigned int r_id);
+
+  /// <summary>
+  // resets all the runtime functions set by:
+  // AddToOnBegin, AddToUpdate, AddToImGuiUpdate, AddToScrollHandling
+  // AddToKeyHandling, AddToMouseHandling, AddToMouseButtonHandling, AddToOnTeardown
+  /// </summary>
+  void ClearAllRuntimeLamdaFunctions();
 
 private:
 
   bool isInit;
 
-  Window* mWindow;
+  std::shared_ptr<Window> mWindow;
 
   bool mSimulateWorldPhysics;
 

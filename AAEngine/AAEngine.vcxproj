@@ -99,7 +99,7 @@
     <ClInclude Include="src\OS\AnimMeshLoader.h" />
     <ClInclude Include="src\Mesh\AnimProp.h" />
     <ClInclude Include="include\AAEngine\Controls\Input.h" />
-    <ClInclude Include="src\OS\Interface\Window.h" />
+    <ClInclude Include="include\AAEngine\OS\Interface\Window.h" />
     <ClInclude Include="src\Mesh\Animation.h" />
     <ClInclude Include="include\AAEngine\Utility\rand.h" />
     <ClInclude Include="src\Physics\NVidiaPhysx.h" />
@@ -109,7 +109,6 @@
     <ClInclude Include="src\OS\LoadPlane.h" />
     <ClInclude Include="src\OS\TextureLoader.h" />
     <ClInclude Include="include\AAEngine\Version.h" />
-    <ClInclude Include="src\GUI\PlainGUI.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
     <ClInclude Include="src\Mesh\Spacial3D.h" />
     <ClInclude Include="src\Sound\SoundEffect.h" />
@@ -125,7 +124,6 @@
     <ClInclude Include="src\OS\MeshLoader.h" />
     <ClInclude Include="include\AAEngine\Interface.h" />
     <ClInclude Include="src\OS\MeshInfo.h" />
-    <ClInclude Include="include\AAEngine\Utility\SceneCheck.h" />
     <ClInclude Include="src\OS\OpenGL\OGLGraphics.h" />
     <ClInclude Include="src\Scene\Lights.h" />
     <ClInclude Include="src\OS\OpenGL\OGLShader.h" />
@@ -134,7 +132,6 @@
     <ClInclude Include="src\Sound\Speaker.h" />
     <ClInclude Include="src\Math\Conversions.h" />
     <ClInclude Include="include\AAEngine\Base\UniqueInstance.h" />
-    <ClInclude Include="src\OS\OpenGL\QueryShader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\InterfaceRuntime.cpp" />
@@ -154,7 +151,6 @@
     <ClCompile Include="src\OS\MeshLoader.cpp" />
     <ClCompile Include="src\OS\LoadPlane.cpp" />
     <ClCompile Include="src\OS\TextureLoader.cpp" />
-    <ClCompile Include="src\GUI\PlainGUI.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Mesh\Spacial3D.cpp" />
     <ClCompile Include="src\Sound\SoundEffect.cpp" />

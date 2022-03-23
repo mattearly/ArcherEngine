@@ -3,6 +3,9 @@
 #include <AL\al.h>
 #include <string>
 namespace AA {
+/// <summary>
+/// does not support .mp3, most other common file types are fine.
+/// </summary>
 class SoundEffect : public UniqueInstance {
 public:
   SoundEffect() = delete;

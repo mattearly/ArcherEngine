@@ -5,15 +5,21 @@
 using namespace physx;
 
 namespace AA {
+  static NVidiaPhysx* physics_singleton_impl = nullptr;
 
 
 // Singleton Implementation
 [[nodiscard]] NVidiaPhysx* NVidiaPhysx::Get() {
-  static NVidiaPhysx* physics_singleton_impl = nullptr;
   if (!physics_singleton_impl) {
     physics_singleton_impl = new NVidiaPhysx();
   }
   return physics_singleton_impl;
+}
+
+void NVidiaPhysx::Shutdown()
+{
+  if (physics_singleton_impl)
+    delete physics_singleton_impl;
 }
 
 

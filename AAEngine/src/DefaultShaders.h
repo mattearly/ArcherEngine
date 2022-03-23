@@ -15,6 +15,12 @@ public:
 
 private:
   DefaultShaders() = delete;
+  DefaultShaders(DefaultShaders&) = delete;
+  DefaultShaders(const DefaultShaders&) = delete;
+  DefaultShaders(DefaultShaders&&) = delete;
+  DefaultShaders(const DefaultShaders&&) = delete;
+
+
 };
 
 }  // end namespace AA

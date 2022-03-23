@@ -1,8 +1,8 @@
 #include "DefaultShaders.h"
 namespace AA {
-
-OGLShader* UBERSHADER;
-OGLShader* STENCILSHADER;
+// access given only though getters
+static OGLShader* UBERSHADER = nullptr;
+static OGLShader* STENCILSHADER = nullptr;
 
 //todo: optimization - uniform buffers https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
 void DefaultShaders::init_stencilshader() {
@@ -58,13 +58,12 @@ void main() {
   STENCILSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());
 }
 
-
 void DefaultShaders::init_ubershader() {
   if (UBERSHADER)
     return;
 
-  const std::string UBERSHADER_VERT_CODE = R"(
-#version 430 core
+  const std::string UBERSHADER_VERT_CODE =
+    R"(#version 430 core
 layout(location=0)in vec3 inPos;
 layout(location=1)in vec2 inTexUV;
 layout(location=2)in vec3 inNorm;
@@ -190,7 +189,7 @@ vec3 CalcDirectionalLight(vec3 normal, vec3 viewDir) {
     diffuse = directionalLight.Diffuse * diff * default_color;
   }
   if (hasSpecular > 0) {
-    vec3 specular = directionalLight.Specular * spec * texture(material.Specular, fs_in.TexUV).rgb;
+    vec3 specular = directionalLight.Specular * spec * texture(material.Specular, fs_in.TexUV).r;
     return(ambient + diffuse + specular);
   } else {
     return(ambient + diffuse);
@@ -224,7 +223,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
   diffuse *= attenuation;
   vec3 specular;
   if (hasSpecular > 0) {
-    specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).rgb;
+    specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).r;
   } else {
     specular = vec3(1,1,1);
   }
@@ -260,7 +259,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
     diffuse = light.Diffuse * diff * default_color;
   }
   if (hasSpecular > 0) {
-    vec3 specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).rgb;
+    vec3 specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).r;
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
@@ -297,19 +296,23 @@ void main()
   UBERSHADER = new OGLShader(UBERSHADER_VERT_CODE.c_str(), UBERSHADER_FRAG_CODE.c_str());
 }
 
-
 OGLShader* DefaultShaders::get_ubershader() {
-  if (!UBERSHADER)
+  if (!UBERSHADER) {
     init_ubershader();
-  UBERSHADER->Use();
+  } else {
+    UBERSHADER->Use();
+  }
   return UBERSHADER;
 }
 
 OGLShader* DefaultShaders::get_stencilshader() {
-  if (!STENCILSHADER)
+  if (!STENCILSHADER) {
     init_stencilshader();
-  STENCILSHADER->Use();
+  } else {
+    STENCILSHADER->Use();
+  }
   return STENCILSHADER;
 }
+
 
 }  // end namespace AA

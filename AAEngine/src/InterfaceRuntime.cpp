@@ -1,6 +1,6 @@
 #include "../include/AAEngine/Interface.h"
 #include "../include/AAEngine/Scene/Camera.h"
-#include "OS/Interface/Window.h"
+#include "../include/AAEngine/OS/Interface/Window.h"
 #include "OS/OpenGL/OGLGraphics.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Mesh/Prop.h"
@@ -81,15 +81,14 @@ void Interface::update() {
   if (g_new_key_reads) {
     for (auto& oKH : onKeyHandling) { oKH.second(g_keyboard_input_status); }
     for (auto& oMH : onMouseButtonHandling) { oMH.second(g_mouse_button_status); }
-    for (auto& oSH : onScrollHandling) {
-      oSH.second(g_scroll_input_status);
-      g_scroll_input_status.yOffset = 0;
-      g_scroll_input_status.xOffset = 0;
-    }
+    for (auto& oSH : onScrollHandling) { oSH.second(g_scroll_input_status); }
+    g_scroll_input_status.yOffset = g_scroll_input_status.xOffset = 0;
     g_new_key_reads = false;
   }
 
   for (auto& oMH : onMouseHandling) { oMH.second(g_mouse_input_status); }
+
+
 }
 
 // Renders visable props every frame
@@ -134,9 +133,7 @@ void Interface::render() {
 #endif
     }
   }
-#ifdef _DEBUG
-  else { std::cout << "0 cameras, skybox and props wont show\n"; }
-#endif
+
   if (mIMGUI) {
     mIMGUI->NewFrame();
     for (auto& oIU : onImGuiUpdate) { oIU.second(); }
@@ -151,6 +148,8 @@ void Interface::teardown() {
   for (auto& oTD : onQuit) {
     oTD.second();
   }
+
+  ClearAllRuntimeLamdaFunctions();
 
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {
@@ -175,6 +174,10 @@ void Interface::teardown() {
   if (mMusic) {
     RemoveMusic();
   }
+
+  mWindow.reset();
+
+  NVidiaPhysx::Shutdown();
 
   isInit = false;
 }

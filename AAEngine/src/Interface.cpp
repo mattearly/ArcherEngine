@@ -6,7 +6,7 @@
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
 #include "OS/OpenGL/OGLGraphics.h"
-#include "OS/Interface/Window.h"
+#include "../include/AAEngine/OS/Interface/Window.h"
 #include "Sound/SoundDevice.h"
 #include "Sound/Speaker.h"
 #include "Sound/SoundEffect.h"
@@ -24,7 +24,7 @@ namespace AA {
 bool Interface::Init() {
   if (isInit)
     return false;
-  mWindow = new Window();
+  mWindow = std::make_shared<Window>();
   SetIMGUI(true);
   SoundDevice::Init();
   auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
@@ -35,7 +35,7 @@ bool Interface::Init() {
 bool Interface::Init(const WindowOptions& winopts) {
   if (isInit)
     return false;
-  mWindow = new Window(winopts);
+  mWindow = std::make_shared<Window>(winopts);
   SetIMGUI(true);
   SoundDevice::Init();
   auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
@@ -46,7 +46,7 @@ bool Interface::Init(const WindowOptions& winopts) {
 bool Interface::Init(std::shared_ptr<WindowOptions> winopts) {
   if (isInit)
     return false;
-  mWindow = new Window(winopts);
+  mWindow = std::make_shared<Window>(winopts);
   SetIMGUI(true);
   SoundDevice::Init();
   auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
@@ -81,29 +81,63 @@ void Interface::Shutdown() noexcept {
     exit(-1);  // probabably shouldn't do this, but its a rare case anyways
 }
 
-// resets all vars but leaves the window alone
+// resets all vars but 
+// not the window,
+// base shaders,
+// and renderer
 void Interface::SoftReset() noexcept {
-  teardown();
+  // run user preferred functions first
+  for (auto& oTD : onQuit) {
+    oTD.second();
+  }
+
+  mSimulateWorldPhysics = false;
 
   mCameras.clear();
 
+  // delete all the meshes and textures from GPU memory
+  for (const auto& p : mProps) {
+    p->RemoveCache();
+  }
+  mProps.clear();
+  for (const auto& ap : mAnimProps) {
+    ap->RemoveCache();
+  }
+  mAnimProps.clear();
+  mAnimation.clear();
+
+  RemoveSkybox();
+
+  RemoveDirectionalLight();
+
+  for (auto& pointlight : mPointLights) {
+    RemovePointLight(pointlight->id);
+  }
+
+  for (auto& spotlight : mSpotLights) {
+    RemoveSpotLight(spotlight->id);
+  }
+
+  if (mMusic) {
+    RemoveMusic();
+  }
+
+  mSoundEffects.clear();
+  mSpeakers.clear();
+
   onStart.clear();
   onUpdate.clear();
-  onKeyHandling.clear();
   onScrollHandling.clear();
+  onKeyHandling.clear();
   onMouseHandling.clear();
   onMouseButtonHandling.clear();
   onQuit.clear();
 
-  SetCursorToNormal();
+  mWindow->SetCursorToNormal();
 }
 
 // Camera
 unsigned int Interface::AddCamera(const int w, const int h) {
-  //if (mCameras.size() > 0) {
-  //  throw("already has a camera, only one cam supported in this version");
-  //}
-
   mCameras.emplace_back(std::move(std::make_shared<Camera>((w < 0) ? 0 : w, (h < 0) ? 0 : h)));
 
   // sort by render depth if there is more than 1 camera
@@ -111,12 +145,6 @@ unsigned int Interface::AddCamera(const int w, const int h) {
     std::sort(mCameras.begin(), mCameras.end(), [](auto a, auto b) {
       return (a->GetRenderDepth() < b->GetRenderDepth());
       });
-#ifdef _DEBUG
-    std::cout << "check render depth orders\n";
-    for (auto& cam : mCameras) {
-      std::cout << cam->GetRenderDepth() << '\n';
-    }
-#endif 
   }
 
   return mCameras.back()->GetUID();
@@ -152,7 +180,7 @@ std::shared_ptr<Camera> Interface::GetCamera(uidtype camId)
   throw("cam id doesn't exist or is invalid");
 }
 
-unsigned int Interface::AddProp(const char* path, glm::vec3 location, glm::vec3 scale) {
+unsigned int Interface::AddProp(const char* path, const glm::vec3 location, const glm::vec3 scale) {
   mProps.emplace_back(std::make_shared<Prop>(path));
   mProps.back()->spacial_data.MoveTo(location);
   mProps.back()->spacial_data.ScaleTo(scale);
@@ -257,12 +285,10 @@ void Interface::StencilPropScale(const unsigned int id, const float scale)
   throw("prop id doesn't exist or is invalid");
 }
 
-unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location) {
+unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location, glm::vec3 starting_scale) {
   mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
   mAnimProps.back()->spacial_data.MoveTo(starting_location);
-#ifdef _DEBUG
-  std::cout << "loaded: " << path << ", id: " << mAnimProps.back()->GetUID() << std::endl;
-#endif
+  mAnimProps.back()->spacial_data.ScaleTo(starting_scale);
   return mAnimProps.back()->GetUID();
 }
 
@@ -444,7 +470,7 @@ void Interface::SimulateWorldPhysics(bool status) {
 
 void Interface::SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept {
   if (mSkybox)
-    return;  // already set
+    RemoveSkybox();
   if (incomingSkymapFiles.size() != 6)
     return;  // invalid size for a skybox
   mSkybox = std::make_shared<Skybox>(incomingSkymapFiles);
@@ -478,10 +504,12 @@ void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff
 }
 
 void Interface::RemoveDirectionalLight() {
-  assert(DefaultShaders::get_ubershader());
-  DefaultShaders::get_ubershader()->Use();
-  DefaultShaders::get_ubershader()->SetInt("isDirectionalLightOn", 0);
-  mDirectionalLight.reset();
+  if (mDirectionalLight) {
+    assert(DefaultShaders::get_ubershader());
+    DefaultShaders::get_ubershader()->Use();
+    DefaultShaders::get_ubershader()->SetInt("isDirectionalLightOn", 0);
+    mDirectionalLight.reset();
+  }
 }
 
 // Point Light
@@ -850,6 +878,7 @@ void Interface::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir,
 }
 
 // Sound Effects
+// todo: rework so we can remove them properly
 unsigned int Interface::AddSoundEffect(const char* path) {
   // make sure the sound effect hasn't already been loaded
   for (const auto& pl : mSoundEffects) {
@@ -884,11 +913,16 @@ void Interface::SetSoundEffectVolume(int sound_id, float new_vol) {
   throw("sound effect volume speaker id not found");
 }
 
+// todo: rework so we can remove them properly
 void Interface::RemoveSoundEffect(int soundId) {
+  throw("oh noes! this doesn't actually work yet");
+
   if (mSoundEffects.empty())
     throw("no sounds exist, nothing to remove");
 
   auto before_size = mSoundEffects.size();
+
+
 
   auto after_size = mSoundEffects.size();
 
@@ -969,21 +1003,6 @@ void Interface::SetMusicVolume(float new_vol) {
   throw("no music loaded");
 }
 
-void Interface::SetCursorToHidden() noexcept {
-  if (mWindow)
-    mWindow->SetCursorToHidden();
-}
-
-void Interface::SetCursorToDisabled() noexcept {
-  if (mWindow)
-    mWindow->SetCursorToDisabled();
-}
-
-void Interface::SetCursorToNormal() noexcept {
-  if (mWindow)
-    mWindow->SetCursorToNormal();
-}
-
 void Interface::SetIMGUI(const bool value) {
   if (!value) {
     if (mIMGUI) {
@@ -1006,33 +1025,26 @@ void Interface::SetWindowClearColor(glm::vec3 color) noexcept {
   OGLGraphics::SetViewportClearColor(color);
 }
 
-// returns -1 if there is no window
-int Interface::GetWindowWidth() noexcept {
-  if (!mWindow) return -1;
-  return mWindow->GetCurrentWidth();
-}
-
-// returns -1 if there is no window
-int Interface::GetWindowHeight() noexcept {
-  if (!mWindow) return -1;
-  return mWindow->GetCurrentHeight();
+std::shared_ptr<Window> Interface::GetWindow()
+{
+  return mWindow;
 }
 
 // changes the window title, does nothing if window is null
 void Interface::SetWindowTitle(const char* name) noexcept {
   if (!mWindow) return;
   // todo: improve efficiency
-  auto temp = mWindow->GetModifiableWindowOptions();
+  auto temp = mWindow->get_and_note_window_options();
   temp->_title = name;
-  mWindow->ApplyChanges();
+  mWindow->apply_new_window_option_changes();
 }
 
 // toggles fullscreen as expected, does nothign if window is null
 void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
   if (!mWindow) return;
-  auto temp = mWindow->GetModifiableWindowOptions();
+  auto temp = mWindow->get_and_note_window_options();
 
-  if (temp->_windowing_mode == WINDOW_MODE::WINDOWED) {
+  if (temp->_windowing_mode == WINDOW_MODE::WINDOWED || temp->_windowing_mode == WINDOW_MODE::MAXIMIZED || temp->_windowing_mode == WINDOW_MODE::WINDOWED_DEFAULT) {
     if (try_borderless) {
       temp->_windowing_mode = WINDOW_MODE::FULLSCREEN_BORDERLESS;
     }
@@ -1044,8 +1056,7 @@ void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
     temp->_windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
   }
 
-
-  mWindow->ApplyChanges();
+  mWindow->apply_new_window_option_changes();
 }
 
 unsigned int Interface::AddToOnBegin(void(*function)()) {
@@ -1098,7 +1109,7 @@ unsigned int Interface::AddToMouseButtonHandling(void(*function)(MouseButtons&))
   return next_mouseButtonhandling_id;
 }
 
-unsigned int Interface::AddToOnTeardown(void(*function)()) {
+unsigned int Interface::AddToOnQuit(void(*function)()) {
   static unsigned int next_teardown_id = 0;
   next_teardown_id++;
   onQuit.emplace(next_teardown_id, function);
@@ -1109,7 +1120,7 @@ bool Interface::RemoveFromOnBegin(unsigned int r_id) {
   return static_cast<bool>(onStart.erase(r_id));
 }
 
-bool Interface::RemoveFromUpdate(unsigned int r_id) {
+bool Interface::RemoveFromOnUpdate(unsigned int r_id) {
   return static_cast<bool>(onUpdate.erase(r_id));
 }
 
@@ -1133,8 +1144,19 @@ bool Interface::RemoveFromMouseButtonHandling(unsigned int r_id) {
   return static_cast<bool>(onMouseButtonHandling.erase(r_id));
 }
 
-bool Interface::RemoveFromTeardown(unsigned int r_id) {
+bool Interface::RemoveFromOnQuit(unsigned int r_id) {
   return static_cast<bool>(onQuit.erase(r_id));
+}
+
+void Interface::ClearAllRuntimeLamdaFunctions() {
+  onStart.clear();
+  onUpdate.clear();
+  onImGuiUpdate.clear();
+  onScrollHandling.clear();
+  onKeyHandling.clear();
+  onMouseHandling.clear();
+  onMouseButtonHandling.clear();
+  onQuit.clear();
 }
 
 } // end namespace AA

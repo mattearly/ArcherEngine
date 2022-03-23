@@ -51,9 +51,6 @@
     <ClInclude Include="src\OS\MeshInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AAEngine\Utility\SceneCheck.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\OS\Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -84,13 +81,7 @@
     <ClInclude Include="include\AAEngine\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\PlainGUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\OS\TextureLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\QueryShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\imGUI.h">
@@ -117,7 +108,7 @@
     <ClInclude Include="src\Mesh\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\Interface\Window.h">
+    <ClInclude Include="include\AAEngine\OS\Interface\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AAEngine\Controls\Input.h">
@@ -189,9 +180,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Sound\SoundEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\PlainGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\MeshLoader.cpp">

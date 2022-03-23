@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "../../../include/AAEngine/OS/Interface/Window.h"
 #include <memory>
 
 namespace AA {
@@ -23,8 +23,22 @@ void GLFWERRORCALLBACK(int e, const char* msg) {
 }
 
 void FRAMEBUFFERSIZESETCALLBACK(GLFWwindow* window, int w, int h) {
+  // be sure size is valid for our mins
+  if (w < WindowOptions::_MIN_WIDTH)
+    w = WindowOptions::_MIN_WIDTH;
+  if (h < WindowOptions::_MIN_HEIGHT)
+    h = WindowOptions::_MIN_HEIGHT;
+
   // Update Cached Width & Height
   Window* self = (Window*)glfwGetWindowUserPointer(window);
+
+  // be sure size is valid for our user preferred mins
+  if (w < self->mWindowOptions->_min_width)
+    w = self->mWindowOptions->_min_width;
+  if (h < self->mWindowOptions->_min_height)
+    h = self->mWindowOptions->_min_height;
+
+  // apply new size
   self->mWindowOptions->_width = w;
   self->mWindowOptions->_height = h;
 

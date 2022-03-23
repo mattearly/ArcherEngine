@@ -4,9 +4,6 @@
 #include "../Mesh/AnimProp.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#ifdef _DEBUG
-#include <iostream>
-#endif
 namespace AA {
 
 static std::string LastLoadedAnimPath;
@@ -14,11 +11,7 @@ static std::string LastLoadedAnimPath;
 //todo: add refinfo for reusing already loaded models
 
 int AnimMeshLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::string& path) {
-#ifdef _DEBUG
-  std::cout << "-> LOAD... ANIMATED PROP: " << path << std::endl;
-#endif
-
-  Assimp::Importer importer;
+  static Assimp::Importer importer;
   int post_processing_flags = 0;
 
   //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
@@ -39,12 +32,8 @@ int AnimMeshLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::strin
   const aiScene* scene = importer.ReadFile(path, post_processing_flags);
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-    if (!scene) {
-#ifdef _DEBUG
-      std::cout << "scene loading error: " << importer.GetErrorString() << std::endl;
-#endif
+    if (!scene)
       return -1;
-    }
     if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
       return -2;
     if (!scene->mRootNode)
