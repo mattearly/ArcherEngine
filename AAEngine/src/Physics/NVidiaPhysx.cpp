@@ -18,8 +18,10 @@ namespace AA {
 
 void NVidiaPhysx::Shutdown()
 {
-  if (physics_singleton_impl)
+  if (physics_singleton_impl) {
     delete physics_singleton_impl;
+    physics_singleton_impl = nullptr;
+  }
 }
 
 

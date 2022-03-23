@@ -151,6 +151,8 @@ void Interface::teardown() {
 
   ClearAllRuntimeLamdaFunctions();
 
+  DefaultShaders::de_init_shaders();
+
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {
     p->RemoveCache();
@@ -165,6 +167,8 @@ void Interface::teardown() {
   // delete imgui
   if (mIMGUI) {
     mIMGUI->Shutdown();
+    delete mIMGUI;
+    mIMGUI = nullptr;
   }
 
   mSpeakers.clear();
@@ -174,6 +178,8 @@ void Interface::teardown() {
   if (mMusic) {
     RemoveMusic();
   }
+
+  SoundDevice::Shutdown();
 
   mWindow.reset();
 
