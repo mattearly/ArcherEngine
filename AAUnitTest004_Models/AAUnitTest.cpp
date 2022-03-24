@@ -31,7 +31,7 @@ public:
     setup_fpp_fly(cam_id);
 
     // load models
-    static int cube_id = instance.AddProp(fullcubepath.c_str(), glm::vec3(0, 0, -10));
+    static int cube_id = instance.AddProp(fullcubepath.c_str(), glm::vec3(-20, 0, -25));
     static int groundplane_id = instance.AddProp(fullgroundplane.c_str(), glm::vec3(0, -30.f, 0));
     instance.ScaleProp(groundplane_id, glm::vec3(2));
     static int peasant_man_id = instance.AddProp(fullpeasant_man.c_str(), glm::vec3(0, -30, -100));
