@@ -18,6 +18,8 @@ public:
     std::string fullgroundplane = runtime_dir + groundplane;
     const char* peasant_man = "3dmodels/peasant_man.dae";
     std::string fullpeasant_man = runtime_dir + peasant_man;
+    const char* walking_man = "3dmodels/Walking.dae";
+    std::string fullwalking_man = runtime_dir + walking_man;
 
     // init engine
     bool initSuccess = instance.Init();
@@ -35,12 +37,16 @@ public:
     // load models
     static int cube_id = instance.AddProp(fullcubepath.c_str(), glm::vec3(0, 0, -10));
     instance.StencilProp(cube_id, true);
-    instance.StencilPropColor(cube_id, glm::vec3(.5, .1, .1));
+    instance.StencilPropColor(cube_id, glm::vec3(.4, .4, .4));
     instance.StencilPropWithNormals(cube_id, false);
-    instance.StencilPropScale(cube_id, 1.2f);
+    instance.StencilPropScale(cube_id, 1.1f);
+
+    static int cube_id2 = instance.AddProp(fullcubepath.c_str(), glm::vec3(-10, 0, -10));
+    static int cube_id3 = instance.AddProp(fullcubepath.c_str(), glm::vec3(10, 0, -10));
+
 
     static int groundplane_id = instance.AddProp(fullgroundplane.c_str(), glm::vec3(0, -30.f, 0));
-    instance.ScaleProp(groundplane_id, glm::vec3(2));
+    instance.ScaleProp(groundplane_id, glm::vec3(3,1,3));
 
 
     static int peasant_man_id = instance.AddProp(fullpeasant_man.c_str(), glm::vec3(0, -30, -100));
@@ -48,12 +54,21 @@ public:
     instance.StencilProp(peasant_man_id, true);
     instance.StencilPropColor(peasant_man_id, glm::vec3(.4,.4,.4));
     instance.StencilPropWithNormals(peasant_man_id, true);
-    instance.StencilPropScale(peasant_man_id, 2.f);
+    instance.StencilPropScale(peasant_man_id, 3.f);
+
+    static int walking_man_id = instance.AddProp(fullwalking_man.c_str(), glm::vec3(-60, -30, -100));
+    instance.ScaleProp(walking_man_id, glm::vec3(.25f));
+    instance.StencilProp(walking_man_id, true);
+    instance.StencilPropColor(walking_man_id, glm::vec3(.4,.4,.4));
+    instance.StencilPropWithNormals(walking_man_id, true);
+    instance.StencilPropScale(walking_man_id, 3.f);
 
     instance.AddToUpdate([](float dt) {
       static float accum_time = 0;
       accum_time += dt;
       instance.RotateProp(cube_id, glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
+      instance.RotateProp(cube_id2, glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
+      instance.RotateProp(cube_id3, glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
       });
 
     // default light and background
