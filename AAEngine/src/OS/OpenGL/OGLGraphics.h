@@ -3,17 +3,16 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
-#include <string>
 
 namespace AA {
 
-class OGLGraphics {
+class OGLGraphics final {
 public:
   static GLuint UploadStatic3DMesh(const std::vector<LitVertex>& verts, const std::vector<GLuint>& elems);
   static GLuint UploadStatic3DMesh(const std::vector<TanVertex>& verts, const std::vector<GLuint>& elems);
   static GLuint UploadStatic3DMesh(const std::vector<AnimVertex>& verts, const std::vector<GLuint>& elems);
   static GLuint Upload3DPositionsMesh(const float* points, const int num_points, const GLuint* indices, const int ind_count);
-  static GLuint Upload2DVerts(const std::vector<glm::vec2>& points); 
+  static GLuint Upload2DVerts(const std::vector<glm::vec2>& points);
   static void DeleteMesh(const GLuint& VAO);
 
   static GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int format);
