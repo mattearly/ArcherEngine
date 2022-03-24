@@ -11,7 +11,7 @@ LitVertex::LitVertex(glm::vec3 pos, glm::vec2 uv, glm::vec3 normal) : Position(p
 TanVertex::TanVertex(glm::vec3 pos, glm::vec2 uv, glm::vec3 normal, glm::vec3 tan, glm::vec3 bitan) : Position(pos), TexCoords(uv), Normal(normal), Tangent(tan), BiTangent(bitan) {}
 
 AnimVertex::AnimVertex(glm::vec3 pos, glm::vec2 uv, glm::vec3 normal) 
-  : LitVertex(pos, uv, normal)
+  : LitVertex(pos, uv, normal), m_BoneIDs{-1,-1,-1,-1}, m_Weights{0.f,0.f,0.f,0.f}
  {}
 
 } // end namespace AA
