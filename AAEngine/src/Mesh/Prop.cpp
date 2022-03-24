@@ -90,7 +90,7 @@ void Prop::Draw() {
     glStencilFunc(GL_ALWAYS, 0, 0xFF);  // todo: abstract
     OGLGraphics::SetDepthTest(true);
   } else {
-    OGLGraphics::SetStencilFuncToAlways();
+    //OGLGraphics::SetStencilFuncToAlways();
     OGLGraphics::SetStencilMask(true);
     OGLShader* shader = DefaultShaders::get_ubershader();
     shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
