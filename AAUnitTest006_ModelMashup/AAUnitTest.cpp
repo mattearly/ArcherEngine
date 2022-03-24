@@ -53,10 +53,10 @@ public:
     // default light and background
     instance.SetWindowClearColor();
 
-    static float lightdir[3] = { .21f, .21f, .1f };
-    static float* lightamb = new float(.2f);
-    static float* lightdiff = new float(.7f);
-    static float* lightspec = new float(.7f);
+    static float lightdir[3] = { -0.095f, .71f, -.2f };
+    static float* lightamb = new float(.35f);
+    static float* lightdiff = new float(.58f);
+    static float* lightspec = new float(.47f);
 
     instance.SetDirectionalLight(
       glm::vec3(lightdir[0], lightdir[1], lightdir[2]),
