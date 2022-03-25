@@ -2,9 +2,8 @@
 #include "../OS/OpenGL/OGLGraphics.h"
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/MeshLoader.h"
-#include "../OS/LoadCube.h"
-#include "../Math/Conversions.h"
 #include "../DefaultShaders.h"
+#include <glm/gtx/transform.hpp>
 
 namespace AA {
 
