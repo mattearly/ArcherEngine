@@ -2,9 +2,8 @@
 #include "../OS/OpenGL/OGLGraphics.h"
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/MeshLoader.h"
-#include "../OS/LoadCube.h"
-#include "../Math/Conversions.h"
 #include "../DefaultShaders.h"
+#include <glm/gtx/transform.hpp>
 
 namespace AA {
 
@@ -90,8 +89,7 @@ void Prop::Draw() {
     glStencilFunc(GL_ALWAYS, 0, 0xFF);  // todo: abstract
     OGLGraphics::SetDepthTest(true);
   } else {
-    OGLGraphics::SetStencilFuncToAlways();
-    OGLGraphics::SetStencilMask(true);
+    OGLGraphics::SetStencilMask(false);
     OGLShader* shader = DefaultShaders::get_ubershader();
     shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
     for (MeshInfo& m : mMeshes) {

@@ -1,6 +1,4 @@
 #include "OGLGraphics.h"
-#include <glm/glm.hpp>
-#include <glad/glad.h>
 #include <cstddef>
 
 namespace AA {

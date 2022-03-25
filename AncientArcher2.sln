@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DownloadTestResources", "Do
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AAUnitTest008_StencilOutline", "AAUnitTest008_StencilOutline\AAUnitTest008_StencilOutline.vcxproj", "{6363275B-AFEC-4AAE-9603-7ABFF96A8304}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AAUnitTest009_SequentialRun", "AAUnitTest009_SequentialRun\AAUnitTest009_SequentialRun.vcxproj", "{970BC8CD-DE04-42DB-89C1-25FDC95C02DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -69,6 +71,10 @@ Global
 		{6363275B-AFEC-4AAE-9603-7ABFF96A8304}.Debug|x64.Build.0 = Debug|x64
 		{6363275B-AFEC-4AAE-9603-7ABFF96A8304}.Release|x64.ActiveCfg = Release|x64
 		{6363275B-AFEC-4AAE-9603-7ABFF96A8304}.Release|x64.Build.0 = Release|x64
+		{970BC8CD-DE04-42DB-89C1-25FDC95C02DA}.Debug|x64.ActiveCfg = Debug|x64
+		{970BC8CD-DE04-42DB-89C1-25FDC95C02DA}.Debug|x64.Build.0 = Debug|x64
+		{970BC8CD-DE04-42DB-89C1-25FDC95C02DA}.Release|x64.ActiveCfg = Release|x64
+		{970BC8CD-DE04-42DB-89C1-25FDC95C02DA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

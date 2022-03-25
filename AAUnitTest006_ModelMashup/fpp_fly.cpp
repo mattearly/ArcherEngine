@@ -12,7 +12,7 @@ struct Move {
 } move;
 bool is_cursor_on = true;
 glm::vec3 move_diff;
-const int DEFAULTMOVESPEED = 3;
+const float DEFAULTMOVESPEED = 16.f;
 double FPP_SENSITIVITY = .1f;
 double lastX{ 0 }, lastY{ 0 };
 double xDelta{ 0 }, yDelta{ 0 };
@@ -22,8 +22,6 @@ bool snap_to_center = false;
 void setup_fpp_fly(unsigned int cam) {
   if (fly_setup) return;
   static auto s_cam_id = cam;
-  //static auto cam = instance.GetCamera(cam_id);
-  //static auto win = instance.GetWindow();
   instance.AddToMouseButtonHandling([](AA::MouseButtons& mb) {
     if (mb.mouseButton2) {
       if (!is_cursor_on) {
@@ -85,8 +83,34 @@ void setup_fpp_fly(unsigned int cam) {
       move_diff += cam_ref->GetRight();
       UnprocessedMovements = true;
     }
+    if (move.up || move.down) {
+      UnprocessedMovements = true;
+    }
+
+    // movement detected - do the move logic
     if (UnprocessedMovements) {
-      cam_ref->ShiftPosition(glm::vec3(move_diff.x, cam_ref->GetPosition().y, move_diff.z));
+
+      // walking around movements
+      glm::vec3 amount_shifted(0);
+      amount_shifted.x += move_diff.x * dt * DEFAULTMOVESPEED;
+      amount_shifted.z += move_diff.z * dt * DEFAULTMOVESPEED;
+      if (move.sprint) {
+        amount_shifted.x *= 2.f;
+        amount_shifted.z *= 2.f;
+      }
+
+      // going up or down logic
+      if (move.up) {
+        amount_shifted.y += dt * DEFAULTMOVESPEED;
+      } else if (move.down) {
+        amount_shifted.y -= dt * DEFAULTMOVESPEED;
+      }
+
+      // apply final positions
+      cam_ref->ShiftPosition(glm::vec3(amount_shifted.x, 0, amount_shifted.z));
+      cam_ref->ShiftPosition(glm::vec3(0, amount_shifted.y, 0));
+
+      // reset movement for next frame
       UnprocessedMovements = !UnprocessedMovements;
       move_diff = glm::vec3(0);
     }
