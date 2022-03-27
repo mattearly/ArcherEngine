@@ -1,18 +1,19 @@
 #include "../include/AAEngine/Interface.h"
-#include "Physics/NVidiaPhysx.h"
 #include "../include/AAEngine/Scene/Camera.h"
+#include "../include/AAEngine/OS/Interface/Window.h"
+#include "OS/OpenGL/OGLGraphics.h"
+#include "OS/OpenGL/InternalShaders/Stencil.h"
+#include "OS/OpenGL/InternalShaders/Uber.h"
+#include "Physics/NVidiaPhysx.h"
 #include "Mesh/Prop.h"
 #include "Mesh/AnimProp.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
-#include "OS/OpenGL/OGLGraphics.h"
-#include "../include/AAEngine/OS/Interface/Window.h"
 #include "Sound/SoundDevice.h"
 #include "Sound/Speaker.h"
 #include "Sound/SoundEffect.h"
 #include "Sound/LongSound.h"
 #include "GUI/imGUI.h"
-#include "DefaultShaders.h"
 #include <string>
 #include <sstream>
 #include <utility>
@@ -169,8 +170,7 @@ bool Interface::RemoveCamera(const int camId) {
   return false;   // fail remove
 }
 
-std::shared_ptr<Camera> Interface::GetCamera(uidtype camId)
-{
+std::shared_ptr<Camera> Interface::GetCamera(uidtype camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam;
@@ -252,8 +252,7 @@ void Interface::StencilProp(const unsigned int id, const bool tf) {
   throw("prop id doesn't exist or is invalid");
 }
 
-void Interface::StencilPropColor(const unsigned int id, const glm::vec3 color)
-{
+void Interface::StencilPropColor(const unsigned int id, const glm::vec3 color) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       prop->stencil_color = color;
@@ -263,8 +262,7 @@ void Interface::StencilPropColor(const unsigned int id, const glm::vec3 color)
   throw("prop id doesn't exist or is invalid");
 }
 
-void Interface::StencilPropWithNormals(const unsigned int id, const bool tf)
-{
+void Interface::StencilPropWithNormals(const unsigned int id, const bool tf) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       prop->stenciled_with_normals = tf;
@@ -274,8 +272,7 @@ void Interface::StencilPropWithNormals(const unsigned int id, const bool tf)
   throw("prop id doesn't exist or is invalid");
 }
 
-void Interface::StencilPropScale(const unsigned int id, const float scale)
-{
+void Interface::StencilPropScale(const unsigned int id, const float scale) {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       prop->stencil_scale = scale;
@@ -319,8 +316,7 @@ void Interface::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
   throw("anim prop id doesn't exist or is invalid");
 }
 
-void Interface::StencilAnimProp(const unsigned int id, const bool tf)
-{
+void Interface::StencilAnimProp(const unsigned int id, const bool tf) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       prop->stenciled = tf;
@@ -330,8 +326,7 @@ void Interface::StencilAnimProp(const unsigned int id, const bool tf)
   throw("prop id doesn't exist or is invalid");
 }
 
-void Interface::StencilAnimPropColor(const unsigned int id, const glm::vec3 color)
-{
+void Interface::StencilAnimPropColor(const unsigned int id, const glm::vec3 color) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       prop->stencil_color = color;
@@ -341,8 +336,7 @@ void Interface::StencilAnimPropColor(const unsigned int id, const glm::vec3 colo
   throw("prop id doesn't exist or is invalid");
 }
 
-void Interface::StencilAnimPropWithNormals(const unsigned int id, const bool tf)
-{
+void Interface::StencilAnimPropWithNormals(const unsigned int id, const bool tf) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       prop->stenciled_with_normals = tf;
@@ -352,8 +346,7 @@ void Interface::StencilAnimPropWithNormals(const unsigned int id, const bool tf)
   throw("prop id doesn't exist or is invalid");
 }
 
-void Interface::StencilAnimPropScale(const unsigned int id, const float scale)
-{
+void Interface::StencilAnimPropScale(const unsigned int id, const float scale) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
       prop->stencil_scale = scale;
@@ -406,8 +399,7 @@ void Interface::SetAnimationOnAnimProp(const unsigned int animation_id, const un
           animprop->mAnimator.reset();
         }
         return;  // done
-      }
-      else {  // not trying to reset
+      } else {  // not trying to reset
         for (auto& animation : mAnimation) {
           if (animation->GetUID() == animation_id) { // animation exists
             animprop->SetAnimator(animation);
@@ -484,8 +476,7 @@ void Interface::RemoveSkybox() noexcept {
 void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
   if (!mDirectionalLight) {
     mDirectionalLight = std::make_shared<DirectionalLight>(dir, amb, diff, spec);
-  }
-  else {
+  } else {
     mDirectionalLight->Direction = dir;
     mDirectionalLight->Ambient = amb;
     mDirectionalLight->Diffuse = diff;
@@ -493,21 +484,21 @@ void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff
   }
 
   {
-    assert(DefaultShaders::get_ubershader());
-    DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetInt("u_is_dir_light_on", 1);
-    DefaultShaders::get_ubershader()->SetVec3("u_dir_light.Direction", mDirectionalLight->Direction);
-    DefaultShaders::get_ubershader()->SetVec3("u_dir_light.Ambient", mDirectionalLight->Ambient);
-    DefaultShaders::get_ubershader()->SetVec3("u_dir_light.Diffuse", mDirectionalLight->Diffuse);
-    DefaultShaders::get_ubershader()->SetVec3("u_dir_light.Specular", mDirectionalLight->Specular);
+    //assert(DefaultShaders::Get());
+    InternalShaders::Uber::Get()->Use();
+    InternalShaders::Uber::Get()->SetInt("u_is_dir_light_on", 1);
+    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Direction", mDirectionalLight->Direction);
+    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Ambient", mDirectionalLight->Ambient);
+    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Diffuse", mDirectionalLight->Diffuse);
+    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Specular", mDirectionalLight->Specular);
   }
 }
 
 void Interface::RemoveDirectionalLight() {
   if (mDirectionalLight) {
-    assert(DefaultShaders::get_ubershader());
-    DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetInt("u_is_dir_light_on", 0);
+    //assert(DefaultShaders::Get());
+    //InternalShaders::Uber::Get()->Use();
+    InternalShaders::Uber::Get()->SetInt("u_is_dir_light_on", 0);
     mDirectionalLight.reset();
   }
 }
@@ -548,16 +539,17 @@ int Interface::AddPointLight(glm::vec3 pos, float constant, float linear, float 
     diffuse += "Diffuse";
     specular += "Specular";
 
-    assert(DefaultShaders::get_ubershader());
-    DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetVec3(position, mPointLights.back()->Position);
-    DefaultShaders::get_ubershader()->SetFloat(constant, mPointLights.back()->Constant);
-    DefaultShaders::get_ubershader()->SetFloat(linear, mPointLights.back()->Linear);
-    DefaultShaders::get_ubershader()->SetFloat(quadratic, mPointLights.back()->Quadratic);
-    DefaultShaders::get_ubershader()->SetVec3(ambient, mPointLights.back()->Ambient);
-    DefaultShaders::get_ubershader()->SetVec3(diffuse, mPointLights.back()->Diffuse);
-    DefaultShaders::get_ubershader()->SetVec3(specular, mPointLights.back()->Specular);
-    DefaultShaders::get_ubershader()->SetInt("u_num_point_lights_in_use", static_cast<int>(new_point_size + 1));
+    //assert(DefaultShaders::Get());
+    //DefaultShaders::Get()->Use();
+    OGLShader* shader_ref = InternalShaders::Uber::Get();
+    shader_ref->SetVec3(position, mPointLights.back()->Position);
+    shader_ref->SetFloat(constant, mPointLights.back()->Constant);
+    shader_ref->SetFloat(linear, mPointLights.back()->Linear);
+    shader_ref->SetFloat(quadratic, mPointLights.back()->Quadratic);
+    shader_ref->SetVec3(ambient, mPointLights.back()->Ambient);
+    shader_ref->SetVec3(diffuse, mPointLights.back()->Diffuse);
+    shader_ref->SetVec3(specular, mPointLights.back()->Specular);
+    shader_ref->SetInt("u_num_point_lights_in_use", static_cast<int>(new_point_size + 1));
   }
   return mPointLights.back()->id;  // unique id
 }
@@ -576,8 +568,8 @@ bool Interface::RemovePointLight(int which_by_id) {
   auto after_size = mPointLights.size();
 
   if (before_size != after_size) {
-    DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetInt("u_num_point_lights_in_use", static_cast<int>(after_size));
+    //DefaultShaders::Get()->Use();
+    InternalShaders::Uber::Get()->SetInt("u_num_point_lights_in_use", static_cast<int>(after_size));
 
     // sync lights on shader after the change
     for (int i = 0; i < after_size; i++) {
@@ -593,8 +585,7 @@ bool Interface::RemovePointLight(int which_by_id) {
       );
     }
     return true;
-  }
-  else
+  } else
     return false;
 }
 
@@ -609,8 +600,8 @@ void Interface::MovePointLight(int which, glm::vec3 new_pos) {
       std::stringstream ss;
       ss << loc_in_vec;
       std::string position = "u_point_lights[" + ss.str() + "].Position";
-      DefaultShaders::get_ubershader()->Use();
-      DefaultShaders::get_ubershader()->SetVec3(position.c_str(), pl->Position);
+      //DefaultShaders::Get()->Use();
+      InternalShaders::Uber::Get()->SetVec3(position.c_str(), pl->Position);
       return;
     }
     loc_in_vec++;
@@ -661,14 +652,15 @@ void Interface::ChangePointLight(int which, glm::vec3 new_pos, float new_constan
         diffuse += "Diffuse";
         specular += "Specular";
 
-        DefaultShaders::get_ubershader()->Use();
-        DefaultShaders::get_ubershader()->SetVec3(pos, pl->Position);
-        DefaultShaders::get_ubershader()->SetFloat(constant, pl->Constant);
-        DefaultShaders::get_ubershader()->SetFloat(linear, pl->Linear);
-        DefaultShaders::get_ubershader()->SetFloat(quadrat, pl->Quadratic);
-        DefaultShaders::get_ubershader()->SetVec3(ambient, pl->Ambient);
-        DefaultShaders::get_ubershader()->SetVec3(diffuse, pl->Diffuse);
-        DefaultShaders::get_ubershader()->SetVec3(specular, pl->Specular);
+        //DefaultShaders::Get()->Use();
+        OGLShader* shader_ref = InternalShaders::Uber::Get();
+        shader_ref->SetVec3(pos, pl->Position);
+        shader_ref->SetFloat(constant, pl->Constant);
+        shader_ref->SetFloat(linear, pl->Linear);
+        shader_ref->SetFloat(quadrat, pl->Quadratic);
+        shader_ref->SetVec3(ambient, pl->Ambient);
+        shader_ref->SetVec3(diffuse, pl->Diffuse);
+        shader_ref->SetVec3(specular, pl->Specular);
       }
       return;
     }
@@ -723,19 +715,20 @@ int Interface::AddSpotLight(
     diffuse += "Diffuse";
     specular += "Specular";
 
-    assert(DefaultShaders::get_ubershader());
-    DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetVec3(pos, mSpotLights.back()->Position);
-    DefaultShaders::get_ubershader()->SetFloat(cutoff, mSpotLights.back()->CutOff);
-    DefaultShaders::get_ubershader()->SetFloat(ocutoff, mSpotLights.back()->OuterCutOff);
-    DefaultShaders::get_ubershader()->SetVec3(direction, mSpotLights.back()->Direction);
-    DefaultShaders::get_ubershader()->SetFloat(constant, mSpotLights.back()->Constant);
-    DefaultShaders::get_ubershader()->SetFloat(linear, mSpotLights.back()->Linear);
-    DefaultShaders::get_ubershader()->SetFloat(quadrat, mSpotLights.back()->Quadratic);
-    DefaultShaders::get_ubershader()->SetVec3(ambient, mSpotLights.back()->Ambient);
-    DefaultShaders::get_ubershader()->SetVec3(diffuse, mSpotLights.back()->Diffuse);
-    DefaultShaders::get_ubershader()->SetVec3(specular, mSpotLights.back()->Specular);
-    DefaultShaders::get_ubershader()->SetInt("u_num_spot_lights_in_use", static_cast<int>(new_spot_loc + 1));
+    //assert(DefaultShaders::Get());
+    //DefaultShaders::Get()->Use();
+    OGLShader* shader_ref = InternalShaders::Uber::Get();
+    shader_ref->SetVec3(pos, mSpotLights.back()->Position);
+    shader_ref->SetFloat(cutoff, mSpotLights.back()->CutOff);
+    shader_ref->SetFloat(ocutoff, mSpotLights.back()->OuterCutOff);
+    shader_ref->SetVec3(direction, mSpotLights.back()->Direction);
+    shader_ref->SetFloat(constant, mSpotLights.back()->Constant);
+    shader_ref->SetFloat(linear, mSpotLights.back()->Linear);
+    shader_ref->SetFloat(quadrat, mSpotLights.back()->Quadratic);
+    shader_ref->SetVec3(ambient, mSpotLights.back()->Ambient);
+    shader_ref->SetVec3(diffuse, mSpotLights.back()->Diffuse);
+    shader_ref->SetVec3(specular, mSpotLights.back()->Specular);
+    shader_ref->SetInt("u_num_spot_lights_in_use", static_cast<int>(new_spot_loc + 1));
   }
   return mSpotLights.back()->id;  // unique id
 }
@@ -754,8 +747,8 @@ bool Interface::RemoveSpotLight(int which_by_id) {
   auto after_size = mSpotLights.size();
 
   if (before_size != after_size) {
-    DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetInt("u_num_spot_lights_in_use", static_cast<int>(after_size));
+    //DefaultShaders::Get()->Use();
+    InternalShaders::Uber::Get()->SetInt("u_num_spot_lights_in_use", static_cast<int>(after_size));
 
     // sync lights on shader after the change
     for (int i = 0; i < after_size; i++) {
@@ -774,8 +767,7 @@ bool Interface::RemoveSpotLight(int which_by_id) {
       );
     }
     return true;
-  }
-  else
+  } else
     return false;
 }
 
@@ -788,13 +780,13 @@ void Interface::MoveSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir) {
     if (sl->id == which) {
       sl->Position = new_pos;
       sl->Direction = new_dir;
-      DefaultShaders::get_ubershader()->Use();
+      //DefaultShaders::Get()->Use();
       std::stringstream ss;
       ss << loc_in_vec;
       std::string position = "u_spot_lights[" + ss.str() + "].Position";
       std::string direction = "u_spot_lights[" + ss.str() + "].Direction";
-      DefaultShaders::get_ubershader()->SetVec3(position, sl->Position);
-      DefaultShaders::get_ubershader()->SetVec3(direction, sl->Direction);
+      InternalShaders::Uber::Get()->SetVec3(position, sl->Position);
+      InternalShaders::Uber::Get()->SetVec3(direction, sl->Direction);
       return;
     }
     loc_in_vec++;
@@ -858,17 +850,19 @@ void Interface::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir,
         diffuse += "Diffuse";
         specular += "Specular";
 
-        DefaultShaders::get_ubershader()->Use();
-        DefaultShaders::get_ubershader()->SetVec3(pos, sl->Position);
-        DefaultShaders::get_ubershader()->SetFloat(cutoff, sl->CutOff);
-        DefaultShaders::get_ubershader()->SetFloat(ocutoff, sl->OuterCutOff);
-        DefaultShaders::get_ubershader()->SetVec3(direction, sl->Direction);
-        DefaultShaders::get_ubershader()->SetFloat(constant, sl->Constant);
-        DefaultShaders::get_ubershader()->SetFloat(linear, sl->Linear);
-        DefaultShaders::get_ubershader()->SetFloat(quadrat, sl->Quadratic);
-        DefaultShaders::get_ubershader()->SetVec3(ambient, sl->Ambient);
-        DefaultShaders::get_ubershader()->SetVec3(diffuse, sl->Diffuse);
-        DefaultShaders::get_ubershader()->SetVec3(specular, sl->Specular);
+
+        //DefaultShaders::Get()->Use();
+        OGLShader* shader_ref = InternalShaders::Uber::Get();
+        shader_ref->SetVec3(pos, sl->Position);
+        shader_ref->SetFloat(cutoff, sl->CutOff);
+        shader_ref->SetFloat(ocutoff, sl->OuterCutOff);
+        shader_ref->SetVec3(direction, sl->Direction);
+        shader_ref->SetFloat(constant, sl->Constant);
+        shader_ref->SetFloat(linear, sl->Linear);
+        shader_ref->SetFloat(quadrat, sl->Quadratic);
+        shader_ref->SetVec3(ambient, sl->Ambient);
+        shader_ref->SetVec3(diffuse, sl->Diffuse);
+        shader_ref->SetVec3(specular, sl->Specular);
       }
       return;
     }
@@ -1009,12 +1003,10 @@ void Interface::SetIMGUI(const bool value) {
       delete mIMGUI;
       mIMGUI = NULL;
     }
-  }
-  else {
+  } else {
     if (mIMGUI) {
       return;
-    }
-    else {
+    } else {
       mIMGUI = new imGUI();
       mIMGUI->InitOpenGL(mWindow->mGLFWwindow);
     }
@@ -1025,8 +1017,7 @@ void Interface::SetWindowClearColor(glm::vec3 color) noexcept {
   OGLGraphics::SetViewportClearColor(color);
 }
 
-std::shared_ptr<Window> Interface::GetWindow()
-{
+std::shared_ptr<Window> Interface::GetWindow() {
   return mWindow;
 }
 
@@ -1047,12 +1038,10 @@ void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
   if (temp->_windowing_mode == WINDOW_MODE::WINDOWED || temp->_windowing_mode == WINDOW_MODE::MAXIMIZED || temp->_windowing_mode == WINDOW_MODE::WINDOWED_DEFAULT) {
     if (try_borderless) {
       temp->_windowing_mode = WINDOW_MODE::FULLSCREEN_BORDERLESS;
-    }
-    else {
+    } else {
       temp->_windowing_mode = WINDOW_MODE::FULLSCREEN;
     }
-  }
-  else {  // turn off fullscreen
+  } else {  // turn off fullscreen
     temp->_windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
   }
 

@@ -1,66 +1,11 @@
-#include "DefaultShaders.h"
-namespace AA {
-// access given only though getters
+#include "Uber.h"
+#include <string>
+namespace AA::InternalShaders {
+
 static OGLShader* UBERSHADER = nullptr;
-static OGLShader* STENCILSHADER = nullptr;
 
 //todo: optimization - uniform buffers https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
-void DefaultShaders::init_stencilshader() {
-  if (STENCILSHADER)
-    return;
-
-  const std::string VERT_CODE = R"(#version 430 core
-layout(location=0)in vec3 inPos;
-layout(location=2)in vec3 inNorm;
-layout(location=3)in ivec4 inBoneIds;
-layout(location=4)in vec4 inWeights;
-
-const int MAX_BONES = 100;
-const int MAX_BONE_INFLUENCE = 4;
-
-uniform mat4 u_projection_matrix;
-uniform mat4 u_view_matrix;
-uniform mat4 u_model_matrix;
-
-uniform mat4 u_final_bone_mats[MAX_BONES];
-uniform int u_stencil_with_normals;
-uniform float u_stencil_scale;
-uniform int u_is_animating;
-
-void main(){
-  vec4 totalPosition = vec4(0.0);
-  if (u_is_animating > 0) {
-    for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++) {
-      if(inBoneIds[i] == -1) continue;
-      if(inBoneIds[i] >= MAX_BONES) {
-          totalPosition = vec4(inPos, 1.0f);
-          break;
-      }
-      vec4 localPosition = u_final_bone_mats[inBoneIds[i]] * vec4(inPos,1.0);
-      totalPosition += localPosition * inWeights[i];
-    }
-  } else {  // Not Animating
-    totalPosition = vec4(inPos, 1.0);
-  }
-  mat4 viewMatrix = u_view_matrix * u_model_matrix;
-  if (u_stencil_with_normals > 0) {
-    gl_Position = u_projection_matrix * viewMatrix * vec4(totalPosition.xyz + inNorm * (u_stencil_scale - 1.0), 1.0);
-  } else {
-    gl_Position = u_projection_matrix * viewMatrix * totalPosition;
-  }
-})";
-
-  const std::string FRAG_CODE = R"(#version 430
-out vec4 FragColor;
-uniform vec3 u_stencil_color;
-void main() {
-  FragColor = vec4(u_stencil_color, 1.0);
-})";
-
-  STENCILSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());
-}
-
-void DefaultShaders::init_ubershader() {
+void Uber::Init() {
   if (UBERSHADER)
     return;
 
@@ -115,7 +60,7 @@ void main(){
   gl_Position = u_projection_matrix * viewMatrix * totalPosition;
 })";
 
-  const std::string UBERSHADER_FRAG_CODE = 
+  const std::string UBERSHADER_FRAG_CODE =
     R"(#version 430 core
 
 in VS_OUT
@@ -298,31 +243,21 @@ void main()
   UBERSHADER = new OGLShader(UBERSHADER_VERT_CODE.c_str(), UBERSHADER_FRAG_CODE.c_str());
 }
 
-OGLShader* DefaultShaders::get_ubershader() {
+OGLShader* Uber::Get() {
   if (!UBERSHADER) {
-    init_ubershader();
+    Init();
   } else {
     UBERSHADER->Use();
   }
   return UBERSHADER;
 }
 
-OGLShader* DefaultShaders::get_stencilshader() {
-  if (!STENCILSHADER) {
-    init_stencilshader();
-  } else {
-    STENCILSHADER->Use();
-  }
-  return STENCILSHADER;
-}
-
-void DefaultShaders::de_init_shaders() {
+void Uber::Shutdown() {
   if (UBERSHADER) {
-    delete UBERSHADER; UBERSHADER = nullptr;
-  }
-  if (STENCILSHADER) {
-    delete STENCILSHADER; STENCILSHADER = nullptr;
+    delete UBERSHADER;
+    UBERSHADER = nullptr;
   }
 }
 
-}  // end namespace AA
+
+}

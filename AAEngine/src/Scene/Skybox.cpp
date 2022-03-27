@@ -3,7 +3,6 @@
 #include "../OS/OpenGL/OGLGraphics.h"
 #include "../OS/LoadCube.h"
 #include "../OS/TextureLoader.h"
-#include "../DefaultShaders.h"
 namespace AA {
 
 static OGLShader* mSkyboxShader = NULL;  // setup once

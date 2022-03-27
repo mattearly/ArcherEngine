@@ -2,6 +2,8 @@
 #include "../include/AAEngine/Scene/Camera.h"
 #include "../include/AAEngine/OS/Interface/Window.h"
 #include "OS/OpenGL/OGLGraphics.h"
+#include "OS/OpenGL/InternalShaders/Stencil.h"
+#include "OS/OpenGL/InternalShaders/Uber.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Mesh/Prop.h"
 #include "Mesh/AnimProp.h"
@@ -12,7 +14,6 @@
 #include "Sound/SoundEffect.h"
 #include "Sound/LongSound.h"
 #include "GUI/imGUI.h"
-#include "DefaultShaders.h"
 #include <string>
 #include <sstream>
 #include <utility>
@@ -96,8 +97,8 @@ void Interface::render() {
   OGLGraphics::ClearScreen();
   OGLGraphics::SetDepthTest(true);
   OGLGraphics::SetDepthMode(GL_LESS);
-  DefaultShaders::get_ubershader()->SetBool("u_is_animating", false);
-  DefaultShaders::get_stencilshader()->SetBool("u_is_animating", false);
+  InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
   if (!mCameras.empty()) {
     for (auto& cam : mCameras) {
       if (cam->isAlwaysScreenSize) {
@@ -114,15 +115,15 @@ void Interface::render() {
       OGLGraphics::SetViewportSize((GLint)cam->BottomLeft.x, (GLint)cam->BottomLeft.y, (GLsizei)cam->Width, (GLsizei)cam->Height);
       for (auto& p : mProps) { p->Draw(); }
       for (auto& ap : mAnimProps) {
-        DefaultShaders::get_ubershader()->SetBool("u_is_animating", false);
-        DefaultShaders::get_stencilshader()->SetBool("u_is_animating", false);
+        InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+        InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
         if (ap->mAnimator) {
-          DefaultShaders::get_ubershader()->SetBool("u_is_animating", true);
-          DefaultShaders::get_stencilshader()->SetBool("u_is_animating", true);
+          InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
+          InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
           auto transforms = ap->mAnimator->GetFinalBoneMatrices();
           for (unsigned int i = 0; i < transforms.size(); ++i) {
-            DefaultShaders::get_ubershader()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-            DefaultShaders::get_stencilshader()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+            InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+            InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
           }
         }
         ap->Draw();
@@ -151,7 +152,8 @@ void Interface::teardown() {
 
   ClearAllRuntimeLamdaFunctions();
 
-  DefaultShaders::de_init_shaders();
+  InternalShaders::Stencil::Shutdown();
+  InternalShaders::Uber::Shutdown();
 
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {

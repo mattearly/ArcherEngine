@@ -1,8 +1,9 @@
 #include "Prop.h"
 #include "../OS/OpenGL/OGLGraphics.h"
 #include "../OS/OpenGL/OGLShader.h"
+#include "../OS/OpenGL/InternalShaders/Uber.h"
+#include "../OS/OpenGL/InternalShaders/Stencil.h"
 #include "../OS/MeshLoader.h"
-#include "../DefaultShaders.h"
 #include <glm/gtx/transform.hpp>
 
 namespace AA {
@@ -23,11 +24,12 @@ Prop::Prop(const char* path) {
 }
 
 void Prop::Draw() {
+    OGLShader* uber_shader = InternalShaders::Uber::Get();
+
   if (stenciled) {
     // 1st pass: render to stencil buffer with normal draw
     OGLGraphics::SetStencilFuncToAlways();
     OGLGraphics::SetStencilMask(true);
-    OGLShader* uber_shader = DefaultShaders::get_ubershader();
     uber_shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
     for (MeshInfo& m : mMeshes) {
       for (const auto& texture : m.textureDrawIds) {
@@ -69,7 +71,7 @@ void Prop::Draw() {
     OGLGraphics::SetStencilFuncToNotEqual();
     OGLGraphics::SetStencilMask(false);
     OGLGraphics::SetDepthTest(false);
-    OGLShader* stencil_shader = DefaultShaders::get_stencilshader();
+    OGLShader* stencil_shader = InternalShaders::Stencil::Get();
     if (stenciled_with_normals) {
       stencil_shader->SetBool("u_stencil_with_normals", true);
       stencil_shader->SetFloat("u_stencil_scale", stencil_scale);
@@ -90,30 +92,29 @@ void Prop::Draw() {
     OGLGraphics::SetDepthTest(true);
   } else {
     OGLGraphics::SetStencilMask(false);
-    OGLShader* shader = DefaultShaders::get_ubershader();
-    shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
+    uber_shader->SetMat4("u_model_matrix", spacial_data.mFinalModelMatrix);
     for (MeshInfo& m : mMeshes) {
       for (const auto& texture : m.textureDrawIds) {
         const std::string texType = texture.second;  // get the texture type
         if (texType == "Albedo") {  //todo, improve comparison performance
-          shader->SetBool("u_has_albedo_tex", true);
-          shader->SetInt(("u_material." + texType).c_str(), 0);
+          uber_shader->SetBool("u_has_albedo_tex", true);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 0);
           OGLGraphics::SetTexture(0, texture.first);
         }
         if (texType == "Specular") {
-          shader->SetBool("u_has_specular_tex", true);
-          shader->SetInt(("u_material." + texType).c_str(), 1);
-          shader->SetFloat("u_material.Shininess", m.shininess);
+          uber_shader->SetBool("u_has_specular_tex", true);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 1);
+          uber_shader->SetFloat("u_material.Shininess", m.shininess);
           OGLGraphics::SetTexture(1, texture.first);
         }
         if (texType == "Normal") {
-          shader->SetBool("u_has_normal_tex", true);
-          shader->SetInt(("u_material." + texType).c_str(), 2);
+          uber_shader->SetBool("u_has_normal_tex", true);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 2);
           OGLGraphics::SetTexture(2, texture.first);
         }
         if (texType == "Emission") {
-          shader->SetBool("u_has_emission_tex", true);
-          shader->SetInt(("u_material." + texType).c_str(), 3);
+          uber_shader->SetBool("u_has_emission_tex", true);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 3);
           OGLGraphics::SetTexture(3, texture.first);
         }
       }
@@ -124,10 +125,10 @@ void Prop::Draw() {
       OGLGraphics::SetTexture(1, 0);
       OGLGraphics::SetTexture(2, 0);
       OGLGraphics::SetTexture(3, 0);
-      shader->SetBool("u_has_albedo_tex", false);
-      shader->SetBool("u_has_specular_tex", false);
-      shader->SetBool("u_has_normal_tex", false);
-      shader->SetBool("u_has_emission_tex", false);
+      uber_shader->SetBool("u_has_albedo_tex", false);
+      uber_shader->SetBool("u_has_specular_tex", false);
+      uber_shader->SetBool("u_has_normal_tex", false);
+      uber_shader->SetBool("u_has_emission_tex", false);
     }
   }
 }

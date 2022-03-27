@@ -1,7 +1,8 @@
 #include "../../include/AAEngine/Scene/Camera.h"
-#include "../DefaultShaders.h"
 #include <glm\ext\matrix_clip_space.hpp>
 #include <glm\gtx\transform.hpp>
+#include "../OS/OpenGL/InternalShaders/Stencil.h"
+#include "../OS/OpenGL/InternalShaders/Uber.h"
 namespace AA {
 
 #define UP glm::vec3(0,1,0)
@@ -235,12 +236,12 @@ void Camera::updateViewMatrix() {
 
 void Camera::shaderTick() {
   if (mProjectionChanged) {
-    DefaultShaders::get_ubershader()->SetMat4("u_projection_matrix", mProjectionMatrix);
-    DefaultShaders::get_stencilshader()->SetMat4("u_projection_matrix", mProjectionMatrix);
+    InternalShaders::Uber::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
+    InternalShaders::Stencil::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
   }
   if (mViewChanged) {
-    DefaultShaders::get_ubershader()->SetMat4("u_view_matrix", mViewMatrix);
-    DefaultShaders::get_stencilshader()->SetMat4("u_view_matrix", mViewMatrix);
+    InternalShaders::Uber::Get()->SetMat4("u_view_matrix", mViewMatrix);
+    InternalShaders::Stencil::Get()->SetMat4("u_view_matrix", mViewMatrix);
   }
   mProjectionChanged = mViewChanged = false;
 }
