@@ -92,6 +92,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\AAEngine\WindowOptions.h" />
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Skycube.h" />
     <ClInclude Include="src\ECS\entt.h" />
     <ClInclude Include="src\Mesh\Skeleton.h" />
     <ClInclude Include="src\Mesh\Bone.h" />
@@ -135,6 +136,7 @@
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Uber.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Skycube.cpp" />
     <ClCompile Include="src\InterfaceRuntime.cpp" />
     <ClCompile Include="src\ECS\entt.cpp" />
     <ClCompile Include="src\Mesh\Skeleton.cpp" />

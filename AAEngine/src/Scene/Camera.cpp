@@ -3,6 +3,7 @@
 #include <glm\gtx\transform.hpp>
 #include "../OS/OpenGL/InternalShaders/Stencil.h"
 #include "../OS/OpenGL/InternalShaders/Uber.h"
+#include "../OS/OpenGL/InternalShaders/Skycube.h"
 namespace AA {
 
 #define UP glm::vec3(0,1,0)
@@ -18,41 +19,35 @@ Camera::Camera(int width, int height) {
   updateProjectionMatrix();
 }
 
-void Camera::SetBottomLeft(int x, int y)
-{
+void Camera::SetBottomLeft(int x, int y) {
   BottomLeft = glm::vec2(x, y);
 }
 
-void Camera::SetMaxRenderDistance(float amt)
-{
+void Camera::SetMaxRenderDistance(float amt) {
   if (amt < 0.f)
     amt = abs(amt);
   MaxRenderDistance = amt;
   updateProjectionMatrix();
 }
 
-void Camera::SetToPerspective()
-{
+void Camera::SetToPerspective() {
   mProjectionType = ProjectionType::PERSPECTIVE;
   updateProjectionMatrix();
 }
 
-void Camera::SetToOrtho_testing()
-{
+void Camera::SetToOrtho_testing() {
   mProjectionType = ProjectionType::ORTHO;
   updateProjectionMatrix();
 }
 
-void Camera::SetFOV(float new_fov)
-{
+void Camera::SetFOV(float new_fov) {
   if (new_fov < 1.f) new_fov = 1.f;
   if (new_fov > 360.f) new_fov = 360.f;
   FOV = new_fov;
   updateProjectionMatrix();
 }
 
-void Camera::SetDimensions_testing(int w, int h)
-{
+void Camera::SetDimensions_testing(int w, int h) {
   if (w < 1 || h < 1)
     throw("invalid cam dimensions");
   Width = w;
@@ -60,14 +55,12 @@ void Camera::SetDimensions_testing(int w, int h)
   updateProjectionMatrix();
 }
 
-void Camera::SetPosition(glm::vec3 new_loc)
-{
+void Camera::SetPosition(glm::vec3 new_loc) {
   Position = new_loc;
   updateCameraVectors();
 }
 
-void Camera::SetPitch(float new_pitch_degrees)
-{
+void Camera::SetPitch(float new_pitch_degrees) {
   if (new_pitch_degrees > 89.9f)
     new_pitch_degrees = 89.9f;
   else if (new_pitch_degrees < -89.9f)
@@ -76,8 +69,7 @@ void Camera::SetPitch(float new_pitch_degrees)
   updateCameraVectors();
 }
 
-void Camera::SetYaw(float new_yaw_degrees)
-{
+void Camera::SetYaw(float new_yaw_degrees) {
   if (new_yaw_degrees > 360.0f)
     new_yaw_degrees -= 360.f;
   else if (new_yaw_degrees < 0.f)
@@ -86,14 +78,12 @@ void Camera::SetYaw(float new_yaw_degrees)
   updateCameraVectors();
 }
 
-void Camera::ShiftPosition(glm::vec3 offset)
-{
+void Camera::ShiftPosition(glm::vec3 offset) {
   Position += offset;
   updateCameraVectors();
 }
 
-void Camera::ShiftPitchAndYaw(double pitch_offset_degrees, double yaw_offset_degrees)
-{
+void Camera::ShiftPitchAndYaw(double pitch_offset_degrees, double yaw_offset_degrees) {
   double new_pitch_degrees = Pitch + pitch_offset_degrees;
   if (new_pitch_degrees > 89.9f)
     new_pitch_degrees = 89.9f;
@@ -111,18 +101,15 @@ void Camera::ShiftPitchAndYaw(double pitch_offset_degrees, double yaw_offset_deg
   updateCameraVectors();
 }
 
-void Camera::SetKeepCameraToWindowSize(bool tf)
-{
+void Camera::SetKeepCameraToWindowSize(bool tf) {
   isAlwaysScreenSize = tf;
 }
 
-void Camera::SetRenderDepth(int new_depth)
-{
+void Camera::SetRenderDepth(int new_depth) {
   RenderDepth = new_depth;
 }
 
-int Camera::GetRenderDepth()
-{
+int Camera::GetRenderDepth() {
   return RenderDepth;
 }
 
@@ -130,43 +117,35 @@ bool Camera::GetIsAlwaysScreenSize() {
   return isAlwaysScreenSize;
 }
 
-glm::vec3 Camera::GetFront()
-{
+glm::vec3 Camera::GetFront() {
   return Front;
 }
 
-glm::vec3 Camera::GetRight()
-{
+glm::vec3 Camera::GetRight() {
   return Right;
 }
 
-glm::vec3 Camera::GetPosition()
-{
+glm::vec3 Camera::GetPosition() {
   return Position;
 }
 
-float Camera::GetPitch()
-{
+float Camera::GetPitch() {
   return Pitch;
 }
 
-float Camera::GetYaw()
-{
+float Camera::GetYaw() {
   return Yaw;
 }
 
-glm::vec2 Camera::GetPitchAndYaw()
-{
+glm::vec2 Camera::GetPitchAndYaw() {
   return glm::vec2(Pitch, Yaw);
 }
 
-glm::mat4 Camera::GetProjectionMatrix()
-{
+glm::mat4 Camera::GetProjectionMatrix() {
   return mProjectionMatrix;
 }
 
-glm::mat4 Camera::GetViewMatrix()
-{
+glm::mat4 Camera::GetViewMatrix() {
   return mViewMatrix;
 }
 
@@ -236,12 +215,14 @@ void Camera::updateViewMatrix() {
 
 void Camera::shaderTick() {
   if (mProjectionChanged) {
-    InternalShaders::Uber::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
-    InternalShaders::Stencil::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
+    if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
+    if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
+    if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
   }
   if (mViewChanged) {
-    InternalShaders::Uber::Get()->SetMat4("u_view_matrix", mViewMatrix);
-    InternalShaders::Stencil::Get()->SetMat4("u_view_matrix", mViewMatrix);
+    if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_view_matrix", mViewMatrix);
+    if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_view_matrix", mViewMatrix);
+    if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_view_matrix", mViewMatrix);
   }
   mProjectionChanged = mViewChanged = false;
 }
