@@ -16,7 +16,7 @@ Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
   setup_incoming_textures(incomingSkymapFiles);
 
   mSkyboxShader->Use();
-  mSkyboxShader->SetInt("skybox", 0);
+  mSkyboxShader->SetInt("u_skybox", 0);
 }
 
 Skybox::~Skybox()
@@ -38,38 +38,40 @@ void Skybox::Render(const std::shared_ptr<Camera>& cam) {
 
 void Skybox::SetProjectionMatrix(glm::mat4 proj_mat) {
   mSkyboxShader->Use();
-  mSkyboxShader->SetMat4("projection", proj_mat);
+  mSkyboxShader->SetMat4("u_projection", proj_mat);
 }
 
 void Skybox::SetViewMatrix(glm::mat4 view_mat) {
   // turn the last column into 0's
   const glm::mat4 viewMatrix = glm::mat4(glm::mat3(view_mat));
   mSkyboxShader->Use();
-  mSkyboxShader->SetMat4("view", viewMatrix);
+  mSkyboxShader->SetMat4("u_view", viewMatrix);
 }
 
-const std::string frag_skycube = R"(
-#version 430 core
-in vec3 TexCoords;
-out vec4 FragColor;
-uniform samplerCube skybox;
-void main() {
-  FragColor = texture(skybox, TexCoords);
-}
-)";
-
-const std::string vert_skycube = R"(
-#version 430 core
-layout(location = 0) in vec3 aPos;
+const std::string vert_skycube =
+R"(#version 430 core
+layout(location = 0) in vec3 inPos;
 out vec3 TexCoords;
-uniform mat4 projection;
-uniform mat4 view;
+uniform mat4 u_projection;
+uniform mat4 u_view;
 void main(){
-  TexCoords = aPos;
-  vec4 pos = projection * view * vec4(aPos, 1.0);
+  TexCoords = inPos;
+  vec4 pos = u_projection * u_view * vec4(inPos, 1.0);
   gl_Position = pos.xyww;
 }
 )";
+
+const std::string frag_skycube = 
+R"(#version 430 core
+in vec3 TexCoords;
+out vec4 FragColor;
+uniform samplerCube u_skybox;
+void main() {
+  FragColor = texture(u_skybox, TexCoords);
+}
+)";
+
+
 
 void Skybox::setup_shader() {
   if (!mSkyboxShader) {
