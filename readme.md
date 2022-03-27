@@ -24,7 +24,7 @@ AncientArcher is a C++ library for game development and simulations.
 ## Documentation
 
   - Generate via Doxygen
-  - See header [Interface.h](AAEngine/include/AncientArcher/AncientArcher.h)
+  - See header [Interface.h](AAEngine/include/AncientArcher/Interface.h)
 
 ## Compile
 
