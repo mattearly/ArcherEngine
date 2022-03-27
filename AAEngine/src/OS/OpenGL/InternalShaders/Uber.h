@@ -7,6 +7,7 @@ public:
   static void Init();
   static OGLShader* Get();
   static void Shutdown();
+  static bool IsActive();
 private:
   Uber() = delete;
   Uber(Uber&) = delete;

@@ -7,6 +7,7 @@ public:
   static void Init();
   static OGLShader* Get();
   static void Shutdown();
+  static bool IsActive();
 private:
   Stencil() = delete;
   Stencil(Stencil&) = delete;

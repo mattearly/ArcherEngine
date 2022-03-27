@@ -259,5 +259,9 @@ void Uber::Shutdown() {
   }
 }
 
+bool Uber::IsActive() {
+    return UBERSHADER;
+}
+
 
 }

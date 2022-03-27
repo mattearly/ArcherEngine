@@ -76,4 +76,7 @@ void Stencil::Shutdown() {
     STENCILSHADER = nullptr;
   }
 }
+bool Stencil::IsActive() {
+  return STENCILSHADER;
+}
 }
