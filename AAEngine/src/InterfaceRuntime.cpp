@@ -96,8 +96,8 @@ void Interface::render() {
   OGLGraphics::ClearScreen();
   OGLGraphics::SetDepthTest(true);
   OGLGraphics::SetDepthMode(GL_LESS);
-  DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
-  DefaultShaders::get_stencilshader()->SetBool("isAnimating", false);
+  DefaultShaders::get_ubershader()->SetBool("u_is_animating", false);
+  DefaultShaders::get_stencilshader()->SetBool("u_is_animating", false);
   if (!mCameras.empty()) {
     for (auto& cam : mCameras) {
       if (cam->isAlwaysScreenSize) {
@@ -114,15 +114,15 @@ void Interface::render() {
       OGLGraphics::SetViewportSize((GLint)cam->BottomLeft.x, (GLint)cam->BottomLeft.y, (GLsizei)cam->Width, (GLsizei)cam->Height);
       for (auto& p : mProps) { p->Draw(); }
       for (auto& ap : mAnimProps) {
-        DefaultShaders::get_ubershader()->SetBool("isAnimating", false);
-        DefaultShaders::get_stencilshader()->SetBool("isAnimating", false);
+        DefaultShaders::get_ubershader()->SetBool("u_is_animating", false);
+        DefaultShaders::get_stencilshader()->SetBool("u_is_animating", false);
         if (ap->mAnimator) {
-          DefaultShaders::get_ubershader()->SetBool("isAnimating", true);
-          DefaultShaders::get_stencilshader()->SetBool("isAnimating", true);
+          DefaultShaders::get_ubershader()->SetBool("u_is_animating", true);
+          DefaultShaders::get_stencilshader()->SetBool("u_is_animating", true);
           auto transforms = ap->mAnimator->GetFinalBoneMatrices();
           for (unsigned int i = 0; i < transforms.size(); ++i) {
-            DefaultShaders::get_ubershader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-            DefaultShaders::get_stencilshader()->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+            DefaultShaders::get_ubershader()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+            DefaultShaders::get_stencilshader()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
           }
         }
         ap->Draw();

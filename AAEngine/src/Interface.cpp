@@ -495,11 +495,11 @@ void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff
   {
     assert(DefaultShaders::get_ubershader());
     DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetInt("isDirectionalLightOn", 1);
-    DefaultShaders::get_ubershader()->SetVec3("directionalLight.Direction", mDirectionalLight->Direction);
-    DefaultShaders::get_ubershader()->SetVec3("directionalLight.Ambient", mDirectionalLight->Ambient);
-    DefaultShaders::get_ubershader()->SetVec3("directionalLight.Diffuse", mDirectionalLight->Diffuse);
-    DefaultShaders::get_ubershader()->SetVec3("directionalLight.Specular", mDirectionalLight->Specular);
+    DefaultShaders::get_ubershader()->SetInt("u_is_dir_light_on", 1);
+    DefaultShaders::get_ubershader()->SetVec3("u_dir_light.Direction", mDirectionalLight->Direction);
+    DefaultShaders::get_ubershader()->SetVec3("u_dir_light.Ambient", mDirectionalLight->Ambient);
+    DefaultShaders::get_ubershader()->SetVec3("u_dir_light.Diffuse", mDirectionalLight->Diffuse);
+    DefaultShaders::get_ubershader()->SetVec3("u_dir_light.Specular", mDirectionalLight->Specular);
   }
 }
 
@@ -507,7 +507,7 @@ void Interface::RemoveDirectionalLight() {
   if (mDirectionalLight) {
     assert(DefaultShaders::get_ubershader());
     DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetInt("isDirectionalLightOn", 0);
+    DefaultShaders::get_ubershader()->SetInt("u_is_dir_light_on", 0);
     mDirectionalLight.reset();
   }
 }
@@ -523,7 +523,7 @@ int Interface::AddPointLight(glm::vec3 pos, float constant, float linear, float 
   // push changes to shader
   {
     std::string position, constant, linear, quadratic, ambient, diffuse, specular;
-    constant = linear = quadratic = ambient = diffuse = specular = position = "pointLight[";
+    constant = linear = quadratic = ambient = diffuse = specular = position = "u_point_lights[";
     std::stringstream ss;
     ss << new_point_size;
     position += ss.str();
@@ -557,7 +557,7 @@ int Interface::AddPointLight(glm::vec3 pos, float constant, float linear, float 
     DefaultShaders::get_ubershader()->SetVec3(ambient, mPointLights.back()->Ambient);
     DefaultShaders::get_ubershader()->SetVec3(diffuse, mPointLights.back()->Diffuse);
     DefaultShaders::get_ubershader()->SetVec3(specular, mPointLights.back()->Specular);
-    DefaultShaders::get_ubershader()->SetInt("NUM_POINT_LIGHTS", static_cast<int>(new_point_size + 1));
+    DefaultShaders::get_ubershader()->SetInt("u_num_point_lights_in_use", static_cast<int>(new_point_size + 1));
   }
   return mPointLights.back()->id;  // unique id
 }
@@ -577,7 +577,7 @@ bool Interface::RemovePointLight(int which_by_id) {
 
   if (before_size != after_size) {
     DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetInt("NUM_POINT_LIGHTS", static_cast<int>(after_size));
+    DefaultShaders::get_ubershader()->SetInt("u_num_point_lights_in_use", static_cast<int>(after_size));
 
     // sync lights on shader after the change
     for (int i = 0; i < after_size; i++) {
@@ -608,7 +608,7 @@ void Interface::MovePointLight(int which, glm::vec3 new_pos) {
       pl->Position = new_pos;
       std::stringstream ss;
       ss << loc_in_vec;
-      std::string position = "pointLight[" + ss.str() + "].Position";
+      std::string position = "u_point_lights[" + ss.str() + "].Position";
       DefaultShaders::get_ubershader()->Use();
       DefaultShaders::get_ubershader()->SetVec3(position.c_str(), pl->Position);
       return;
@@ -636,7 +636,7 @@ void Interface::ChangePointLight(int which, glm::vec3 new_pos, float new_constan
         pl->Quadratic = new_quad;
         pl->Specular = new_spec;
         std::string pos, ambient, constant, diffuse, linear, quadrat, specular;
-        ambient = constant = diffuse = linear = quadrat = specular = pos = "pointLight[";
+        ambient = constant = diffuse = linear = quadrat = specular = pos = "u_point_lights[";
         std::stringstream ss;
         ss << loc_in_vec;
         pos += ss.str();
@@ -689,7 +689,7 @@ int Interface::AddSpotLight(
   // push changes to shader
   {
     std::string pos, ambient, constant, cutoff, ocutoff, diffuse, direction, linear, quadrat, specular;
-    ambient = constant = cutoff = ocutoff = diffuse = direction = linear = quadrat = specular = pos = "spotLight[";
+    ambient = constant = cutoff = ocutoff = diffuse = direction = linear = quadrat = specular = pos = "u_spot_lights[";
     std::stringstream ss;
     ss << new_spot_loc;
     pos += ss.str();
@@ -735,7 +735,7 @@ int Interface::AddSpotLight(
     DefaultShaders::get_ubershader()->SetVec3(ambient, mSpotLights.back()->Ambient);
     DefaultShaders::get_ubershader()->SetVec3(diffuse, mSpotLights.back()->Diffuse);
     DefaultShaders::get_ubershader()->SetVec3(specular, mSpotLights.back()->Specular);
-    DefaultShaders::get_ubershader()->SetInt("NUM_SPOT_LIGHTS", static_cast<int>(new_spot_loc + 1));
+    DefaultShaders::get_ubershader()->SetInt("u_num_spot_lights_in_use", static_cast<int>(new_spot_loc + 1));
   }
   return mSpotLights.back()->id;  // unique id
 }
@@ -755,7 +755,7 @@ bool Interface::RemoveSpotLight(int which_by_id) {
 
   if (before_size != after_size) {
     DefaultShaders::get_ubershader()->Use();
-    DefaultShaders::get_ubershader()->SetInt("NUM_SPOT_LIGHTS", static_cast<int>(after_size));
+    DefaultShaders::get_ubershader()->SetInt("u_num_spot_lights_in_use", static_cast<int>(after_size));
 
     // sync lights on shader after the change
     for (int i = 0; i < after_size; i++) {
@@ -791,8 +791,8 @@ void Interface::MoveSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir) {
       DefaultShaders::get_ubershader()->Use();
       std::stringstream ss;
       ss << loc_in_vec;
-      std::string position = "spotLight[" + ss.str() + "].Position";
-      std::string direction = "spotLight[" + ss.str() + "].Direction";
+      std::string position = "u_spot_lights[" + ss.str() + "].Position";
+      std::string direction = "u_spot_lights[" + ss.str() + "].Direction";
       DefaultShaders::get_ubershader()->SetVec3(position, sl->Position);
       DefaultShaders::get_ubershader()->SetVec3(direction, sl->Direction);
       return;
@@ -824,7 +824,7 @@ void Interface::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir,
         sl->Quadratic = new_quad;
         sl->Specular = new_spec;
         std::string pos, ambient, constant, cutoff, ocutoff, diffuse, direction, linear, quadrat, specular;
-        ambient = constant = cutoff = ocutoff = diffuse = direction = linear = quadrat = specular = pos = "spotLight[";
+        ambient = constant = cutoff = ocutoff = diffuse = direction = linear = quadrat = specular = pos = "u_spot_lights[";
         std::stringstream ss;
         ss << loc_in_vec;
         pos += ss.str();

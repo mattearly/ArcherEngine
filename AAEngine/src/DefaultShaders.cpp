@@ -14,6 +14,7 @@ layout(location=0)in vec3 inPos;
 layout(location=2)in vec3 inNorm;
 layout(location=3)in ivec4 inBoneIds;
 layout(location=4)in vec4 inWeights;
+
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
 
@@ -21,20 +22,21 @@ uniform mat4 u_projection_matrix;
 uniform mat4 u_view_matrix;
 uniform mat4 u_model_matrix;
 
-uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform mat4 u_final_bone_mats[MAX_BONES];
 uniform int u_stencil_with_normals;
 uniform float u_stencil_scale;
-uniform int isAnimating;
+uniform int u_is_animating;
+
 void main(){
   vec4 totalPosition = vec4(0.0);
-  if (isAnimating > 0) {
+  if (u_is_animating > 0) {
     for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++) {
       if(inBoneIds[i] == -1) continue;
       if(inBoneIds[i] >= MAX_BONES) {
           totalPosition = vec4(inPos, 1.0f);
           break;
       }
-      vec4 localPosition = finalBonesMatrices[inBoneIds[i]] * vec4(inPos,1.0);
+      vec4 localPosition = u_final_bone_mats[inBoneIds[i]] * vec4(inPos,1.0);
       totalPosition += localPosition * inWeights[i];
     }
   } else {  // Not Animating
@@ -83,14 +85,14 @@ uniform mat4 u_projection_matrix;
 uniform mat4 u_view_matrix;
 uniform mat4 u_model_matrix;
 
-uniform mat4 finalBonesMatrices[MAX_BONES];
-uniform int isAnimating;
+uniform mat4 u_final_bone_mats[MAX_BONES];
+uniform int u_is_animating;
 
 void main(){
   vs_out.TexUV = inTexUV;
   vec4 totalPosition = vec4(0.0);
 
-  if (isAnimating > 0) {
+  if (u_is_animating > 0) {
     vec3 totalNormal = vec3(0.0);
     for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++) {
       if(inBoneIds[i] == -1) continue;
@@ -98,9 +100,9 @@ void main(){
           totalPosition = vec4(inPos, 1.0f);
           break;
       }
-      vec4 localPosition = finalBonesMatrices[inBoneIds[i]] * vec4(inPos,1.0);
+      vec4 localPosition = u_final_bone_mats[inBoneIds[i]] * vec4(inPos,1.0);
       totalPosition += localPosition * inWeights[i];
-      //totalNormal += mat3(finalBonesMatrices[inBoneIds[i]]) * inNorm;
+      //totalNormal += mat3(u_final_bone_mats[inBoneIds[i]]) * inNorm;
     }
     vs_out.Pos = (u_model_matrix * totalPosition).xyz;
   } else {  // Not Animating
@@ -113,8 +115,8 @@ void main(){
   gl_Position = u_projection_matrix * viewMatrix * totalPosition;
 })";
 
-  const std::string UBERSHADER_FRAG_CODE = R"(
-#version 430 core
+  const std::string UBERSHADER_FRAG_CODE = 
+    R"(#version 430 core
 
 in VS_OUT
 {
@@ -151,60 +153,60 @@ struct SpotLight {
   vec3 Ambient, Diffuse, Specular;
 };
 
-const vec3 default_color = vec3(0.1);
+const vec3 DEFAULT_FRAG_COLOR = vec3(0.9, 0.2, 0.2);  // red so they stand out
 const int MAXPOINTLIGHTS = 24; // if changed, needs to match on light controllers
 const int MAXSPOTLIGHTS = 12;
 
 uniform vec3 u_view_pos;
-uniform int hasAlbedo;
-uniform int hasSpecular;
-uniform int hasNormal;
-uniform int hasEmission;
-uniform Material material;
-uniform int isDirectionalLightOn;
-uniform DirectionalLight directionalLight;
-uniform PointLight pointLight[MAXPOINTLIGHTS];
-uniform SpotLight spotLight[MAXSPOTLIGHTS];
-uniform int NUM_POINT_LIGHTS;
-uniform int NUM_SPOT_LIGHTS;
+uniform int u_has_albedo_tex;
+uniform int u_has_specular_tex;
+uniform int u_has_normal_tex;
+uniform int u_has_emission_tex;
+uniform Material u_material;
+uniform int u_is_dir_light_on;
+uniform DirectionalLight u_dir_light;
+uniform PointLight u_point_lights[MAXPOINTLIGHTS];
+uniform SpotLight u_spot_lights[MAXSPOTLIGHTS];
+uniform int u_num_point_lights_in_use;
+uniform int u_num_spot_lights_in_use;
 
-vec3 CalcDirectionalLight(vec3 normal, vec3 viewDir) {
-  vec3 lightDir = normalize(-directionalLight.Direction);
+vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
+  vec3 lightDir = normalize(-u_dir_light.Direction);
   // diffuse shading
   float diff = max(dot(normal, lightDir), 0.);
   // specular shading
   float spec;
-  if (hasSpecular > 0) {
+  if (u_has_specular_tex > 0) {
     vec3 reflectDir = reflect(-lightDir, normal);
-    spec = pow(max(dot(viewDir, reflectDir), 0.), material.Shininess);
+    spec = pow(max(dot(viewDir, reflectDir), 0.), u_material.Shininess);
   }
   // combine results
   vec3 ambient;
   vec3 diffuse;
-  if (hasAlbedo > 0) { 
-    ambient = directionalLight.Ambient * texture(material.Albedo, fs_in.TexUV).rgb;
-    diffuse = directionalLight.Diffuse * diff * texture(material.Albedo, fs_in.TexUV).rgb;
+  if (u_has_albedo_tex > 0) { 
+    ambient = u_dir_light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
+    diffuse = u_dir_light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
-    ambient = directionalLight.Ambient * default_color;
-    diffuse = directionalLight.Diffuse * diff * default_color;
+    ambient = u_dir_light.Ambient * DEFAULT_FRAG_COLOR;
+    diffuse = u_dir_light.Diffuse * diff * DEFAULT_FRAG_COLOR;
   }
-  if (hasSpecular > 0) {
-    vec3 specular = directionalLight.Specular * spec * texture(material.Specular, fs_in.TexUV).r;
+  if (u_has_specular_tex > 0) {
+    vec3 specular = u_dir_light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
     return(ambient + diffuse + specular);
   } else {
     return(ambient + diffuse);
   }
 }
 
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
+vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir){
   vec3 lightDir = normalize(light.Position - fs_in.Pos);
   // diffuse shading
   float diff = max(dot(normal, lightDir), 0.0);
   // specular shading
   float spec;
-  if (hasSpecular > 0) {
+  if (u_has_specular_tex > 0) {
     vec3 reflectDir = reflect(-lightDir, normal);
-    spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    spec = pow(max(dot(viewDir, reflectDir), 0.0), u_material.Shininess);
   }
   // attenuation
   float dist = length(light.Position - fs_in.Pos);
@@ -212,18 +214,18 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir){
   // combine results
   vec3 ambient;
   vec3 diffuse;
-  if (hasAlbedo > 0) {
-    ambient = light.Ambient * texture(material.Albedo, fs_in.TexUV).rgb;
-    diffuse = light.Diffuse * diff * texture(material.Albedo, fs_in.TexUV).rgb;
+  if (u_has_albedo_tex > 0) {
+    ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
+    diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
-    ambient = light.Ambient * default_color;
-    diffuse = light.Diffuse * diff * default_color;
+    ambient = light.Ambient * DEFAULT_FRAG_COLOR;
+    diffuse = light.Diffuse * diff * DEFAULT_FRAG_COLOR;
   }
   ambient *= attenuation;
   diffuse *= attenuation;
   vec3 specular;
-  if (hasSpecular > 0) {
-    specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).r;
+  if (u_has_specular_tex > 0) {
+    specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
   } else {
     specular = vec3(1,1,1);
   }
@@ -237,9 +239,9 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
   float diff = max(dot(normal, lightDir), 0.0);
   // specular shaing
   float spec;
-  if (hasSpecular > 0) {
+  if (u_has_specular_tex > 0) {
     vec3 reflectDir = reflect(-lightDir, normal);
-    spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    spec = pow(max(dot(viewDir, reflectDir), 0.0), u_material.Shininess);
   }
   // attenuation
   float dist = length(light.Position - fs_in.Pos);
@@ -251,15 +253,15 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
   // combine results
    vec3 ambient;
    vec3 diffuse;
-  if (hasAlbedo > 0) {
-    ambient = light.Ambient * texture(material.Albedo, fs_in.TexUV).rgb;
-    diffuse = light.Diffuse * diff * texture(material.Albedo, fs_in.TexUV).rgb;
+  if (u_has_albedo_tex > 0) {
+    ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
+    diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
-    ambient = light.Ambient * default_color;
-    diffuse = light.Diffuse * diff * default_color;
+    ambient = light.Ambient * DEFAULT_FRAG_COLOR;
+    diffuse = light.Diffuse * diff * DEFAULT_FRAG_COLOR;
   }
-  if (hasSpecular > 0) {
-    vec3 specular = light.Specular * spec * texture(material.Specular, fs_in.TexUV).r;
+  if (u_has_specular_tex > 0) {
+    vec3 specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
@@ -274,20 +276,20 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
 void main()
 {
   vec3 normal;
-  if (hasNormal > 0) {
-    normal = texture(material.Normal, fs_in.TexUV).rgb;
+  if (u_has_normal_tex > 0) {
+    normal = texture(u_material.Normal, fs_in.TexUV).rgb;
     normal = normalize(normal * 2.0 - 1.0);
   } else {
     normal = normalize(fs_in.Norm * 2.0 - 1.0);
   }
   vec3 view_dir = normalize(u_view_pos - fs_in.Pos);
   vec3 result;
-  if (isDirectionalLightOn > 0) { result += CalcDirectionalLight(normal, view_dir); }
+  if (u_is_dir_light_on > 0) { result += CalculateDirLight(normal, view_dir); }
   int i = 0;
-  for (i; i < NUM_POINT_LIGHTS; i++) { result += CalcPointLight(pointLight[i], normal, view_dir); }
-  for (i = 0; i < NUM_SPOT_LIGHTS; i++) { result += CalcSpotLight(spotLight[i], normal, view_dir); }
-  if (hasEmission > 0) {
-    vec3 emission = texture(material.Emission, fs_in.TexUV).rgb;
+  for (i; i < u_num_point_lights_in_use; i++) { result += CalculatePointLights(u_point_lights[i], normal, view_dir); }
+  for (i = 0; i < u_num_spot_lights_in_use; i++) { result += CalcSpotLight(u_spot_lights[i], normal, view_dir); }
+  if (u_has_emission_tex > 0) {
+    vec3 emission = texture(u_material.Emission, fs_in.TexUV).rgb;
     result += emission;
   }
   out_Color = vec4(result, 1.0);

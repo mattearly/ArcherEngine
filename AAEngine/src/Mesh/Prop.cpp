@@ -33,25 +33,25 @@ void Prop::Draw() {
       for (const auto& texture : m.textureDrawIds) {
         const std::string texType = texture.second;  // get the texture type
         if (texType == "Albedo") {
-          uber_shader->SetBool("hasAlbedo", true);
+          uber_shader->SetBool("u_has_albedo_tex", true);
           OGLGraphics::SetTexture(0, texture.first);
-          uber_shader->SetInt(("material." + texType).c_str(), 0);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 0);
         }
         if (texType == "Specular") {
-          uber_shader->SetBool("hasSpecular", true);
-          uber_shader->SetInt(("material." + texType).c_str(), 1);
-          uber_shader->SetFloat("material.Shininess", m.shininess);
+          uber_shader->SetBool("u_has_specular_tex", true);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 1);
+          uber_shader->SetFloat("u_material.Shininess", m.shininess);
           OGLGraphics::SetTexture(1, texture.first);
         }
         if (texType == "Normal") {
-          uber_shader->SetBool("hasNormal", true);
+          uber_shader->SetBool("u_has_normal_tex", true);
           OGLGraphics::SetTexture(2, texture.first);
-          uber_shader->SetInt(("material." + texType).c_str(), 2);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 2);
         }
         if (texType == "Emission") {
-          uber_shader->SetBool("hasEmission", true);
+          uber_shader->SetBool("u_has_emission_tex", true);
           OGLGraphics::SetTexture(3, texture.first);
-          uber_shader->SetInt(("material." + texType).c_str(), 3);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 3);
         }
       }
       OGLGraphics::SetCullFace(m.backface_culled);
@@ -60,10 +60,10 @@ void Prop::Draw() {
       OGLGraphics::SetTexture(1, 0);
       OGLGraphics::SetTexture(2, 0);
       OGLGraphics::SetTexture(3, 0);
-      uber_shader->SetBool("hasAlbedo", false);
-      uber_shader->SetBool("hasSpecular", false);
-      uber_shader->SetBool("hasNormal", false);
-      uber_shader->SetBool("hasEmission", false);
+      uber_shader->SetBool("u_has_albedo_tex", false);
+      uber_shader->SetBool("u_has_specular_tex", false);
+      uber_shader->SetBool("u_has_normal_tex", false);
+      uber_shader->SetBool("u_has_emission_tex", false);
     }
     // 2nd pass
     OGLGraphics::SetStencilFuncToNotEqual();
@@ -96,24 +96,24 @@ void Prop::Draw() {
       for (const auto& texture : m.textureDrawIds) {
         const std::string texType = texture.second;  // get the texture type
         if (texType == "Albedo") {  //todo, improve comparison performance
-          shader->SetBool("hasAlbedo", true);
-          shader->SetInt(("material." + texType).c_str(), 0);
+          shader->SetBool("u_has_albedo_tex", true);
+          shader->SetInt(("u_material." + texType).c_str(), 0);
           OGLGraphics::SetTexture(0, texture.first);
         }
         if (texType == "Specular") {
-          shader->SetBool("hasSpecular", true);
-          shader->SetInt(("material." + texType).c_str(), 1);
-          shader->SetFloat("material.Shininess", m.shininess);
+          shader->SetBool("u_has_specular_tex", true);
+          shader->SetInt(("u_material." + texType).c_str(), 1);
+          shader->SetFloat("u_material.Shininess", m.shininess);
           OGLGraphics::SetTexture(1, texture.first);
         }
         if (texType == "Normal") {
-          shader->SetBool("hasNormal", true);
-          shader->SetInt(("material." + texType).c_str(), 2);
+          shader->SetBool("u_has_normal_tex", true);
+          shader->SetInt(("u_material." + texType).c_str(), 2);
           OGLGraphics::SetTexture(2, texture.first);
         }
         if (texType == "Emission") {
-          shader->SetBool("hasEmission", true);
-          shader->SetInt(("material." + texType).c_str(), 3);
+          shader->SetBool("u_has_emission_tex", true);
+          shader->SetInt(("u_material." + texType).c_str(), 3);
           OGLGraphics::SetTexture(3, texture.first);
         }
       }
@@ -124,10 +124,10 @@ void Prop::Draw() {
       OGLGraphics::SetTexture(1, 0);
       OGLGraphics::SetTexture(2, 0);
       OGLGraphics::SetTexture(3, 0);
-      shader->SetBool("hasAlbedo", false);
-      shader->SetBool("hasSpecular", false);
-      shader->SetBool("hasNormal", false);
-      shader->SetBool("hasEmission", false);
+      shader->SetBool("u_has_albedo_tex", false);
+      shader->SetBool("u_has_specular_tex", false);
+      shader->SetBool("u_has_normal_tex", false);
+      shader->SetBool("u_has_emission_tex", false);
     }
   }
 }
