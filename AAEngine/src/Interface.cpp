@@ -170,7 +170,7 @@ bool Interface::RemoveCamera(const int camId) {
   return false;   // fail remove
 }
 
-std::shared_ptr<Camera> Interface::GetCamera(uidtype camId) {
+std::weak_ptr<Camera> Interface::GetCamera(uidtype camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam;
@@ -1017,7 +1017,7 @@ void Interface::SetWindowClearColor(glm::vec3 color) noexcept {
   OGLGraphics::SetViewportClearColor(color);
 }
 
-std::shared_ptr<Window> Interface::GetWindow() {
+std::weak_ptr<Window> Interface::GetWindow() {
   return mWindow;
 }
 
