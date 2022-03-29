@@ -61,3 +61,12 @@ int main(int argc, char** argv) {
   return instance.Run();
 }
 ```
+
+
+## Development
+
+Development on AncientArcher2 is the wild west sometimes, but here are some general rules:
+
+1. `dev` branch should only be updated via Pull Requests and should come with a [version](AAEngine/include/AAEngine/version.h) update.
+2. `main` should only be updated via pull requests from `dev`, and probably happen about once a month with an accompanied vlog. This branch should remain the same for about a month at a time.
+3. make other branches off of `dev` to do work, and merge them into `dev` when complete. 
