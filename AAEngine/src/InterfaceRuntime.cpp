@@ -166,9 +166,9 @@ void Interface::teardown() {
   }
   mAnimProps.clear();
 
-  if (mSkybox) {
-    mSkybox.reset();
-  }
+  // remove skybox if it exists
+  RemoveSkybox();
+
   // delete imgui
   if (mIMGUI) {
     mIMGUI->Shutdown();
