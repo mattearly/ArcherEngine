@@ -38,84 +38,134 @@ static std::forward_list<RefModelInfo> AllLoadedModels;
 /// <param name="out_model">the model to be populated if successful</param>
 /// <param name="path">full original path</param>
 /// <returns>true if out_model was populated, false if not</returns>
-bool MeshLoader::IsAlreadyLoaded(Prop& out_model, const std::string& path) {
-  for (auto& model : AllLoadedModels) {
-    if (model.path == "")
+bool local_helper_reuse_if_already_loaded(std::vector<MeshInfo>& out_meshes, const std::string& path) {
+  for (auto& ref_model_info : AllLoadedModels) {
+    if (ref_model_info.path == "")
       continue;
-    if (path == model.path.data()) {
-      model.ref_count++;
-      TextureLoader::increment_given_texture_ids(model.textureDrawIds);
-      out_model.mMeshes.emplace_back(MeshInfo(model.vao, model.numElements, model.textureDrawIds, glm::mat4(1)));
+    if (path == ref_model_info.path.data()) {
+      ref_model_info.ref_count++;
+      TextureLoader::increment_given_texture_ids(ref_model_info.textureDrawIds);
+      out_meshes.emplace_back(MeshInfo(ref_model_info.vao, ref_model_info.numElements, ref_model_info.textureDrawIds, glm::mat4(1)));
       return true;  // already loaded
     }
   }
   return false; // not already loaded
 }
 
+// notes: this is not a very efficient way of doing this, but alas it does work
+// todo: update and improve
+void local_helper_decrement_all_loaded_models_ref(const std::string& path_to_remove) {
+  // step1: decrement loaded count
+  for (auto& ref_model_info : AllLoadedModels) {
+    if (ref_model_info.path == "")
+      continue;
+    if (path_to_remove == ref_model_info.path.data()) {
+      if (ref_model_info.ref_count > 0) {
+        ref_model_info.ref_count--;
+      }
+    }
+  }
+
+  // step2: remove if ref count is 0 (or less, somehow)
+
+  // a) if we were using a vector instead of a forward_list 
+  //AllLoadedModels.erase(std::remove_if(
+  //  AllLoadedModels.begin(), AllLoadedModels.end(),
+  //  [](const RefModelInfo& ref) {
+  //    return ref.ref_count < 1;
+  //  }), AllLoadedModels.end());
+
+  // b) C++20 method that should work on a forward list, but we are using C++17
+  //std::erase_if(AllLoadedModels, [](const RefModelInfo& ref) {
+  //  return ref.ref_count < 1;
+  //  });
+
+  // c) C++17 (and maybe some older) method to remove from foward_list
+  auto before = AllLoadedModels.before_begin();
+  for (auto it = AllLoadedModels.begin(); it != AllLoadedModels.end(); ) {
+    if (it->ref_count < 1) {
+      it = AllLoadedModels.erase_after(before);
+    } else {
+      before = it;
+      ++it;
+    }
+  }
+}
+
 static std::string LastLoadedPath;
 
 // Loads the data from the model at path, and saves it to out_model
-// returns true on fail to open:
+// returns true (negative int) on fail to open:
 //   error codes: 
 //    -1 = scene was null after attempt to load
 //    -2 = scene has incomplete flag from assimp after attempted to load
 //    -3 = there is no root node on the model
-//    -4 = model is already loaded/cached
+// returns true (positive int) on model already loaded and reused mesh info reference
+//    1 = model is already loaded/cached
+// retursn false (0) on model loaded
+//    0 = model loaded from given path
 // otherwise returns 0 if the import is successful
-int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path) {
-  if (IsAlreadyLoaded(out_model, path))
-    return -4;
+int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path_to_load) {
+  int return_code = 0;
+  return_code = local_helper_reuse_if_already_loaded(out_model.mMeshes, path_to_load);
 
-  static Assimp::Importer importer;
-  int post_processing_flags = 0;
+  if (return_code != 1) {
+    static Assimp::Importer importer;
+    int post_processing_flags = 0;
 
-  //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
-  post_processing_flags |= aiProcess_JoinIdenticalVertices |
-    aiProcess_Triangulate |
-    aiProcess_FlipUVs |
-    //#ifdef D3D
-    //	aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | 
-    //#endif
-    //aiProcess_PreTransformVertices |
-    //aiProcess_CalcTangentSpace |
-    aiProcess_GenNormals |  // can't be used with gensmoothnormals
-    //aiProcess_GenSmoothNormals |
-    //aiProcess_FixInfacingNormals |
-    //aiProcess_FindInvalidData |
-    aiProcess_ValidateDataStructure
-    ;
+    //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
+    post_processing_flags |= aiProcess_JoinIdenticalVertices |
+      aiProcess_Triangulate |
+      aiProcess_FlipUVs |
+      //#ifdef D3D
+      //	aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | 
+      //#endif
+      //aiProcess_PreTransformVertices |
+      //aiProcess_CalcTangentSpace |
+      aiProcess_GenNormals |  // can't be used with gensmoothnormals
+      //aiProcess_GenSmoothNormals |
+      //aiProcess_FixInfacingNormals |
+      //aiProcess_FindInvalidData |
+      aiProcess_ValidateDataStructure
+      ;
 
-  const aiScene* scene = importer.ReadFile(path, post_processing_flags);
+    const aiScene* scene = importer.ReadFile(path_to_load, post_processing_flags);
 
-  if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+    // check if errors on load
     if (!scene)
-      return -1;
-    if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
-      return -2;
-    if (!scene->mRootNode)
-      return -3;
+      return_code = -1;
+    else if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
+      return_code = -2;
+    else if (!scene->mRootNode)
+      return_code = -3;
+
+    if (scene && return_code == 0) {
+      LastLoadedPath = path_to_load;
+      recursive_processNode(scene->mRootNode, scene, out_model);
+      // if it loaded correctly, save a ref to this loaded up model (certainly a new entry at this point because we checked for copy at the beginning of this function LoadGameObjectFromFile)
+      RefModelInfo temp_mesh_info;
+      temp_mesh_info.vao = out_model.mMeshes.front().vao;
+      temp_mesh_info.numElements = out_model.mMeshes.front().numElements;
+      temp_mesh_info.path = path_to_load;
+      temp_mesh_info.textureDrawIds = out_model.mMeshes.front().textureDrawIds;   // id:type
+      AllLoadedModels.push_front(temp_mesh_info);
+    }
   }
 
-  LastLoadedPath = path;
-
-  recursive_processNode(scene->mRootNode, scene, out_model);
-
-  // if it loaded correctly, save a ref to this loaded up model (certainly a new entry at this point because we checked for copy at the begginning of this function LoadGameObjectFromFile)
-  RefModelInfo temp_mesh_info;
-  temp_mesh_info.vao = out_model.mMeshes.front().vao;
-  temp_mesh_info.numElements = out_model.mMeshes.front().numElements;
-  temp_mesh_info.path = path;
-  temp_mesh_info.textureDrawIds = out_model.mMeshes.front().textureDrawIds;   // id:type
-  AllLoadedModels.push_front(temp_mesh_info);
-
-  return 0;
+  return return_code;
 }
 
 
 // unloads all textures and vao's from a list of nodeinfos
-void MeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload) {
+void MeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
   for (const auto& a_mesh : toUnload) {
+    // remove reference of path
+    local_helper_decrement_all_loaded_models_ref(path_to_unload);
+
+    // delete mesh data from graphics card
     OGLGraphics::DeleteMesh(a_mesh.vao);
+
+    // delete texture (or reduce reference count of them if others still in use)
     TextureLoader::UnloadTexture(a_mesh.textureDrawIds);
   }
 }

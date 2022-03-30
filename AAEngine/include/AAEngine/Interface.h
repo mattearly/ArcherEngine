@@ -1,3 +1,7 @@
+/*
+* This is the main way to interface with AAEngine, and maybe the only include file you need.
+*/
+
 #pragma once
 // standard
 #include <vector>
@@ -16,7 +20,6 @@
 
 namespace AA {
 
-class Window;
 class Skybox;
 class imGUI;
 class Prop;
@@ -98,7 +101,7 @@ public:
   /// </summary>
   /// <param name="camId">id that was returned by AddCamera()</param>
   /// <returns></returns>
-  std::shared_ptr<Camera> GetCamera(uidtype camId);
+  std::weak_ptr<Camera> GetCamera(uidtype camId);
 
   /// <summary>
   /// Adds a Prop.
@@ -482,7 +485,7 @@ public:
   /// Get window to access public functions
   /// </summary>
   /// <returns>A Shared Pointer to the Window Class</returns>
-  std::shared_ptr<Window> GetWindow();
+  std::weak_ptr<Window> GetWindow();
 
   /// <summary>
   /// Sets the title of the window.

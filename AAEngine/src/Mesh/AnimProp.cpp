@@ -6,7 +6,6 @@
 #include "../OS/AnimMeshLoader.h"
 #include "../OS/LoadCube.h"
 #include "../Math/Conversions.h"
-#include "../DefaultShaders.h"
 namespace AA {
 
 AnimProp::AnimProp(const std::string& path) : Prop() {

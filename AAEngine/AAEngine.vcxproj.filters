@@ -93,9 +93,6 @@
     <ClInclude Include="src\OS\LoadCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DefaultShaders.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\OS\LoadPlane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -136,6 +133,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AAEngine\WindowOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Stencil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Uber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Skycube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -215,9 +221,6 @@
     <ClCompile Include="src\OS\Interface\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DefaultShaders.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Mesh\AnimProp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -240,6 +243,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\InterfaceRuntime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Stencil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Uber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Skycube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

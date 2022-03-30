@@ -20,7 +20,6 @@ private:
   void SetViewMatrix(glm::mat4 view_mat);
   void SetProjectionMatrix(glm::mat4 proj_mat);
   unsigned int mCubemapTexId = 0;
-  void setup_shader();
   void setup_cube_geometry();
   void setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles);
 };
