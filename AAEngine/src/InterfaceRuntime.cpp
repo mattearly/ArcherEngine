@@ -150,6 +150,8 @@ void Interface::teardown() {
     oTD.second();
   }
 
+  mCameras.clear();
+
   ClearAllRuntimeLamdaFunctions();
 
   InternalShaders::Stencil::Shutdown();
@@ -165,6 +167,15 @@ void Interface::teardown() {
     ap->RemoveCache();
   }
   mAnimProps.clear();
+
+  for (auto& anim : mAnimation) {
+    anim.reset();
+  }
+  mAnimation.clear();
+
+  mDirectionalLight.reset();
+  mPointLights.clear();
+  mSpotLights.clear();
 
   // remove skybox if it exists
   RemoveSkybox();
