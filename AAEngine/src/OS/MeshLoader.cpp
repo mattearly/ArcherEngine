@@ -38,18 +38,58 @@ static std::forward_list<RefModelInfo> AllLoadedModels;
 /// <param name="out_model">the model to be populated if successful</param>
 /// <param name="path">full original path</param>
 /// <returns>true if out_model was populated, false if not</returns>
-bool MeshLoader::IsAlreadyLoaded(Prop& out_model, const std::string& path) {
-  for (auto& model : AllLoadedModels) {
-    if (model.path == "")
+bool local_helper_reuse_if_already_loaded(std::vector<MeshInfo>& out_meshes, const std::string& path) {
+  for (auto& ref_model_info : AllLoadedModels) {
+    if (ref_model_info.path == "")
       continue;
-    if (path == model.path.data()) {
-      model.ref_count++;
-      TextureLoader::increment_given_texture_ids(model.textureDrawIds);
-      out_model.mMeshes.emplace_back(MeshInfo(model.vao, model.numElements, model.textureDrawIds, glm::mat4(1)));
+    if (path == ref_model_info.path.data()) {
+      ref_model_info.ref_count++;
+      TextureLoader::increment_given_texture_ids(ref_model_info.textureDrawIds);
+      out_meshes.emplace_back(MeshInfo(ref_model_info.vao, ref_model_info.numElements, ref_model_info.textureDrawIds, glm::mat4(1)));
       return true;  // already loaded
     }
   }
   return false; // not already loaded
+}
+
+// notes: this is not a very efficient way of doing this, but alas it does work
+// todo: update and improve
+void local_helper_decrement_all_loaded_models_ref(const std::string& path_to_remove) {
+  // step1: decrement loaded count
+  for (auto& ref_model_info : AllLoadedModels) {
+    if (ref_model_info.path == "")
+      continue;
+    if (path_to_remove == ref_model_info.path.data()) {
+      if (ref_model_info.ref_count > 0) {
+        ref_model_info.ref_count--;
+      }
+    }
+  }
+
+  // step2: remove if ref count is 0 (or less, somehow)
+
+  // a) if we were using a vector instead of a forward_list 
+  //AllLoadedModels.erase(std::remove_if(
+  //  AllLoadedModels.begin(), AllLoadedModels.end(),
+  //  [](const RefModelInfo& ref) {
+  //    return ref.ref_count < 1;
+  //  }), AllLoadedModels.end());
+
+  // b) C++20 method that should work on a forward list, but we are using C++17
+  //std::erase_if(AllLoadedModels, [](const RefModelInfo& ref) {
+  //  return ref.ref_count < 1;
+  //  });
+
+  // c) C++17 (and maybe some older) method to remove from foward_list
+  auto before = AllLoadedModels.before_begin();
+  for (auto it = AllLoadedModels.begin(); it != AllLoadedModels.end(); ) {
+    if (it->ref_count < 1) {
+      it = AllLoadedModels.erase_after(before);
+    } else {
+      before = it;
+      ++it;
+    }
+  }
 }
 
 static std::string LastLoadedPath;
@@ -117,9 +157,15 @@ int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path_
 
 
 // unloads all textures and vao's from a list of nodeinfos
-void MeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload) {
+void MeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
   for (const auto& a_mesh : toUnload) {
+    // remove reference of path
+    local_helper_decrement_all_loaded_models_ref(path_to_unload);
+
+    // delete mesh data from graphics card
     OGLGraphics::DeleteMesh(a_mesh.vao);
+
+    // delete texture (or reduce reference count of them if others still in use)
     TextureLoader::UnloadTexture(a_mesh.textureDrawIds);
   }
 }
