@@ -55,60 +55,64 @@ bool MeshLoader::IsAlreadyLoaded(Prop& out_model, const std::string& path) {
 static std::string LastLoadedPath;
 
 // Loads the data from the model at path, and saves it to out_model
-// returns true on fail to open:
+// returns true (negative int) on fail to open:
 //   error codes: 
 //    -1 = scene was null after attempt to load
 //    -2 = scene has incomplete flag from assimp after attempted to load
 //    -3 = there is no root node on the model
-//    -4 = model is already loaded/cached
+// returns true (positive int) on model already loaded and reused mesh info reference
+//    1 = model is already loaded/cached
+// retursn false (0) on model loaded
+//    0 = model loaded from given path
 // otherwise returns 0 if the import is successful
-int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path) {
-  if (IsAlreadyLoaded(out_model, path))
-    return -4;
+int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path_to_load) {
+  int return_code = 0;
+  return_code = local_helper_reuse_if_already_loaded(out_model.mMeshes, path_to_load);
 
-  static Assimp::Importer importer;
-  int post_processing_flags = 0;
+  if (return_code != 1) {
+    static Assimp::Importer importer;
+    int post_processing_flags = 0;
 
-  //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
-  post_processing_flags |= aiProcess_JoinIdenticalVertices |
-    aiProcess_Triangulate |
-    aiProcess_FlipUVs |
-    //#ifdef D3D
-    //	aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | 
-    //#endif
-    //aiProcess_PreTransformVertices |
-    //aiProcess_CalcTangentSpace |
-    aiProcess_GenNormals |  // can't be used with gensmoothnormals
-    //aiProcess_GenSmoothNormals |
-    //aiProcess_FixInfacingNormals |
-    //aiProcess_FindInvalidData |
-    aiProcess_ValidateDataStructure
-    ;
+    //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
+    post_processing_flags |= aiProcess_JoinIdenticalVertices |
+      aiProcess_Triangulate |
+      aiProcess_FlipUVs |
+      //#ifdef D3D
+      //	aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | 
+      //#endif
+      //aiProcess_PreTransformVertices |
+      //aiProcess_CalcTangentSpace |
+      aiProcess_GenNormals |  // can't be used with gensmoothnormals
+      //aiProcess_GenSmoothNormals |
+      //aiProcess_FixInfacingNormals |
+      //aiProcess_FindInvalidData |
+      aiProcess_ValidateDataStructure
+      ;
 
-  const aiScene* scene = importer.ReadFile(path, post_processing_flags);
+    const aiScene* scene = importer.ReadFile(path_to_load, post_processing_flags);
 
-  if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+    // check if errors on load
     if (!scene)
-      return -1;
-    if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
-      return -2;
-    if (!scene->mRootNode)
-      return -3;
+      return_code = -1;
+    else if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
+      return_code = -2;
+    else if (!scene->mRootNode)
+      return_code = -3;
+
+    if (scene && return_code == 0) {
+      LastLoadedPath = path_to_load;
+      recursive_processNode(scene->mRootNode, scene, out_model);
+      // if it loaded correctly, save a ref to this loaded up model (certainly a new entry at this point because we checked for copy at the beginning of this function LoadGameObjectFromFile)
+      RefModelInfo temp_mesh_info;
+      temp_mesh_info.vao = out_model.mMeshes.front().vao;
+      temp_mesh_info.numElements = out_model.mMeshes.front().numElements;
+      temp_mesh_info.path = path_to_load;
+      temp_mesh_info.textureDrawIds = out_model.mMeshes.front().textureDrawIds;   // id:type
+      AllLoadedModels.push_front(temp_mesh_info);
+    }
   }
 
-  LastLoadedPath = path;
-
-  recursive_processNode(scene->mRootNode, scene, out_model);
-
-  // if it loaded correctly, save a ref to this loaded up model (certainly a new entry at this point because we checked for copy at the begginning of this function LoadGameObjectFromFile)
-  RefModelInfo temp_mesh_info;
-  temp_mesh_info.vao = out_model.mMeshes.front().vao;
-  temp_mesh_info.numElements = out_model.mMeshes.front().numElements;
-  temp_mesh_info.path = path;
-  temp_mesh_info.textureDrawIds = out_model.mMeshes.front().textureDrawIds;   // id:type
-  AllLoadedModels.push_front(temp_mesh_info);
-
-  return 0;
+  return return_code;
 }
 
 
