@@ -10,8 +10,10 @@
 // add headers that you want to pre-compile here
 #include <AAEngine/Interface.h>
 #include <imgui.h>
+#include <vector>
 #include <string>
 
-//const std::string runtime_dir = "../../RuntimeFiles/";
+const std::string runtime_dir = "../../RuntimeFiles/";
+
 
 #endif //PCH_H
