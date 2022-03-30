@@ -31,6 +31,8 @@ protected:
 
   std::vector<MeshInfo> mMeshes;
 
+  std::string cached_load_path;
+
   friend class Interface;
   friend class MeshLoader;
 

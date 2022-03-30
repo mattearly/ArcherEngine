@@ -13,6 +13,7 @@ Prop::Prop() {
   stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
   stenciled_with_normals = false;
   stencil_scale = 1.1f;
+  cached_load_path.clear();
 }
 
 Prop::Prop(const char* path) {
@@ -135,18 +136,30 @@ void Prop::Draw() {
 
 void Prop::RemoveCache() {
   if (!mMeshes.empty()) {
-    MeshLoader::UnloadGameObject(mMeshes);
+    MeshLoader::UnloadGameObject(mMeshes, cached_load_path);
     mMeshes.clear();
   }
 }
 
+/// <summary>
+/// if this doesn't throw, assume load successful
+/// </summary>
+/// <param name="path">path to model to load and cache</param>
 void Prop::Load(const std::string& path) {
-  if (mMeshes.empty()) {
-    if (MeshLoader::LoadGameObjectFromFile(*this, path) == -1) {
-      throw(std::_Xruntime_error, "failed to load path");
-    }
-  } else {
+  if (!mMeshes.empty())
     throw(std::_Xruntime_error, "Meshes are loaded already. Remove cache first.");
+
+  int load_code = MeshLoader::LoadGameObjectFromFile(*this, path);
+  if (load_code == 0) {  // loaded from path
+    cached_load_path = path;
+  } else if (load_code == 1) {  // reused already loaded cache
+    cached_load_path = path;
+  } else if (load_code == -1) {
+    throw(std::_Xruntime_error, "scene was null");
+  } else if (load_code == -2) {
+    throw(std::_Xruntime_error, "scene has incomplete flags");
+  } else if (load_code == -3) {
+    throw(std::_Xruntime_error, "scene has incomplete flags");
   }
 }
 
