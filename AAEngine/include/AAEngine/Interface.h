@@ -18,6 +18,7 @@
 #include "OS/Interface/Window.h"
 #include "WindowOptions.h"
 #include "Mesh/Prop.h"
+#include "Mesh/AnimProp.h"
 
 namespace AA {
 
@@ -168,7 +169,7 @@ public:
   /// <param name="scale">scale should be > 1 or you probably won't see the stencil</param>
   void StencilPropScale(const unsigned int id, const float scale);
 
-  std::weak_ptr<Prop> GetProp(const unsigned int id);
+  std::weak_ptr<Prop> GetProp(const unsigned int id) const;
   
   /// <summary>
   /// Adds a Animated Prop.
@@ -234,6 +235,8 @@ public:
   /// <param name="id"></param>
   /// <returns></returns>
   unsigned int GetAnimPropBoneCount_testing(const unsigned int anim_prop_id);
+
+  std::weak_ptr<AnimProp> GetAnimProp(const unsigned int anim_prop_id) const;
 
   /// <summary>
   /// Adds Skeletal Animation Data to the memory bank of a Animated Prop.

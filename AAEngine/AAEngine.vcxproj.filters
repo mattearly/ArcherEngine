@@ -111,7 +111,7 @@
     <ClInclude Include="include\AAEngine\Controls\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Mesh\AnimProp.h">
+    <ClInclude Include="include\AAEngine\Mesh\AnimProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\OS\AnimMeshLoader.h">

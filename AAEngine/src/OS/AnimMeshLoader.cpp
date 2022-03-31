@@ -1,7 +1,7 @@
 #include "AnimMeshLoader.h"
 #include "TextureLoader.h"
 #include "OpenGL/OGLGraphics.h"
-#include "../Mesh/AnimProp.h"
+#include "../../include/AAEngine/Mesh/AnimProp.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 namespace AA {

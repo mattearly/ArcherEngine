@@ -1,4 +1,4 @@
-#include "AnimProp.h"
+#include "../../include/AAEngine/Mesh/AnimProp.h"
 #include "../../include/AAEngine/Mesh/Prop.h"
 #include "../OS/OpenGL/OGLGraphics.h"
 #include "../OS/OpenGL/OGLShader.h"

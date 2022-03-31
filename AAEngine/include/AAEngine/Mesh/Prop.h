@@ -20,7 +20,7 @@ public:
   virtual void RemoveCache();
   virtual void Load(const std::string& path);
 
-  std::vector<MeshInfo> mMeshes;
+  const std::vector<MeshInfo>& GetMeshes() const;
 protected:
 
   bool stenciled;
@@ -28,6 +28,7 @@ protected:
   bool stenciled_with_normals;
   float stencil_scale;
 
+  std::vector<MeshInfo> mMeshes;
   Spacial3D spacial_data;
 
 

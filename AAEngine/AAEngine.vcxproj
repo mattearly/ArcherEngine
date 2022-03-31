@@ -98,7 +98,7 @@
     <ClInclude Include="src\Mesh\Bone.h" />
     <ClInclude Include="src\Mesh\Animator.h" />
     <ClInclude Include="src\OS\AnimMeshLoader.h" />
-    <ClInclude Include="src\Mesh\AnimProp.h" />
+    <ClInclude Include="include\AAEngine\Mesh\AnimProp.h" />
     <ClInclude Include="include\AAEngine\Controls\Input.h" />
     <ClInclude Include="include\AAEngine\OS\Interface\Window.h" />
     <ClInclude Include="src\Mesh\Animation.h" />
