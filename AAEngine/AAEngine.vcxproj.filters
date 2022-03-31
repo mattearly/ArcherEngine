@@ -242,9 +242,6 @@
     <ClCompile Include="src\ECS\entt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\InterfaceRuntime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Stencil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -252,6 +249,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Skycube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntefaceRunetime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -136,8 +136,8 @@
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Uber.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\IntefaceRunetime.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Skycube.cpp" />
-    <ClCompile Include="src\InterfaceRuntime.cpp" />
     <ClCompile Include="src\ECS\entt.cpp" />
     <ClCompile Include="src\Mesh\Skeleton.cpp" />
     <ClCompile Include="src\Mesh\Bone.cpp" />
