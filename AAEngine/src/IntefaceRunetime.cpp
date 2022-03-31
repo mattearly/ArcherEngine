@@ -89,54 +89,51 @@ void Interface::update() {
   }
 
   for (auto& oMH : onMouseHandling) { oMH.second(g_mouse_input_status); }
-
-
 }
 
 // Renders visable props every frame
 void Interface::render() {
-  if (mCameras.empty())
-    return;
-
   OGLGraphics::ClearScreen();
-  OGLGraphics::SetDepthTest(true);
-  OGLGraphics::SetDepthMode(GL_LESS);
-  InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
-  
-  // draw to all cameras
-  for (auto& cam : mCameras) {
-    if (cam->isAlwaysScreenSize) {
-      if (g_os_window_resized) {
-        cam->SetBottomLeft(0, 0);
-        cam->SetDimensions_testing(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-        cam->updateProjectionMatrix();
-        g_os_window_resized = false;
-      }
-    }
-    cam->updateViewMatrix();
-    cam->updateProjectionMatrix();
-    cam->shaderTick();
-    OGLGraphics::SetViewportSize((GLint)cam->BottomLeft.x, (GLint)cam->BottomLeft.y, (GLsizei)cam->Width, (GLsizei)cam->Height);
-    for (auto& p : mProps) { p->Draw(); }
-    for (auto& ap : mAnimProps) {
-      InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-      InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
-      if (ap->mAnimator) {
-        InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
-        InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
-        auto transforms = ap->mAnimator->GetFinalBoneMatrices();
-        for (unsigned int i = 0; i < transforms.size(); ++i) {
-          InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-          InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+  if (!mCameras.empty()) {
+    OGLGraphics::SetDepthTest(true);
+    OGLGraphics::SetDepthMode(GL_LESS);
+    InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+    InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
+
+    // draw to all cameras
+    for (auto& cam : mCameras) {
+      if (cam->isAlwaysScreenSize) {
+        if (g_os_window_resized) {
+          cam->SetBottomLeft(0, 0);
+          cam->SetDimensions_testing(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
+          cam->updateProjectionMatrix();
+          g_os_window_resized = false;
         }
       }
-      ap->Draw();
-    }
-    if (mSkybox) { mSkybox->Render(cam); }
+      cam->updateViewMatrix();
+      cam->updateProjectionMatrix();
+      cam->shaderTick();
+      OGLGraphics::SetViewportSize((GLint)cam->BottomLeft.x, (GLint)cam->BottomLeft.y, (GLsizei)cam->Width, (GLsizei)cam->Height);
+      for (auto& p : mProps) { p->Draw(); }
+      for (auto& ap : mAnimProps) {
+        InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+        InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
+        if (ap->mAnimator) {
+          InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
+          InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
+          auto transforms = ap->mAnimator->GetFinalBoneMatrices();
+          for (unsigned int i = 0; i < transforms.size(); ++i) {
+            InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+            InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+          }
+        }
+        ap->Draw();
+      }
+      if (mSkybox) { mSkybox->Render(cam); }
 #ifdef _DEBUG
-    if (mSimulateWorldPhysics) { NVidiaPhysx::Get()->DrawDebug(cam); }
+      if (mSimulateWorldPhysics) { NVidiaPhysx::Get()->DrawDebug(cam); }
 #endif
+    }
   }
 
   // render imgui interface

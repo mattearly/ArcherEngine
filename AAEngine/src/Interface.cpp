@@ -137,7 +137,9 @@ void Interface::SoftReset() noexcept {
   mWindow->SetCursorToNormal();
 }
 
-// Camera
+//
+// Camera Access
+//
 unsigned int Interface::AddCamera(const int w, const int h) {
   mCameras.emplace_back(std::move(std::make_shared<Camera>((w < 0) ? 0 : w, (h < 0) ? 0 : h)));
 
@@ -180,6 +182,9 @@ std::weak_ptr<Camera> Interface::GetCamera(uidtype camId) {
   throw("cam id doesn't exist or is invalid");
 }
 
+//
+// Props Access
+//
 unsigned int Interface::AddProp(const char* path, const glm::vec3 location, const glm::vec3 scale) {
   mProps.emplace_back(std::make_shared<Prop>(path));
   mProps.back()->spacial_data.MoveTo(location);
@@ -212,76 +217,6 @@ bool Interface::RemoveProp(const unsigned int id) {
   return (before_size != after_size);
 }
 
-void Interface::MoveProp(const unsigned int id, glm::vec3 loc) {
-  for (auto& prop : mProps) {
-    if (prop->GetUID() == id) {
-      prop->spacial_data.MoveTo(loc);
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-void Interface::ScaleProp(const unsigned int id, glm::vec3 scale) {
-  for (auto& prop : mProps) {
-    if (prop->GetUID() == id) {
-      prop->spacial_data.ScaleTo(scale);
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-void Interface::RotateProp(const unsigned int id, glm::vec3 rot) {
-  for (auto& prop : mProps) {
-    if (prop->GetUID() == id) {
-      prop->spacial_data.RotateTo(rot);
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-void Interface::StencilProp(const unsigned int id, const bool tf) {
-  for (auto& prop : mProps) {
-    if (prop->GetUID() == id) {
-      prop->stenciled = tf;
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-void Interface::StencilPropColor(const unsigned int id, const glm::vec3 color) {
-  for (auto& prop : mProps) {
-    if (prop->GetUID() == id) {
-      prop->stencil_color = color;
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-void Interface::StencilPropWithNormals(const unsigned int id, const bool tf) {
-  for (auto& prop : mProps) {
-    if (prop->GetUID() == id) {
-      prop->stenciled_with_normals = tf;
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-void Interface::StencilPropScale(const unsigned int id, const float scale) {
-  for (auto& prop : mProps) {
-    if (prop->GetUID() == id) {
-      prop->stencil_scale = scale;
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
 std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
@@ -291,6 +226,10 @@ std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
   throw(-9999);
 }
 
+
+//
+// Anim Props Access
+//
 unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location, glm::vec3 starting_scale) {
   mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
   mAnimProps.back()->spacial_data.MoveTo(starting_location);

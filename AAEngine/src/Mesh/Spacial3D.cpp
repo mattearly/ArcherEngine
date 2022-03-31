@@ -4,25 +4,26 @@
 
 namespace AA {
 
-Spacial3D::Spacial3D() {
+Spacial3D::Spacial3D() : mRigidBody() {
   mCurrentLocation = glm::vec3(0);
   mCurrentRot = glm::vec3(0);
   mCurrentScale = glm::vec3(1);
   mFinalModelMatrix = glm::mat4(1);
   has_unprocessed_modifications = true;
 }
-void Spacial3D::MoveTo(glm::vec3 location) {
+
+void Spacial3D::MoveTo(const glm::vec3& location) {
   mCurrentLocation = location;
   has_unprocessed_modifications = true;
 }
 
-void Spacial3D::ScaleTo(glm::vec3 scale) {
+void Spacial3D::ScaleTo(const glm::vec3& scale) {
   mCurrentScale = scale;
   has_unprocessed_modifications = true;
 }
 
 // rotates on respective xyz axii by radian amounts given in rot
-void Spacial3D::RotateTo(glm::vec3 rot) {
+void Spacial3D::RotateTo(const glm::vec3& rot) {
   mCurrentRot = rot;
   has_unprocessed_modifications = true;
 }
@@ -39,7 +40,6 @@ void Spacial3D::ProcessModifications() {
 
     has_unprocessed_modifications = false;
   }
-  //else std::cout << "no modifications to process\n";
 }
 
 void Spacial3D::ApplyPhysx(glm::mat4 changes) {
