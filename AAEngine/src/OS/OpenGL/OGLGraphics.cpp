@@ -463,17 +463,19 @@ void OGLGraphics::Proc(void* proc) {
 }
 
 /// <summary>
-/// Buffers and depth map of the specified width and height
+/// Buffers and depth map of the specified width and height.
+/// derived from https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
 /// </summary>
 /// <param name="shadow_width"></param>
 /// <param name="shadow_height"></param>
-/// <returns>depth map FBO</returns>
+/// <returns>depth map FBO for rendering</returns>
 GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height) {
+  // create framebuffer object for rendering
   GLuint depthMapFBO;
   glGenFramebuffers(1, &depthMapFBO);
 
+  // create 2d texture to use as framebuffer's depth buffer
   const GLuint SHADOW_WIDTH = shadow_width, SHADOW_HEIGHT = shadow_height;
-
   GLuint depthMap;
   glGenTextures(1, &depthMap);
   glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -483,6 +485,7 @@ GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+  // attach to fraembuffers depth buffer
   glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
   glDrawBuffer(GL_NONE);
@@ -491,6 +494,7 @@ GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height) {
 
   return depthMapFBO;
 }
+
 //Note that this only has effect if depth testing is enabled. 
 void OGLGraphics::SetDepthMask(const bool enabled) {
   if (enabled)
