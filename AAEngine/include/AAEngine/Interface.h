@@ -17,12 +17,12 @@
 #include "Scene/Camera.h"
 #include "OS/Interface/Window.h"
 #include "WindowOptions.h"
+#include "Mesh/Prop.h"
 
 namespace AA {
 
 class Skybox;
 class imGUI;
-class Prop;
 class AnimProp;
 class Animation;
 struct DirectionalLight;
@@ -168,6 +168,8 @@ public:
   /// <param name="scale">scale should be > 1 or you probably won't see the stencil</param>
   void StencilPropScale(const unsigned int id, const float scale);
 
+  std::weak_ptr<Prop> GetProp(const unsigned int id);
+  
   /// <summary>
   /// Adds a Animated Prop.
   /// Assumes Bones and Animations are included in the file.

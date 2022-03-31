@@ -1,5 +1,5 @@
 #pragma once
-#include "Prop.h"
+#include "../../include/AAEngine/Mesh/Prop.h"
 #include "Animator.h"
 #include "Skeleton.h"
 #include <vector>

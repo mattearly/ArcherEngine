@@ -5,7 +5,7 @@
 #include "OS/OpenGL/InternalShaders/Stencil.h"
 #include "OS/OpenGL/InternalShaders/Uber.h"
 #include "Physics/NVidiaPhysx.h"
-#include "Mesh/Prop.h"
+#include "../include/AAEngine/Mesh/Prop.h"
 #include "Mesh/AnimProp.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"

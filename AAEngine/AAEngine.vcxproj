@@ -114,7 +114,7 @@
     <ClInclude Include="src\Sound\SoundEffect.h" />
     <ClInclude Include="src\OS\TextureInfo.h" />
     <ClInclude Include="include\AAEngine\Scene\Camera.h" />
-    <ClInclude Include="src\Mesh\Prop.h" />
+    <ClInclude Include="include\AAEngine\Mesh\Prop.h" />
     <ClInclude Include="glad\glad.h" />
     <ClInclude Include="src\Sound\ErrorCheck.h" />
     <ClInclude Include="src\Sound\SoundListener.h" />

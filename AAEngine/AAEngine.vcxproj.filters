@@ -33,7 +33,7 @@
     <ClInclude Include="src\Sound\Speaker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Mesh\Prop.h">
+    <ClInclude Include="include\AAEngine\Mesh\Prop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AAEngine\Scene\Camera.h">

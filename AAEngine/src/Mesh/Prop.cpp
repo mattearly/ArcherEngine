@@ -1,4 +1,4 @@
-#include "Prop.h"
+#include "../../include/AAEngine/Mesh/Prop.h"
 #include "../OS/OpenGL/OGLGraphics.h"
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/OpenGL/InternalShaders/Uber.h"

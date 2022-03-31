@@ -5,7 +5,7 @@
 #include "OS/OpenGL/InternalShaders/Stencil.h"
 #include "OS/OpenGL/InternalShaders/Uber.h"
 #include "Physics/NVidiaPhysx.h"
-#include "Mesh/Prop.h"
+#include "../include/AAEngine/Mesh/Prop.h"
 #include "Mesh/AnimProp.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
@@ -280,6 +280,15 @@ void Interface::StencilPropScale(const unsigned int id, const float scale) {
     }
   }
   throw("prop id doesn't exist or is invalid");
+}
+
+std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) {
+  for (auto& prop : mProps) {
+    if (prop->GetUID() == id) {
+      return prop;
+    }
+  }
+  throw(-9999);
 }
 
 unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location, glm::vec3 starting_scale) {

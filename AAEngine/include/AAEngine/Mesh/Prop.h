@@ -1,7 +1,7 @@
 #pragma once
-#include "../../include/AAEngine/Base/UniqueInstance.h"
-#include "Spacial3D.h"
-#include "../OS/MeshInfo.h"
+#include "../Base/UniqueInstance.h"
+#include "../../../src/Mesh/Spacial3D.h"
+#include "../../../src/OS/MeshInfo.h"
 #include <vector>
 #include <string>
 
@@ -20,6 +20,7 @@ public:
   virtual void RemoveCache();
   virtual void Load(const std::string& path);
 
+  std::vector<MeshInfo> mMeshes;
 protected:
 
   bool stenciled;
@@ -29,7 +30,6 @@ protected:
 
   Spacial3D spacial_data;
 
-  std::vector<MeshInfo> mMeshes;
 
   std::string cached_load_path;
 

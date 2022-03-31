@@ -1,5 +1,5 @@
 #pragma once
-#include "../Mesh/Prop.h"
+#include "../../include/AAEngine/Mesh/Prop.h"
 #include "MeshInfo.h"
 #include "TextureInfo.h"
 #include <assimp/scene.h>
