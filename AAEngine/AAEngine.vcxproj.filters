@@ -144,6 +144,9 @@
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Skycube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Shadow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sound\SoundDevice.cpp">
@@ -249,6 +252,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Skycube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Shadow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\IntefaceRunetime.cpp">
