@@ -1,6 +1,6 @@
 #pragma once
 #include "Animation.h"
-#include "AnimProp.h"
+#include "../../include/AAEngine/Mesh/AnimProp.h"
 #include <string>
 #include <map>
 #include <memory>

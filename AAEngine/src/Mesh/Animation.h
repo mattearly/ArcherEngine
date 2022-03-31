@@ -9,7 +9,7 @@
 #include <vector>
 #include <map>
 #include "Bone.h"
-#include "AnimProp.h"
+#include "../../include/AAEngine/Mesh/AnimProp.h"
 #include "../Math/Conversions.h"
 #include "../OS/Vertex.h"
 #include "../../include/AAEngine/Base/UniqueInstance.h"

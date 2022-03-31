@@ -36,6 +36,12 @@ Recommended:
 
 ## Dependencies
 
+### C++
+
+C++17 or later
+
+### Libraries
+
 glm, assimp, entt, glfw3, glad, OpenAL-Soft, sndfile, imgui, physx, stb, curl
 
 *managed by vcpkg manifest*

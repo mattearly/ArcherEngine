@@ -1,4 +1,4 @@
-#include "Prop.h"
+#include "../../include/AAEngine/Mesh/Prop.h"
 #include "../OS/OpenGL/OGLGraphics.h"
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/OpenGL/InternalShaders/Uber.h"
@@ -25,7 +25,7 @@ Prop::Prop(const char* path) {
 }
 
 void Prop::Draw() {
-    OGLShader* uber_shader = InternalShaders::Uber::Get();
+  OGLShader* uber_shader = InternalShaders::Uber::Get();
 
   if (stenciled) {
     // 1st pass: render to stencil buffer with normal draw
@@ -161,6 +161,10 @@ void Prop::Load(const std::string& path) {
   } else if (load_code == -3) {
     throw(std::_Xruntime_error, "scene has incomplete flags");
   }
+}
+
+const std::vector<MeshInfo>& Prop::GetMeshes() const {
+  return mMeshes;
 }
 
 }  // end namespace AA

@@ -1,10 +1,9 @@
-#include "AnimProp.h"
-#include "Prop.h"
+#include "../../include/AAEngine/Mesh/AnimProp.h"
+#include "../../include/AAEngine/Mesh/Prop.h"
 #include "../OS/OpenGL/OGLGraphics.h"
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/MeshLoader.h"
 #include "../OS/AnimMeshLoader.h"
-#include "../OS/LoadCube.h"
 #include "../Math/Conversions.h"
 namespace AA {
 
@@ -14,7 +13,7 @@ AnimProp::AnimProp(const std::string& path) : Prop() {
 
 void AnimProp::RemoveCache() {
   if (!mMeshes.empty()) {
-    AnimMeshLoader::UnloadGameObject(mMeshes);
+    AnimMeshLoader::UnloadGameObject(mMeshes, cached_load_path);
     mMeshes.clear();
     mAnimator.reset();
   }
@@ -22,7 +21,12 @@ void AnimProp::RemoveCache() {
 
 void AnimProp::Load(const std::string& path) {
   if (mMeshes.empty()) {
-    AnimMeshLoader::LoadGameObjectFromFile(*this, path);
+    if (AnimMeshLoader::LoadGameObjectFromFile(*this, path) == -1) {
+      throw(std::_Xruntime_error, "failed to load path");
+    }
+    cached_load_path = path;
+  } else {
+    throw(std::_Xruntime_error, "Meshes are loaded already. Remove cache first.");
   }
 }
 

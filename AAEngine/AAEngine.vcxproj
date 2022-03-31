@@ -98,7 +98,7 @@
     <ClInclude Include="src\Mesh\Bone.h" />
     <ClInclude Include="src\Mesh\Animator.h" />
     <ClInclude Include="src\OS\AnimMeshLoader.h" />
-    <ClInclude Include="src\Mesh\AnimProp.h" />
+    <ClInclude Include="include\AAEngine\Mesh\AnimProp.h" />
     <ClInclude Include="include\AAEngine\Controls\Input.h" />
     <ClInclude Include="include\AAEngine\OS\Interface\Window.h" />
     <ClInclude Include="src\Mesh\Animation.h" />
@@ -114,7 +114,7 @@
     <ClInclude Include="src\Sound\SoundEffect.h" />
     <ClInclude Include="src\OS\TextureInfo.h" />
     <ClInclude Include="include\AAEngine\Scene\Camera.h" />
-    <ClInclude Include="src\Mesh\Prop.h" />
+    <ClInclude Include="include\AAEngine\Mesh\Prop.h" />
     <ClInclude Include="glad\glad.h" />
     <ClInclude Include="src\Sound\ErrorCheck.h" />
     <ClInclude Include="src\Sound\SoundListener.h" />

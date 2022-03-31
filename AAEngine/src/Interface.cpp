@@ -5,8 +5,8 @@
 #include "OS/OpenGL/InternalShaders/Stencil.h"
 #include "OS/OpenGL/InternalShaders/Uber.h"
 #include "Physics/NVidiaPhysx.h"
-#include "Mesh/Prop.h"
-#include "Mesh/AnimProp.h"
+#include "../include/AAEngine/Mesh/Prop.h"
+#include "../include/AAEngine/Mesh/AnimProp.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
 #include "Sound/SoundDevice.h"
@@ -282,6 +282,15 @@ void Interface::StencilPropScale(const unsigned int id, const float scale) {
   throw("prop id doesn't exist or is invalid");
 }
 
+std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
+  for (auto& prop : mProps) {
+    if (prop->GetUID() == id) {
+      return prop;
+    }
+  }
+  throw(-9999);
+}
+
 unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location, glm::vec3 starting_scale) {
   mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
   mAnimProps.back()->spacial_data.MoveTo(starting_location);
@@ -362,6 +371,15 @@ unsigned int Interface::GetAnimPropBoneCount_testing(const unsigned int anim_pro
       return (unsigned int)prop->m_Skeleton.m_Bones.size();
   }
   return 0;
+}
+
+std::weak_ptr<AnimProp> Interface::GetAnimProp(const unsigned int anim_prop_id) const {
+  for (auto& prop : mAnimProps) {
+    if (prop->GetUID() == anim_prop_id) {
+      return prop;
+    }
+  }
+  throw("prop id doesn't exist or is invalid");
 }
 
 unsigned int Interface::AddAnimation(const char* path, const unsigned int anim_prop_id) {
