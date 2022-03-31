@@ -1,6 +1,6 @@
 /*
 * Tests some of the core functionality of the engine.
-* If this fails to load resources, be sure you have ran the DownloadTestResources utility 
+* If this fails to load resources, be sure you have ran the DownloadTestResources utility
 *   and extra to the RuntimeFiles directory.
 */
 
@@ -24,16 +24,11 @@ std::vector<std::string> DaySkyTextures;
 std::vector<std::string> CaveTextures;
 
 // model paths
-const char* cubepath = "3dmodels/cube.glb";
-std::string fullcubepath = runtime_dir + cubepath;
-const char* groundplane = "3dmodels/large_green_plane.obj";
-std::string fullgroundplane = runtime_dir + groundplane;
-const char* peasant_man = "3dmodels/peasant_man.dae";
-std::string fullpeasant_man = runtime_dir + peasant_man;
-const char* zombie_ = "3dmodels/Zombie Punching.fbx";
-std::string fullzombie_ = runtime_dir + zombie_;
-const char* walking_man = "3dmodels/Walking.dae";
-std::string fullwalking_man = runtime_dir + walking_man;
+const std::string fullcubepath = runtime_dir + "3dmodels/cube.glb";
+const std::string fullgroundplane = runtime_dir + "3dmodels/large_green_plane.obj";
+const std::string fullpeasant_man = runtime_dir + "3dmodels/peasant_man.dae";
+const std::string fullzombie_ = runtime_dir + "3dmodels/Zombie Punching.fbx";
+const std::string fullwalking_man = runtime_dir + "3dmodels/Walking.dae";
 
 unsigned int se_coins1(0);
 unsigned int se_flashlight(0);
@@ -49,10 +44,10 @@ unsigned int g_untextured_cube_id[3] = { 0,0,0 };
 unsigned int g_ground_plane_id = 0;
 unsigned int g_peasant_man_id = 0;
 
-unsigned int g_zombie_id = 0;
+unsigned int g_zombie_id[2] = { 0, 0 };
 unsigned int g_punching_anim_id = 0;
 
-unsigned int g_walking_man_id  = 0;
+unsigned int g_walking_man_id = 0;
 unsigned int g_walking_anim_id = 0;
 
 bool g_Yes(false), g_No(false);
@@ -65,7 +60,8 @@ float* dir_light_spec = new float(.47f);
 void reset_test_globals() {
   g_imgui_func = g_update_func = 0;
   g_untextured_cube_id[0] = g_untextured_cube_id[1] = g_untextured_cube_id[2] = 0;
-  g_cam_id = g_ground_plane_id = g_peasant_man_id = g_zombie_id = g_walking_man_id = 0;
+  g_zombie_id[0] = g_zombie_id[1] = 0;
+  g_cam_id = g_ground_plane_id = g_peasant_man_id = g_walking_man_id = 0;
   g_punching_anim_id = g_walking_anim_id = 0;
   se_coins1 = se_flashlight = se_gunshot = se_mgsalert = 0;
   g_Yes = g_No = false;
@@ -154,7 +150,7 @@ public:
       }
       if (WinSizeDecr) {
         g_window_ref = g_aa_interface.GetWindow();
-        std::shared_ptr<AA::Window> local_window_ref = g_window_ref.lock(); 
+        std::shared_ptr<AA::Window> local_window_ref = g_window_ref.lock();
         int new_width = local_window_ref->GetCurrentWidth() - 50;
         int new_height = local_window_ref->GetCurrentHeight() - 50;
         local_window_ref->SetNewWidthAndHeight(new_width, new_height);
@@ -348,9 +344,9 @@ public:
       setup_fpp_fly(g_cam_id);
     }
 
-    g_zombie_id = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(0, -30, -75), glm::vec3(.25f));
-    g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id);
-    g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id);
+    g_zombie_id[0] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(0, -30, -75), glm::vec3(.25f));
+    g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[0]);
+    g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[0]);
 
     // default light and background
     g_aa_interface.SetWindowClearColor();
@@ -415,9 +411,9 @@ public:
 
     g_peasant_man_id = g_aa_interface.AddProp(fullpeasant_man.c_str(), glm::vec3(0, -30, -70), glm::vec3(.15f));
 
-    g_zombie_id = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(-30, -30, -70), glm::vec3(.15f));
-    g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id);
-    g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id);
+    g_zombie_id[0] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(-30, -30, -70), glm::vec3(.15f));
+    g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[0]);
+    g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[0]);
 
     g_walking_man_id = g_aa_interface.AddAnimProp(fullwalking_man.c_str(), glm::vec3(30, -30, -70), glm::vec3(3));
     g_walking_anim_id = g_aa_interface.AddAnimation(fullwalking_man.c_str(), g_walking_man_id);
@@ -588,11 +584,113 @@ public:
     reset_test_globals();
   }
 
+  TEST_METHOD(ReuseModelResources) {
+    // init engine
+    {
+      bool initSuccess = g_aa_interface.Init();
+      Assert::AreEqual(initSuccess, true);
+    }
+
+    // camera that stays screen size
+    {
+      g_window_ref = g_aa_interface.GetWindow();
+      std::shared_ptr<AA::Window> local_window_ref = g_window_ref.lock();
+      g_cam_id = g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
+      g_camera_ref = g_aa_interface.GetCamera(g_cam_id);
+      std::shared_ptr<AA::Camera> local_camera_ref = g_camera_ref.lock();
+      local_camera_ref->SetKeepCameraToWindowSize(true);
+      local_camera_ref->SetFOV(75.f);
+      setup_fpp_fly(g_cam_id);
+    }
+
+    g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
+
+    // load models
+    g_untextured_cube_id[0] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(-20, 0, -25));
+    g_untextured_cube_id[1] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(20, 0, -25));
+
+    // a light so we can see
+    g_aa_interface.SetDirectionalLight(
+      glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
+      glm::vec3(*dir_light_amb),
+      glm::vec3(*dir_light_diff),
+      glm::vec3(*dir_light_spec));
+
+    auto w1 = g_aa_interface.GetProp(g_untextured_cube_id[0]);
+    auto w2 = g_aa_interface.GetProp(g_untextured_cube_id[1]);
+
+    std::shared_ptr<AA::Prop> s1 = w1.lock();
+    std::shared_ptr<AA::Prop> s2 = w2.lock();
+
+    auto vao1 = s1->GetMeshes()[0].vao;
+    auto vao2 = s2->GetMeshes()[0].vao;
+
+    // make sure using the same vao
+    Assert::AreEqual(vao1, vao2);
+
+    int run_diag = g_aa_interface.Run();
+
+    Assert::AreEqual(run_diag, 0);
+
+    reset_test_globals();
+  }
+
+  TEST_METHOD(ReuseAnimModelResources) {
+    // init engine
+    {
+      bool initSuccess = g_aa_interface.Init();
+      Assert::AreEqual(initSuccess, true);
+    }
+
+    // camera that stays screen size
+    {
+      g_window_ref = g_aa_interface.GetWindow();
+      std::shared_ptr<AA::Window> local_window_ref = g_window_ref.lock();
+      g_cam_id = g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
+      g_camera_ref = g_aa_interface.GetCamera(g_cam_id);
+      std::shared_ptr<AA::Camera> local_camera_ref = g_camera_ref.lock();
+      local_camera_ref->SetKeepCameraToWindowSize(true);
+      local_camera_ref->SetFOV(75.f);
+      setup_fpp_fly(g_cam_id);
+    }
+
+    g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
+
+    // load models
+    g_zombie_id[0] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(-20, -20, -45), glm::vec3(.15f));
+    g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[0]);
+    g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[0]);
+
+    g_zombie_id[1] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(20, -20, -45), glm::vec3(.15f));
+    g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[1]);
+    g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[1]);
 
 
-  // todo: reuse model tests
+    // a light so we can see
+    g_aa_interface.SetDirectionalLight(
+      glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
+      glm::vec3(*dir_light_amb),
+      glm::vec3(*dir_light_diff),
+      glm::vec3(*dir_light_spec));
 
-  // todo: reuse anim model tests
+    auto w1 = g_aa_interface.GetAnimProp(g_zombie_id[0]);
+    auto w2 = g_aa_interface.GetAnimProp(g_zombie_id[1]);
+
+    std::shared_ptr<AA::AnimProp> s1 = w1.lock();
+    std::shared_ptr<AA::AnimProp> s2 = w2.lock();
+
+    auto vao1 = s1->GetMeshes()[0].vao;
+    auto vao2 = s2->GetMeshes()[0].vao;
+
+    // make sure using the same vao
+    Assert::AreEqual(vao1, vao2);
+
+    int run_diag = g_aa_interface.Run();
+    Assert::AreEqual(run_diag, 0);
+    Assert::AreEqual(g_No, false);
+
+    reset_test_globals();
+  }
 
   // todo: music tests
 
