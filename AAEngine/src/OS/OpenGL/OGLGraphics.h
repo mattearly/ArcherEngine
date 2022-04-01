@@ -19,7 +19,7 @@ public:
   static GLuint UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, int format);
   static void DeleteTex(const GLuint& id);
 
-  static GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height);
+  static GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map);
 
   static void SetSamplerCube(int which, const int& cubetexID);
   static void SetTexture(int which, const int& textureID);
