@@ -19,9 +19,7 @@ Skybox::~Skybox() {
   if (mCubemapTexId != 0) {
     OGLGraphics::DeleteTex(mCubemapTexId);
   }
-  if (InternalShaders::Skycube::Get()) {
-    InternalShaders::Skycube::Shutdown();
-  }
+  InternalShaders::Skycube::Shutdown();
 }
 
 void Skybox::Render(const std::shared_ptr<Camera>& cam) {

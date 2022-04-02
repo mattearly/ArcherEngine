@@ -4,6 +4,7 @@
 #include "OS/OpenGL/OGLGraphics.h"
 #include "OS/OpenGL/InternalShaders/Stencil.h"
 #include "OS/OpenGL/InternalShaders/Uber.h"
+#include "OS/OpenGL/InternalShaders/Shadow.h"
 #include "Physics/NVidiaPhysx.h"
 #include "../include/AAEngine/Mesh/Prop.h"
 #include "../include/AAEngine/Mesh/AnimProp.h"
@@ -88,18 +89,18 @@ void Interface::update() {
   }
 
   for (auto& oMH : onMouseHandling) { oMH.second(g_mouse_input_status); }
-
-
 }
 
 // Renders visable props every frame
 void Interface::render() {
   OGLGraphics::ClearScreen();
-  OGLGraphics::SetDepthTest(true);
-  OGLGraphics::SetDepthMode(GL_LESS);
-  InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
   if (!mCameras.empty()) {
+    OGLGraphics::SetDepthTest(true);
+    OGLGraphics::SetDepthMode(GL_LESS);
+    InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+    InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
+
+    // draw to all cameras
     for (auto& cam : mCameras) {
       if (cam->isAlwaysScreenSize) {
         if (g_os_window_resized) {
@@ -135,11 +136,14 @@ void Interface::render() {
     }
   }
 
+  // render imgui interface
   if (mIMGUI) {
     mIMGUI->NewFrame();
     for (auto& oIU : onImGuiUpdate) { oIU.second(); }
     mIMGUI->Render();
   }
+
+  // display frame changes
   mWindow->swap_buffers();
 }
 
@@ -156,6 +160,7 @@ void Interface::teardown() {
 
   InternalShaders::Stencil::Shutdown();
   InternalShaders::Uber::Shutdown();
+  InternalShaders::Shadow::Shutdown();
 
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {
@@ -203,4 +208,5 @@ void Interface::teardown() {
 
   isInit = false;
 }
-}
+
+}  // end namespace AA

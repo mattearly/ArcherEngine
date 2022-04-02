@@ -463,34 +463,38 @@ void OGLGraphics::Proc(void* proc) {
 }
 
 /// <summary>
-/// Buffers and depth map of the specified width and height
+/// Buffers and depth map of the specified width and height.
+/// derived from https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
 /// </summary>
 /// <param name="shadow_width"></param>
 /// <param name="shadow_height"></param>
-/// <returns>depth map FBO</returns>
-GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height) {
+/// <returns>depth map FBO for rendering</returns>
+GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map) {
+  // create framebuffer object for rendering
   GLuint depthMapFBO;
   glGenFramebuffers(1, &depthMapFBO);
 
+  // create 2d texture to use as framebuffer's depth buffer
   const GLuint SHADOW_WIDTH = shadow_width, SHADOW_HEIGHT = shadow_height;
-
-  GLuint depthMap;
-  glGenTextures(1, &depthMap);
-  glBindTexture(GL_TEXTURE_2D, depthMap);
+  //GLuint depth_map;
+  glGenTextures(1, &out_depth_map);
+  glBindTexture(GL_TEXTURE_2D, out_depth_map);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+  // attach to framebuffers depth buffer
   glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, out_depth_map, 0);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   return depthMapFBO;
 }
+
 //Note that this only has effect if depth testing is enabled. 
 void OGLGraphics::SetDepthMask(const bool enabled) {
   if (enabled)

@@ -114,63 +114,20 @@ public:
   unsigned int AddProp(const char* path, const glm::vec3 location = glm::vec3(0), const glm::vec3 scale = glm::vec3(1));
 
   /// <summary>
-  /// Removes a prop. Calls remove cache on model data to keep track of instance count.
+  /// Removes a prop for our list of managed ones.
+  /// Calls remove cache on model data.
   /// </summary>
   /// <param name="id">id of the prop to remove</param>
   /// <returns>true if successful, false otherwise</returns>
   bool RemoveProp(const unsigned int id);
 
   /// <summary>
-  /// Moves a prop to a location
+  /// Access to props.
   /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="loc">desired location</param>
-  void MoveProp(const unsigned int id, glm::vec3 loc);
-
-  /// <summary>
-  /// Scales a prop
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="scale">desired scale</param>
-  void ScaleProp(const unsigned int id, glm::vec3 scale);
-
-  /// <summary>
-  /// Rotates a prop
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
-  void RotateProp(const unsigned int id, glm::vec3 rot);
-
-  /// <summary>
-  /// Sets whether the prop should have a stencil around it.
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="tf">true or false for on or off</param>
-  void StencilProp(const unsigned int id, const bool tf);
-
-  /// <summary>
-  /// Sets the color of the stencil.
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="color">stencil color in rgb</param>
-  void StencilPropColor(const unsigned int id, const glm::vec3 color);
-
-  /// <summary>
-  /// Calculate stencil with Normals or Not. Normals work better for objects that do not have a centered origin.
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="tf">true to calculate stencil with normal, false to calculate normally. If the stencil is offcentered, try true.</param>
-  void StencilPropWithNormals(const unsigned int id, const bool tf);
-
-  /// <summary>
-  /// Scale of the stencil. These scale differently depending on whether calculated with Normals or not.
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="scale">scale should be > 1 or you probably won't see the stencil</param>
-  void StencilPropScale(const unsigned int id, const float scale);
-
+  /// <param name="id">id of the prop to access</param>
+  /// <returns>a weak ptr to a prop</returns>
   std::weak_ptr<Prop> GetProp(const unsigned int id) const;
-  
+
   /// <summary>
   /// Adds a Animated Prop.
   /// Assumes Bones and Animations are included in the file.
@@ -582,9 +539,9 @@ public:
   bool RemoveFromOnQuit(unsigned int r_id);
 
   /// <summary>
-  // resets all the runtime functions set by:
-  // AddToOnBegin, AddToUpdate, AddToImGuiUpdate, AddToScrollHandling
-  // AddToKeyHandling, AddToMouseHandling, AddToMouseButtonHandling, AddToOnTeardown
+  /// resets all the runtime functions set by:
+  /// AddToOnBegin, AddToUpdate, AddToImGuiUpdate, AddToScrollHandling
+  /// AddToKeyHandling, AddToMouseHandling, AddToMouseButtonHandling, AddToOnTeardown
   /// </summary>
   void ClearAllRuntimeLamdaFunctions();
 

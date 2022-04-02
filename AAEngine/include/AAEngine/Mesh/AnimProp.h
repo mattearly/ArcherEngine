@@ -18,8 +18,6 @@ class AnimProp : public Prop {
 public:
   AnimProp(const std::string& path);
 
-  virtual void RemoveCache() override;
-  virtual void Load(const std::string& path) override;
 
   void UpdateAnim(float dt);
 
@@ -31,9 +29,14 @@ public:
 
   Skeleton m_Skeleton;
 
-  friend class AnimMeshLoader;
-  friend class Interface;
+protected:
 
+  friend class AnimMeshLoader;
+
+
+  friend class Interface;
+  virtual void RemoveCache() override;
+  virtual void Load(const std::string& path) override;
 };
 
 }

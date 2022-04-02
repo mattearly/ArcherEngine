@@ -167,4 +167,32 @@ const std::vector<MeshInfo>& Prop::GetMeshes() const {
   return mMeshes;
 }
 
+void Prop::SetLocation(const glm::vec3& loc) {
+  spacial_data.MoveTo(loc);
+}
+
+void Prop::SetScale(const glm::vec3& scale) {
+  spacial_data.ScaleTo(scale);
+}
+
+void Prop::SetRotation(const glm::vec3& rot) {
+  spacial_data.RotateTo(rot);
+}
+
+void Prop::SetStencil(const bool& tf) {
+  stenciled = tf;
+}
+
+void Prop::SetStencilColor(const glm::vec3& color) {
+  stencil_color = color;
+}
+
+void Prop::SetStencilWithNormals(const bool& tf) {
+  stenciled_with_normals = tf;
+}
+
+void Prop::SetStencilScale(const float& scale) {
+  stencil_scale = scale;
+}
+
 }  // end namespace AA

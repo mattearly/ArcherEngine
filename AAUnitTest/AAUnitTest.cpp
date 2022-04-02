@@ -283,7 +283,9 @@ public:
     g_update_func = g_aa_interface.AddToUpdate([](float dt) {
       static float accum_time = 0;
       accum_time += dt;
-      g_aa_interface.RotateProp(g_untextured_cube_id[0], glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
+      auto t1 = g_aa_interface.GetProp(g_untextured_cube_id[0]);
+      std::shared_ptr<AA::Prop> s1 = t1.lock();
+      s1->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
       });
 
     // default light and background
@@ -477,35 +479,49 @@ public:
     }
 
     // load models
-    g_untextured_cube_id[0] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(0, 0, -10));
-    g_aa_interface.StencilProp(g_untextured_cube_id[0], true);
-    g_aa_interface.StencilPropColor(g_untextured_cube_id[0], glm::vec3(.4, .4, .4));
-    g_aa_interface.StencilPropWithNormals(g_untextured_cube_id[0], false);
-    g_aa_interface.StencilPropScale(g_untextured_cube_id[0], 1.1f);
+    {
+      g_untextured_cube_id[0] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(0, 0, -10));
+      auto w1 = g_aa_interface.GetProp(g_untextured_cube_id[0]);
+      std::shared_ptr<AA::Prop> s1 = w1.lock();
+      s1->SetStencil(true);
+      s1->SetStencilColor(glm::vec3(.4, .4, .4));
+      s1->SetStencilWithNormals(false);
+      s1->SetStencilScale(1.1f);
 
-    g_untextured_cube_id[1] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(-10, 0, -10));
-    g_untextured_cube_id[2] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(10, 0, -10));
+      g_untextured_cube_id[1] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(-10, 0, -10));
+      g_untextured_cube_id[2] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(10, 0, -10));
 
-    g_ground_plane_id = g_aa_interface.AddProp(fullgroundplane.c_str(), glm::vec3(0, -30.f, 0), glm::vec3(3, 1, 3));
+      g_ground_plane_id = g_aa_interface.AddProp(fullgroundplane.c_str(), glm::vec3(0, -30.f, 0), glm::vec3(3, 1, 3));
 
-    g_peasant_man_id = g_aa_interface.AddProp(fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(.25f));
-    g_aa_interface.StencilProp(g_peasant_man_id, true);
-    g_aa_interface.StencilPropColor(g_peasant_man_id, glm::vec3(.4, .4, .4));
-    g_aa_interface.StencilPropWithNormals(g_peasant_man_id, true);
-    g_aa_interface.StencilPropScale(g_peasant_man_id, 3.f);
+      g_peasant_man_id = g_aa_interface.AddProp(fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(.25f));
+      auto w2 = g_aa_interface.GetProp(g_peasant_man_id);
+      std::shared_ptr<AA::Prop> s2 = w2.lock();
+      s2->SetStencil(true);
+      s2->SetStencilColor(glm::vec3(.4, .4, .4));
+      s2->SetStencilWithNormals(true);
+      s2->SetStencilScale(3.f);
 
-    g_walking_man_id = g_aa_interface.AddProp(fullwalking_man.c_str(), glm::vec3(-60, -30, -100), glm::vec3(.25f));
-    g_aa_interface.StencilProp(g_walking_man_id, true);
-    g_aa_interface.StencilPropColor(g_walking_man_id, glm::vec3(.4, .4, .4));
-    g_aa_interface.StencilPropWithNormals(g_walking_man_id, true);
-    g_aa_interface.StencilPropScale(g_walking_man_id, 3.f);
+      g_walking_man_id = g_aa_interface.AddProp(fullwalking_man.c_str(), glm::vec3(-60, -30, -100), glm::vec3(.25f));
+      auto w3 = g_aa_interface.GetProp(g_walking_man_id);
+      std::shared_ptr<AA::Prop> s3 = w3.lock();
+      s3->SetStencil(true);
+      s3->SetStencilColor(glm::vec3(.4, .4, .4));
+      s3->SetStencilWithNormals(true);
+      s3->SetStencilScale(3.f);
+    }
 
     g_aa_interface.AddToUpdate([](float dt) {
       static float accum_time = 0;
       accum_time += dt;
-      g_aa_interface.RotateProp(g_untextured_cube_id[0], glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
-      g_aa_interface.RotateProp(g_untextured_cube_id[1], glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
-      g_aa_interface.RotateProp(g_untextured_cube_id[2], glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
+      auto t1 = g_aa_interface.GetProp(g_untextured_cube_id[0]);
+      auto t2 = g_aa_interface.GetProp(g_untextured_cube_id[1]);
+      auto t3 = g_aa_interface.GetProp(g_untextured_cube_id[2]);
+      std::shared_ptr<AA::Prop> st1 = t1.lock();
+      std::shared_ptr<AA::Prop> st2 = t2.lock();
+      std::shared_ptr<AA::Prop> st3 = t3.lock();
+      st1->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
+      st2->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
+      st3->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
       });
 
     // default light and background
