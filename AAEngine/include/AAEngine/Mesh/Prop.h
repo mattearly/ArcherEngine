@@ -15,6 +15,10 @@ public:
   Prop();
   Prop(const char* path);
 
+  /// <summary>
+  /// Read only access to mesh data
+  /// </summary>
+  /// <returns>const mesh vec</returns>
   const std::vector<MeshInfo>& GetMeshes() const;
 
   /// <summary>

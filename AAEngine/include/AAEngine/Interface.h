@@ -539,9 +539,9 @@ public:
   bool RemoveFromOnQuit(unsigned int r_id);
 
   /// <summary>
-  // resets all the runtime functions set by:
-  // AddToOnBegin, AddToUpdate, AddToImGuiUpdate, AddToScrollHandling
-  // AddToKeyHandling, AddToMouseHandling, AddToMouseButtonHandling, AddToOnTeardown
+  /// resets all the runtime functions set by:
+  /// AddToOnBegin, AddToUpdate, AddToImGuiUpdate, AddToScrollHandling
+  /// AddToKeyHandling, AddToMouseHandling, AddToMouseButtonHandling, AddToOnTeardown
   /// </summary>
   void ClearAllRuntimeLamdaFunctions();
 
