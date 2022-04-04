@@ -226,7 +226,6 @@ std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
   throw(-9999);
 }
 
-
 //
 // Anim Props Access
 //
@@ -237,79 +236,28 @@ unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_locatio
   return mAnimProps.back()->GetUID();
 }
 
-void Interface::MoveAnimProp(const unsigned int id, glm::vec3 loc) {
+bool Interface::RemoveAnimProp(const unsigned int id) {
+  // remove cache (or decrement count of loaded in when multiloading)
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == id) {
-      return prop->spacial_data.MoveTo(loc);
+      prop->RemoveCache();
     }
   }
-  throw("anim prop id doesn't exist or is invalid");
-}
 
-void Interface::ScaleAnimProp(const unsigned int id, glm::vec3 scale) {
-  for (auto& prop : mAnimProps) {
-    if (prop->GetUID() == id) {
-      return prop->spacial_data.ScaleTo(scale);
-    }
-  }
-  throw("anim prop id doesn't exist or is invalid");
-}
+  // the actual remove
+  auto before_size = mAnimProps.size();
 
-void Interface::RotateAnimProp(const unsigned int id, glm::vec3 rot) {
-  for (auto& prop : mAnimProps) {
-    if (prop->GetUID() == id) {
-      return prop->spacial_data.RotateTo(rot);
-    }
-  }
-  throw("anim prop id doesn't exist or is invalid");
-}
+  auto ret_it = mAnimProps.erase(
+    std::remove_if(
+      mAnimProps.begin(),
+      mAnimProps.end(),
+      [&](auto& prop) { return prop->GetUID() == id; }),
+    mAnimProps.end());
 
-void Interface::StencilAnimProp(const unsigned int id, const bool tf) {
-  for (auto& prop : mAnimProps) {
-    if (prop->GetUID() == id) {
-      prop->stenciled = tf;
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
+  auto after_size = mAnimProps.size();
 
-void Interface::StencilAnimPropColor(const unsigned int id, const glm::vec3 color) {
-  for (auto& prop : mAnimProps) {
-    if (prop->GetUID() == id) {
-      prop->stencil_color = color;
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-void Interface::StencilAnimPropWithNormals(const unsigned int id, const bool tf) {
-  for (auto& prop : mAnimProps) {
-    if (prop->GetUID() == id) {
-      prop->stenciled_with_normals = tf;
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-void Interface::StencilAnimPropScale(const unsigned int id, const float scale) {
-  for (auto& prop : mAnimProps) {
-    if (prop->GetUID() == id) {
-      prop->stencil_scale = scale;
-      return;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-unsigned int Interface::GetAnimPropBoneCount_testing(const unsigned int anim_prop_id) {
-  for (auto& prop : mAnimProps) {
-    if (prop->GetUID() == anim_prop_id)
-      return (unsigned int)prop->m_Skeleton.m_Bones.size();
-  }
-  return 0;
+  // return true if successful removal, false otherwise
+  return (before_size != after_size);
 }
 
 std::weak_ptr<AnimProp> Interface::GetAnimProp(const unsigned int anim_prop_id) const {
@@ -321,6 +269,20 @@ std::weak_ptr<AnimProp> Interface::GetAnimProp(const unsigned int anim_prop_id) 
   throw("prop id doesn't exist or is invalid");
 }
 
+
+
+unsigned int Interface::GetAnimPropBoneCount_testing(const unsigned int anim_prop_id) {
+  for (auto& prop : mAnimProps) {
+    if (prop->GetUID() == anim_prop_id)
+      return (unsigned int)prop->m_Skeleton.m_Bones.size();
+  }
+  return 0;
+}
+
+
+//
+// Animation Access
+//
 unsigned int Interface::AddAnimation(const char* path, const unsigned int anim_prop_id) {
   for (auto& prop : mAnimProps) {
     if (prop->GetUID() == anim_prop_id) {
@@ -369,6 +331,10 @@ void Interface::SetAnimationOnAnimProp(const unsigned int animation_id, const un
   throw("invalid animation id or animated prop id");
 }
 
+
+//
+// Physics Integration Access
+//
 void Interface::AddPropPhysics(const int prop_id, const COLLIDERTYPE type) {
   // todo: fix
   for (auto& p : mProps) {
@@ -417,6 +383,10 @@ void Interface::SimulateWorldPhysics(bool status) {
   mSimulateWorldPhysics = status;
 }
 
+
+//
+// Skybox Interface
+//
 void Interface::SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept {
   if (mSkybox)
     RemoveSkybox();
@@ -430,6 +400,10 @@ void Interface::RemoveSkybox() noexcept {
     mSkybox.reset();
 }
 
+
+//
+// Lights Interface
+//
 void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
   if (!mDirectionalLight) {
     mDirectionalLight = std::make_shared<DirectionalLight>(dir, amb, diff, spec);
@@ -566,8 +540,7 @@ void Interface::MovePointLight(int which, glm::vec3 new_pos) {
   throw("u messed up");
 }
 
-void Interface::ChangePointLight(int which, glm::vec3 new_pos, float new_constant, float new_linear, float new_quad,
-  glm::vec3 new_amb, glm::vec3 new_diff, glm::vec3 new_spec) {
+void Interface::ChangePointLight(int which, glm::vec3 new_pos, float new_constant, float new_linear, float new_quad, glm::vec3 new_amb, glm::vec3 new_diff, glm::vec3 new_spec) {
   if (which < 0)
     throw("dont");
 
@@ -626,8 +599,8 @@ void Interface::ChangePointLight(int which, glm::vec3 new_pos, float new_constan
   throw("u messed up");
 }
 
-int Interface::AddSpotLight(
-  glm::vec3 pos, glm::vec3 dir, float inner, float outer, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
+// Spot Light
+int Interface::AddSpotLight(glm::vec3 pos, glm::vec3 dir, float inner, float outer, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
   if (mSpotLights.size() == MAXSPOTLIGHTS) {
     throw("too many spot lights");
   }
@@ -751,9 +724,7 @@ void Interface::MoveSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir) {
   throw("u messed up");
 }
 
-void Interface::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir, float new_inner,
-  float new_outer, float new_constant, float new_linear, float new_quad, glm::vec3 new_amb,
-  glm::vec3 new_diff, glm::vec3 new_spec) {
+void Interface::ChangeSpotLight(int which, glm::vec3 new_pos, glm::vec3 new_dir, float new_inner, float new_outer, float new_constant, float new_linear, float new_quad, glm::vec3 new_amb, glm::vec3 new_diff, glm::vec3 new_spec) {
   if (which < 0)
     throw("dont");
 

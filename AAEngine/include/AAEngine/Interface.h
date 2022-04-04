@@ -144,6 +144,8 @@ public:
   /// <param name="loc">desired location</param>  
   void MoveAnimProp(const unsigned int id, glm::vec3 loc);
 
+  bool RemoveAnimProp(const unsigned int id);
+
   /// <summary>
   /// Scales a animated prop
   /// </summary>
