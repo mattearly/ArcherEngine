@@ -2,7 +2,6 @@
 #include "../Base/UniqueInstance.h"
 #include "../../../src/Mesh/Spacial3D.h"
 #include "../../../src/OS/MeshInfo.h"
-#include "ShaderUniforms.h"
 #include <vector>
 #include <string>
 
