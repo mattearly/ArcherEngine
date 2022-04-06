@@ -27,6 +27,7 @@ void Spacial3D::RotateTo(const glm::vec3& rot) {
   mCurrentRot = rot;
   has_unprocessed_modifications = true;
 }
+
 void Spacial3D::ProcessModifications() {
   if (has_unprocessed_modifications) {
     mFinalModelMatrix = glm::mat4(1);
@@ -41,10 +42,5 @@ void Spacial3D::ProcessModifications() {
     has_unprocessed_modifications = false;
   }
 }
-
-void Spacial3D::ApplyPhysx(glm::mat4 changes) {
- //todo
-}
-
 
 }

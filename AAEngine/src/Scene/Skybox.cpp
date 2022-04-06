@@ -6,9 +6,6 @@
 #include "../OS/TextureLoader.h"
 namespace AA {
 
-static unsigned int mVAO = 0;  // setup once via load_cube operation
-static const unsigned int mNumElements = 36;
-
 Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
   setup_cube_geometry();
   setup_incoming_textures(incomingSkymapFiles);
@@ -17,29 +14,16 @@ Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
 
 Skybox::~Skybox() {
   if (mCubemapTexId != 0) {
-    OGLGraphics::DeleteTex(mCubemapTexId);
+    OGLGraphics::DeleteTex(mCubemapTexId);  // todo: cache textures and reuse
   }
-  InternalShaders::Skycube::Shutdown();
 }
 
-void Skybox::Render(const std::shared_ptr<Camera>& cam) {
-  SetViewMatrix(cam->GetViewMatrix());
-  SetProjectionMatrix(cam->GetProjectionMatrix());  // todo (matt): unhack. not set this every frame but only when it changes
-  OGLGraphics::SetDepthTest(true); // should usually already be true
-  OGLGraphics::SetDepthMode(GL_LEQUAL);
-  OGLGraphics::SetSamplerCube(0, mCubemapTexId);
-  OGLGraphics::SetCullFace(false);
-  OGLGraphics::RenderElements(mVAO, mNumElements);
+const unsigned int Skybox::GetCubeMapTexureID() const {
+  return mCubemapTexId;
 }
 
-void Skybox::SetProjectionMatrix(glm::mat4 proj_mat) {
-  InternalShaders::Skycube::Get()->SetMat4("u_projection_matrix", proj_mat);
-}
-
-void Skybox::SetViewMatrix(glm::mat4 view_mat) {
-  // turn the last column into 0's
-  const glm::mat4 viewMatrix = glm::mat4(glm::mat3(view_mat));
-  InternalShaders::Skycube::Get()->SetMat4("u_view_matrix", viewMatrix);
+const unsigned int Skybox::GetVAO() const {
+  return mVAO;
 }
 
 void Skybox::setup_cube_geometry() {

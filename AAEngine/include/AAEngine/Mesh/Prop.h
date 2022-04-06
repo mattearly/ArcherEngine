@@ -21,6 +21,16 @@ public:
   /// <returns>const mesh vec</returns>
   const std::vector<MeshInfo>& GetMeshes() const;
 
+  const glm::mat4 GetFMM() const;
+
+  const bool IsStenciled() const;
+
+  const bool IsStenciledWithNormals() const;
+
+  const float GetStencilScale() const;
+
+  const glm::vec3 GetStencilColor() const;
+
   /// <summary>
   /// Moves a prop to a location
   /// </summary>
@@ -67,21 +77,20 @@ protected:
 
   // mesh loader helps set all these
   friend class MeshLoader;
+  friend class OGLGraphics;
   bool stenciled;
   glm::vec3 stencil_color;
   bool stenciled_with_normals;
   float stencil_scale;
 
-
-  std::vector<MeshInfo> mMeshes;
-
   Spacial3D spacial_data;
+  
+  std::vector<MeshInfo> mMeshes;
 
   std::string cached_load_path;
 
   // only intferace calls draw, removecache, and load
   friend class Interface;
-  virtual void Draw();
   virtual void RemoveCache();
   virtual void Load(const std::string& path);
 

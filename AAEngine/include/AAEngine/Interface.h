@@ -22,7 +22,6 @@
 
 namespace AA {
 
-class Skybox;
 class imGUI;
 class AnimProp;
 class Animation;
@@ -203,19 +202,6 @@ public:
   /// </summary>
   /// <param name="status">true to turn on, false to turn off</param>
   void SimulateWorldPhysics(bool status);
-
-  /// <summary>
-  /// Sets a skybox with 6 textures
-  /// </summary>
-  /// <param name="incomingSkymapFiles">6 textures</param>
-  /// <param name="has_alpha">true is images have and alpha channel, false otherwise</param>
-  void SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept;
-
-  /// <summary>
-  /// Removes current skybox. You will see the clear screen color instead.
-  /// Call SetSkybox with new parameters to set up the skybox again.
-  /// </summary>
-  void RemoveSkybox() noexcept;
 
   /// <summary>
   /// Sets the directional light on the default lit shader.
@@ -524,11 +510,9 @@ private:
 
   std::vector<std::shared_ptr<Prop> > mProps;
 
-  std::vector<std::shared_ptr<AnimProp> > mAnimProps;
+  std::vector<std::shared_ptr<AnimProp> > mAnimatedProps;
 
   std::vector<std::shared_ptr<Animation> > mAnimation;
-
-  std::shared_ptr<Skybox> mSkybox;
 
   std::shared_ptr<DirectionalLight> mDirectionalLight;
 
@@ -555,7 +539,10 @@ private:
 
   void begin();
   void update();
+  void settle_window_resize_flag();  // pre_render helper
+  void pre_render();
   void render();
+  void post_render();
   void teardown();
 
 };

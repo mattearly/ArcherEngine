@@ -1,9 +1,10 @@
 #include "../../include/AAEngine/Scene/Camera.h"
-#include <glm\ext\matrix_clip_space.hpp>
-#include <glm\gtx\transform.hpp>
+#include "../OS/OpenGL/InternalShaders/Skycube.h"
 #include "../OS/OpenGL/InternalShaders/Stencil.h"
 #include "../OS/OpenGL/InternalShaders/Uber.h"
-#include "../OS/OpenGL/InternalShaders/Skycube.h"
+
+#include <glm\ext\matrix_clip_space.hpp>
+#include <glm\gtx\transform.hpp>
 namespace AA {
 
 #define UP glm::vec3(0,1,0)
@@ -12,52 +13,64 @@ Camera::Camera(int width, int height) {
   if (width == 0 || height == 0) {
     SetKeepCameraToWindowSize(true);
   } else {
-    Width = width;
-    Height = height;
+    mViewport.Width = width;
+    mViewport.Height = height;
   }
-  resetViewportVars();
-  updateProjectionMatrix();
+  ResetToDefault();
+  static int LastRenderDepth = 0;
+  RenderDepth = LastRenderDepth++;
 }
 
-void Camera::SetBottomLeft(int x, int y) {
-  BottomLeft = glm::vec2(x, y);
+Camera::~Camera() {
+  if (mSkybox)
+    mSkybox.reset();
 }
 
-void Camera::SetMaxRenderDistance(float amt) {
+void Camera::ProjectionChanged() {
+  camera_projection_changed = true;
+}
+
+void Camera::SetBottomLeft(const int& x, const int& y) {
+  mViewport.BottomLeft[0] = x;
+  mViewport.BottomLeft[1] = y;
+}
+
+void Camera::SetMaxRenderDistance(const float& amt) {
   if (amt < 0.f)
-    amt = abs(amt);
-  MaxRenderDistance = amt;
-  updateProjectionMatrix();
+    MaxRenderDistance = abs(amt);
+  else
+    MaxRenderDistance = amt;
+  camera_projection_changed = true;
 }
 
 void Camera::SetToPerspective() {
   mProjectionType = ProjectionType::PERSPECTIVE;
-  updateProjectionMatrix();
+  camera_projection_changed = true;
 }
 
 void Camera::SetToOrtho_testing() {
   mProjectionType = ProjectionType::ORTHO;
-  updateProjectionMatrix();
+  camera_projection_changed = true;
 }
 
 void Camera::SetFOV(float new_fov) {
   if (new_fov < 1.f) new_fov = 1.f;
   if (new_fov > 360.f) new_fov = 360.f;
   FOV = new_fov;
-  updateProjectionMatrix();
+  camera_projection_changed = true;
 }
 
-void Camera::SetDimensions_testing(int w, int h) {
+void Camera::SetDimensions(int w, int h) {
   if (w < 1 || h < 1)
-    throw("invalid cam dimensions");
-  Width = w;
-  Height = h;
-  updateProjectionMatrix();
+    return;
+  mViewport.Width = w;
+  mViewport.Height = h;
+  camera_projection_changed = true;
 }
 
 void Camera::SetPosition(glm::vec3 new_loc) {
   Position = new_loc;
-  updateCameraVectors();
+  camera_vectors_changed = true;
 }
 
 void Camera::SetPitch(float new_pitch_degrees) {
@@ -66,7 +79,7 @@ void Camera::SetPitch(float new_pitch_degrees) {
   else if (new_pitch_degrees < -89.9f)
     new_pitch_degrees = -89.9f;
   Pitch = new_pitch_degrees;
-  updateCameraVectors();
+  camera_vectors_changed = true;
 }
 
 void Camera::SetYaw(float new_yaw_degrees) {
@@ -75,12 +88,12 @@ void Camera::SetYaw(float new_yaw_degrees) {
   else if (new_yaw_degrees < 0.f)
     new_yaw_degrees += 360.f;
   Yaw = new_yaw_degrees;
-  updateCameraVectors();
+  camera_vectors_changed = true;
 }
 
 void Camera::ShiftPosition(glm::vec3 offset) {
   Position += offset;
-  updateCameraVectors();
+  camera_vectors_changed = true;
 }
 
 void Camera::ShiftPitchAndYaw(double pitch_offset_degrees, double yaw_offset_degrees) {
@@ -98,7 +111,7 @@ void Camera::ShiftPitchAndYaw(double pitch_offset_degrees, double yaw_offset_deg
     new_yaw_degrees += 360.f;
   Yaw = static_cast<float>(new_yaw_degrees);
 
-  updateCameraVectors();
+  camera_vectors_changed = true;
 }
 
 void Camera::SetKeepCameraToWindowSize(bool tf) {
@@ -109,59 +122,71 @@ void Camera::SetRenderDepth(int new_depth) {
   RenderDepth = new_depth;
 }
 
-int Camera::GetRenderDepth() {
+void Camera::SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept {
+  if (incomingSkymapFiles.size() != 6)
+    return;  // invalid size for a skybox
+
+  if (mSkybox) RemoveSkybox();
+
+  mSkybox = std::make_unique<Skybox>(incomingSkymapFiles);
+  camera_projection_changed = true; // to update the skybox shader
+}
+
+void Camera::RemoveSkybox() noexcept {
+  if (mSkybox)
+    mSkybox.reset();
+}
+
+const Skybox* Camera::GetSkybox() const {
+  return mSkybox.get();
+}
+
+const int Camera::GetRenderDepth() const {
   return RenderDepth;
 }
 
-bool Camera::GetIsAlwaysScreenSize() {
+const bool Camera::GetIsAlwaysScreenSize() const {
   return isAlwaysScreenSize;
 }
 
-glm::vec3 Camera::GetFront() {
+const glm::vec3 Camera::GetFront() const {
   return Front;
 }
 
-glm::vec3 Camera::GetRight() {
+const glm::vec3 Camera::GetRight() const {
   return Right;
 }
 
-glm::vec3 Camera::GetPosition() {
+const glm::vec3 Camera::GetPosition() const {
   return Position;
 }
 
-float Camera::GetPitch() {
+const float Camera::GetPitch() const {
   return Pitch;
 }
 
-float Camera::GetYaw() {
+const float Camera::GetYaw() const {
   return Yaw;
 }
 
-glm::vec2 Camera::GetPitchAndYaw() {
+const glm::vec2 Camera::GetPitchAndYaw() const {
   return glm::vec2(Pitch, Yaw);
 }
 
-glm::mat4 Camera::GetProjectionMatrix() {
+const glm::mat4 Camera::GetProjectionMatrix() const {
   return mProjectionMatrix;
 }
 
-glm::mat4 Camera::GetViewMatrix() {
+const glm::mat4 Camera::GetViewMatrix() const {
   return mViewMatrix;
 }
 
-void Camera::updateCameraVectors() {
-  glm::vec3 front{};
-  front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-  front.y = sin(glm::radians(Pitch));
-  front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-  Front = glm::normalize(front);
-  Right = glm::normalize(glm::cross(Front, UP));
-  Up = glm::normalize(glm::cross(Right, Front));
-  updateViewMatrix();
+const Viewport Camera::GetViewport() const {
+  return mViewport;
 }
 
-void Camera::resetViewportVars() {
-  BottomLeft = glm::vec2(0, 0);
+void Camera::ResetToDefault() {
+  mViewport.BottomLeft[0] = mViewport.BottomLeft[1] = 0;
   Position = glm::vec3(0.f);
   FOV = 45.f;
   Yaw = -90.f;  // look down the -z axis
@@ -169,27 +194,57 @@ void Camera::resetViewportVars() {
   MaxRenderDistance = 3000.f;
   mProjectionType = ProjectionType::PERSPECTIVE;
   isAlwaysScreenSize = false;
-  static int LastRenderDepth = 0;
-  RenderDepth = LastRenderDepth++;
-  updateCameraVectors();
+  camera_vectors_changed = true;
+  camera_projection_changed = true;
+}
+
+void Camera::NewFrame() {
+  if (camera_vectors_changed) {
+    update_camera_vectors_tick();
+    if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_view_matrix", mViewMatrix);
+    if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_view_matrix", mViewMatrix);
+    if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_view_matrix", glm::mat4(glm::mat3(mViewMatrix)));
+    camera_vectors_changed = false;
+  }
+  if (camera_projection_changed) {
+    update_cached_projection_matrix();
+    if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_projection_matrix",  mProjectionMatrix);
+    if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
+    if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
+    camera_projection_changed = false;
+  }
+}
+
+void Camera::update_camera_vectors_tick() {
+  glm::vec3 front{};
+  front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+  front.y = sin(glm::radians(Pitch));
+  front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+  Front = glm::normalize(front);
+  Right = glm::normalize(glm::cross(Front, UP));
+  Up = glm::normalize(glm::cross(Right, Front));
+  update_cached_view_matrix();
 }
 
 // updates the cached projection
-void Camera::updateProjectionMatrix() {
-  if (Width < 1 || Height < 1) return;
+void Camera::update_cached_projection_matrix() {
+  float w = static_cast<float>(mViewport.Width);
+  float h = static_cast<float>(mViewport.Height);
+  if (w < 1.f || h < 1.f)
+    return;
   switch (mProjectionType) {
   case ProjectionType::PERSPECTIVE:
   {
-    float aspectRatio = static_cast<float>(Width) / static_cast<float>(Height);
+    float aspectRatio = w / h;
     mProjectionMatrix = glm::perspective(glm::radians(FOV), aspectRatio, 0.0167f, MaxRenderDistance);
   }
   break;
   case ProjectionType::ORTHO:
   {
     // we are going to use an aspect corrected view
-    float aspect_ratio = (float)Width * Height;
-    float ortho_height = (float)Height / 2.f;   // or ortho size
-    float ortho_width = Width * ortho_height;
+    float aspect_ratio = w * h;
+    float ortho_height = h / 2.f;   // or ortho size
+    float ortho_width = w * ortho_height;
     mProjectionMatrix = glm::ortho(
       -ortho_width,
       ortho_width,
@@ -203,28 +258,12 @@ void Camera::updateProjectionMatrix() {
   default:
     break;
   }
-  mProjectionChanged = true;
 }
 
 // update cached view matrix
 // you need to update the shader somewhere else
-void Camera::updateViewMatrix() {
+void Camera::update_cached_view_matrix() {
   mViewMatrix = glm::lookAt(Position, Position + Front, Up);
-  mViewChanged = true;
-}
-
-void Camera::shaderTick() {
-  if (mProjectionChanged) {
-    if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
-    if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
-    if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
-  }
-  if (mViewChanged) {
-    if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_view_matrix", mViewMatrix);
-    if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_view_matrix", mViewMatrix);
-    if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_view_matrix", mViewMatrix);
-  }
-  mProjectionChanged = mViewChanged = false;
 }
 
 }  // end namespace AA
