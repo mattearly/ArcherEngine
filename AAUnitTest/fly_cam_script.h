@@ -1,9 +1,9 @@
-#include "pch.h"
-extern AA::Interface  g_aa_interface;
+#pragma once
+#include "test_globals.h"
 
 // globals local to this file
-static bool fly_setup = false;
-static struct Move {
+bool fly_setup = false;
+struct Move {
   bool forward = false;
   bool backwards = false;
   bool left = false;
@@ -12,25 +12,25 @@ static struct Move {
   bool down = false;
   bool sprint = false;
 } move;
-static bool is_cursor_on = true;
-static glm::vec3 move_diff{ 0 };
-static const float DEFAULTMOVESPEED = 16.f;
-static double FPP_SENSITIVITY = .1f;
-static double lastX{ 0 }, lastY{ 0 };
-static double xDelta{ 0 }, yDelta{ 0 };
-static bool UnprocessedMovements = false;
-static bool snap_to_center = false;
-static unsigned int cam_id_set_to = 0;
-static unsigned int fly_mouse_button_func = 0;
-static unsigned int fly_kb_button_func = 0;
-static unsigned int fly_mouse_handling_func = 0;
-static unsigned int fly_update_func = 0;
-static std::weak_ptr<AA::Window> fly_window;
-static std::weak_ptr<AA::Camera> fly_camera;
+bool is_cursor_on = true;
+glm::vec3 move_diff{ 0 };
+const float DEFAULTMOVESPEED = 16.f;
+double FPP_SENSITIVITY = .1f;
+double lastX{ 0 }, lastY{ 0 };
+double xDelta{ 0 }, yDelta{ 0 };
+bool UnprocessedMovements = false;
+bool snap_to_center = false;
+unsigned int cam_id_set_to = 0;
+unsigned int fly_mouse_button_func = 0;
+unsigned int fly_kb_button_func = 0;
+unsigned int fly_mouse_handling_func = 0;
+unsigned int fly_update_func = 0;
+std::weak_ptr<AA::Window> fly_window;
+std::weak_ptr<AA::Camera> fly_camera;
 
 void setup_fpp_fly(unsigned int cam) {
   if (fly_setup) return;
-  
+
   cam_id_set_to = cam;
 
   fly_mouse_button_func = g_aa_interface.AddToMouseButtonHandling([](AA::MouseButtons& mb) {
@@ -156,15 +156,19 @@ void turn_off_fly() {
   UnprocessedMovements = false;
   snap_to_center = false;
 
-  bool ret_val = false;
-  ret_val = g_aa_interface.RemoveFromMouseButtonHandling(fly_mouse_button_func);
-  fly_mouse_button_func = 0;
-  ret_val = g_aa_interface.RemoveFromKeyHandling(fly_kb_button_func);
-  fly_kb_button_func = 0;
-  ret_val = g_aa_interface.RemoveFromMouseHandling(fly_mouse_handling_func);
-  fly_mouse_handling_func = 0;
-  ret_val = g_aa_interface.RemoveFromOnUpdate(fly_update_func);
-  fly_update_func = 0;
+  if (g_aa_interface.RemoveFromMouseButtonHandling(fly_mouse_button_func)) {
+    fly_mouse_button_func = 0;
+  }
+  if (g_aa_interface.RemoveFromKeyHandling(fly_kb_button_func)) {
+    fly_kb_button_func = 0;
+
+  }
+  if (g_aa_interface.RemoveFromMouseHandling(fly_mouse_handling_func)) {
+    fly_mouse_handling_func = 0;
+  }
+  if (g_aa_interface.RemoveFromOnUpdate(fly_update_func)) {
+    fly_update_func = 0;
+  }
 
   fly_window.reset();
   fly_camera.reset();

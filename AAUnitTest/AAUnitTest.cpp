@@ -5,82 +5,11 @@
 */
 
 #include "pch.h"
+#include "test_globals.h"
+#include "fly_cam_script.h"
 #include "CppUnitTest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-
-// test globals
-AA::Interface g_aa_interface;
-unsigned int g_imgui_func = 0;
-unsigned int g_update_func = 0;
-unsigned int g_cam_id = 0;
-std::weak_ptr<AA::Camera> g_camera_ref;
-std::weak_ptr<AA::Window> g_window_ref;
-
-// resources
-// skymap files storage
-std::vector<std::string> NightSkyTextures;
-std::vector<std::string> DaySkyTextures;
-std::vector<std::string> CaveTextures;
-
-// model paths
-const std::string fullcubepath = runtime_dir + "3dmodels/cube.glb";
-const std::string fullgroundplane = runtime_dir + "3dmodels/large_green_plane.obj";
-const std::string fullpeasant_man = runtime_dir + "3dmodels/peasant_man.dae";
-const std::string fullzombie_ = runtime_dir + "3dmodels/Zombie Punching.fbx";
-const std::string fullwalking_man = runtime_dir + "3dmodels/Walking.dae";
-
-unsigned int se_coins1(0);
-unsigned int se_flashlight(0);
-unsigned int se_gunshot(0);
-unsigned int se_mgsalert(0);
-const std::string path_se_coins1 = runtime_dir + "soundeffects/coins.ogg";
-const std::string path_se_flashlightclick = runtime_dir + "soundeffects/flashlightclick.wav";
-const std::string path_se_gunshot = runtime_dir + "soundeffects/GunShotSingle.wav";
-const std::string path_se_mgsalert = runtime_dir + "soundeffects/Metal Gear Solid Alert.ogg";
-
-
-unsigned int g_untextured_cube_id[3] = { 0,0,0 };
-unsigned int g_ground_plane_id = 0;
-unsigned int g_peasant_man_id = 0;
-
-unsigned int g_zombie_id[2] = { 0, 0 };
-unsigned int g_punching_anim_id = 0;
-
-unsigned int g_walking_man_id = 0;
-unsigned int g_walking_anim_id = 0;
-
-bool g_Yes(false), g_No(false);
-
-float dir_light_direction[3] = { -0.095f, .71f, -.2f };
-float* dir_light_amb = new float(.35f);
-float* dir_light_diff = new float(.58f);
-float* dir_light_spec = new float(.47f);
-
-void reset_test_globals() {
-  g_imgui_func = g_update_func = 0;
-  g_untextured_cube_id[0] = g_untextured_cube_id[1] = g_untextured_cube_id[2] = 0;
-  g_zombie_id[0] = g_zombie_id[1] = 0;
-  g_cam_id = g_ground_plane_id = g_peasant_man_id = g_walking_man_id = 0;
-  g_punching_anim_id = g_walking_anim_id = 0;
-  se_coins1 = se_flashlight = se_gunshot = se_mgsalert = 0;
-  g_Yes = g_No = false;
-  g_camera_ref.reset();
-  g_window_ref.reset();
-  NightSkyTextures.clear();
-  DaySkyTextures.clear();
-  CaveTextures.clear();
-  dir_light_direction[0] = -0.095f;
-  dir_light_direction[1] = 0.71f;
-  dir_light_direction[2] = -0.2f;
-  *dir_light_amb = 0.35f;
-  *dir_light_diff = 0.58f;
-  *dir_light_spec = 0.47f;
-}
-
-// functions to toggle fly controls
-extern void setup_fpp_fly(unsigned int);
-extern void turn_off_fly();
 
 namespace AAUnitTest
 {
@@ -656,6 +585,70 @@ public:
     reset_test_globals();
   }
 
+  TEST_METHOD(LightingTests) {
+    // init engine
+    {
+      bool initSuccess = g_aa_interface.Init();
+      Assert::AreEqual(initSuccess, true);
+    }
+
+    // create a camera that stays screen size
+    {
+      g_window_ref = g_aa_interface.GetWindow();
+      std::shared_ptr<AA::Window> local_window_ref = g_window_ref.lock();
+      g_cam_id = g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
+      g_camera_ref = g_aa_interface.GetCamera(g_cam_id);
+      std::shared_ptr<AA::Camera> local_camera_ref = g_camera_ref.lock();
+      local_camera_ref->SetKeepCameraToWindowSize(true);
+      local_camera_ref->SetFOV(75.f);
+      setup_fpp_fly(g_cam_id);
+    }
+
+    g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
+
+    // load model
+    g_zombie_id[0] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(-20, -20, -45), glm::vec3(.15f));
+    g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[0]);
+    g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[0]);
+
+
+    // a light so we can see
+    g_aa_interface.SetDirectionalLight(
+      glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
+      glm::vec3(*dir_light_amb),
+      glm::vec3(*dir_light_diff),
+      glm::vec3(*dir_light_spec));
+
+    // directional light controls
+    g_imgui_func = g_aa_interface.AddToImGuiUpdate([]() {
+      ImGui::Begin("Directional Light Controls");
+      bool update_light1 = ImGui::SliderFloat3("Light Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
+      bool update_light2 = ImGui::SliderFloat("Light Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
+      bool update_light3 = ImGui::SliderFloat("Light Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_light4 = ImGui::SliderFloat("Light Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
+      ImGui::Text("Does everything look right?");
+      g_Yes = ImGui::Button("Yes");
+      g_No = ImGui::Button("No");
+      ImGui::End();
+
+      // state update
+      if (update_light1 || update_light2 || update_light3 || update_light4)
+        g_aa_interface.SetDirectionalLight(
+          glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
+          glm::vec3(*dir_light_amb),
+          glm::vec3(*dir_light_diff),
+          glm::vec3(*dir_light_spec));
+      if (g_Yes || g_No) { g_aa_interface.Shutdown(); };
+      });
+
+    int run_diag = g_aa_interface.Run();
+
+    Assert::AreEqual(run_diag, 0);
+    Assert::AreEqual(g_No, false);
+
+    reset_test_globals();
+  }
+
   TEST_METHOD(ReuseAnimModelResources) {
     // init engine
     {
@@ -712,6 +705,7 @@ public:
 
     reset_test_globals();
   }
+
 
   // todo: music tests
 
