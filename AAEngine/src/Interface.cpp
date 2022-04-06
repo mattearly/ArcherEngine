@@ -4,6 +4,7 @@
 #include "OS/OpenGL/OGLGraphics.h"
 #include "OS/OpenGL/InternalShaders/Stencil.h"
 #include "OS/OpenGL/InternalShaders/Uber.h"
+#include "OS/OpenGL/InternalShaders/Init.h"
 #include "Physics/NVidiaPhysx.h"
 #include "../include/AAEngine/Mesh/Prop.h"
 #include "../include/AAEngine/Mesh/AnimProp.h"
@@ -28,6 +29,7 @@ bool Interface::Init() {
   mWindow = std::make_shared<Window>();
   SetIMGUI(true);
   SoundDevice::Init();
+  InternalShaders::Init();
   auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
   isInit = true;
   return true;
@@ -39,6 +41,7 @@ bool Interface::Init(const WindowOptions& winopts) {
   mWindow = std::make_shared<Window>(winopts);
   SetIMGUI(true);
   SoundDevice::Init();
+  InternalShaders::Init();
   auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
   isInit = true;
   return true;
@@ -50,6 +53,7 @@ bool Interface::Init(std::shared_ptr<WindowOptions> winopts) {
   mWindow = std::make_shared<Window>(winopts);
   SetIMGUI(true);
   SoundDevice::Init();
+  InternalShaders::Init();
   auto physics_impl = NVidiaPhysx::Get();  // returns a pointer to implementation, ignored here
   isInit = true;
   return true;
@@ -68,7 +72,9 @@ int Interface::Run() {
   begin();
   while (!mWindow->GetShouldClose()) {
     update();
+    pre_render();
     render();
+    post_render();
   }
   teardown();
   return 0;
@@ -101,13 +107,11 @@ void Interface::SoftReset() noexcept {
     p->RemoveCache();
   }
   mProps.clear();
-  for (const auto& ap : mAnimProps) {
+  for (const auto& ap : mAnimatedProps) {
     ap->RemoveCache();
   }
-  mAnimProps.clear();
+  mAnimatedProps.clear();
   mAnimation.clear();
-
-  RemoveSkybox();
 
   RemoveDirectionalLight();
 
@@ -230,38 +234,38 @@ std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
 // Anim Props Access
 //
 unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location, glm::vec3 starting_scale) {
-  mAnimProps.emplace_back(std::make_shared<AnimProp>(path));
-  mAnimProps.back()->spacial_data.MoveTo(starting_location);
-  mAnimProps.back()->spacial_data.ScaleTo(starting_scale);
-  return mAnimProps.back()->GetUID();
+  mAnimatedProps.emplace_back(std::make_shared<AnimProp>(path));
+  mAnimatedProps.back()->spacial_data.MoveTo(starting_location);
+  mAnimatedProps.back()->spacial_data.ScaleTo(starting_scale);
+  return mAnimatedProps.back()->GetUID();
 }
 
 bool Interface::RemoveAnimProp(const unsigned int id) {
   // remove cache (or decrement count of loaded in when multiloading)
-  for (auto& prop : mAnimProps) {
+  for (auto& prop : mAnimatedProps) {
     if (prop->GetUID() == id) {
       prop->RemoveCache();
     }
   }
 
   // the actual remove
-  auto before_size = mAnimProps.size();
+  auto before_size = mAnimatedProps.size();
 
-  auto ret_it = mAnimProps.erase(
+  auto ret_it = mAnimatedProps.erase(
     std::remove_if(
-      mAnimProps.begin(),
-      mAnimProps.end(),
+      mAnimatedProps.begin(),
+      mAnimatedProps.end(),
       [&](auto& prop) { return prop->GetUID() == id; }),
-    mAnimProps.end());
+    mAnimatedProps.end());
 
-  auto after_size = mAnimProps.size();
+  auto after_size = mAnimatedProps.size();
 
   // return true if successful removal, false otherwise
   return (before_size != after_size);
 }
 
 std::weak_ptr<AnimProp> Interface::GetAnimProp(const unsigned int anim_prop_id) const {
-  for (auto& prop : mAnimProps) {
+  for (auto& prop : mAnimatedProps) {
     if (prop->GetUID() == anim_prop_id) {
       return prop;
     }
@@ -272,7 +276,7 @@ std::weak_ptr<AnimProp> Interface::GetAnimProp(const unsigned int anim_prop_id) 
 
 
 unsigned int Interface::GetAnimPropBoneCount_testing(const unsigned int anim_prop_id) {
-  for (auto& prop : mAnimProps) {
+  for (auto& prop : mAnimatedProps) {
     if (prop->GetUID() == anim_prop_id)
       return (unsigned int)prop->m_Skeleton.m_Bones.size();
   }
@@ -284,7 +288,7 @@ unsigned int Interface::GetAnimPropBoneCount_testing(const unsigned int anim_pro
 // Animation Access
 //
 unsigned int Interface::AddAnimation(const char* path, const unsigned int anim_prop_id) {
-  for (auto& prop : mAnimProps) {
+  for (auto& prop : mAnimatedProps) {
     if (prop->GetUID() == anim_prop_id) {
       mAnimation.emplace_back(std::make_shared<Animation>(path, prop));
       return mAnimation.back()->GetUID();
@@ -311,7 +315,7 @@ bool Interface::RemoveAnimation(const unsigned int animation_id) {
 
 void Interface::SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id) {
   // this is terribly inefficient, but it should work
-  for (auto& animprop : mAnimProps) {
+  for (auto& animprop : mAnimatedProps) {
     if (animprop->GetUID() == animprop_id) { // animated prop exists
       if (animation_id == -1) { // -1 means reset
         if (animprop->mAnimator) {
@@ -381,23 +385,6 @@ void Interface::AddGroundPlane(const glm::vec3 norm, float distance) {
 
 void Interface::SimulateWorldPhysics(bool status) {
   mSimulateWorldPhysics = status;
-}
-
-
-//
-// Skybox Interface
-//
-void Interface::SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept {
-  if (mSkybox)
-    RemoveSkybox();
-  if (incomingSkymapFiles.size() != 6)
-    return;  // invalid size for a skybox
-  mSkybox = std::make_shared<Skybox>(incomingSkymapFiles);
-}
-
-void Interface::RemoveSkybox() noexcept {
-  if (mSkybox)
-    mSkybox.reset();
 }
 
 

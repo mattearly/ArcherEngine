@@ -110,8 +110,8 @@ int AnimMeshLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::strin
       //#endif
       //aiProcess_PreTransformVertices |
       //aiProcess_CalcTangentSpace |
-      aiProcess_GenNormals |  // can't be used with gensmoothnormals
-      //aiProcess_GenSmoothNormals |
+      //aiProcess_GenNormals |  // can't be used with gensmoothnormals
+      aiProcess_GenSmoothNormals |
       //aiProcess_FixInfacingNormals |
       //aiProcess_FindInvalidData |
       aiProcess_ValidateDataStructure

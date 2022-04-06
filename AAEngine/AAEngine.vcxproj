@@ -91,7 +91,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\ShaderUniforms.h" />
+    <ClInclude Include="include\AAEngine\Scene\Viewport.h" />
     <ClInclude Include="include\AAEngine\WindowOptions.h" />
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Shadow.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Skycube.h" />
     <ClInclude Include="src\ECS\entt.h" />

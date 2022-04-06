@@ -9,7 +9,6 @@ public:
   void ScaleTo(const glm::vec3& scale);
   void RotateTo(const glm::vec3& rot);
   void ProcessModifications();
-  void ApplyPhysx(glm::mat4 changes);
 private: 
   physx::PxRigidDynamic* mRigidBody;
   glm::vec3 mCurrentLocation;

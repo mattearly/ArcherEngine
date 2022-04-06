@@ -147,6 +147,15 @@
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Shadow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\AAEngine\Scene\Viewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\ShaderUniforms.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sound\SoundDevice.cpp">

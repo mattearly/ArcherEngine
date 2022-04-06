@@ -237,11 +237,16 @@ public:
       UserSaidSkyboxFailed = ImGui::Button("No");
       ImGui::End();
       if (Night) {
-        g_aa_interface.SetSkybox(NightSkyTextures);
+        std::shared_ptr<AA::Camera> night_cam = g_camera_ref.lock();
+        night_cam->SetSkybox(NightSkyTextures);
       } else if (Day) {
-        g_aa_interface.SetSkybox(DaySkyTextures);
+        std::shared_ptr<AA::Camera> day_cam = g_camera_ref.lock();
+
+        day_cam->SetSkybox(DaySkyTextures);
       } else if (Cave) {
-        g_aa_interface.SetSkybox(CaveTextures);
+        std::shared_ptr<AA::Camera> cave_cam = g_camera_ref.lock();
+
+        cave_cam->SetSkybox(CaveTextures);
       } else if (Done || UserSaidSkyboxFailed) {
         g_aa_interface.Shutdown();
       };
@@ -533,7 +538,7 @@ public:
       glm::vec3(*dir_light_spec));
 
     g_imgui_func = g_aa_interface.AddToImGuiUpdate([]() {
-      ImGui::Begin("Model Mashup Test");
+      ImGui::Begin("Stencil Outline Test");
       bool update_light1 = ImGui::SliderFloat3("Light Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
       bool update_light2 = ImGui::SliderFloat("Light Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
       bool update_light3 = ImGui::SliderFloat("Light Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);

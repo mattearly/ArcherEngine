@@ -5,6 +5,7 @@
 #include "OS/OpenGL/InternalShaders/Stencil.h"
 #include "OS/OpenGL/InternalShaders/Uber.h"
 #include "OS/OpenGL/InternalShaders/Shadow.h"
+#include "OS/OpenGL/InternalShaders/Skycube.h"
 #include "Physics/NVidiaPhysx.h"
 #include "../include/AAEngine/Mesh/Prop.h"
 #include "../include/AAEngine/Mesh/AnimProp.h"
@@ -64,7 +65,7 @@ void Interface::update() {
     p->spacial_data.ProcessModifications();
   }
 
-  for (auto& ap : mAnimProps) {
+  for (auto& ap : mAnimatedProps) {
     ap->spacial_data.ProcessModifications();
     if (ap->mAnimator) {
       ap->UpdateAnim(elapsedTime);
@@ -91,48 +92,37 @@ void Interface::update() {
   for (auto& oMH : onMouseHandling) { oMH.second(g_mouse_input_status); }
 }
 
+void Interface::settle_window_resize_flag() {
+  if (!mCameras.empty()) {
+    for (auto& cam : mCameras) {
+      if (cam->GetIsAlwaysScreenSize()) {
+        cam->SetBottomLeft(0, 0);
+        cam->SetDimensions(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
+      }
+      cam->ProjectionChanged();
+    }
+  }
+  g_os_window_resized = false;
+}
+
+void Interface::pre_render() {
+  if (g_os_window_resized) {
+    settle_window_resize_flag();
+  }
+
+  OGLGraphics::NewFrame();
+}
+
 // Renders visable props every frame
 void Interface::render() {
-  OGLGraphics::ClearScreen();
   if (!mCameras.empty()) {
-    OGLGraphics::SetDepthTest(true);
-    OGLGraphics::SetDepthMode(GL_LESS);
-    InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-    InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
+    for (const auto& cam : mCameras) {
+      cam->NewFrame();
+      OGLGraphics::BatchDrawToViewport(mProps, cam->GetViewport());
 
-    // draw to all cameras
-    for (auto& cam : mCameras) {
-      if (cam->isAlwaysScreenSize) {
-        if (g_os_window_resized) {
-          cam->SetBottomLeft(0, 0);
-          cam->SetDimensions_testing(mWindow->GetCurrentWidth(), mWindow->GetCurrentHeight());
-          cam->updateProjectionMatrix();
-          g_os_window_resized = false;
-        }
-      }
-      cam->updateViewMatrix();
-      cam->updateProjectionMatrix();
-      cam->shaderTick();
-      OGLGraphics::SetViewportSize((GLint)cam->BottomLeft.x, (GLint)cam->BottomLeft.y, (GLsizei)cam->Width, (GLsizei)cam->Height);
-      for (auto& p : mProps) { p->Draw(); }
-      for (auto& ap : mAnimProps) {
-        InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-        InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
-        if (ap->mAnimator) {
-          InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
-          InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
-          auto transforms = ap->mAnimator->GetFinalBoneMatrices();
-          for (unsigned int i = 0; i < transforms.size(); ++i) {
-            InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-            InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-          }
-        }
-        ap->Draw();
-      }
-      if (mSkybox) { mSkybox->Render(cam); }
-#ifdef _DEBUG
-      if (mSimulateWorldPhysics) { NVidiaPhysx::Get()->DrawDebug(cam); }
-#endif
+      OGLGraphics::BatchDrawToViewport(mAnimatedProps, cam->GetViewport());
+      
+      OGLGraphics::DrawSkybox(cam->GetSkybox());
     }
   }
 
@@ -143,9 +133,9 @@ void Interface::render() {
     mIMGUI->Render();
   }
 
-  // display frame changes
-  mWindow->swap_buffers();
 }
+
+void Interface::post_render() { mWindow->swap_buffers(); }
 
 // Runs Once on Engine Shutdown
 void Interface::teardown() {
@@ -161,6 +151,7 @@ void Interface::teardown() {
   InternalShaders::Stencil::Shutdown();
   InternalShaders::Uber::Shutdown();
   InternalShaders::Shadow::Shutdown();
+  InternalShaders::Skycube::Shutdown();
 
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {
@@ -168,10 +159,10 @@ void Interface::teardown() {
   }
   mProps.clear();
 
-  for (const auto& ap : mAnimProps) {
+  for (const auto& ap : mAnimatedProps) {
     ap->RemoveCache();
   }
-  mAnimProps.clear();
+  mAnimatedProps.clear();
 
   for (auto& anim : mAnimation) {
     anim.reset();
@@ -181,9 +172,6 @@ void Interface::teardown() {
   mDirectionalLight.reset();
   mPointLights.clear();
   mSpotLights.clear();
-
-  // remove skybox if it exists
-  RemoveSkybox();
 
   // delete imgui
   if (mIMGUI) {
