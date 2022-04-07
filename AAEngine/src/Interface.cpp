@@ -1,13 +1,11 @@
 #include "../include/AAEngine/Interface.h"
 #include "../include/AAEngine/Scene/Camera.h"
 #include "../include/AAEngine/OS/Interface/Window.h"
-#include "OS/OpenGL/OGLGraphics.h"
-#include "OS/OpenGL/InternalShaders/Stencil.h"
-#include "OS/OpenGL/InternalShaders/Uber.h"
-#include "OS/OpenGL/InternalShaders/Init.h"
-#include "Physics/NVidiaPhysx.h"
 #include "../include/AAEngine/Mesh/Prop.h"
 #include "../include/AAEngine/Mesh/AnimProp.h"
+#include "OS/OpenGL/OGLGraphics.h"
+#include "OS/OpenGL/InternalShaders/Init.h"
+#include "Physics/NVidiaPhysx.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
 #include "Sound/SoundDevice.h"
@@ -15,6 +13,7 @@
 #include "Sound/SoundEffect.h"
 #include "Sound/LongSound.h"
 #include "GUI/imGUI.h"
+
 #include <string>
 #include <sstream>
 #include <utility>

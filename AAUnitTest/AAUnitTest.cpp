@@ -170,11 +170,9 @@ public:
         night_cam->SetSkybox(NightSkyTextures);
       } else if (Day) {
         std::shared_ptr<AA::Camera> day_cam = g_camera_ref.lock();
-
         day_cam->SetSkybox(DaySkyTextures);
       } else if (Cave) {
         std::shared_ptr<AA::Camera> cave_cam = g_camera_ref.lock();
-
         cave_cam->SetSkybox(CaveTextures);
       } else if (Done || UserSaidSkyboxFailed) {
         g_aa_interface.Shutdown();

@@ -1,14 +1,10 @@
 #include "../include/AAEngine/Interface.h"
 #include "../include/AAEngine/Scene/Camera.h"
 #include "../include/AAEngine/OS/Interface/Window.h"
-#include "OS/OpenGL/OGLGraphics.h"
-#include "OS/OpenGL/InternalShaders/Stencil.h"
-#include "OS/OpenGL/InternalShaders/Uber.h"
-#include "OS/OpenGL/InternalShaders/Shadow.h"
-#include "OS/OpenGL/InternalShaders/Skycube.h"
-#include "Physics/NVidiaPhysx.h"
 #include "../include/AAEngine/Mesh/Prop.h"
 #include "../include/AAEngine/Mesh/AnimProp.h"
+#include "OS/OpenGL/OGLGraphics.h"
+#include "Physics/NVidiaPhysx.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
 #include "Sound/SoundDevice.h"
@@ -16,13 +12,13 @@
 #include "Sound/SoundEffect.h"
 #include "Sound/LongSound.h"
 #include "GUI/imGUI.h"
+#include "OS/LoadCube.h"
+#include "OS/LoadPlane.h"
 #include <string>
 #include <sstream>
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
-#include "OS/LoadCube.h"
-#include "OS/LoadPlane.h"
 
 namespace AA {
 
@@ -146,7 +142,7 @@ void Interface::teardown() {
   }
 
   mCameras.clear();
-  
+
   unload_cube();
   unload_plane();
 
