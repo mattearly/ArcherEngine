@@ -18,11 +18,8 @@ public:
   const unsigned int GetCubeMapTexureID() const;
   const unsigned int GetVAO() const;
 private:
-  void SetViewMatrix(glm::mat4 view_mat);
-  void SetProjectionMatrix(glm::mat4 proj_mat);
   unsigned int mCubemapTexId = 0;
   unsigned int mVAO = 0;  // setup once via setup_cube_geometry operation
-  //const unsigned int mNumElements = 36;
   void setup_cube_geometry();
   void setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles);
 };

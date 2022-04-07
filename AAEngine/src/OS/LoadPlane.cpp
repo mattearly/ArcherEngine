@@ -3,11 +3,10 @@
 namespace AA {
 
 static unsigned int vao_to_the_plane = 0;
-static bool plane_loaded = false;
 
 unsigned int load_plane() {
 
-  if (plane_loaded) {
+  if (vao_to_the_plane != 0) {
     return vao_to_the_plane;
   }
   const float SIZE = 1.f;
@@ -24,9 +23,14 @@ unsigned int load_plane() {
   };
 
   vao_to_the_plane = OGLGraphics::Upload3DPositionsMesh(planeVertices, sizeof(planeVertices) / sizeof(planeVertices[0]), faces, sizeof(faces) / sizeof(faces[0]));
-  plane_loaded = true;
   return vao_to_the_plane;
 }
 
+void unload_plane() {
+  if (vao_to_the_plane != 0) {
+    OGLGraphics::DeleteMesh(vao_to_the_plane);
+    vao_to_the_plane = 0;
+  }
+}
 
 }

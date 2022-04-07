@@ -21,6 +21,8 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
+#include "OS/LoadCube.h"
+#include "OS/LoadPlane.h"
 
 namespace AA {
 
@@ -145,6 +147,9 @@ void Interface::teardown() {
   }
 
   mCameras.clear();
+  
+  unload_cube();
+  unload_plane();
 
   ClearAllRuntimeLamdaFunctions();
 
