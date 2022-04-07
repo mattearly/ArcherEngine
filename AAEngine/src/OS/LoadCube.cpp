@@ -2,13 +2,13 @@
 #include "OpenGL/OGLGraphics.h"
 namespace AA {
 static unsigned int vao_to_the_cube = 0;
-static bool cube_loaded = false;
 
 // returns the vao to a -1 by 1 cube
 unsigned int load_cube() {
-  if (cube_loaded) {
+  if (vao_to_the_cube != 0) {
     return vao_to_the_cube;
   }
+
   const float cubeVertices[] = {
     // front
     -1.0, -1.0,  1.0,
@@ -44,8 +44,14 @@ unsigned int load_cube() {
 
   vao_to_the_cube = OGLGraphics::Upload3DPositionsMesh(cubeVertices, sizeof(cubeVertices) / sizeof(cubeVertices[0]), faces, sizeof(faces) / sizeof(faces[0]));
 
-  cube_loaded = true;
   return vao_to_the_cube;
+}
+
+void unload_cube() {
+  if (vao_to_the_cube != 0) {
+    OGLGraphics::DeleteMesh(vao_to_the_cube);
+    vao_to_the_cube = 0;
+  }
 }
 
 }  // end namespace AA

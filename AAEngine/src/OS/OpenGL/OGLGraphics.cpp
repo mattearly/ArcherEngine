@@ -24,13 +24,13 @@ void OGLGraphics::SetTexture(int which, const int& textureID) {
   glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-void OGLGraphics::RenderElements(unsigned int vao, unsigned int numElements) {
+void OGLGraphics::DrawElements(unsigned int vao, unsigned int numElements) {
   glBindVertexArray(vao);
   glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
 }
 
-void OGLGraphics::RenderStrip(unsigned int vao, const int& count) {
+void OGLGraphics::DrawStrip(unsigned int vao, const int& count) {
   glBindVertexArray(vao);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, count);
   glBindVertexArray(0);
@@ -545,157 +545,5 @@ void OGLGraphics::SetStencilFuncToAlways() {
 void OGLGraphics::SetStencilFuncToNotEqual() {
   glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 }
-//
-//void OGLGraphics::BatchDrawToViewport(const std::vector<std::shared_ptr<AA::Prop> >& render_objects, const Viewport& vp) {
-//  OGLGraphics::SetViewportSize(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
-//
-//  OGLShader* uber_shader = InternalShaders::Uber::Get();
-//  for (auto& render_object : render_objects) {
-//
-//    if (render_object->IsStenciled()) {
-//      // 1st pass: render to stencil buffer with normal draw
-//      OGLGraphics::SetStencilFuncToAlways();
-//      OGLGraphics::SetStencilMask(true);
-//
-//      uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
-//
-//      for (const MeshInfo& m : render_object->GetMeshes()) {
-//        for (const auto& texture : m.textureDrawIds) {
-//          const std::string texType = texture.second;  // get the texture type
-//          if (texType == "Albedo") {
-//            uber_shader->SetBool("u_has_albedo_tex", true);
-//            OGLGraphics::SetTexture(0, texture.first);
-//            uber_shader->SetInt(("u_material." + texType).c_str(), 0);
-//          }
-//          if (texType == "Specular") {
-//            uber_shader->SetBool("u_has_specular_tex", true);
-//            uber_shader->SetInt(("u_material." + texType).c_str(), 1);
-//            uber_shader->SetFloat("u_material.Shininess", m.shininess);
-//            OGLGraphics::SetTexture(1, texture.first);
-//          }
-//          if (texType == "Normal") {
-//            uber_shader->SetBool("u_has_normal_tex", true);
-//            OGLGraphics::SetTexture(2, texture.first);
-//            uber_shader->SetInt(("u_material." + texType).c_str(), 2);
-//          }
-//          if (texType == "Emission") {
-//            uber_shader->SetBool("u_has_emission_tex", true);
-//            OGLGraphics::SetTexture(3, texture.first);
-//            uber_shader->SetInt(("u_material." + texType).c_str(), 3);
-//          }
-//        }
-//        OGLGraphics::SetCullFace(m.backface_culled);
-//        OGLGraphics::RenderElements(m.vao, m.numElements);
-//
-//        // reset texture shader variables
-//        OGLGraphics::SetTexture(0, 0);
-//        OGLGraphics::SetTexture(1, 0);
-//        OGLGraphics::SetTexture(2, 0);
-//        OGLGraphics::SetTexture(3, 0);
-//        uber_shader->SetBool("u_has_albedo_tex", false);
-//        uber_shader->SetBool("u_has_specular_tex", false);
-//        uber_shader->SetBool("u_has_normal_tex", false);
-//        uber_shader->SetBool("u_has_emission_tex", false);
-//      }
-//      // 2nd pass
-//      OGLGraphics::SetStencilFuncToNotEqual();
-//      OGLGraphics::SetStencilMask(false);
-//      OGLGraphics::SetDepthTest(false);
-//      OGLShader* stencil_shader = InternalShaders::Stencil::Get();
-//      if (render_object->stenciled_with_normals) {
-//        stencil_shader->SetBool("u_stencil_with_normals", true);
-//        stencil_shader->SetFloat("u_stencil_scale", render_object->stencil_scale);
-//        stencil_shader->SetMat4("u_model_matrix", render_object->GetFMM());
-//      } else {
-//        stencil_shader->SetBool("u_stencil_with_normals", false);
-//        // if stencil scale is less than 1.0 in this case, you won't be able to see it.
-//        glm::mat4 scaled_stencil_model_matrix = glm::scale(render_object->GetFMM(), glm::vec3(render_object->GetStencilScale()));
-//        stencil_shader->SetMat4("u_model_matrix", scaled_stencil_model_matrix);
-//      }
-//      stencil_shader->SetVec3("u_stencil_color", render_object->GetStencilColor());
-//      for (const MeshInfo& m : render_object->GetMeshes()) {
-//        OGLGraphics::SetCullFace(m.backface_culled);
-//        OGLGraphics::RenderElements(m.vao, m.numElements);
-//      }
-//      OGLGraphics::SetStencilMask(true);
-//      glStencilFunc(GL_ALWAYS, 0, 0xFF);  // todo: abstract
-//      OGLGraphics::SetDepthTest(true);
-//    } else {
-//      OGLGraphics::SetStencilMask(false);
-//      uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
-//      for (const MeshInfo& m : render_object->GetMeshes()) {
-//        for (const auto& texture : m.textureDrawIds) {
-//          const std::string texType = texture.second;  // get the texture type
-//          if (texType == "Albedo") {  //todo, improve comparison performance
-//            uber_shader->SetBool("u_has_albedo_tex", true);
-//            uber_shader->SetInt(("u_material." + texType).c_str(), 0);
-//            OGLGraphics::SetTexture(0, texture.first);
-//          }
-//          if (texType == "Specular") {
-//            uber_shader->SetBool("u_has_specular_tex", true);
-//            uber_shader->SetInt(("u_material." + texType).c_str(), 1);
-//            uber_shader->SetFloat("u_material.Shininess", m.shininess);
-//            OGLGraphics::SetTexture(1, texture.first);
-//          }
-//          if (texType == "Normal") {
-//            uber_shader->SetBool("u_has_normal_tex", true);
-//            uber_shader->SetInt(("u_material." + texType).c_str(), 2);
-//            OGLGraphics::SetTexture(2, texture.first);
-//          }
-//          if (texType == "Emission") {
-//            uber_shader->SetBool("u_has_emission_tex", true);
-//            uber_shader->SetInt(("u_material." + texType).c_str(), 3);
-//            OGLGraphics::SetTexture(3, texture.first);
-//          }
-//        }
-//        OGLGraphics::SetCullFace(m.backface_culled);
-//        OGLGraphics::RenderElements(m.vao, m.numElements);
-//        //set textures back to 0 or the defaults for that type
-//        OGLGraphics::SetTexture(0, 0);
-//        OGLGraphics::SetTexture(1, 0);
-//        OGLGraphics::SetTexture(2, 0);
-//        OGLGraphics::SetTexture(3, 0);
-//        uber_shader->SetBool("u_has_albedo_tex", false);
-//        uber_shader->SetBool("u_has_specular_tex", false);
-//        uber_shader->SetBool("u_has_normal_tex", false);
-//        uber_shader->SetBool("u_has_emission_tex", false);
-//      }
-//    }
-//  }
-//
-//  // render skybox
-//}
-
-//
-//void OGLGraphics::DrawSkybox(const Skybox* skybox_target) const {
-//  //SetViewMatrix(cam->GetViewMatrix());
-//  //SetProjectionMatrix(cam->GetProjectionMatrix());  // todo (matt): unhack. not set this every frame but only when it changes
-//  
-//  glDepthFunc(GL_LEQUAL);
-//  // set sampler cube
-//  glActiveTexture(GL_TEXTURE0 + skybox_target->GetCubeMapTexureID());
-//  glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_target->GetCubeMapTexureID());
-//
-//  glDisable(GL_CULL_FACE);
-//
-//  glBindVertexArray(skybox_target->GetVAO());
-//  glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-//  
-//  ResetToDefault();
-//}
-
-//void OGLGraphics::ResetToDefault() const {
-//
-//  // reset all things changed
-//  glActiveTexture(GL_TEXTURE0);
-//  glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-//  glBindVertexArray(0);
-//
-//  // ogl defaults
-//  glEnable(GL_DEPTH_TEST);
-//  glDepthFunc(GL_LESS);
-//
-//
-//}
 
 }  // end namespace AA

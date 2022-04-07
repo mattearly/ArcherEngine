@@ -48,10 +48,12 @@ unsigned int g_walking_anim_id = 0;
 
 bool g_Yes(false), g_No(false);
 
-float dir_light_direction[3] = { -0.095f, .71f, -.2f };
-float* dir_light_amb = new float(.35f);
-float* dir_light_diff = new float(.58f);
-float* dir_light_spec = new float(.47f);
+float dir_light_direction[3] = { 0.33f, 0.33f, -0.33f };
+float* dir_light_diff = new float(0.33f);
+float* dir_light_amb = new float(0.0153f);
+float* dir_light_spec = new float(0.0153f);
+
+float* cam_fov = new float(45.f);
 
 
 void reset_test_globals() {
@@ -67,10 +69,14 @@ void reset_test_globals() {
   NightSkyTextures.clear();
   DaySkyTextures.clear();
   CaveTextures.clear();
-  dir_light_direction[0] = -0.095f;
-  dir_light_direction[1] = 0.71f;
-  dir_light_direction[2] = -0.2f;
-  *dir_light_amb = 0.35f;
-  *dir_light_diff = 0.58f;
-  *dir_light_spec = 0.47f;
+
+  dir_light_direction[0] = 0.33f;
+  dir_light_direction[1] = 0.33f;
+  dir_light_direction[2] = -0.33f;
+
+  *dir_light_diff = 0.33f;
+  *dir_light_amb = 0.0153f;
+  *dir_light_spec = 0.0153f;
+
+  *cam_fov = 45.f;
 }

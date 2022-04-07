@@ -47,9 +47,13 @@ void FRAMEBUFFERSIZESETCALLBACK(GLFWwindow* window, int w, int h) {
 }
 
 void NORMALMOUSEREPORTINGCALLBACK(GLFWwindow* window, double xpos, double ypos) {
-  // Update Cached Position
-  g_mouse_input_status.xOffset = xpos;
-  g_mouse_input_status.yOffset = ypos;
+  // if different, update cached position
+  if (g_mouse_input_status.xOffset != xpos) {
+    g_mouse_input_status.xOffset = xpos;
+  }
+  if (g_mouse_input_status.yOffset != ypos) {
+    g_mouse_input_status.yOffset = ypos;
+  }
 }
 
 void ONWINDOWFOCUSCALLBACK(GLFWwindow* window, int focused) {
@@ -537,8 +541,13 @@ void MOUSEBUTTONCALLBACK(GLFWwindow* w, int button, int action, int mods) {
 }
 
 void MOUSESCROLLWHEELCALLBACK(GLFWwindow* w, double xoffset, double yoffset) {
-  g_scroll_input_status.xOffset = xoffset;
-  g_scroll_input_status.yOffset = yoffset;
-  g_new_key_reads = true;
+  if (g_scroll_input_status.xOffset != xoffset) {
+    g_scroll_input_status.xOffset = xoffset;
+    g_new_key_reads = true;
+  }
+  if (g_scroll_input_status.yOffset != yoffset) {
+    g_scroll_input_status.yOffset = yoffset;
+    g_new_key_reads = true;
+  }
 }
 }  // end namespace AA

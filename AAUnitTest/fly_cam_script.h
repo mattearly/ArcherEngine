@@ -71,12 +71,14 @@ void setup_fpp_fly(unsigned int cam) {
     xDelta = cursor.xOffset - lastX;
     yDelta = lastY - cursor.yOffset;
 
-    fly_camera = g_aa_interface.GetCamera(cam_id_set_to);
-    std::shared_ptr<AA::Camera> local_fly_cam = fly_camera.lock();
-    local_fly_cam->ShiftPitchAndYaw(yDelta * FPP_SENSITIVITY, xDelta * FPP_SENSITIVITY);
+    if (xDelta != 0.0 || yDelta != 0.0) {
+      fly_camera = g_aa_interface.GetCamera(cam_id_set_to);
+      std::shared_ptr<AA::Camera> local_fly_cam = fly_camera.lock();
+      local_fly_cam->ShiftPitchAndYaw(yDelta * FPP_SENSITIVITY, xDelta * FPP_SENSITIVITY);
 
-    lastX = cursor.xOffset;
-    lastY = cursor.yOffset;
+      lastX = cursor.xOffset;
+      lastY = cursor.yOffset;
+    }
 
     });
 
