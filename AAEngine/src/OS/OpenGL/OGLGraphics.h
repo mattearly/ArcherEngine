@@ -104,9 +104,11 @@ public:
 
   static void RenderSkybox(const Skybox* skybox_target) {
     if (!skybox_target) { return; }
-
+ 
     glDepthFunc(GL_LEQUAL);
-    glDisable(GL_CULL_FACE);
+
+    auto skybox_shader = InternalShaders::Skycube::Get();
+    
     SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
     DrawElements(skybox_target->GetVAO(), 36);
 
