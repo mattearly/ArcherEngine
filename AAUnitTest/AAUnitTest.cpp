@@ -320,11 +320,23 @@ public:
     reset_test_globals();
   }
 
-  TEST_METHOD(ModelMashup) {
+  TEST_METHOD(SpaceSceneMashup) {
     // init AA
     {
       bool initSuccess = g_aa_interface.Init();
       Assert::AreEqual(initSuccess, true);
+    }
+
+    g_aa_interface.SetWindowTitle("Space Scene Mashup Test");
+    
+    // night time skybox files
+    {
+      const std::string skyboxfolder = runtime_dir + "skybox/night/";
+      const std::string order[6] = { "right",  "left",  "top", "bottom", "front", "back" };
+      const std::string skyboxfileext = ".png";
+      NightSkyTextures.reserve(6);
+      for (int j = 0; j < 6; ++j)
+        NightSkyTextures.emplace_back(skyboxfolder + order[j] + skyboxfileext);
     }
 
     // camera that stays screen size
@@ -332,29 +344,39 @@ public:
       g_window_ref = g_aa_interface.GetWindow();
       std::shared_ptr<AA::Window> local_window_ref = g_window_ref.lock();
       g_cam_id = g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
+      
+      
       g_camera_ref = g_aa_interface.GetCamera(g_cam_id);
       std::shared_ptr<AA::Camera> local_camera_ref = g_camera_ref.lock();
+      local_camera_ref->SetSkybox(NightSkyTextures);
+
       local_camera_ref->SetKeepCameraToWindowSize(true);
-      local_camera_ref->SetFOV(75.f);
+      local_camera_ref->SetFOV(*cam_fov);  
       setup_fpp_fly(g_cam_id);
     }
 
     // load models
-    g_untextured_cube_id[0] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(-10, -10, -10));
-    g_ground_plane_id = g_aa_interface.AddProp(fullgroundplane.c_str(), glm::vec3(0, -30.f, 0), glm::vec3(2));
+    //g_walking_man_id = g_aa_interface.AddAnimProp(fullwalking_man.c_str(), glm::vec3(30, -30, -70), glm::vec3(1.f));
+    //g_walking_anim_id = g_aa_interface.AddAnimation(fullwalking_man.c_str(), g_walking_man_id);
+    //g_aa_interface.SetAnimationOnAnimProp(g_walking_anim_id, g_walking_man_id);
 
-    g_peasant_man_id = g_aa_interface.AddProp(fullpeasant_man.c_str(), glm::vec3(0, -30, -70), glm::vec3(.15f));
 
-    g_zombie_id[0] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(-30, -30, -70), glm::vec3(.15f));
+    //g_untextured_cube_id[0] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(-10, -10, -10));
+    g_ground_plane_id = g_aa_interface.AddProp(fullgroundplane.c_str(), glm::vec3(0, -30.f, 0), glm::vec3(3));
+
+
+    //g_peasant_man_id = g_aa_interface.AddProp(fullpeasant_man.c_str(), glm::vec3(0, -30, -70), glm::vec3(.15f));
+
+
+    // Add Zombie With Punching Animation.
+    g_zombie_id[0] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(-30, -30, -70), glm::vec3(0.12f));
     g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[0]);
     g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[0]);
 
-    g_walking_man_id = g_aa_interface.AddAnimProp(fullwalking_man.c_str(), glm::vec3(30, -30, -70), glm::vec3(3));
-    g_walking_anim_id = g_aa_interface.AddAnimation(fullwalking_man.c_str(), g_walking_man_id);
-    g_aa_interface.SetAnimationOnAnimProp(g_walking_anim_id, g_walking_man_id);
+
 
     // default light and background
-    g_aa_interface.SetWindowClearColor();
+    //g_aa_interface.SetWindowClearColor();
 
     g_aa_interface.SetDirectionalLight(
       glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
@@ -363,14 +385,16 @@ public:
       glm::vec3(*dir_light_spec));
 
     g_imgui_func = g_aa_interface.AddToImGuiUpdate([]() {
-      ImGui::Begin("Model Mashup Test");
-      bool update_light1 = ImGui::SliderFloat3("Light Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
-      bool update_light2 = ImGui::SliderFloat("Light Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
-      bool update_light3 = ImGui::SliderFloat("Light Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_light4 = ImGui::SliderFloat("Light Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
-      ImGui::Text("Does everything look right?");
-      g_Yes = ImGui::Button("Yes");
-      g_No = ImGui::Button("No");
+      ImGui::Begin("Space Scene Mashup");
+      ImGui::Text("Directional Light Controls");
+      bool update_light1 = ImGui::SliderFloat3("Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
+      bool update_light3 = ImGui::SliderFloat("Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_light2 = ImGui::SliderFloat("Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
+      bool update_light4 = ImGui::SliderFloat("Specular", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
+      ImGui::Text("Camera Controls");
+      bool update_cam_fov = ImGui::SliderFloat("FOV", cam_fov, 30.f, 90.f);
+      g_No = ImGui::Button("report broken");
+      g_Yes = ImGui::Button("QUIT");
       ImGui::End();
 
       // state update
@@ -380,6 +404,10 @@ public:
           glm::vec3(*dir_light_amb),
           glm::vec3(*dir_light_diff),
           glm::vec3(*dir_light_spec));
+      if (update_cam_fov) {
+        auto cam = g_camera_ref.lock();
+        cam->SetFOV(*cam_fov);
+      }
       if (g_Yes || g_No) { g_aa_interface.Shutdown(); };
       });
 
