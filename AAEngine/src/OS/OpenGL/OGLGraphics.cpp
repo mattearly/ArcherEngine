@@ -24,13 +24,13 @@ void OGLGraphics::SetTexture(int which, const int& textureID) {
   glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-void OGLGraphics::RenderElements(unsigned int vao, unsigned int numElements) {
+void OGLGraphics::DrawElements(unsigned int vao, unsigned int numElements) {
   glBindVertexArray(vao);
   glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
 }
 
-void OGLGraphics::RenderStrip(unsigned int vao, const int& count) {
+void OGLGraphics::DrawStrip(unsigned int vao, const int& count) {
   glBindVertexArray(vao);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, count);
   glBindVertexArray(0);

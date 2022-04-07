@@ -43,7 +43,6 @@ void Interface::begin() {
 
 // Runs core and all user defined functionality
 void Interface::update() {
-  g_poll_input_events();
 
   // init delta clock on first tap into update
   static float currTime;
@@ -120,11 +119,8 @@ void Interface::render() {
   if (!mCameras.empty()) {
     for (const auto& cam : mCameras) {
       cam->NewFrame();
-      OGLGraphics::BatchDrawToViewport(mProps, cam->GetViewport());
-
-      OGLGraphics::BatchDrawToViewport(mAnimatedProps, cam->GetViewport());
-      
-      OGLGraphics::DrawSkybox(cam->GetSkybox());
+      OGLGraphics::BatchDrawToViewport(mProps, mAnimatedProps, cam->GetViewport());
+      OGLGraphics::RenderSkybox(cam->GetSkybox());
     }
   }
 
@@ -137,7 +133,10 @@ void Interface::render() {
 
 }
 
-void Interface::post_render() { mWindow->swap_buffers(); }
+void Interface::post_render() {
+  mWindow->swap_buffers();
+  g_poll_input_events();
+}
 
 // Runs Once on Engine Shutdown
 void Interface::teardown() {

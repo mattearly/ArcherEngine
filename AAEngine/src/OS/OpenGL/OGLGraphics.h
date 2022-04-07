@@ -40,8 +40,8 @@ public:
 
   static void SetSamplerCube(int which, const int& cubetexID);
   static void SetTexture(int which, const int& textureID);
-  static void RenderElements(unsigned int vao, unsigned int numElements);
-  static void RenderStrip(unsigned int vao, const int& count);
+  static void DrawElements(unsigned int vao, unsigned int numElements);
+  static void DrawStrip(unsigned int vao, const int& count);
   static void SetViewportSize(GLint x, GLint y, GLsizei w, GLsizei h);
   static void SetViewportClearColor(glm::vec3 color) noexcept;
 
@@ -67,7 +67,13 @@ public:
   //
   // render graph stuff
   //
-  static void BatchDrawToViewport(const std::vector<std::shared_ptr<AA::Prop> >& render_objects, const Viewport& vp) {
+
+  static void BatchDrawToViewport(
+    const std::vector<std::shared_ptr<AA::Prop> >& render_objects, 
+    const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
+    const Viewport& vp) {
+
+
     glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
     for (const auto& render_object : render_objects) {
       if (render_object->IsStenciled()) {
@@ -76,11 +82,8 @@ public:
         OGLGraphics::RenderNormal(render_object);
       }
     }
-  }
 
-  static void BatchDrawToViewport(const std::vector<std::shared_ptr<AA::AnimProp> >& render_objects, const Viewport& vp) {
-    glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
-    for (const auto& render_object : render_objects) {
+    for (const auto& render_object : animated_render_objects) {
       if (render_object->mAnimator) {
         InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
         InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
@@ -95,21 +98,17 @@ public:
       } else {
         OGLGraphics::RenderNormal(std::dynamic_pointer_cast<AA::Prop>(render_object));
       }
-
     }
+
   }
 
-  static void DrawSkybox(const Skybox* skybox_target) {
+  static void RenderSkybox(const Skybox* skybox_target) {
     if (!skybox_target) { return; }
 
     glDepthFunc(GL_LEQUAL);
-
-    OGLGraphics::SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
-
     glDisable(GL_CULL_FACE);
-
-    glBindVertexArray(skybox_target->GetVAO());
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+    SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
+    DrawElements(skybox_target->GetVAO(), 36);
 
     ResetToDefault();
   }
@@ -215,7 +214,7 @@ public:
         }
       }
       OGLGraphics::SetCullFace(m.backface_culled);
-      OGLGraphics::RenderElements(m.vao, m.numElements);
+      OGLGraphics::DrawElements(m.vao, m.numElements);
     }
     // 2nd pass
     OGLGraphics::SetStencilFuncToNotEqual();
@@ -235,7 +234,7 @@ public:
     stencil_shader->SetVec3("u_stencil_color", render_object->GetStencilColor());
     for (const MeshInfo& m : render_object->GetMeshes()) {
       OGLGraphics::SetCullFace(m.backface_culled);
-      OGLGraphics::RenderElements(m.vao, m.numElements);
+      OGLGraphics::DrawElements(m.vao, m.numElements);
     }
     OGLGraphics::SetStencilMask(true);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);  // todo: abstract
@@ -243,7 +242,6 @@ public:
     ResetToDefault();
   }
 
-  
   static void RenderNormal(const std::shared_ptr<AA::Prop>& render_object) {
     OGLShader* uber_shader = InternalShaders::Uber::Get();
     uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
@@ -273,13 +271,10 @@ public:
         }
       }
       OGLGraphics::SetCullFace(m.backface_culled);
-      OGLGraphics::RenderElements(m.vao, m.numElements);
+      OGLGraphics::DrawElements(m.vao, m.numElements);
     }
     ResetToDefault();
   }
-
-
-
 
 private:
   OGLGraphics() = delete;
