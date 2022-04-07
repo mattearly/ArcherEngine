@@ -68,7 +68,7 @@ public:
   // render graph stuff
   //
 
-  static void BatchDrawToViewport(
+  static void BatchRenderToViewport(
     const std::vector<std::shared_ptr<AA::Prop> >& render_objects, 
     const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
     const Viewport& vp) {
@@ -124,7 +124,7 @@ public:
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
     // reset all things changed
-    glActiveTexture(GL_TEXTURE0);
+    //glActiveTexture(GL_TEXTURE0);
     glDisable(GL_CULL_FACE);
     glDisable(GL_STENCIL_TEST);
 

@@ -115,7 +115,7 @@ void Interface::render() {
   if (!mCameras.empty()) {
     for (const auto& cam : mCameras) {
       cam->NewFrame();
-      OGLGraphics::BatchDrawToViewport(mProps, mAnimatedProps, cam->GetViewport());
+      OGLGraphics::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport());
       OGLGraphics::RenderSkybox(cam->GetSkybox());
     }
   }
