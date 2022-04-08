@@ -48,15 +48,24 @@ unsigned int g_walking_anim_id = 0;
 
 bool g_Yes(false), g_No(false);
 
-float dir_light_direction[3] = { 0.33f, -0.33f, -0.33f };
-float* dir_light_diff = new float(0.43f);
-float* dir_light_amb = new float(0.0333f);
-float* dir_light_spec = new float(0.0153f);
+float  dir_light_direction[3] = { 0.33f, -0.33f, -0.33f };
+float* dir_light_diff         = new float(0.43f);
+float* dir_light_amb          = new float(0.0333f);
+float* dir_light_spec         = new float(0.0153f);
+
+unsigned int g_plight1_id     = 0;
+float  point_light_loc[3]     = { 0.0f, 0.0f, 0.0f };
+float* point_light_constant   = new float(1.0f);
+float* point_light_linear     = new float(0.027f);
+float* point_light_quadratic  = new float(0.0028f);
+float* point_light_ambient    = new float(.3f);
+float* point_light_diff       = new float(.5f);
+float* point_light_spec       = new float(.3f);
 
 float* cam_fov = new float(45.f);
 
-
 void reset_test_globals() {
+
   g_imgui_func = g_update_func = 0;
   g_untextured_cube_id[0] = g_untextured_cube_id[1] = g_untextured_cube_id[2] = 0;
   g_zombie_id[0] = g_zombie_id[1] = 0;
@@ -77,6 +86,16 @@ void reset_test_globals() {
   *dir_light_diff = 0.43f;
   *dir_light_amb = 0.0333f;
   *dir_light_spec = 0.0153f;
+
+  point_light_loc[0] = 0.0f;
+  point_light_loc[1] = 0.0f;
+  point_light_loc[2] = 0.0f;
+  *point_light_constant = 1.0f;
+  *point_light_linear = 0.027f;
+  *point_light_quadratic = 0.0028f;
+  *point_light_ambient = .3f;
+  *point_light_diff = .5f;
+  *point_light_spec = .3f;
 
   *cam_fov = 45.f;
 }
