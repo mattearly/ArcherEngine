@@ -14,7 +14,7 @@ struct Move {
 } move;
 bool is_cursor_on = true;
 glm::vec3 move_diff{ 0 };
-const float DEFAULTMOVESPEED = 16.f;
+const float DEFAULTMOVESPEED = 116.f;
 double FPP_SENSITIVITY = .1f;
 double lastX{ 0 }, lastY{ 0 };
 double xDelta{ 0 }, yDelta{ 0 };
