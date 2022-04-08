@@ -231,17 +231,17 @@ public:
 
     g_imgui_func = g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("Model Test");
-      bool update_light1 = ImGui::SliderFloat3("Light Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
-      bool update_light2 = ImGui::SliderFloat("Light Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
-      bool update_light3 = ImGui::SliderFloat("Light Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_light4 = ImGui::SliderFloat("Light Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_dir = ImGui::SliderFloat3("Light Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
+      bool update_dlight_amb = ImGui::SliderFloat("Light Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_diffuse = ImGui::SliderFloat("Light Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_specular = ImGui::SliderFloat("Light Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
       ImGui::Text("Does everything look right?");
       g_Yes = ImGui::Button("Yes");
       g_No = ImGui::Button("No");
       ImGui::End();
 
       // state update
-      if (update_light1 || update_light2 || update_light3 || update_light4)
+      if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
         g_aa_interface.SetDirectionalLight(
           glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
           glm::vec3(*dir_light_amb),
@@ -293,17 +293,17 @@ public:
 
     g_imgui_func = g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("Animated Model Test");
-      bool update_light1 = ImGui::SliderFloat3("Light Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
-      bool update_light2 = ImGui::SliderFloat("Light Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
-      bool update_light3 = ImGui::SliderFloat("Light Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_light4 = ImGui::SliderFloat("Light Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_dir = ImGui::SliderFloat3("Light Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
+      bool update_dlight_amb = ImGui::SliderFloat("Light Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_diffuse = ImGui::SliderFloat("Light Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_specular = ImGui::SliderFloat("Light Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
       ImGui::Text("Does everything look right?");
       g_Yes = ImGui::Button("Yes");
       g_No = ImGui::Button("No");
       ImGui::End();
 
       // state update
-      if (update_light1 || update_light2 || update_light3 || update_light4)
+      if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
         g_aa_interface.SetDirectionalLight(
           glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
           glm::vec3(*dir_light_amb),
@@ -328,7 +328,7 @@ public:
     }
 
     g_aa_interface.SetWindowTitle("Space Scene Mashup Test");
-    
+
     // night time skybox files
     {
       const std::string skyboxfolder = runtime_dir + "skybox/night/";
@@ -344,14 +344,13 @@ public:
       g_window_ref = g_aa_interface.GetWindow();
       std::shared_ptr<AA::Window> local_window_ref = g_window_ref.lock();
       g_cam_id = g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
-      
-      
+
+
       g_camera_ref = g_aa_interface.GetCamera(g_cam_id);
       std::shared_ptr<AA::Camera> local_camera_ref = g_camera_ref.lock();
       local_camera_ref->SetSkybox(NightSkyTextures);
-
       local_camera_ref->SetKeepCameraToWindowSize(true);
-      local_camera_ref->SetFOV(*cam_fov);  
+      local_camera_ref->SetFOV(*cam_fov);
       setup_fpp_fly(g_cam_id);
     }
 
@@ -360,18 +359,38 @@ public:
     //g_walking_anim_id = g_aa_interface.AddAnimation(fullwalking_man.c_str(), g_walking_man_id);
     //g_aa_interface.SetAnimationOnAnimProp(g_walking_anim_id, g_walking_man_id);
 
+    {
+      g_untextured_cube_id[0] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(-10, -10, -10));
+      auto w1 = g_aa_interface.GetProp(g_untextured_cube_id[0]);
+      std::shared_ptr<AA::Prop> s1 = w1.lock();
+      s1->SetRotation(glm::vec3(1.571f, 3.14159f, 0));
+      s1->SetStencil(true);
+      s1->SetStencilColor(glm::vec3(.4, .4, .4));
+      s1->SetStencilWithNormals(false);
+      s1->SetStencilScale(1.1f);
+    }
 
-    //g_untextured_cube_id[0] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(-10, -10, -10));
     g_ground_plane_id = g_aa_interface.AddProp(fullgroundplane.c_str(), glm::vec3(0, -30.f, 0), glm::vec3(3));
 
 
     //g_peasant_man_id = g_aa_interface.AddProp(fullpeasant_man.c_str(), glm::vec3(0, -30, -70), glm::vec3(.15f));
 
 
+
     // Add Zombie With Punching Animation.
     g_zombie_id[0] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(-30, -30, -70), glm::vec3(0.12f));
     g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[0]);
     g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[0]);
+    {
+      auto weak_tmp = g_aa_interface.GetAnimProp(g_zombie_id[0]);
+      auto strong_tmp = weak_tmp.lock();
+      strong_tmp->SetStencil(true);
+      strong_tmp->SetStencilWithNormals(true);
+      strong_tmp->SetStencilColor(glm::vec3(0, 9, 0));
+      strong_tmp->SetStencilScale(5.f);
+
+    }
+
 
 
 
@@ -387,10 +406,10 @@ public:
     g_imgui_func = g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("Space Scene Mashup");
       ImGui::Text("Directional Light Controls");
-      bool update_light1 = ImGui::SliderFloat3("Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
-      bool update_light3 = ImGui::SliderFloat("Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_light2 = ImGui::SliderFloat("Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
-      bool update_light4 = ImGui::SliderFloat("Specular", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_dir = ImGui::SliderFloat3("Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
+      bool update_dlight_diffuse = ImGui::SliderFloat("Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_amb = ImGui::SliderFloat("Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_specular = ImGui::SliderFloat("Specular", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
       ImGui::Text("Camera Controls");
       bool update_cam_fov = ImGui::SliderFloat("FOV", cam_fov, 30.f, 90.f);
       g_No = ImGui::Button("report broken");
@@ -398,7 +417,7 @@ public:
       ImGui::End();
 
       // state update
-      if (update_light1 || update_light2 || update_light3 || update_light4)
+      if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
         g_aa_interface.SetDirectionalLight(
           glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
           glm::vec3(*dir_light_amb),
@@ -494,17 +513,17 @@ public:
 
     g_imgui_func = g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("Stencil Outline Test");
-      bool update_light1 = ImGui::SliderFloat3("Light Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
-      bool update_light2 = ImGui::SliderFloat("Light Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
-      bool update_light3 = ImGui::SliderFloat("Light Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_light4 = ImGui::SliderFloat("Light Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_dir = ImGui::SliderFloat3("Light Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
+      bool update_dlight_amb = ImGui::SliderFloat("Light Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_diffuse = ImGui::SliderFloat("Light Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_dlight_specular = ImGui::SliderFloat("Light Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
       ImGui::Text("Does everything look right?");
       g_Yes = ImGui::Button("Yes");
       g_No = ImGui::Button("No");
       ImGui::End();
 
       // state update
-      if (update_light1 || update_light2 || update_light3 || update_light4)
+      if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
         g_aa_interface.SetDirectionalLight(
           glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
           glm::vec3(*dir_light_amb),
