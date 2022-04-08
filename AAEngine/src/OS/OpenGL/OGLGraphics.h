@@ -69,21 +69,25 @@ public:
   //
 
   static void BatchRenderToViewport(
-    const std::vector<std::shared_ptr<AA::Prop> >& render_objects, 
+    const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
     const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
     const Viewport& vp) {
 
 
     glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
+
+
     for (const auto& render_object : render_objects) {
       if (render_object->IsStenciled()) {
-        OGLGraphics::RenderStenciled(render_object);
-      } else {
-        OGLGraphics::RenderNormal(render_object);
+        continue;
       }
+      OGLGraphics::RenderNormal(render_object);
     }
 
     for (const auto& render_object : animated_render_objects) {
+      if (render_object->IsStenciled()) {
+        continue;
+      }
       if (render_object->mAnimator) {
         InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
         InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
@@ -93,10 +97,32 @@ public:
           InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
         }
       }
+      OGLGraphics::RenderNormal(std::dynamic_pointer_cast<AA::Prop>(render_object));
+    }
+  
+
+
+
+  // stencils LAST
+
+    for (const auto& render_object : render_objects) {
       if (render_object->IsStenciled()) {
+        OGLGraphics::RenderStenciled(render_object);
+      }
+    }
+
+    for (const auto& render_object : animated_render_objects) {
+      if (render_object->IsStenciled()) {
+        if (render_object->mAnimator) {
+          InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
+          InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
+          auto transforms = render_object->mAnimator->GetFinalBoneMatrices();
+          for (unsigned int i = 0; i < transforms.size(); ++i) {
+            InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+            InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+          }
+        }
         OGLGraphics::RenderStenciled(std::dynamic_pointer_cast<AA::Prop>(render_object));
-      } else {
-        OGLGraphics::RenderNormal(std::dynamic_pointer_cast<AA::Prop>(render_object));
       }
     }
 
@@ -104,11 +130,11 @@ public:
 
   static void RenderSkybox(const Skybox* skybox_target) {
     if (!skybox_target) { return; }
- 
+
     glDepthFunc(GL_LEQUAL);
 
     auto skybox_shader = InternalShaders::Skycube::Get();
-    
+
     SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
     DrawElements(skybox_target->GetVAO(), 36);
 
@@ -117,18 +143,14 @@ public:
 
   static void ResetToDefault() {
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-    glDepthFunc(GL_LESS);
-    //glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    //glStencilFunc(GL_ALWAYS, 0, 0xFF);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
-    // reset all things changed
-    //glActiveTexture(GL_TEXTURE0);
     glDisable(GL_CULL_FACE);
-    glDisable(GL_STENCIL_TEST);
-
+    glDepthFunc(GL_LESS);
+    glEnable(GL_STENCIL_TEST);
+    //glDisable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     //glStencilMask(0x00); // disable writes
+
+                         
     //glStencilMask(0xFF); // enable writes
 
     if (InternalShaders::Uber::IsActive()) {
@@ -183,14 +205,12 @@ public:
 
   static void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
     // 1st pass: render to stencil buffer with normal draw
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_STENCIL_TEST);
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    OGLGraphics::SetStencilFuncToAlways();
-    OGLGraphics::SetStencilMask(true);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF);
+
     auto uber_shader = InternalShaders::Uber::Get();
     uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
     for (const MeshInfo& m : render_object->GetMeshes()) {
@@ -218,10 +238,11 @@ public:
       OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::DrawElements(m.vao, m.numElements);
     }
+
     // 2nd pass
-    OGLGraphics::SetStencilFuncToNotEqual();
-    OGLGraphics::SetStencilMask(false);
-    OGLGraphics::SetDepthTest(false);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00); // disable writing to the stencil buffer
+    glDisable(GL_DEPTH_TEST);
     OGLShader* stencil_shader = InternalShaders::Stencil::Get();
     if (render_object->IsStenciledWithNormals()) {
       stencil_shader->SetBool("u_stencil_with_normals", true);
@@ -235,12 +256,15 @@ public:
     }
     stencil_shader->SetVec3("u_stencil_color", render_object->GetStencilColor());
     for (const MeshInfo& m : render_object->GetMeshes()) {
-      OGLGraphics::SetCullFace(m.backface_culled);
+      //OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::DrawElements(m.vao, m.numElements);
     }
+
     OGLGraphics::SetStencilMask(true);
-    glStencilFunc(GL_ALWAYS, 0, 0xFF);  // todo: abstract
-    OGLGraphics::SetDepthTest(true);
+    //glStencilFunc(GL_ALWAYS, 0, 0xFF);  // todo: abstract
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glEnable(GL_DEPTH_TEST);
     ResetToDefault();
   }
 
