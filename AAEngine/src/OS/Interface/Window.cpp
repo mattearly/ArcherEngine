@@ -84,7 +84,7 @@ Window::~Window() {
 
 // note: saved prev_window_options on each call, must be carefully managed 
 //       or ApplyChanges might not work as expected
-std::shared_ptr<WindowOptions> Window::get_and_note_window_options() {
+std::weak_ptr<WindowOptions> Window::get_and_note_window_options() {
   mPrevWindowOptions = *mWindowOptions;  // copy to prev window options
   return mWindowOptions;
 }
@@ -179,7 +179,8 @@ void Window::SetCursorToNormal() noexcept {
 }
 void Window::SetNewWidthAndHeight(int w, int h) noexcept
 {
-  auto opts = get_and_note_window_options();
+  auto weak_opts = get_and_note_window_options();
+  auto opts = weak_opts.lock();
   opts->_width = w;
   opts->_height = h;
   apply_new_window_option_changes();
@@ -187,7 +188,8 @@ void Window::SetNewWidthAndHeight(int w, int h) noexcept
 
 void Window::SetNewMinWidthAndHeight(int w, int h) noexcept
 {
-  auto opts = get_and_note_window_options();
+  auto weak_opts = get_and_note_window_options();
+  auto opts = weak_opts.lock();
   opts->_min_width = w;
   opts->_min_height = h;
   apply_new_window_option_changes();

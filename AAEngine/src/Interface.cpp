@@ -940,23 +940,24 @@ void Interface::SetWindowTitle(const char* name) noexcept {
   if (!mWindow) return;
   // todo: improve efficiency
   auto temp = mWindow->get_and_note_window_options();
-  temp->_title = name;
+  auto shared = temp.lock();
+  shared->_title = name;
   mWindow->apply_new_window_option_changes();
 }
 
 // toggles fullscreen as expected, does nothign if window is null
 void Interface::ToggleWindowFullscreen(bool try_borderless) noexcept {
   if (!mWindow) return;
-  auto temp = mWindow->get_and_note_window_options();
-
-  if (temp->_windowing_mode == WINDOW_MODE::WINDOWED || temp->_windowing_mode == WINDOW_MODE::MAXIMIZED || temp->_windowing_mode == WINDOW_MODE::WINDOWED_DEFAULT) {
+  auto weak = mWindow->get_and_note_window_options();
+  auto shared = weak.lock();
+  if (shared->_windowing_mode == WINDOW_MODE::WINDOWED || shared->_windowing_mode == WINDOW_MODE::MAXIMIZED || shared->_windowing_mode == WINDOW_MODE::WINDOWED_DEFAULT) {
     if (try_borderless) {
-      temp->_windowing_mode = WINDOW_MODE::FULLSCREEN_BORDERLESS;
+      shared->_windowing_mode = WINDOW_MODE::FULLSCREEN_BORDERLESS;
     } else {
-      temp->_windowing_mode = WINDOW_MODE::FULLSCREEN;
+      shared->_windowing_mode = WINDOW_MODE::FULLSCREEN;
     }
   } else {  // turn off fullscreen
-    temp->_windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
+    shared->_windowing_mode = WINDOW_MODE::WINDOWED_DEFAULT;
   }
 
   mWindow->apply_new_window_option_changes();
