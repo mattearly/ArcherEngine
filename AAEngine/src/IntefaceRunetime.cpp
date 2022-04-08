@@ -116,6 +116,11 @@ void Interface::render() {
     for (const auto& cam : mCameras) {
       cam->NewFrame();
       OGLGraphics::RenderSkybox(cam->GetSkybox());
+      if (mDebugLightIndicators) {
+        for (const auto& pl : mPointLights) {
+          OGLGraphics::RenderWhiteCubeAt(pl->Position);
+        }
+      }
       OGLGraphics::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport());
     }
   }

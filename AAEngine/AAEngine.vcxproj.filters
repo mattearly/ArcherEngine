@@ -156,6 +156,9 @@
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Icon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sound\SoundDevice.cpp">
@@ -267,6 +270,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\IntefaceRunetime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Icon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

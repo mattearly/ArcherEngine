@@ -2,6 +2,7 @@
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
 #include "../OS/OpenGL/InternalShaders/Stencil.h"
 #include "../OS/OpenGL/InternalShaders/Uber.h"
+#include "../OS/OpenGL/InternalShaders/Icon.h"
 
 #include <glm\ext\matrix_clip_space.hpp>
 #include <glm\gtx\transform.hpp>
@@ -204,6 +205,7 @@ void Camera::NewFrame() {
     if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_view_matrix", mViewMatrix);
     if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_view_matrix", mViewMatrix);
     if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_view_matrix", glm::mat4(glm::mat3(mViewMatrix)));
+    if (InternalShaders::Icon::IsActive()) InternalShaders::Icon::Get()->SetMat4("u_view_matrix", glm::mat4(mViewMatrix));
     camera_vectors_changed = false;
   }
   if (camera_projection_changed) {
@@ -211,6 +213,7 @@ void Camera::NewFrame() {
     if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_projection_matrix",  mProjectionMatrix);
     if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
     if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
+    if (InternalShaders::Icon::IsActive()) InternalShaders::Icon::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
     camera_projection_changed = false;
   }
 }

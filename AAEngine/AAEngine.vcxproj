@@ -91,6 +91,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Icon.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\ShaderUniforms.h" />
     <ClInclude Include="include\AAEngine\Scene\Viewport.h" />
     <ClInclude Include="include\AAEngine\WindowOptions.h" />
@@ -140,6 +141,7 @@
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Uber.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Icon.cpp" />
     <ClCompile Include="src\IntefaceRunetime.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Shadow.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Skycube.cpp" />

@@ -585,6 +585,10 @@ void Interface::ChangePointLight(int which, glm::vec3 new_pos, float new_constan
   throw("u messed up");
 }
 
+void Interface::DebugLightIndicatorsOnOrOff(const bool& tf) {
+  mDebugLightIndicators = tf;
+}
+
 // Spot Light
 int Interface::AddSpotLight(glm::vec3 pos, glm::vec3 dir, float inner, float outer, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
   if (mSpotLights.size() == MAXSPOTLIGHTS) {

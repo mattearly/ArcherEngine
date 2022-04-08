@@ -651,6 +651,7 @@ public:
       setup_fpp_fly(g_cam_id);
     }
 
+    g_aa_interface.DebugLightIndicatorsOnOrOff(true);
     g_aa_interface.ToggleWindowFullscreen(true);
     g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
 
@@ -670,19 +671,26 @@ public:
       glm::vec3(*dir_light_diff),
       glm::vec3(*dir_light_spec));
 
-    g_plight1_id = g_aa_interface.AddPointLight(/*glm::vec3 pos, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec*/
-    glm::vec3(0,0,0), 1.0f, 0.027f, 0.0028f, glm::vec3(0.33f), glm::vec3(0.90f), glm::vec3(0.33f));
+    /*sig: glm::vec3 pos, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec*/
+    g_plight1_id = g_aa_interface.AddPointLight(
+      glm::vec3(point_light_loc[0], point_light_loc[1], point_light_loc[2]),
+      1.0f /* constant*/,
+      *point_light_linear,
+      *point_light_quadratic,
+      glm::vec3(*point_light_ambient),
+      glm::vec3(*point_light_diff),
+      glm::vec3(*point_light_spec));
 
     // ImGui Controls
     g_imgui_func = g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("LightingTests");
-     
+      bool doToggleFS = ImGui::Button("ToggleFullscreen");
+
       bool update_dlight_dir = ImGui::SliderFloat3("Sun Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
       bool update_dlight_amb = ImGui::SliderFloat("Sun Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
       bool update_dlight_diffuse = ImGui::SliderFloat("Sun Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_dlight_specular = ImGui::SliderFloat("Sun Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
     
-      ImGui::Text("Point Light");
       bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", point_light_loc, -100.f, 100.f, "%f", 1.0f);
       bool update_plight1_linear = ImGui::SliderFloat("PL Linear", point_light_linear, 0.001, 0.300, "%f", 1.0f);
       bool update_plight1_quadratic = ImGui::SliderFloat("PL Quadratic", point_light_quadratic, 0.001, 0.300, "%f", 1.0f);
@@ -690,14 +698,15 @@ public:
       bool update_plight1_diff = ImGui::SliderFloat("PL Diffuse", point_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_spec = ImGui::SliderFloat("PL Spec", point_light_spec, 0.f, 1.f, "%f", 1.0f);
      
-        ImGui::Text("Camera");
-      bool update_cam_fov = ImGui::SliderFloat("FOV", cam_fov, 30.f, 90.f);
+      bool update_cam_fov = ImGui::SliderFloat("Cam FOV", cam_fov, 30.f, 90.f);
 
       g_No = ImGui::Button("report broken");
       g_Yes = ImGui::Button("NEXT TEST");
       ImGui::End();
 
       // state update
+      if (doToggleFS) { g_aa_interface.ToggleWindowFullscreen(); };
+
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
         g_aa_interface.SetDirectionalLight(
           glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),

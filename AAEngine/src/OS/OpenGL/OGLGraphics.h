@@ -1,21 +1,26 @@
 #pragma once
+#include "../../../include/AAEngine/Scene/Viewport.h"
+#include "../../../include/AAEngine/Mesh/Prop.h"
+#include "../../../include/AAEngine/Mesh/AnimProp.h"
+#include "../../Scene/Skybox.h"
 #include "../Vertex.h"
 #include "../MeshInfo.h"
-#include "../../../include/AAEngine/Scene/Viewport.h"
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <vector>
-#include <memory>
+#include "../LoadCube.h"
 #include "OGLShader.h"
+
 #include "InternalShaders/Uber.h"
 #include "InternalShaders/Stencil.h"
 #include "InternalShaders/Skycube.h"
 #include "InternalShaders/Shadow.h"
-#include "../../../include/AAEngine/Mesh/Prop.h"
+#include "InternalShaders/Icon.h"
+
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <cstddef>
-#include <glm/ext/matrix_transform.hpp>
-#include "../../Scene/Skybox.h"
-#include "../../../include/AAEngine/Mesh/AnimProp.h"
+#include <vector>
+#include <memory>
 
 namespace AA {
 
@@ -299,6 +304,14 @@ public:
       OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::DrawElements(m.vao, m.numElements);
     }
+    ResetToDefault();
+  }
+
+  static void RenderWhiteCubeAt(glm::vec3 loc) {
+    glm::mat4 model_matrix = glm::mat4(1);
+    model_matrix = glm::translate(model_matrix, loc);
+    InternalShaders::Icon::Get()->SetMat4("u_model_matrix", model_matrix);
+    OGLGraphics::DrawElements(load_cube(), 36);
     ResetToDefault();
   }
 
