@@ -12,8 +12,7 @@
 #include "Sound/SoundEffect.h"
 #include "Sound/LongSound.h"
 #include "GUI/imGUI.h"
-#include "OS/LoadCube.h"
-#include "OS/LoadPlane.h"
+#include "OS/OpenGL/InternalShaders/Init.h"
 #include <string>
 #include <sstream>
 #include <utility>
@@ -153,10 +152,7 @@ void Interface::teardown() {
 
   ClearAllRuntimeLamdaFunctions();
 
-  InternalShaders::Stencil::Shutdown();
-  InternalShaders::Uber::Shutdown();
-  InternalShaders::Shadow::Shutdown();
-  InternalShaders::Skycube::Shutdown();
+  InternalShaders::Shutdown();
 
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {

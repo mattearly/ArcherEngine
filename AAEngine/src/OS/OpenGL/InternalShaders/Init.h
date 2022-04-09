@@ -13,6 +13,14 @@ static void Init() {
   Shadow::Get();
   Icon::Get();
 }
+
+static void Shutdown() {
+  Uber::Shutdown();
+  Skycube::Shutdown();
+  Stencil::Shutdown();
+  Shadow::Shutdown();
+  Icon::Shutdown();
+}
 }  // end namespace InternalShaders
 }  // end namespace AA
 
