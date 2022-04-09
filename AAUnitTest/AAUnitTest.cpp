@@ -682,6 +682,20 @@ public:
       glm::vec3(*point_light_diff),
       glm::vec3(*point_light_spec));
 
+    /* sig: glm::vec3 pos, glm::vec3 dir, float inner, float outer, float constant, float linear, float quad, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec */
+    g_slight1_id = g_aa_interface.AddSpotLight(
+      glm::vec3(spot_light_loc[0], spot_light_loc[1], spot_light_loc[2]),
+      glm::vec3(spot_light_dir[0], spot_light_dir[1], spot_light_dir[2]),
+      *spot_light_inner, // inner
+      *spot_light_outer, // outer
+      1.0f /* constant*/,
+      *spot_light_linear,
+      *spot_light_quadratic,
+      glm::vec3(*spot_light_ambient),
+      glm::vec3(*spot_light_diff),
+      glm::vec3(*spot_light_spec)
+    );
+
     // ImGui Controls
     g_imgui_func = g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("LightingTests");
@@ -697,8 +711,20 @@ public:
       bool update_plight1_quadratic = ImGui::SliderFloat("PL Quadratic", point_light_quadratic, 0.0001f, 0.300f, "%f", 1.0f);
       bool update_plight1_ambient = ImGui::SliderFloat("PL Ambient", point_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_diff = ImGui::SliderFloat("PL Diffuse", point_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_plight1_spec = ImGui::SliderFloat("PL Spec", point_light_spec, 0.f, 1.f, "%f", 1.0f);
+      bool update_plight1_spec = ImGui::SliderFloat("PL Spec", point_light_spec, 0.f, 1.f, "%f", 1.0f);   
+
+      bool update_slight1_loc = ImGui::SliderFloat3("Spot Light Location", spot_light_loc, -100.f, 400.f, "%f", 1.0f);
+      bool update_slight1_dir = ImGui::SliderFloat3("Spot Light Direction", spot_light_dir, -1.f, 1.f, "%f", 1.0f);
+      bool update_slight1_inner = ImGui::SliderFloat("SL Inner", spot_light_inner, 0.03f, 19.f, "%f", 1.0f);
+      bool update_slight1_outer = ImGui::SliderFloat("SL Outer", spot_light_outer, 0.1f, 40.f, "%f", 1.0f);
+      bool update_slight1_linear = ImGui::SliderFloat("SL Linear", spot_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
+      bool update_slight1_quadratic = ImGui::SliderFloat("SL Quadratic", spot_light_quadratic, 0.0001f, 0.300f, "%f", 1.0f);
+      bool update_slight1_ambient = ImGui::SliderFloat("SL Ambient", spot_light_ambient, 0.f, 1.f, "%f", 1.0f);
+      bool update_slight1_diff = ImGui::SliderFloat("SL Diffuse", spot_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_slight1_spec = ImGui::SliderFloat("SL Spec", spot_light_spec, 0.f, 1.f, "%f", 1.0f);
      
+
+
       bool update_cam_fov = ImGui::SliderFloat("Cam FOV", cam_fov, 30.f, 90.f);
 
       g_No = ImGui::Button("report broken");
@@ -719,6 +745,20 @@ public:
         || update_plight1_diff || update_plight1_spec) {
        g_aa_interface.ChangePointLight(g_plight1_id, glm::vec3(point_light_loc[0], point_light_loc[1], point_light_loc[2]), *point_light_constant, *point_light_linear, *point_light_quadratic,
          glm::vec3(*point_light_ambient), glm::vec3(*point_light_diff), glm::vec3(*point_light_spec));
+      }
+
+      if (update_slight1_loc ||
+        update_slight1_dir ||
+        update_slight1_inner ||
+        update_slight1_outer ||
+        update_slight1_linear ||
+        update_slight1_quadratic ||
+        update_slight1_ambient ||
+        update_slight1_diff ||
+        update_slight1_spec
+        ) {
+        g_aa_interface.ChangeSpotLight(g_slight1_id, glm::vec3(spot_light_loc[0], spot_light_loc[1], spot_light_loc[2]), glm::vec3(spot_light_dir[0], spot_light_dir[1], spot_light_dir[2]), *spot_light_inner, *spot_light_outer, *spot_light_constant, *spot_light_linear, *spot_light_quadratic,
+          glm::vec3(*spot_light_ambient), glm::vec3(*spot_light_diff), glm::vec3(*spot_light_spec));
       }
 
       if (update_cam_fov) {

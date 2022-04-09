@@ -62,6 +62,19 @@ float* point_light_ambient    = new float(.3f);
 float* point_light_diff       = new float(.5f);
 float* point_light_spec       = new float(.3f);
 
+
+unsigned int g_slight1_id     = 0;
+float  spot_light_loc[3]     = { 0.0f, 0.0f, 0.0f };
+float  spot_light_dir[3] = { 1.f, 1.f, 1.f };
+float* spot_light_inner   = new float(.3f);
+float* spot_light_outer   = new float(.7f);
+float* spot_light_constant   = new float(1.0f);
+float* spot_light_linear     = new float(0.027f);
+float* spot_light_quadratic  = new float(0.0028f);
+float* spot_light_ambient    = new float(.3f);
+float* spot_light_diff       = new float(.5f);
+float* spot_light_spec       = new float(.3f);
+
 float* cam_fov = new float(45.f);
 
 void reset_test_globals() {
@@ -87,6 +100,7 @@ void reset_test_globals() {
   *dir_light_amb = 0.0333f;
   *dir_light_spec = 0.0153f;
 
+  g_plight1_id = 0;
   point_light_loc[0] = 0.0f;
   point_light_loc[1] = 0.0f;
   point_light_loc[2] = 0.0f;
@@ -96,6 +110,22 @@ void reset_test_globals() {
   *point_light_ambient = .3f;
   *point_light_diff = .5f;
   *point_light_spec = .3f;
+
+  g_slight1_id = 0;
+   spot_light_loc[0] = 0.f;
+   spot_light_loc[1] = 0.f;
+   spot_light_loc[2] = 0.f;
+   spot_light_dir[0] = 1.f;
+   spot_light_dir[1] = 1.f;
+   spot_light_dir[2] = 1.f;
+   *spot_light_inner = .3f;
+   *spot_light_outer = .7f;
+  *spot_light_constant  = 1.0f;
+  *spot_light_linear    = 0.027f;
+  *spot_light_quadratic = 0.0028f;
+  *spot_light_ambient   = .3f;
+  *spot_light_diff      = .5f;
+  *spot_light_spec      = .3f;
 
   *cam_fov = 45.f;
 }
