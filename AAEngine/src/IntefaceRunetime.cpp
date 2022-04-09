@@ -147,8 +147,7 @@ void Interface::teardown() {
 
   mCameras.clear();
 
-  unload_cube();
-  unload_plane();
+  Primatives::unload_all();
 
   ClearAllRuntimeLamdaFunctions();
 

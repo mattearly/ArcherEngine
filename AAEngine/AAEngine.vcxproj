@@ -110,8 +110,6 @@
     <ClInclude Include="include\AAEngine\Utility\rand.h" />
     <ClInclude Include="src\Physics\NVidiaPhysx.h" />
     <ClInclude Include="src\GUI\imGUI.h" />
-    <ClInclude Include="src\OS\LoadCube.h" />
-    <ClInclude Include="src\OS\LoadPlane.h" />
     <ClInclude Include="src\OS\TextureLoader.h" />
     <ClInclude Include="include\AAEngine\Version.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
@@ -156,9 +154,7 @@
     <ClCompile Include="src\Mesh\Animation.cpp" />
     <ClCompile Include="src\Physics\NVidiaPhysx.cpp" />
     <ClCompile Include="src\GUI\imGUI.cpp" />
-    <ClCompile Include="src\OS\LoadCube.cpp" />
     <ClCompile Include="src\OS\MeshLoader.cpp" />
-    <ClCompile Include="src\OS\LoadPlane.cpp" />
     <ClCompile Include="src\OS\TextureLoader.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Mesh\Spacial3D.cpp" />

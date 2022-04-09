@@ -5,7 +5,6 @@
 #include "../../Scene/Skybox.h"
 #include "../Vertex.h"
 #include "../MeshInfo.h"
-#include "../LoadCube.h"
 #include "OGLShader.h"
 
 #include "InternalShaders/Uber.h"
@@ -27,6 +26,16 @@ namespace AA {
 class Prop;
 class AnimProp;
 class Skybox;
+
+namespace Primatives {
+unsigned int load_cone(unsigned int& out_num_elements);
+void unload_cone();
+unsigned int load_cube();
+void unload_cube();
+unsigned int load_plane();
+void unload_plane();
+void unload_all();
+}
 
 class OGLGraphics final {
 public:
@@ -311,7 +320,7 @@ public:
     glm::mat4 model_matrix = glm::mat4(1);
     model_matrix = glm::translate(model_matrix, loc);
     InternalShaders::Icon::Get()->SetMat4("u_model_matrix", model_matrix);
-    OGLGraphics::DrawElements(load_cube(), 36);
+    OGLGraphics::DrawElements(Primatives::load_cube(), 36);
     ResetToDefault();
   }
 

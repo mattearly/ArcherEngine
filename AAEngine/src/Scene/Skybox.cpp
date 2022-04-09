@@ -2,7 +2,6 @@
 #include "../../include/AAEngine/Utility/Files.h"
 #include "../OS/OpenGL/OGLGraphics.h"
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
-#include "../OS/LoadCube.h"
 #include "../OS/TextureLoader.h"
 namespace AA {
 
@@ -28,7 +27,7 @@ const unsigned int Skybox::GetVAO() const {
 
 void Skybox::setup_cube_geometry() {
   if (mVAO == 0) {
-    mVAO = load_cube();
+    mVAO = Primatives::load_cube();
   }
 }
 
