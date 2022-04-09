@@ -7,10 +7,12 @@
 #include "InternalShaders/Shadow.h"
 #include "InternalShaders/Uber.h"
 #include "../../../include/AAEngine/Mesh/Prop.h"
-#include "glm/glm.hpp"
-#include <cstddef>
-#include <glm/ext/matrix_transform.hpp>
 #include "../../Scene/Skybox.h"
+
+#include <glm/ext/matrix_transform.hpp>
+#include "glm/glm.hpp"
+
+#include <cstddef>
 
 namespace AA {
 

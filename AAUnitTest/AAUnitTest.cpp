@@ -633,7 +633,9 @@ public:
   TEST_METHOD(LightingTests) {
     // init engine
     {
-      bool initSuccess = g_aa_interface.Init();
+      AA::WindowOptions win_opts;
+      win_opts._windowing_mode = AA::WINDOW_MODE::MAXIMIZED;
+      bool initSuccess = g_aa_interface.Init(win_opts);
       Assert::AreEqual(initSuccess, true);
     }
 
@@ -652,7 +654,6 @@ public:
     }
 
     g_aa_interface.DebugLightIndicatorsOnOrOff(true);
-    g_aa_interface.ToggleWindowFullscreen(true);
     g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
 
     // load model
@@ -691,9 +692,9 @@ public:
       bool update_dlight_diffuse = ImGui::SliderFloat("Sun Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_dlight_specular = ImGui::SliderFloat("Sun Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
     
-      bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", point_light_loc, -100.f, 100.f, "%f", 1.0f);
-      bool update_plight1_linear = ImGui::SliderFloat("PL Linear", point_light_linear, 0.001, 0.300, "%f", 1.0f);
-      bool update_plight1_quadratic = ImGui::SliderFloat("PL Quadratic", point_light_quadratic, 0.001, 0.300, "%f", 1.0f);
+      bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", point_light_loc, -100.f, 400.f, "%f", 1.0f);
+      bool update_plight1_linear = ImGui::SliderFloat("PL Linear", point_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
+      bool update_plight1_quadratic = ImGui::SliderFloat("PL Quadratic", point_light_quadratic, 0.0001f, 0.300f, "%f", 1.0f);
       bool update_plight1_ambient = ImGui::SliderFloat("PL Ambient", point_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_diff = ImGui::SliderFloat("PL Diffuse", point_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_spec = ImGui::SliderFloat("PL Spec", point_light_spec, 0.f, 1.f, "%f", 1.0f);
