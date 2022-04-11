@@ -586,42 +586,106 @@ public:
       Assert::AreEqual(initSuccess, true);
     }
 
-    // camera that stays screen size
+    // camera that stays screen size with a light and fov slider
     {
       g_window_ref = g_aa_interface.GetWindow();
       std::shared_ptr<AA::Window> local_window_ref = g_window_ref.lock();
+
       g_cam_id = g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
+      //g_cam_id = g_aa_interface.AddCamera(1, 1);
       g_camera_ref = g_aa_interface.GetCamera(g_cam_id);
       std::shared_ptr<AA::Camera> local_camera_ref = g_camera_ref.lock();
       local_camera_ref->SetKeepCameraToWindowSize(true);
-      local_camera_ref->SetFOV(75.f);
+      local_camera_ref->SetFOV(*cam_fov);
+
       setup_fpp_fly(g_cam_id);
+
+      g_aa_interface.SetDirectionalLight(
+        glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
+        glm::vec3(*dir_light_amb),
+        glm::vec3(*dir_light_diff),
+        glm::vec3(*dir_light_spec));
     }
+
+    g_aa_interface.AddToImGuiUpdate([]() {
+      ImGui::Begin("ReuseModelResources");
+
+      bool doToggleFS = ImGui::Button("ToggleFullscreen");
+      bool update_dlight_dir = ImGui::SliderFloat3("Sun Direction", dir_light_direction, -1.0f, 1.0f, "%f", 1.0f);
+      bool update_dlight_amb = ImGui::SliderFloat("Sun Ambient", dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
+      bool update_dlight_diffuse = ImGui::SliderFloat("Sun Diffuse", dir_light_diff, 0.003f, 1.f, "%f", 1.0f);
+      bool update_dlight_specular = ImGui::SliderFloat("Sun Spec", dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
+      bool update_cam_fov = ImGui::SliderFloat("Cam FOV", cam_fov, 30.f, 90.f);
+      g_No = ImGui::Button("report broken");
+      g_Yes = ImGui::Button("NEXT TEST");
+
+      ImGui::End();
+
+      // IMGUI INTERFACE STATE UPDATE
+      // ----------------------------
+      if (doToggleFS) { g_aa_interface.ToggleWindowFullscreen(); };
+
+      if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular) {
+        g_aa_interface.SetDirectionalLight(
+          glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
+          glm::vec3(*dir_light_amb),
+          glm::vec3(*dir_light_diff),
+          glm::vec3(*dir_light_spec));
+      }
+
+      if (update_cam_fov) {
+        auto cam = g_camera_ref.lock();
+        cam->SetFOV(*cam_fov);
+      }
+
+      if (g_Yes || g_No) { g_aa_interface.Shutdown(); };
+
+      // --------------------------------
+      // END IMGUI INTERFACE STATE UPDATE
+      });
 
     g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
 
-    // load models
-    g_untextured_cube_id[0] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(-20, 0, -25));
-    g_untextured_cube_id[1] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(20, 0, -25));
 
-    // a light so we can see
-    g_aa_interface.SetDirectionalLight(
-      glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
-      glm::vec3(*dir_light_amb),
-      glm::vec3(*dir_light_diff),
-      glm::vec3(*dir_light_spec));
+    // Load and Test Models to make sure thy reuse the same VAO if loading from the same file
+    {
+      g_untextured_cube_id[0] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(-20, 0, -25));
+      g_untextured_cube_id[1] = g_aa_interface.AddProp(fullcubepath.c_str(), glm::vec3(20, 0, -25));
 
-    auto w1 = g_aa_interface.GetProp(g_untextured_cube_id[0]);
-    auto w2 = g_aa_interface.GetProp(g_untextured_cube_id[1]);
+      auto w1 = g_aa_interface.GetProp(g_untextured_cube_id[0]);
+      std::shared_ptr<AA::Prop> s1 = w1.lock();
+      auto vao1 = s1->GetMeshes()[0].vao;
 
-    std::shared_ptr<AA::Prop> s1 = w1.lock();
-    std::shared_ptr<AA::Prop> s2 = w2.lock();
+      auto w2 = g_aa_interface.GetProp(g_untextured_cube_id[1]);
+      std::shared_ptr<AA::Prop> s2 = w2.lock();
+      auto vao2 = s2->GetMeshes()[0].vao;
 
-    auto vao1 = s1->GetMeshes()[0].vao;
-    auto vao2 = s2->GetMeshes()[0].vao;
+      Assert::AreEqual(vao1, vao2);  // should be from the same vao
+    }
 
-    // make sure using the same vao
-    Assert::AreEqual(vao1, vao2);
+
+    // Load and Test Animated Models to make sure thy reuse the same VAO if loading from the same file
+    {
+      g_zombie_id[0] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(-20, -20, -45), glm::vec3(.15f));
+      g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[0]);
+      g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[0]);
+
+      g_zombie_id[1] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(20, -20, -45), glm::vec3(.15f));
+      g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[1]);
+      g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[1]);
+
+      auto w1 = g_aa_interface.GetAnimProp(g_zombie_id[0]);
+      std::shared_ptr<AA::Prop> s1 = w1.lock();
+      auto vao3 = s1->GetMeshes()[0].vao;
+
+      auto w2 = g_aa_interface.GetAnimProp(g_zombie_id[0]);
+      std::shared_ptr<AA::Prop> s2 = w2.lock();
+      auto vao4 = s2->GetMeshes()[0].vao;
+
+      Assert::AreEqual(vao3, vao4);  // should be from the same vao
+    }
+
+
 
     int run_diag = g_aa_interface.Run();
 
@@ -776,64 +840,6 @@ public:
 
     reset_test_globals();
   }
-
-  TEST_METHOD(ReuseAnimModelResources) {
-    // init engine
-    {
-      bool initSuccess = g_aa_interface.Init();
-      Assert::AreEqual(initSuccess, true);
-    }
-
-    // camera that stays screen size
-    {
-      g_window_ref = g_aa_interface.GetWindow();
-      std::shared_ptr<AA::Window> local_window_ref = g_window_ref.lock();
-      g_cam_id = g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
-      g_camera_ref = g_aa_interface.GetCamera(g_cam_id);
-      std::shared_ptr<AA::Camera> local_camera_ref = g_camera_ref.lock();
-      local_camera_ref->SetKeepCameraToWindowSize(true);
-      local_camera_ref->SetFOV(75.f);
-      setup_fpp_fly(g_cam_id);
-    }
-
-    g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
-
-    // load models
-    g_zombie_id[0] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(-20, -20, -45), glm::vec3(.15f));
-    g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[0]);
-    g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[0]);
-
-    g_zombie_id[1] = g_aa_interface.AddAnimProp(fullzombie_.c_str(), glm::vec3(20, -20, -45), glm::vec3(.15f));
-    g_punching_anim_id = g_aa_interface.AddAnimation(fullzombie_.c_str(), g_zombie_id[1]);
-    g_aa_interface.SetAnimationOnAnimProp(g_punching_anim_id, g_zombie_id[1]);
-
-
-    // a light so we can see
-    g_aa_interface.SetDirectionalLight(
-      glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]),
-      glm::vec3(*dir_light_amb),
-      glm::vec3(*dir_light_diff),
-      glm::vec3(*dir_light_spec));
-
-    auto w1 = g_aa_interface.GetAnimProp(g_zombie_id[0]);
-    auto w2 = g_aa_interface.GetAnimProp(g_zombie_id[1]);
-
-    std::shared_ptr<AA::AnimProp> s1 = w1.lock();
-    std::shared_ptr<AA::AnimProp> s2 = w2.lock();
-
-    auto vao1 = s1->GetMeshes()[0].vao;
-    auto vao2 = s2->GetMeshes()[0].vao;
-
-    // make sure using the same vao
-    Assert::AreEqual(vao1, vao2);
-
-    int run_diag = g_aa_interface.Run();
-    Assert::AreEqual(run_diag, 0);
-    Assert::AreEqual(g_No, false);
-
-    reset_test_globals();
-  }
-
 
   // todo: music tests
 
