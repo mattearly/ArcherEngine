@@ -11,7 +11,7 @@
 #include "InternalShaders/Stencil.h"
 #include "InternalShaders/Skycube.h"
 #include "InternalShaders/Shadow.h"
-#include "InternalShaders/Icon.h"
+#include "InternalShaders/Basic.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -319,7 +319,7 @@ public:
   static void RenderWhiteCubeAt(glm::vec3 loc) {
     glm::mat4 model_matrix = glm::mat4(1);
     model_matrix = glm::translate(model_matrix, loc);
-    InternalShaders::Icon::Get()->SetMat4("u_model_matrix", model_matrix);
+    InternalShaders::Basic::Get()->SetMat4("u_model_matrix", model_matrix);
     OGLGraphics::DrawElements(Primatives::load_cube(), 36);
     ResetToDefault();
   }

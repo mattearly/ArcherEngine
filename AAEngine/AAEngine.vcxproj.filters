@@ -150,7 +150,7 @@
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\InternalShaders\Icon.h">
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Basic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -260,7 +260,7 @@
     <ClCompile Include="src\IntefaceRunetime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\OpenGL\InternalShaders\Icon.cpp">
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Basic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

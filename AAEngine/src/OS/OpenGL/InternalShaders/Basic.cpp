@@ -1,11 +1,11 @@
-#include "Icon.h"
+#include "Basic.h"
 #include <string>
 namespace AA::InternalShaders {
 
-static OGLShader* ICONSHADER = NULL;  // setup once
+static OGLShader* BASICSHADER = NULL;  // setup once
 
-void Icon::Init() {
-  if (ICONSHADER)
+void Basic::Init() {
+  if (BASICSHADER)
     return;
 
   const std::string VERT_CODE =
@@ -25,27 +25,27 @@ void main() {
     out_Color = vec4(1.0,1.0,1.0,1.0);
 })";
 
-  ICONSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());
+  BASICSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());
 }
 
-OGLShader* Icon::Get() {
-  if (!ICONSHADER) {
+OGLShader* Basic::Get() {
+  if (!BASICSHADER) {
     Init();
   } else {
-    ICONSHADER->Use();
+    BASICSHADER->Use();
   }
-  return ICONSHADER;
+  return BASICSHADER;
 }
 
-void Icon::Shutdown() {
-  if (ICONSHADER) {
-    delete ICONSHADER;
-    ICONSHADER = nullptr;
+void Basic::Shutdown() {
+  if (BASICSHADER) {
+    delete BASICSHADER;
+    BASICSHADER = nullptr;
   }
 }
 
-bool Icon::IsActive() {
-  return ICONSHADER;
+bool Basic::IsActive() {
+  return BASICSHADER;
 }
 
 } // end namespace AA::InternalShaders

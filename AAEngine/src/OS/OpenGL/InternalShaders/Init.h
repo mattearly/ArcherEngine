@@ -3,7 +3,7 @@
 #include "Uber.h"
 #include "Stencil.h"
 #include "Skycube.h"
-#include "Icon.h"
+#include "Basic.h"
 namespace AA {
 namespace InternalShaders {
 static void Init() {
@@ -11,7 +11,7 @@ static void Init() {
   Skycube::Get();
   Stencil::Get();
   Shadow::Get();
-  Icon::Get();
+  Basic::Get();
 }
 
 static void Shutdown() {
@@ -19,7 +19,7 @@ static void Shutdown() {
   Skycube::Shutdown();
   Stencil::Shutdown();
   Shadow::Shutdown();
-  Icon::Shutdown();
+  Basic::Shutdown();
 }
 }  // end namespace InternalShaders
 }  // end namespace AA
