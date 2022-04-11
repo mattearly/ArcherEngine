@@ -32,6 +32,7 @@ public:
     Assert::AreEqual(run_diag, 0);
     reset_test_globals();
   }
+
   TEST_METHOD(WindowOptions) {
     {
       AA::WindowOptions winopts;
@@ -765,20 +766,20 @@ public:
       ImGui::Begin("LightingTests");
       bool doToggleFS = ImGui::Button("ToggleFullscreen");
 
-      bool update_dlight_dir = ImGui::SliderFloat3("Sun Direction", dir_light_direction, -1.f, 1.f, "%f", 1.0f);
-      bool update_dlight_amb = ImGui::SliderFloat("Sun Ambient", dir_light_amb, 0.f, 1.f, "%f", 1.0f);
-      bool update_dlight_diffuse = ImGui::SliderFloat("Sun Diffuse", dir_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_dlight_specular = ImGui::SliderFloat("Sun Spec", dir_light_spec, 0.f, 1.f, "%f", 1.0f);
-    
-      bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", point_light_loc, -100.f, 400.f, "%f", 1.0f);
+      bool update_dlight_dir = ImGui::SliderFloat3("Sun Direction", dir_light_direction, -1.0f, 1.0f, "%f", 1.0f);
+      bool update_dlight_amb = ImGui::SliderFloat("Sun Ambient", dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
+      bool update_dlight_diffuse = ImGui::SliderFloat("Sun Diffuse", dir_light_diff, 0.003f, 1.f, "%f", 1.0f);
+      bool update_dlight_specular = ImGui::SliderFloat("Sun Spec", dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
+
+      bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", point_light_loc, -400.f, 400.f, "%f", 1.0f);
       bool update_plight1_linear = ImGui::SliderFloat("PL Linear", point_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
       bool update_plight1_quadratic = ImGui::SliderFloat("PL Quadratic", point_light_quadratic, 0.0001f, 0.300f, "%f", 1.0f);
       bool update_plight1_ambient = ImGui::SliderFloat("PL Ambient", point_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_diff = ImGui::SliderFloat("PL Diffuse", point_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_plight1_spec = ImGui::SliderFloat("PL Spec", point_light_spec, 0.f, 1.f, "%f", 1.0f);   
+      bool update_plight1_spec = ImGui::SliderFloat("PL Spec", point_light_spec, 0.f, 1.f, "%f", 1.0f);
 
-      bool update_slight1_loc = ImGui::SliderFloat3("Spot Light Location", spot_light_loc, -100.f, 400.f, "%f", 1.0f);
       bool update_slight1_dir = ImGui::SliderFloat3("Spot Light Direction", spot_light_dir, -1.f, 1.f, "%f", 1.0f);
+      bool update_slight1_loc = ImGui::SliderFloat3("Spot Light Location", spot_light_loc, -400.f, 400.f, "%f", 1.0f);
       bool update_slight1_inner = ImGui::SliderFloat("SL Inner", spot_light_inner, 0.03f, 19.f, "%f", 1.0f);
       bool update_slight1_outer = ImGui::SliderFloat("SL Outer", spot_light_outer, 0.1f, 40.f, "%f", 1.0f);
       bool update_slight1_linear = ImGui::SliderFloat("SL Linear", spot_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
@@ -786,8 +787,6 @@ public:
       bool update_slight1_ambient = ImGui::SliderFloat("SL Ambient", spot_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_slight1_diff = ImGui::SliderFloat("SL Diffuse", spot_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_slight1_spec = ImGui::SliderFloat("SL Spec", spot_light_spec, 0.f, 1.f, "%f", 1.0f);
-     
-
 
       bool update_cam_fov = ImGui::SliderFloat("Cam FOV", cam_fov, 30.f, 90.f);
 
@@ -804,11 +803,11 @@ public:
           glm::vec3(*dir_light_amb),
           glm::vec3(*dir_light_diff),
           glm::vec3(*dir_light_spec));
-      
+
       if (update_plight1_loc || update_plight1_linear || update_plight1_quadratic || update_plight1_ambient
         || update_plight1_diff || update_plight1_spec) {
-       g_aa_interface.ChangePointLight(g_plight1_id, glm::vec3(point_light_loc[0], point_light_loc[1], point_light_loc[2]), *point_light_constant, *point_light_linear, *point_light_quadratic,
-         glm::vec3(*point_light_ambient), glm::vec3(*point_light_diff), glm::vec3(*point_light_spec));
+        g_aa_interface.ChangePointLight(g_plight1_id, glm::vec3(point_light_loc[0], point_light_loc[1], point_light_loc[2]), *point_light_constant, *point_light_linear, *point_light_quadratic,
+          glm::vec3(*point_light_ambient), glm::vec3(*point_light_diff), glm::vec3(*point_light_spec));
       }
 
       if (update_slight1_loc ||
