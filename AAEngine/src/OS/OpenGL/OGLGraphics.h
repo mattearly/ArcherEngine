@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <vector>
 #include <memory>
+#include <cmath>
 
 namespace AA {
 
@@ -81,21 +82,21 @@ public:
   //
   // render graph stuff
   //
+  static void ResetToDefault() {
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+  }
 
-  static void BatchRenderToViewport(
-    const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
-    const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
-    const Viewport& vp) {
-
-
+  static void BatchRenderToViewport(const std::vector<std::shared_ptr<AA::Prop> >& render_objects, const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects, const Viewport& vp) {
     glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
-
-
     for (const auto& render_object : render_objects) {
       if (render_object->IsStenciled()) {
         continue;
       }
-      OGLGraphics::RenderNormal(render_object);
+      OGLGraphics::RenderProp(render_object);
     }
 
     for (const auto& render_object : animated_render_objects) {
@@ -111,14 +112,10 @@ public:
           InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
         }
       }
-      OGLGraphics::RenderNormal(std::dynamic_pointer_cast<AA::Prop>(render_object));
+      OGLGraphics::RenderProp(std::dynamic_pointer_cast<AA::Prop>(render_object));
     }
   
-
-
-
-  // stencils LAST
-
+    // stencils LAST
     for (const auto& render_object : render_objects) {
       if (render_object->IsStenciled()) {
         OGLGraphics::RenderStenciled(render_object);
@@ -139,82 +136,15 @@ public:
         OGLGraphics::RenderStenciled(std::dynamic_pointer_cast<AA::Prop>(render_object));
       }
     }
-
   }
 
   static void RenderSkybox(const Skybox* skybox_target) {
     if (!skybox_target) { return; }
-
     glDepthFunc(GL_LEQUAL);
-
     auto skybox_shader = InternalShaders::Skycube::Get();
-
     SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
     DrawElements(skybox_target->GetVAO(), 36);
-
     ResetToDefault();
-  }
-
-  static void ResetToDefault() {
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_STENCIL_TEST);
-    //glDisable(GL_STENCIL_TEST);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-    //glStencilMask(0x00); // disable writes
-
-                         
-    //glStencilMask(0xFF); // enable writes
-
-    if (InternalShaders::Uber::IsActive()) {
-      OGLShader* uber_shader = InternalShaders::Uber::Get();
-      uber_shader->SetBool("u_has_albedo_tex", false);
-      uber_shader->SetBool("u_has_specular_tex", false);
-      uber_shader->SetBool("u_has_normal_tex", false);
-      uber_shader->SetBool("u_has_emission_tex", false);
-      uber_shader->SetBool("u_is_animating", false);
-
-      /*
-      uniform mat4 u_projection_matrix;
-      uniform mat4 u_view_matrix;
-      uniform mat4 u_model_matrix;
-
-      uniform mat4 u_final_bone_mats[MAX_BONES];
-      uniform int u_is_animating;
-
-      uniform vec3 u_view_pos;
-      uniform int u_has_albedo_tex;
-      uniform int u_has_specular_tex;
-      uniform int u_has_normal_tex;
-      uniform int u_has_emission_tex;
-      uniform Material u_material;
-      uniform int u_is_dir_light_on;
-      uniform DirectionalLight u_dir_light;
-      uniform PointLight u_point_lights[MAXPOINTLIGHTS];
-      uniform SpotLight u_spot_lights[MAXSPOTLIGHTS];
-      uniform int u_num_point_lights_in_use;
-      uniform int u_num_spot_lights_in_use;
-
-      */
-    }
-
-    if (InternalShaders::Stencil::IsActive()) {
-      OGLShader* stencil_shader = InternalShaders::Stencil::Get();
-      stencil_shader->SetBool("u_is_animating", false);
-      stencil_shader->SetBool("u_stencil_with_normals", false);
-
-      /*
-      uniform mat4 u_projection_matrix;
-      uniform mat4 u_view_matrix;
-      uniform mat4 u_model_matrix;
-
-      uniform mat4 u_final_bone_mats[MAX_BONES];
-      uniform int u_stencil_with_normals;
-      uniform float u_stencil_scale;
-      uniform int u_is_animating;
-      */
-    }
   }
 
   static void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
@@ -251,7 +181,12 @@ public:
       }
       OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::DrawElements(m.vao, m.numElements);
+      uber_shader->SetBool("u_has_albedo_tex", false);
+      uber_shader->SetBool("u_has_specular_tex", false);
+      uber_shader->SetBool("u_has_normal_tex", false);
+      uber_shader->SetBool("u_has_emission_tex", false);
     }
+    uber_shader->SetBool("u_is_animating", false);
 
     // 2nd pass
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -270,19 +205,19 @@ public:
     }
     stencil_shader->SetVec3("u_stencil_color", render_object->GetStencilColor());
     for (const MeshInfo& m : render_object->GetMeshes()) {
-      //OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::DrawElements(m.vao, m.numElements);
     }
 
     OGLGraphics::SetStencilMask(true);
-    //glStencilFunc(GL_ALWAYS, 0, 0xFF);  // todo: abstract
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glEnable(GL_DEPTH_TEST);
+    stencil_shader->SetBool("u_is_animating", false);
+    stencil_shader->SetBool("u_stencil_with_normals", false);
     ResetToDefault();
   }
 
-  static void RenderNormal(const std::shared_ptr<AA::Prop>& render_object) {
+  static void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
     OGLShader* uber_shader = InternalShaders::Uber::Get();
     uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
     for (const MeshInfo& m : render_object->GetMeshes()) {
@@ -312,10 +247,19 @@ public:
       }
       OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::DrawElements(m.vao, m.numElements);
+      uber_shader->SetBool("u_has_albedo_tex", false);
+      uber_shader->SetBool("u_has_specular_tex", false);
+      uber_shader->SetBool("u_has_normal_tex", false);
+      uber_shader->SetBool("u_has_emission_tex", false);
     }
+
+    uber_shader->SetBool("u_is_animating", false);
     ResetToDefault();
   }
 
+  /// <summary>
+  /// Debug
+  /// </summary>
   static void RenderWhiteCubeAt(glm::vec3 loc) {
     glm::mat4 model_matrix = glm::mat4(1);
     model_matrix = glm::translate(model_matrix, loc);
@@ -324,6 +268,57 @@ public:
     ResetToDefault();
   }
 
+  /// <summary>
+  /// Debug
+  /// todo:: test and fix
+  /// </summary>
+  static void RenderDirectionalLightArrowIcon(glm::vec3 dir_from_00) {
+
+    // todo: math to spin the arrow icon & keep it at some portion of the screen
+    // the below math is WRONG!
+    glm::vec3 rot_angles_in_radians = glm::vec3(0);
+
+    rot_angles_in_radians.x = -dir_from_00.x;
+    rot_angles_in_radians.y = -dir_from_00.y;
+    rot_angles_in_radians.z = -dir_from_00.z;
+
+    glm::mat4 model_matrix = glm::mat4(1);
+    model_matrix = glm::rotate(model_matrix, rot_angles_in_radians.x, glm::vec3(0, 1, 0));
+    model_matrix = glm::rotate(model_matrix, rot_angles_in_radians.y, glm::vec3(0, 0, 1));
+    model_matrix = glm::rotate(model_matrix, rot_angles_in_radians.z, glm::vec3(1, 0, 0));
+
+    // update and draw
+    InternalShaders::Basic::Get()->SetMat4("u_model_matrix", model_matrix);
+    unsigned int num_elements;
+    // figure out how to draw an arrow better
+    unsigned int cone_vao = Primatives::load_cone(num_elements);
+    OGLGraphics::DrawElements(cone_vao, num_elements);
+
+    ResetToDefault();
+  }
+
+  /// <summary>
+  /// Debug RenderSpotLightIcon
+  /// todo: test and fix
+  /// </summary>
+  static void RenderSpotLightIcon(glm::vec3 location, glm::vec3 direction) {
+   
+    // location and direction 
+    // need to check that this is correct
+    glm::mat4 model_matrix = glm::mat4(1);
+    model_matrix = glm::translate(model_matrix, location);
+
+    model_matrix = glm::rotate(model_matrix, direction.x, glm::vec3(0, 1, 0));
+    model_matrix = glm::rotate(model_matrix, direction.y, glm::vec3(0, 0, 1));
+    model_matrix = glm::rotate(model_matrix, direction.z, glm::vec3(1, 0, 0));
+    
+    InternalShaders::Basic::Get()->SetMat4("u_model_matrix", model_matrix);
+    // needs a better icon than a cube
+    OGLGraphics::DrawElements(Primatives::load_cube(), 36);
+    ResetToDefault();
+  }
+
+  
 private:
   OGLGraphics() = delete;
 };
