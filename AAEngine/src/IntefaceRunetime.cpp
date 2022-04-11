@@ -172,6 +172,7 @@ void Interface::teardown() {
   mDirectionalLight.reset();
   mPointLights.clear();
   mSpotLights.clear();
+  mDebugLightIndicators = false;
 
   // delete imgui
   if (mIMGUI) {
