@@ -119,10 +119,10 @@ void Interface::render() {
       if (mDebugLightIndicators) {
         for (const auto& pl : mPointLights)
           OGLGraphics::RenderWhiteCubeAt(pl->Position);
-        for (const auto& sl : mSpotLights)
-          OGLGraphics::RenderSpotLightIcon(sl->Position, sl->Direction);
-        if (mDirectionalLight)
-          OGLGraphics::RenderDirectionalLightArrowIcon(mDirectionalLight->Direction);
+        //for (const auto& sl : mSpotLights)
+        //  OGLGraphics::RenderSpotLightIcon(sl->Position, sl->Direction);
+        //if (mDirectionalLight)
+        //  OGLGraphics::RenderDirectionalLightArrowIcon(mDirectionalLight->Direction);
       }
     }
   }
