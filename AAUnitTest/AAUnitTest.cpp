@@ -656,7 +656,6 @@ public:
 
     tg->g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
 
-
     // Load and Test Models to make sure thy reuse the same VAO if loading from the same file
     {
       tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(-20, 0, -25));
@@ -741,7 +740,6 @@ public:
         glm::vec3(*tg->spot_light_spec)
       );
 
-
       // a sunlight
       tg->g_aa_interface.SetDirectionalLight(
         glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
@@ -749,12 +747,11 @@ public:
         glm::vec3(*tg->dir_light_diff),
         glm::vec3(*tg->dir_light_spec));
 
-
-
-      // ground and a house
-      tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(0, -30.f, 0), glm::vec3(20));
-
-
+      // ground
+      for (int i = -3; i < 4; i++)
+        for (int j = -3; j < 4; j++)
+          tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i*400, -30.f, j*400), glm::vec3(1.f));
+      
       tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(1.f));
 
       tg->g_plight1_id = tg->g_aa_interface.AddPointLight(
@@ -769,13 +766,9 @@ public:
       tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
     }
 
-
-
-
     // ImGui Controls
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("LightingTests");
-      bool doToggleFS = ImGui::Button("ToggleFullscreen");
       ImGui::Text("SUN");
       bool update_dlight_dir = ImGui::SliderFloat3("Sun Direction", tg->dir_light_direction, -1.0f, 1.0f, "%f", 1.0f);
       bool update_dlight_amb = ImGui::SliderFloat("Sun Ambient", tg->dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
@@ -783,17 +776,15 @@ public:
       bool update_dlight_specular = ImGui::SliderFloat("Sun Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
 
       ImGui::Text("BULB");
+      bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
       bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", tg->point_light_loc, -400.f, 400.f, "%f", 1.0f);
       bool update_plight1_linear = ImGui::SliderFloat("Point Light Linear", tg->point_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
       bool update_plight1_quadratic = ImGui::SliderFloat("Point Light Quadratic", tg->point_light_quadratic, 0.0001f, 0.300f, "%f", 1.0f);
       bool update_plight1_ambient = ImGui::SliderFloat("Point Light Ambient", tg->point_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_diff = ImGui::SliderFloat("Point Light Diffuse", tg->point_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_spec = ImGui::SliderFloat("Point Light Spec", tg->point_light_spec, 0.f, 1.f, "%f", 1.0f);
-      bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
 
       ImGui::Text("FLASHLIGHT");
-      //bool update_slight1_loc = ImGui::SliderFloat3("Spot Light Location", tg->spot_light_loc, -400.f, 400.f, "%f", 1.0f);
-      //bool update_slight1_dir = ImGui::SliderFloat3("Spot Light Direction", spot_light_dir, -1.f, 1.f, "%f", 1.0f);
       bool update_slight1_inner = ImGui::SliderFloat("Spot Light Inner", tg->spot_light_inner, 0.03f, 19.f, "%f", 1.0f);
       bool update_slight1_outer = ImGui::SliderFloat("Spot Light Outer", tg->spot_light_outer, 0.1f, 40.f, "%f", 1.0f);
       bool update_slight1_linear = ImGui::SliderFloat("Spot Light Linear", tg->spot_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
@@ -804,6 +795,7 @@ public:
 
       ImGui::Text("VIEWPORT");
       bool update_cam_fov = ImGui::SliderFloat("Cam FOV", tg->cam_fov, 30.f, 90.f);
+      bool doToggleFS = ImGui::Button("ToggleFullscreen");
 
       tg->g_No = ImGui::Button("report broken");
       tg->g_Yes = ImGui::Button("NEXT TEST");
@@ -845,10 +837,10 @@ public:
           glm::vec3(*tg->spot_light_diff), 
           glm::vec3(*tg->spot_light_spec));
       }
+
       if (update_draw_plight1_loc_cube) {
         tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
       }
-
 
       // keep spot light on cam location and direction
       {
