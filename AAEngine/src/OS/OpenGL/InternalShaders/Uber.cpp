@@ -79,6 +79,7 @@ struct Material {
   sampler2D Normal;
   sampler2D Emission;
   float Shininess;
+  vec4 Color;
 };
 struct DirectionalLight {
   vec3 Direction;
@@ -98,7 +99,6 @@ struct SpotLight {
   vec3 Ambient, Diffuse, Specular;
 };
 
-const vec3 DEFAULT_FRAG_COLOR = vec3(0.9, 0.2, 0.2);  // red so they stand out
 const int MAXPOINTLIGHTS = 24; // if changed, needs to match on light controllers
 const int MAXSPOTLIGHTS = 12;
 
@@ -204,8 +204,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
     ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
-    ambient = light.Ambient * DEFAULT_FRAG_COLOR;
-    diffuse = light.Diffuse * diff * DEFAULT_FRAG_COLOR;
+    ambient = light.Ambient * u_material.Color.rgb;
+    diffuse = light.Diffuse * diff * u_material.Color.rgb;
   }
   if (u_has_specular_tex > 0) {
     vec3 specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
