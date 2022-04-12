@@ -147,18 +147,10 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
 
 vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir){
   vec3 lightDir = normalize(light.Position - fs_in.Pos);
-  // diffuse shading
-  float diff = max(dot(normal, lightDir), 0.0);
-  // specular shading
-  float spec;
-  if (u_has_specular_tex > 0) {
-    vec3 reflectDir = reflect(-lightDir, normal);
-    spec = pow(max(dot(viewDir, reflectDir), 0.0), u_material.Shininess);
-  }
-  // attenuation
+  float diff = max(dot(lightDir, normal), 0.0);
+  vec3 halfwayDir = normalize(lightDir + viewDir);
   float dist = length(light.Position - fs_in.Pos);
   float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * (dist * dist));
-  // combine results
   vec3 ambient;
   vec3 diffuse;
   if (u_has_albedo_tex > 0) {
@@ -169,6 +161,7 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir){
     diffuse = light.Diffuse * diff * u_material.Color.rgb;
   }
   vec3 specular;
+  float spec = pow(max(dot(normal, halfwayDir), 0.0), u_material.Shininess);
   if (u_has_specular_tex > 0) {
     specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
   } else {
