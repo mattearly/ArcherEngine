@@ -202,7 +202,10 @@ void Camera::ResetToDefault() {
 void Camera::NewFrame() {
   if (camera_vectors_changed) {
     update_camera_vectors_tick();
-    if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_view_matrix", mViewMatrix);
+    if (InternalShaders::Uber::IsActive()) {
+      InternalShaders::Uber::Get()->SetVec3("u_view_pos", Position);
+      InternalShaders::Uber::Get()->SetMat4("u_view_matrix", mViewMatrix);
+    }
     if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_view_matrix", mViewMatrix);
     if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_view_matrix", glm::mat4(glm::mat3(mViewMatrix)));
     if (InternalShaders::Basic::IsActive()) InternalShaders::Basic::Get()->SetMat4("u_view_matrix", glm::mat4(mViewMatrix));
