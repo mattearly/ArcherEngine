@@ -132,15 +132,17 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     ambient = u_dir_light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = u_dir_light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
-    ambient = u_dir_light.Ambient * DEFAULT_FRAG_COLOR;
-    diffuse = u_dir_light.Diffuse * diff * DEFAULT_FRAG_COLOR;
+    ambient = u_dir_light.Ambient * u_material.Color.rgb;
+    diffuse = u_dir_light.Diffuse * diff * u_material.Color.rgb;
   }
+  vec3 specular;
   if (u_has_specular_tex > 0) {
-    vec3 specular = u_dir_light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
-    return(ambient + diffuse + specular);
+    specular = u_dir_light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
   } else {
-    return(ambient + diffuse);
+    specular = u_dir_light.Specular * spec * u_material.Shininess;    
   }
+
+  return(ambient + diffuse + specular);
 }
 
 vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir){
@@ -163,17 +165,17 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir){
     ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
-    ambient = light.Ambient * DEFAULT_FRAG_COLOR;
-    diffuse = light.Diffuse * diff * DEFAULT_FRAG_COLOR;
+    ambient = light.Ambient * u_material.Color.rgb;
+    diffuse = light.Diffuse * diff * u_material.Color.rgb;
   }
-  ambient *= attenuation;
-  diffuse *= attenuation;
   vec3 specular;
   if (u_has_specular_tex > 0) {
     specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
   } else {
-    specular = vec3(1,1,1);
+    specular = light.Specular * spec * u_material.Shininess;
   }
+  ambient *= attenuation;
+  diffuse *= attenuation;
   specular *= attenuation;
   return (ambient + diffuse + specular);
 }

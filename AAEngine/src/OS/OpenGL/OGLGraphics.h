@@ -98,7 +98,6 @@ public:
       }
       OGLGraphics::RenderProp(render_object);
     }
-
     for (const auto& render_object : animated_render_objects) {
       if (render_object->IsStenciled()) {
         continue;
@@ -114,7 +113,7 @@ public:
       }
       OGLGraphics::RenderProp(std::dynamic_pointer_cast<AA::Prop>(render_object));
     }
-  
+
     // stencils LAST
     for (const auto& render_object : render_objects) {
       if (render_object->IsStenciled()) {
@@ -185,6 +184,9 @@ public:
       uber_shader->SetBool("u_has_specular_tex", false);
       uber_shader->SetBool("u_has_normal_tex", false);
       uber_shader->SetBool("u_has_emission_tex", false);
+      uber_shader->SetFloat("u_material.Shininess", 0.3336f); // default shininess
+      uber_shader->SetVec3("u_material.Color", glm::vec3(1.0f, 0.1f, 0.1f)); // default color
+
     }
     uber_shader->SetBool("u_is_animating", false);
 
@@ -251,6 +253,8 @@ public:
       uber_shader->SetBool("u_has_specular_tex", false);
       uber_shader->SetBool("u_has_normal_tex", false);
       uber_shader->SetBool("u_has_emission_tex", false);
+      uber_shader->SetFloat("u_material.Shininess", 0.3336f); // default shininess
+      uber_shader->SetVec3("u_material.Color", glm::vec3(1.0f, 0.1f, 0.1f)); // default color
     }
 
     uber_shader->SetBool("u_is_animating", false);
