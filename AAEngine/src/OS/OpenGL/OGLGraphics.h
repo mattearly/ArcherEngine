@@ -137,15 +137,6 @@ public:
     }
   }
 
-  static void RenderSkybox(const Skybox* skybox_target) {
-    if (!skybox_target) { return; }
-    glDepthFunc(GL_LEQUAL);
-    auto skybox_shader = InternalShaders::Skycube::Get();
-    SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
-    DrawElements(skybox_target->GetVAO(), 36);
-    ResetToDefault();
-  }
-
   static void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
     // 1st pass: render to stencil buffer with normal draw
 
@@ -258,6 +249,15 @@ public:
     }
 
     uber_shader->SetBool("u_is_animating", false);
+    ResetToDefault();
+  }
+
+  static void RenderSkybox(const Skybox* skybox_target) {
+    if (!skybox_target) { return; }
+    glDepthFunc(GL_LEQUAL);
+    auto skybox_shader = InternalShaders::Skycube::Get();
+    SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
+    DrawElements(skybox_target->GetVAO(), 36);
     ResetToDefault();
   }
 
