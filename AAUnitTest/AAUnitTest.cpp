@@ -778,8 +778,8 @@ public:
       ImGui::Text("BULB");
       bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
       bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", tg->point_light_loc, -400.f, 400.f, "%f", 1.0f);
-      bool update_plight1_linear = ImGui::SliderFloat("Point Light Linear", tg->point_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
-      bool update_plight1_quadratic = ImGui::SliderFloat("Point Light Quadratic", tg->point_light_quadratic, 0.0001f, 0.300f, "%f", 1.0f);
+      bool update_plight1_linear = ImGui::SliderFloat("Point Light Linear", tg->point_light_linear, 0.0001f, 0.400f, "%f", 1.0f);
+      bool update_plight1_quadratic = ImGui::SliderFloat("Point Light Quadratic", tg->point_light_quadratic, 0.00001f, 0.200f, "%f", 1.0f);
       bool update_plight1_ambient = ImGui::SliderFloat("Point Light Ambient", tg->point_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_diff = ImGui::SliderFloat("Point Light Diffuse", tg->point_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_spec = ImGui::SliderFloat("Point Light Spec", tg->point_light_spec, 0.f, 1.f, "%f", 1.0f);
