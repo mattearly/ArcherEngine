@@ -184,7 +184,7 @@ public:
       uber_shader->SetBool("u_has_specular_tex", false);
       uber_shader->SetBool("u_has_normal_tex", false);
       uber_shader->SetBool("u_has_emission_tex", false);
-      uber_shader->SetFloat("u_material.Shininess", 0.3336f); // default shininess
+      uber_shader->SetFloat("u_material.Shininess", 16.0f); // default shininess
       uber_shader->SetVec3("u_material.Color", glm::vec3(1.0f, 0.1f, 0.1f)); // default color
 
     }
@@ -253,7 +253,7 @@ public:
       uber_shader->SetBool("u_has_specular_tex", false);
       uber_shader->SetBool("u_has_normal_tex", false);
       uber_shader->SetBool("u_has_emission_tex", false);
-      uber_shader->SetFloat("u_material.Shininess", 0.3336f); // default shininess
+      uber_shader->SetFloat("u_material.Shininess", 16.0f); // default shininess
       uber_shader->SetVec3("u_material.Color", glm::vec3(1.0f, 0.1f, 0.1f)); // default color
     }
 
