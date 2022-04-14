@@ -22,7 +22,7 @@ namespace AA {
 /// Holds info for reusing models that are already loaded.
 /// </summary>
 struct RefModelInfo {
-  uint32_t vao = 0;
+  uint32_t vao;
   uint32_t numElements = 0;
   std::string path = "";
   std::unordered_map<uint32_t, std::string> textureDrawIds{};   // id:type
@@ -144,17 +144,17 @@ int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path_
       recursive_processNode(scene->mRootNode, scene, out_model);
       // if it loaded correctly, save a ref to this loaded up model (certainly a new entry at this point because we checked for copy at the beginning of this function LoadGameObjectFromFile)
       RefModelInfo temp_mesh_info;
-      temp_mesh_info.vao = out_model.mMeshes.front().vao;
+      temp_mesh_info.vao = out_model.mMeshes.front().vao; // todo: save all the vaos, issue #26
       temp_mesh_info.numElements = out_model.mMeshes.front().numElements;
       temp_mesh_info.path = path_to_load;
       temp_mesh_info.textureDrawIds = out_model.mMeshes.front().textureDrawIds;   // id:type
       AllLoadedModels.push_front(temp_mesh_info);
     }
+
   }
 
   return return_code;
 }
-
 
 // unloads all textures and vao's from a list of nodeinfos
 void MeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
@@ -207,17 +207,19 @@ MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x
 
   // Step3: Send the vertex data to the graphic memory
   unsigned int vao = 0;
+
   vao = OGLGraphics::UploadStatic3DMesh(loaded_vertices, loaded_elements);
 
   // Step4: Return this draw data to the user
-  return MeshInfo(
+  MeshInfo return_info(
     vao,
-    (unsigned int)loaded_elements.size(),
+    static_cast<unsigned int>(loaded_elements.size()),
     TextureLoader::LoadAllTextures(scene, scene->mMaterials[mesh->mMaterialIndex], LastLoadedPath),  // get all the textures that belong with this mesh
-    aiMat4_to_glmMat4(*trans)
-  );
-}
+    aiMat4_to_glmMat4(*trans));
 
+
+  return return_info;
+}
 
 // recursive helper function for LoadGameObjectFromFile
 void MeshLoader::recursive_processNode(aiNode* node, const aiScene* scene, Prop& out_model) {
