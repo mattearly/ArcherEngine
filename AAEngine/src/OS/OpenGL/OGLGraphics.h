@@ -93,15 +93,11 @@ public:
   static void BatchRenderToViewport(const std::vector<std::shared_ptr<AA::Prop> >& render_objects, const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects, const Viewport& vp) {
     glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
     for (const auto& render_object : render_objects) {
-      if (render_object->IsStenciled()) {
-        continue;
-      }
+      if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
       OGLGraphics::RenderProp(render_object);
     }
     for (const auto& render_object : animated_render_objects) {
-      if (render_object->IsStenciled()) {
-        continue;
-      }
+      if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
       if (render_object->mAnimator) {
         InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
         InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
@@ -112,6 +108,8 @@ public:
         }
       }
       OGLGraphics::RenderProp(std::dynamic_pointer_cast<AA::Prop>(render_object));
+      InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+      InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
     }
 
     // stencils LAST
@@ -133,8 +131,60 @@ public:
           }
         }
         OGLGraphics::RenderStenciled(std::dynamic_pointer_cast<AA::Prop>(render_object));
+        InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+        InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
       }
     }
+  }
+
+  static void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
+    OGLShader* uber_shader = InternalShaders::Uber::Get();
+    uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
+    for (const MeshInfo& m : render_object->GetMeshes()) {
+      for (const auto& texture : m.textureDrawIds) {
+        const std::string texType = texture.second;  // get the texture type
+        if (texType == "Albedo") {
+          uber_shader->SetBool("u_has_albedo_tex", true);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 0);
+          OGLGraphics::SetTexture(0, texture.first);
+        } else if (texType == "Specular") {
+          uber_shader->SetBool("u_has_specular_tex", true);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 1);
+          uber_shader->SetFloat("u_material.Shininess", m.shininess);
+          uber_shader->SetBool("u_reflection_model.BlinnPhong", true);
+          OGLGraphics::SetTexture(1, texture.first);
+        } else if (texType == "Normal") {
+          uber_shader->SetBool("u_has_normal_tex", true);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 2);
+          OGLGraphics::SetTexture(2, texture.first);
+        } else if (texType == "Emission") {
+          uber_shader->SetBool("u_has_emission_tex", true);
+          uber_shader->SetInt(("u_material." + texType).c_str(), 3);
+          OGLGraphics::SetTexture(3, texture.first);
+        }
+      }
+      OGLGraphics::SetCullFace(m.backface_culled);
+      OGLGraphics::DrawElements(m.vao, m.numElements);
+
+      // reset this shader
+      uber_shader->SetBool("u_has_albedo_tex", false);
+      uber_shader->SetBool("u_has_specular_tex", false);
+      uber_shader->SetBool("u_has_normal_tex", false);
+      uber_shader->SetBool("u_has_emission_tex", false);
+      uber_shader->SetFloat("u_material.Shininess", 0.0f);
+      uber_shader->SetBool("u_reflection_model.Phong", false);
+      uber_shader->SetBool("u_reflection_model.BlinnPhong", false);
+    }
+    ResetToDefault();
+  }
+
+  static void RenderSkybox(const Skybox* skybox_target) {
+    if (!skybox_target) { return; }
+    glDepthFunc(GL_LEQUAL);
+    auto skybox_shader = InternalShaders::Skycube::Get();
+    SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
+    DrawElements(skybox_target->GetVAO(), 36);
+    ResetToDefault();
   }
 
   static void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
@@ -158,6 +208,7 @@ public:
           uber_shader->SetBool("u_has_specular_tex", true);
           uber_shader->SetInt(("u_material." + texType).c_str(), 1);
           uber_shader->SetFloat("u_material.Shininess", m.shininess);
+          uber_shader->SetBool("u_reflection_model.BlinnPhong", true);
           OGLGraphics::SetTexture(1, texture.first);
         } else if (texType == "Normal") {
           uber_shader->SetBool("u_has_normal_tex", true);
@@ -171,15 +222,16 @@ public:
       }
       OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::DrawElements(m.vao, m.numElements);
+
+      // reset this shader
       uber_shader->SetBool("u_has_albedo_tex", false);
       uber_shader->SetBool("u_has_specular_tex", false);
       uber_shader->SetBool("u_has_normal_tex", false);
       uber_shader->SetBool("u_has_emission_tex", false);
-      uber_shader->SetFloat("u_material.Shininess", 16.0f); // default shininess
-      uber_shader->SetVec3("u_material.Color", glm::vec3(1.0f, 0.1f, 0.1f)); // default color
-
+      uber_shader->SetFloat("u_material.Shininess", 0.0f);
+      uber_shader->SetBool("u_reflection_model.Phong", false);
+      uber_shader->SetBool("u_reflection_model.BlinnPhong", false);
     }
-    uber_shader->SetBool("u_is_animating", false);
 
     // 2nd pass
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -205,62 +257,10 @@ public:
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glEnable(GL_DEPTH_TEST);
-    stencil_shader->SetBool("u_is_animating", false);
     stencil_shader->SetBool("u_stencil_with_normals", false);
     ResetToDefault();
   }
-
-  static void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
-    OGLShader* uber_shader = InternalShaders::Uber::Get();
-    uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
-    for (const MeshInfo& m : render_object->GetMeshes()) {
-      for (const auto& texture : m.textureDrawIds) {
-        const std::string texType = texture.second;  // get the texture type
-        if (texType == "Albedo") {  //todo, improve comparison performance
-          uber_shader->SetBool("u_has_albedo_tex", true);
-          uber_shader->SetInt(("u_material." + texType).c_str(), 0);
-          OGLGraphics::SetTexture(0, texture.first);
-        }
-        if (texType == "Specular") {
-          uber_shader->SetBool("u_has_specular_tex", true);
-          uber_shader->SetInt(("u_material." + texType).c_str(), 1);
-          uber_shader->SetFloat("u_material.Shininess", m.shininess);
-          OGLGraphics::SetTexture(1, texture.first);
-        }
-        if (texType == "Normal") {
-          uber_shader->SetBool("u_has_normal_tex", true);
-          uber_shader->SetInt(("u_material." + texType).c_str(), 2);
-          OGLGraphics::SetTexture(2, texture.first);
-        }
-        if (texType == "Emission") {
-          uber_shader->SetBool("u_has_emission_tex", true);
-          uber_shader->SetInt(("u_material." + texType).c_str(), 3);
-          OGLGraphics::SetTexture(3, texture.first);
-        }
-      }
-      OGLGraphics::SetCullFace(m.backface_culled);
-      OGLGraphics::DrawElements(m.vao, m.numElements);
-      uber_shader->SetBool("u_has_albedo_tex", false);
-      uber_shader->SetBool("u_has_specular_tex", false);
-      uber_shader->SetBool("u_has_normal_tex", false);
-      uber_shader->SetBool("u_has_emission_tex", false);
-      uber_shader->SetFloat("u_material.Shininess", 16.0f); // default shininess
-      uber_shader->SetVec3("u_material.Color", glm::vec3(1.0f, 0.1f, 0.1f)); // default color
-    }
-
-    uber_shader->SetBool("u_is_animating", false);
-    ResetToDefault();
-  }
-
-  static void RenderSkybox(const Skybox* skybox_target) {
-    if (!skybox_target) { return; }
-    glDepthFunc(GL_LEQUAL);
-    auto skybox_shader = InternalShaders::Skycube::Get();
-    SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
-    DrawElements(skybox_target->GetVAO(), 36);
-    ResetToDefault();
-  }
-
+  
   /// <summary>
   /// Debug
   /// </summary>
