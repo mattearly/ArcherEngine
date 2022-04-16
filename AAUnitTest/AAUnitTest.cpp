@@ -750,8 +750,8 @@ public:
       // ground
       for (int i = -3; i < 4; i++)
         for (int j = -3; j < 4; j++)
-          tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i*400, -30.f, j*400), glm::vec3(1.f));
-      
+          tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i * 400, -30.f, j * 400), glm::vec3(1.f));
+
       tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(1.f));
 
       tg->g_plight1_id = tg->g_aa_interface.AddPointLight(
@@ -825,16 +825,16 @@ public:
         auto dir = cam->GetFront();
         tg->g_aa_interface.MoveSpotLight(tg->g_slight1_id, loc, dir);
         tg->g_aa_interface.ChangeSpotLight(
-          tg->g_slight1_id, 
+          tg->g_slight1_id,
           loc,
-          dir, 
-          *tg->spot_light_inner, 
-          *tg->spot_light_outer, 
-          *tg->spot_light_constant, 
-          *tg->spot_light_linear, 
+          dir,
+          *tg->spot_light_inner,
+          *tg->spot_light_outer,
+          *tg->spot_light_constant,
+          *tg->spot_light_linear,
           *tg->spot_light_quadratic,
-          glm::vec3(*tg->spot_light_ambient), 
-          glm::vec3(*tg->spot_light_diff), 
+          glm::vec3(*tg->spot_light_ambient),
+          glm::vec3(*tg->spot_light_diff),
           glm::vec3(*tg->spot_light_spec));
       }
 
@@ -867,8 +867,6 @@ public:
 
     TestGlobals::reset();
   }
-
-  // todo: music tests
 
 };
 }
