@@ -769,6 +769,7 @@ public:
     // ImGui Controls
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("LightingTests");
+
       ImGui::Text("SUN");
       bool update_dlight_dir = ImGui::SliderFloat3("Sun Direction", tg->dir_light_direction, -1.0f, 1.0f, "%f", 1.0f);
       bool update_dlight_amb = ImGui::SliderFloat("Sun Ambient", tg->dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
@@ -795,14 +796,16 @@ public:
 
       ImGui::Text("VIEWPORT");
       bool update_cam_fov = ImGui::SliderFloat("Cam FOV", tg->cam_fov, 30.f, 90.f);
-      bool doToggleFS = ImGui::Button("ToggleFullscreen");
+      bool doToggleFS = ImGui::Button("Toggle Fullscreen");
+      bool update_gamma_correction = ImGui::Checkbox("Apply Driver Gamma Correction", &tg->gamma_correction);
 
       tg->g_No = ImGui::Button("report broken");
       tg->g_Yes = ImGui::Button("NEXT TEST");
       ImGui::End();
 
       // state update
-      if (doToggleFS) { tg->g_aa_interface.ToggleWindowFullscreen(); };
+
+
 
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular) {
         tg->g_aa_interface.SetDirectionalLight(
@@ -853,6 +856,12 @@ public:
       if (update_cam_fov) {
         auto cam = tg->g_camera_ref.lock();
         cam->SetFOV(*tg->cam_fov);
+      }
+
+      if (doToggleFS) { tg->g_aa_interface.ToggleWindowFullscreen(); };
+      if (update_gamma_correction) {
+        std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
+        local_window_ref->SetGammaCorrection(tg->gamma_correction);
       }
 
       if (tg->g_Yes || tg->g_No) { tg->g_aa_interface.Shutdown(); };

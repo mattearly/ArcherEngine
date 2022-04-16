@@ -45,6 +45,9 @@ public:
   int GetCurrentMinWidth();
   int GetCurrentMinHeight();
 
+  void SetGammaCorrection(const bool enabled);
+  bool GetGammaCorrection();
+
   void Close();
 
 private:

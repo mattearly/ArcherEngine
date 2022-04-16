@@ -70,7 +70,7 @@ public:
   static void SetDepthTest(const bool enabled);
   static void SetDepthMode(int mode);
   static void SetMultiSampling(const bool enabled);
-  static void Proc(void* proc);
+  static void SetGammaCorrection(const bool enabled);
 
   static void SetDepthMask(const bool enabled);
   static void SetStencil(const bool enabled);
@@ -78,6 +78,9 @@ public:
   static void SetStencilOpDepthPassToReplace();
   static void SetStencilFuncToAlways();
   static void SetStencilFuncToNotEqual();
+
+  static void Proc(void* proc);
+
 
   //
   // render graph stuff

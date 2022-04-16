@@ -155,30 +155,48 @@ void Window::apply_new_window_option_changes() {
     glfwSwapInterval(mWindowOptions->_vsync);
   }
 
+  if (mPrevWindowOptions._gamma_correction != mWindowOptions->_gamma_correction) {
+    OGLGraphics::SetGammaCorrection(mWindowOptions->_gamma_correction);
+  }
+
   // note (copy) applied settings
   mPrevWindowOptions = *mWindowOptions;
+}
+
+void Window::SetGammaCorrection(const bool enabled) {
+  auto weak_opts = get_and_note_window_options();
+  auto opts = weak_opts.lock();
+  opts->_gamma_correction = enabled;
+  apply_new_window_option_changes();
+}
+
+bool Window::GetGammaCorrection() {
+  return mWindowOptions.get()->_gamma_correction;
 }
 
 void Window::Close() {
   glfwSetWindowShouldClose(mGLFWwindow, 1);
 }
+
 void Window::SetCursorToHidden() noexcept {
   get_and_note_window_options();
   mWindowOptions->_cursor_mode = CURSOR_MODE::HIDDEN;
   apply_new_window_option_changes();
 }
+
 void Window::SetCursorToDisabled() noexcept {
   get_and_note_window_options();
   mWindowOptions->_cursor_mode = CURSOR_MODE::DISABLED;
   apply_new_window_option_changes();
 }
+
 void Window::SetCursorToNormal() noexcept {
   get_and_note_window_options();
   mWindowOptions->_cursor_mode = CURSOR_MODE::NORMAL;
   apply_new_window_option_changes();
 }
-void Window::SetNewWidthAndHeight(int w, int h) noexcept
-{
+
+void Window::SetNewWidthAndHeight(int w, int h) noexcept {
   auto weak_opts = get_and_note_window_options();
   auto opts = weak_opts.lock();
   opts->_width = w;
@@ -186,8 +204,7 @@ void Window::SetNewWidthAndHeight(int w, int h) noexcept
   apply_new_window_option_changes();
 }
 
-void Window::SetNewMinWidthAndHeight(int w, int h) noexcept
-{
+void Window::SetNewMinWidthAndHeight(int w, int h) noexcept {
   auto weak_opts = get_and_note_window_options();
   auto opts = weak_opts.lock();
   opts->_min_width = w;
@@ -198,6 +215,7 @@ void Window::SetNewMinWidthAndHeight(int w, int h) noexcept
 bool Window::GetShouldClose() {
   return glfwWindowShouldClose(mGLFWwindow);
 }
+
 int Window::GetCurrentWidth() {
   int width, height;
   glfwGetWindowSize(mGLFWwindow, &width, &height);
@@ -284,14 +302,11 @@ void Window::default_init() {
   if (mWindowOptions->_height < 144)
     mWindowOptions->_height = 144;
 
-
-
-
-
   if (mWindowOptions->_windowing_mode == WINDOW_MODE::MAXIMIZED) {
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
   }
   glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
+
   if (mWindowOptions->_rendering_tech != RENDER_TECH::OPENGL4) {
     throw("unsupported render tech");  // todo (major): add other render techs
   } else {
@@ -339,6 +354,7 @@ void Window::default_init() {
 
     if (!mGLFWwindow) { throw("Unable to init Window for OpenGL 4.3+"); }
 
+
     glfwSetWindowSizeLimits(mGLFWwindow, mWindowOptions->_min_width, mWindowOptions->_min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     glfwSetInputMode(mGLFWwindow, GLFW_CURSOR, static_cast<int>(mWindowOptions->_cursor_mode));
@@ -347,15 +363,12 @@ void Window::default_init() {
     // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
     glfwMakeContextCurrent(mGLFWwindow);
     OGLGraphics::Proc(glfwGetProcAddress);
-
-  }
-
-  if (mWindowOptions->_stencil_bits > 0) {
+ }
+ if (mWindowOptions->_stencil_bits > 0) {
     OGLGraphics::SetStencil(true);
     OGLGraphics::SetStencilFuncToNotEqual();
     OGLGraphics::SetStencilOpDepthPassToReplace();
-  }
-  else {
+  } else {
     OGLGraphics::SetStencil(false);
   }
 

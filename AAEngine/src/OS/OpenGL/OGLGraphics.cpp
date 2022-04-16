@@ -474,6 +474,13 @@ void OGLGraphics::SetMultiSampling(const bool enabled) {
   }
 }
 
+void OGLGraphics::SetGammaCorrection(const bool enabled) {
+  if (enabled)
+    glEnable(GL_FRAMEBUFFER_SRGB);
+  else
+    glDisable(GL_FRAMEBUFFER_SRGB);
+}
+
 void OGLGraphics::Proc(void* proc) {
   if (!gladLoadGLLoader((GLADloadproc)proc)) {
     throw("contexting window to OpenGL failed\n");
