@@ -712,7 +712,7 @@ public:
       Assert::AreEqual(initSuccess, true);
     }
 
-    // Create a Flying Camera and a Sunlight 
+    // Create a Flying Camera, Lights, and Models
     {
       tg->g_window_ref = tg->g_aa_interface.GetWindow();
       std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
@@ -747,13 +747,7 @@ public:
         glm::vec3(*tg->dir_light_diff),
         glm::vec3(*tg->dir_light_spec));
 
-      // ground
-      for (int i = -3; i < 4; i++)
-        for (int j = -3; j < 4; j++)
-          tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i * 400, -30.f, j * 400), glm::vec3(1.f));
-
-      tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(1.f));
-
+      // a point light
       tg->g_plight1_id = tg->g_aa_interface.AddPointLight(
         glm::vec3(tg->point_light_loc[0], tg->point_light_loc[1], tg->point_light_loc[2]),
         1.0f /* constant*/,
@@ -764,6 +758,24 @@ public:
         glm::vec3(*tg->point_light_spec));
 
       tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
+
+      // ground
+      for (int i = -3; i < 4; i++)
+        for (int j = -3; j < 4; j++)
+          tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i * 400, -30.f, j * 400), glm::vec3(1.f));
+
+      // peasant man
+      tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(1.f));
+      
+      // man with walking anim
+      tg->g_walking_man_id = tg->g_aa_interface.AddAnimProp(tg->fullwalking_man.c_str(), glm::vec3(180, -30, -100), glm::vec3(1.f));
+      //tg->g_walking_anim_id = tg->g_aa_interface.AddAnimation(tg->fullwalking_man.c_str(), tg->g_walking_man_id);
+      //tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_walking_anim_id, tg->g_walking_man_id);
+
+      // zombie with punching anim
+      tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-180, -30, -100), glm::vec3(1.f));
+      tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->fullzombie_.c_str(), tg->g_zombie_id[0]);
+      tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
     }
 
     // ImGui Controls
@@ -804,9 +816,6 @@ public:
       ImGui::End();
 
       // state update
-
-
-
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular) {
         tg->g_aa_interface.SetDirectionalLight(
           glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
