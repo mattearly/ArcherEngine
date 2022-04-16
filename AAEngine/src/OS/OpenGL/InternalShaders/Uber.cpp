@@ -105,23 +105,58 @@ struct ReflectionModel {
   bool BlinnPhong;
 };
 
-const int MAXPOINTLIGHTS = 24; // if changed, needs to match on light controllers
-const int MAXSPOTLIGHTS = 12;
-const vec3 DEFAULTCOLOR = vec3(0.9,0.9,0.9);
+
 uniform vec3 u_view_pos;
+
 uniform int u_has_albedo_tex;
 uniform int u_has_specular_tex;
 uniform int u_has_normal_tex;
 uniform int u_has_emission_tex;
-uniform ReflectionModel u_reflection_model;
+uniform int u_has_shadows;
+
 uniform Material u_material;
+uniform ReflectionModel u_reflection_model;
+uniform sampler2D u_shadow_map;
+
+const vec3 DEFAULTCOLOR = vec3(0.9,0.9,0.9);
 uniform int u_is_dir_light_on;
 uniform DirectionalLight u_dir_light;
+
+const int MAXPOINTLIGHTS = 24; // if changed, needs to match on light controllers
 uniform PointLight u_point_lights[MAXPOINTLIGHTS];
-uniform SpotLight u_spot_lights[MAXSPOTLIGHTS];
 uniform int u_num_point_lights_in_use;
+
+const int MAXSPOTLIGHTS = 12;
+uniform SpotLight u_spot_lights[MAXSPOTLIGHTS];
 uniform int u_num_spot_lights_in_use;
 
+vec3 CalculateDirLight(vec3 normal, vec3 viewDir);
+vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir);
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir);
+
+void main() {
+  vec3 normal;
+  if (u_has_normal_tex > 0) {
+    normal = texture(u_material.Normal, fs_in.TexUV).rgb;
+    normal = normalize(normal * 2.0 - 1.0);
+  } else {
+    //normal = normalize(fs_in.Norm * 2.0 - 1.0);
+    normal = fs_in.Norm;
+  }
+  vec3 view_dir = normalize(u_view_pos - fs_in.Pos);
+  vec3 result;
+  if (u_is_dir_light_on > 0) { result += CalculateDirLight(normal, view_dir); }
+  int i = 0;
+  for (i; i < u_num_point_lights_in_use; i++) { result += CalculatePointLights(u_point_lights[i], normal, view_dir); }
+  for (i = 0; i < u_num_spot_lights_in_use; i++) { result += CalcSpotLight(u_spot_lights[i], normal, view_dir); }
+  if (u_has_emission_tex > 0) {
+    vec3 emission = texture(u_material.Emission, fs_in.TexUV).rgb;
+    result += emission;
+  }
+  out_Color = vec4(result, 1.0);
+}
+
+// Light Calculations
 vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
   vec3 lightDir = normalize(-u_dir_light.Direction);
   // diffuse shading
@@ -159,7 +194,8 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
   return(ambient + diffuse + specular);
 }
 
-vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir){
+
+vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
   vec3 lightDir = normalize(light.Position - fs_in.Pos);
   float diff = max(dot(lightDir, normal), 0.0);
 
@@ -198,7 +234,7 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir){
   return (ambient + diffuse + specular);
 }
 
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   vec3 lightDir = normalize(light.Position - fs_in.Pos);
   // diffuse shading
   float diff = max(dot(normal, lightDir), 0.0);
@@ -246,26 +282,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir){
   return (ambient + diffuse + specular);
 }
 
-void main() {
-  vec3 normal;
-  if (u_has_normal_tex > 0) {
-    normal = texture(u_material.Normal, fs_in.TexUV).rgb;
-    normal = normalize(normal * 2.0 - 1.0);
-  } else {
-    normal = normalize(fs_in.Norm * 2.0 - 1.0);
-  }
-  vec3 view_dir = normalize(u_view_pos - fs_in.Pos);
-  vec3 result;
-  if (u_is_dir_light_on > 0) { result += CalculateDirLight(normal, view_dir); }
-  int i = 0;
-  for (i; i < u_num_point_lights_in_use; i++) { result += CalculatePointLights(u_point_lights[i], normal, view_dir); }
-  for (i = 0; i < u_num_spot_lights_in_use; i++) { result += CalcSpotLight(u_spot_lights[i], normal, view_dir); }
-  if (u_has_emission_tex > 0) {
-    vec3 emission = texture(u_material.Emission, fs_in.TexUV).rgb;
-    result += emission;
-  }
-  out_Color = vec4(result, 1.0);
-}
+
+
 )";
 
   UBERSHADER = new OGLShader(UBERSHADER_VERT_CODE.c_str(), UBERSHADER_FRAG_CODE.c_str());
