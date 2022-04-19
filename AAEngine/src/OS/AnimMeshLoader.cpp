@@ -1,60 +1,151 @@
 #include "AnimMeshLoader.h"
 #include "TextureLoader.h"
 #include "OpenGL/OGLGraphics.h"
-#include "../Mesh/AnimProp.h"
+#include "../../include/AAEngine/Mesh/AnimProp.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+
 namespace AA {
+
+/// <summary>
+/// Holds info for reusing models that are already loaded.
+/// </summary>
+struct AnimRefModelInfo {
+  uint32_t vao = 0;
+  uint32_t numElements = 0;
+  std::string path = "";
+  std::unordered_map<uint32_t, std::string> textureDrawIds{};   // id:type
+  Skeleton skelly;
+  int ref_count = 1;
+};
+
+// keeps track of all the models we have loaded so fars
+static std::forward_list<AnimRefModelInfo> AllLoadedAnimModels;
+
+/// <summary>
+/// Checks the AllLoadedAnimModels reference list and reuses models that have already been loaded.
+/// </summary>
+/// <param name="out_model">the model to be populated if successful</param>
+/// <param name="path">full original path</param>
+/// <returns>true if out_model was populated, false if not</returns>
+bool local_helper_reuse_anim_model_if_already_loaded(std::vector<MeshInfo>& out_meshes, Skeleton& skel, const std::string& path) {
+  for (auto& ref_model_info : AllLoadedAnimModels) {
+    if (ref_model_info.path == "")
+      continue;
+    if (path == ref_model_info.path.data()) {
+      ref_model_info.ref_count++;
+      TextureLoader::increment_given_texture_ids(ref_model_info.textureDrawIds);
+      out_meshes.emplace_back(MeshInfo(ref_model_info.vao, ref_model_info.numElements, ref_model_info.textureDrawIds, glm::mat4(1)));
+      skel = ref_model_info.skelly;
+      return true;  // already loaded
+    }
+  }
+  return false; // not already loaded
+}
+
+// notes: this is not a very efficient way of doing this, but alas it does work
+// todo: update and improve
+void local_helper_decrement_all_loaded_anim_models_ref(const std::string& path_to_remove) {
+  // step1: decrement loaded count
+  for (auto& ref_model_info : AllLoadedAnimModels) {
+    if (ref_model_info.path == "")
+      continue;
+    if (path_to_remove == ref_model_info.path.data()) {
+      if (ref_model_info.ref_count > 0) {
+        ref_model_info.ref_count--;
+      }
+    }
+  }
+
+  // step2: remove if ref count is 0 (or less, somehow)
+
+  // a) if we were using a vector instead of a forward_list 
+  //AllLoadedModels.erase(std::remove_if(
+  //  AllLoadedModels.begin(), AllLoadedModels.end(),
+  //  [](const RefModelInfo& ref) {
+  //    return ref.ref_count < 1;
+  //  }), AllLoadedModels.end());
+
+  // b) C++20 method that should work on a forward list, but we are using C++17
+  //std::erase_if(AllLoadedModels, [](const RefModelInfo& ref) {
+  //  return ref.ref_count < 1;
+  //  });
+
+  // c) C++17 (and maybe some older) method to remove from foward_list
+  auto before = AllLoadedAnimModels.before_begin();
+  for (auto it = AllLoadedAnimModels.begin(); it != AllLoadedAnimModels.end(); ) {
+    if (it->ref_count < 1) {
+      it = AllLoadedAnimModels.erase_after(before);
+    } else {
+      before = it;
+      ++it;
+    }
+  }
+}
 
 static std::string LastLoadedAnimPath;
 
-//todo: add refinfo for reusing already loaded models
-
-int AnimMeshLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::string& path) {
-  static Assimp::Importer importer;
-  int post_processing_flags = 0;
-
-  //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
-  post_processing_flags |= aiProcess_JoinIdenticalVertices |
-    aiProcess_Triangulate |
-    aiProcess_FlipUVs |
-    //#ifdef D3D
-    //	aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | 
-    //#endif
-    //aiProcess_PreTransformVertices |
-    //aiProcess_CalcTangentSpace |
-    //aiProcess_GenSmoothNormals |
-    //aiProcess_FixInfacingNormals |
-    //aiProcess_FindInvalidData |
-    aiProcess_ValidateDataStructure
-    ;
-
-  const aiScene* scene = importer.ReadFile(path, post_processing_flags);
-
-  if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-    if (!scene)
-      return -1;
-    if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
-      return -2;
-    if (!scene->mRootNode)
-      return -3;
-  }
-
-  // save global inverse transform for bone animations later
-  out_model.mGlobalInverseTransform = glm::inverse(aiMat4_to_glmMat4(scene->mRootNode->mTransformation));
-
-  LastLoadedAnimPath = path;
-
-  recursive_processNode(out_model, scene->mRootNode, scene);
-
-  return 0;
-}
-
-void AnimMeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload) {
+void AnimMeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
   for (const auto& a_mesh : toUnload) {
+    local_helper_decrement_all_loaded_anim_models_ref(path_to_unload);
     OGLGraphics::DeleteMesh(a_mesh.vao);
     TextureLoader::UnloadTexture(a_mesh.textureDrawIds);
   }
+}
+
+int AnimMeshLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::string& path_to_load) {
+  int return_code = 0;
+  return_code = local_helper_reuse_anim_model_if_already_loaded(out_model.mMeshes, out_model.m_Skeleton, path_to_load);
+
+  if (return_code != 1) {
+    static Assimp::Importer importer;
+    int post_processing_flags = 0;
+
+    //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
+    post_processing_flags |= aiProcess_JoinIdenticalVertices |
+      aiProcess_Triangulate |
+      aiProcess_FlipUVs |
+      //#ifdef D3D
+      //	aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | 
+      //#endif
+      //aiProcess_PreTransformVertices |
+      //aiProcess_CalcTangentSpace |
+      //aiProcess_GenNormals |  // can't be used with gensmoothnormals
+      aiProcess_GenSmoothNormals |
+      //aiProcess_FixInfacingNormals |
+      //aiProcess_FindInvalidData |
+      aiProcess_ValidateDataStructure
+      ;
+
+    const aiScene* scene = importer.ReadFile(path_to_load, post_processing_flags);
+
+    // check if errors on load
+    if (!scene)
+      return_code = -1;
+    else if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
+      return_code = -2;
+    else if (!scene->mRootNode)
+      return_code = -3;
+
+    if (scene && return_code == 0) {
+      LastLoadedAnimPath = path_to_load;
+
+      // save global inverse transform for bone animations later
+      out_model.mGlobalInverseTransform = glm::inverse(aiMat4_to_glmMat4(scene->mRootNode->mTransformation));
+
+      recursive_processNode(out_model, scene->mRootNode, scene);
+
+      // cache for later reloads of the same model
+      AnimRefModelInfo temp_mesh_info;
+      temp_mesh_info.vao = out_model.mMeshes.front().vao;
+      temp_mesh_info.numElements = out_model.mMeshes.front().numElements;
+      temp_mesh_info.path = path_to_load;
+      temp_mesh_info.textureDrawIds = out_model.mMeshes.front().textureDrawIds;   // id:type
+      temp_mesh_info.skelly = out_model.m_Skeleton;
+      AllLoadedAnimModels.push_front(temp_mesh_info);
+    }
+  }
+  return return_code;
 }
 
 // local helper

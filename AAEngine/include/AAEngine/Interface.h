@@ -1,3 +1,7 @@
+/*
+* This is the main way to interface with AAEngine, and maybe the only include file you need.
+*/
+
 #pragma once
 // standard
 #include <vector>
@@ -13,13 +17,12 @@
 #include "Scene/Camera.h"
 #include "OS/Interface/Window.h"
 #include "WindowOptions.h"
+#include "Mesh/Prop.h"
+#include "Mesh/AnimProp.h"
 
 namespace AA {
 
-class Window;
-class Skybox;
 class imGUI;
-class Prop;
 class AnimProp;
 class Animation;
 struct DirectionalLight;
@@ -98,7 +101,7 @@ public:
   /// </summary>
   /// <param name="camId">id that was returned by AddCamera()</param>
   /// <returns></returns>
-  std::shared_ptr<Camera> GetCamera(uidtype camId);
+  std::weak_ptr<Camera> GetCamera(uidtype camId);
 
   /// <summary>
   /// Adds a Prop.
@@ -110,60 +113,19 @@ public:
   unsigned int AddProp(const char* path, const glm::vec3 location = glm::vec3(0), const glm::vec3 scale = glm::vec3(1));
 
   /// <summary>
-  /// Removes a prop. Calls remove cache on model data to keep track of instance count.
+  /// Removes a prop for our list of managed ones.
+  /// Calls remove cache on model data.
   /// </summary>
   /// <param name="id">id of the prop to remove</param>
   /// <returns>true if successful, false otherwise</returns>
   bool RemoveProp(const unsigned int id);
 
   /// <summary>
-  /// Moves a prop to a location
+  /// Access to props.
   /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="loc">desired location</param>
-  void MoveProp(const unsigned int id, glm::vec3 loc);
-
-  /// <summary>
-  /// Scales a prop
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="scale">desired scale</param>
-  void ScaleProp(const unsigned int id, glm::vec3 scale);
-
-  /// <summary>
-  /// Rotates a prop
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
-  void RotateProp(const unsigned int id, glm::vec3 rot);
-
-  /// <summary>
-  /// Sets whether the prop should have a stencil around it.
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="tf">true or false for on or off</param>
-  void StencilProp(const unsigned int id, const bool tf);
-
-  /// <summary>
-  /// Sets the color of the stencil.
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="color">stencil color in rgb</param>
-  void StencilPropColor(const unsigned int id, const glm::vec3 color);
-
-  /// <summary>
-  /// Calculate stencil with Normals or Not. Normals work better for objects that do not have a centered origin.
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="tf">true to calculate stencil with normal, false to calculate normally. If the stencil is offcentered, try true.</param>
-  void StencilPropWithNormals(const unsigned int id, const bool tf);
-
-  /// <summary>
-  /// Scale of the stencil. These scale differently depending on whether calculated with Normals or not.
-  /// </summary>
-  /// <param name="id">id of the prop to effect</param>
-  /// <param name="scale">scale should be > 1 or you probably won't see the stencil</param>
-  void StencilPropScale(const unsigned int id, const float scale);
+  /// <param name="id">id of the prop to access</param>
+  /// <returns>a weak ptr to a prop</returns>
+  std::weak_ptr<Prop> GetProp(const unsigned int id) const;
 
   /// <summary>
   /// Adds a Animated Prop.
@@ -175,53 +137,12 @@ public:
   unsigned int AddAnimProp(const char* path, glm::vec3 starting_location = glm::vec3(0), glm::vec3 starting_scale = glm::vec3(0));
 
   /// <summary>
-  /// Moves a animated prop to a location
-  /// </summary>
-  /// <param name="id">id of the animated prop to effect</param>
-  /// <param name="loc">desired location</param>  
-  void MoveAnimProp(const unsigned int id, glm::vec3 loc);
-
-  /// <summary>
-  /// Scales a animated prop
-  /// </summary>
-  /// <param name="id">id of the animated prop to effect</param>
-  /// <param name="scale">desired scale</param>
-  void ScaleAnimProp(const unsigned int id, glm::vec3 scale);
-
-  /// <summary>
-  /// Rotates a animated prop
-  /// </summary>
-  /// <param name="id">id of the animated prop to effect</param>
-  /// <param name="rot">rotation axis values, x, y, z should be radians -PI to PI</param>
-  void RotateAnimProp(const unsigned int id, glm::vec3 rot);
-
-  /// <summary>
-  /// Sets whether the animated prop should have a stencil around it.
-  /// </summary>
-  /// <param name="id">id of the animated prop to effect</param>
-  /// <param name="tf">true or false for on or off</param>
-  void StencilAnimProp(const unsigned int id, const bool tf);
-
-  /// <summary>
-  /// Sets the color of the stencil.
-  /// </summary>
-  /// <param name="id">id of the animated prop to effect</param>
-  /// <param name="color">stencil color in rgb</param>
-  void StencilAnimPropColor(const unsigned int id, const glm::vec3 color);
-
-  /// <summary>
-  /// Calculate stencil with Normals or Not. Normals work better for objects that do not have a centered origin.
-  /// </summary>
-  /// <param name="id">id of the animated prop to effect</param>
-  /// <param name="tf">true to calculate stencil with normal, false to calculate normally. If the stencil is offcentered, try true.</param>
-  void StencilAnimPropWithNormals(const unsigned int id, const bool tf);
-
-  /// <summary>
-  /// Scale of the stencil. These scale differently depending on whether calculated with Normals or not.
-  /// </summary>
-  /// <param name="id">id of the animated prop to effect</param>
-  /// <param name="scale">scale should be > 1 or you probably won't see the stencil</param>
-  void StencilAnimPropScale(const unsigned int id, const float scale);
+/// Removes an animated prop for our list of managed ones.
+/// Calls remove cache on model data.
+/// </summary>
+/// <param name="id">id of the prop to remove</param>
+/// <returns>true if successful, false otherwise</returns>
+  bool RemoveAnimProp(const unsigned int id);
 
   /// <summary>
   /// Returns the bone count.
@@ -229,6 +150,13 @@ public:
   /// <param name="id"></param>
   /// <returns></returns>
   unsigned int GetAnimPropBoneCount_testing(const unsigned int anim_prop_id);
+
+  /// <summary>
+  /// User access to animated props and their public functions.
+  /// </summary>
+  /// <param name="anim_prop_id">unique identifier</param>
+  /// <returns>Returns weak access to an AnimatedProp</returns>
+  std::weak_ptr<AnimProp> GetAnimProp(const unsigned int anim_prop_id) const;
 
   /// <summary>
   /// Adds Skeletal Animation Data to the memory bank of a Animated Prop.
@@ -274,19 +202,6 @@ public:
   /// </summary>
   /// <param name="status">true to turn on, false to turn off</param>
   void SimulateWorldPhysics(bool status);
-
-  /// <summary>
-  /// Sets a skybox with 6 textures
-  /// </summary>
-  /// <param name="incomingSkymapFiles">6 textures</param>
-  /// <param name="has_alpha">true is images have and alpha channel, false otherwise</param>
-  void SetSkybox(std::vector<std::string> incomingSkymapFiles) noexcept;
-
-  /// <summary>
-  /// Removes current skybox. You will see the clear screen color instead.
-  /// Call SetSkybox with new parameters to set up the skybox again.
-  /// </summary>
-  void RemoveSkybox() noexcept;
 
   /// <summary>
   /// Sets the directional light on the default lit shader.
@@ -349,6 +264,8 @@ public:
   /// <param name="new_spec"></param>
   void ChangePointLight(int which, glm::vec3 new_pos, float new_constant, float new_linear, float new_quad,
     glm::vec3 new_amb, glm::vec3 new_diff, glm::vec3 new_spec);
+
+  void DebugLightIndicatorsOnOrOff(const bool& tf);
 
   /// <summary>
   /// Adds a Spot light (flashlight style) to the default lit shader.
@@ -482,7 +399,7 @@ public:
   /// Get window to access public functions
   /// </summary>
   /// <returns>A Shared Pointer to the Window Class</returns>
-  std::shared_ptr<Window> GetWindow();
+  std::weak_ptr<Window> GetWindow();
 
   /// <summary>
   /// Sets the title of the window.
@@ -574,9 +491,9 @@ public:
   bool RemoveFromOnQuit(unsigned int r_id);
 
   /// <summary>
-  // resets all the runtime functions set by:
-  // AddToOnBegin, AddToUpdate, AddToImGuiUpdate, AddToScrollHandling
-  // AddToKeyHandling, AddToMouseHandling, AddToMouseButtonHandling, AddToOnTeardown
+  /// resets all the runtime functions set by:
+  /// AddToOnBegin, AddToUpdate, AddToImGuiUpdate, AddToScrollHandling
+  /// AddToKeyHandling, AddToMouseHandling, AddToMouseButtonHandling, AddToOnTeardown
   /// </summary>
   void ClearAllRuntimeLamdaFunctions();
 
@@ -595,11 +512,9 @@ private:
 
   std::vector<std::shared_ptr<Prop> > mProps;
 
-  std::vector<std::shared_ptr<AnimProp> > mAnimProps;
+  std::vector<std::shared_ptr<AnimProp> > mAnimatedProps;
 
   std::vector<std::shared_ptr<Animation> > mAnimation;
-
-  std::shared_ptr<Skybox> mSkybox;
 
   std::shared_ptr<DirectionalLight> mDirectionalLight;
 
@@ -610,6 +525,8 @@ private:
   int mNumSpotLightsInUse;
   const int MAXSPOTLIGHTS = 12;   // needs to match on shader
   std::vector<std::shared_ptr<SpotLight> > mSpotLights;
+
+  bool mDebugLightIndicators = false;
 
   LongSound* mMusic;
   std::vector<std::shared_ptr<SoundEffect> > mSoundEffects;
@@ -626,7 +543,10 @@ private:
 
   void begin();
   void update();
+  void settle_window_resize_flag();  // pre_render helper
+  void pre_render();
   void render();
+  void post_render();
   void teardown();
 
 };

@@ -91,22 +91,25 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Basic.h" />
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\ShaderUniforms.h" />
+    <ClInclude Include="include\AAEngine\Scene\Viewport.h" />
     <ClInclude Include="include\AAEngine\WindowOptions.h" />
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h" />
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Shadow.h" />
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Skycube.h" />
     <ClInclude Include="src\ECS\entt.h" />
     <ClInclude Include="src\Mesh\Skeleton.h" />
     <ClInclude Include="src\Mesh\Bone.h" />
     <ClInclude Include="src\Mesh\Animator.h" />
     <ClInclude Include="src\OS\AnimMeshLoader.h" />
-    <ClInclude Include="src\Mesh\AnimProp.h" />
+    <ClInclude Include="include\AAEngine\Mesh\AnimProp.h" />
     <ClInclude Include="include\AAEngine\Controls\Input.h" />
     <ClInclude Include="include\AAEngine\OS\Interface\Window.h" />
     <ClInclude Include="src\Mesh\Animation.h" />
     <ClInclude Include="include\AAEngine\Utility\rand.h" />
     <ClInclude Include="src\Physics\NVidiaPhysx.h" />
-    <ClInclude Include="src\DefaultShaders.h" />
     <ClInclude Include="src\GUI\imGUI.h" />
-    <ClInclude Include="src\OS\LoadCube.h" />
-    <ClInclude Include="src\OS\LoadPlane.h" />
     <ClInclude Include="src\OS\TextureLoader.h" />
     <ClInclude Include="include\AAEngine\Version.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
@@ -114,7 +117,7 @@
     <ClInclude Include="src\Sound\SoundEffect.h" />
     <ClInclude Include="src\OS\TextureInfo.h" />
     <ClInclude Include="include\AAEngine\Scene\Camera.h" />
-    <ClInclude Include="src\Mesh\Prop.h" />
+    <ClInclude Include="include\AAEngine\Mesh\Prop.h" />
     <ClInclude Include="glad\glad.h" />
     <ClInclude Include="src\Sound\ErrorCheck.h" />
     <ClInclude Include="src\Sound\SoundListener.h" />
@@ -132,24 +135,26 @@
     <ClInclude Include="src\Sound\Speaker.h" />
     <ClInclude Include="src\Math\Conversions.h" />
     <ClInclude Include="include\AAEngine\Base\UniqueInstance.h" />
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Stencil.h" />
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Uber.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\InterfaceRuntime.cpp" />
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Basic.cpp" />
+    <ClCompile Include="src\IntefaceRunetime.cpp" />
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Shadow.cpp" />
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Skycube.cpp" />
     <ClCompile Include="src\ECS\entt.cpp" />
     <ClCompile Include="src\Mesh\Skeleton.cpp" />
     <ClCompile Include="src\Mesh\Bone.cpp" />
     <ClCompile Include="src\Mesh\Animator.cpp" />
     <ClCompile Include="src\OS\AnimMeshLoader.cpp" />
     <ClCompile Include="src\Mesh\AnimProp.cpp" />
-    <ClCompile Include="src\DefaultShaders.cpp" />
     <ClCompile Include="src\OS\Interface\Callbacks.cpp" />
     <ClCompile Include="src\OS\Interface\Window.cpp" />
     <ClCompile Include="src\Mesh\Animation.cpp" />
     <ClCompile Include="src\Physics\NVidiaPhysx.cpp" />
     <ClCompile Include="src\GUI\imGUI.cpp" />
-    <ClCompile Include="src\OS\LoadCube.cpp" />
     <ClCompile Include="src\OS\MeshLoader.cpp" />
-    <ClCompile Include="src\OS\LoadPlane.cpp" />
     <ClCompile Include="src\OS\TextureLoader.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Mesh\Spacial3D.cpp" />
@@ -168,6 +173,8 @@
     <ClCompile Include="src\OS\OpenGL\OGLShader.cpp" />
     <ClCompile Include="src\Utility\rand.cpp" />
     <ClCompile Include="src\OS\Vertex.cpp" />
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Stencil.cpp" />
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Uber.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -20,6 +20,7 @@ struct WindowOptions final {
   int          _msaa_samples = -1;
   unsigned int _stencil_bits = 8;
   bool         _vsync = false;
+  bool         _gamma_correction = false;
 };
 
 static void SetDefaults(WindowOptions& winopts) {

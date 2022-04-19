@@ -1,6 +1,6 @@
 #pragma once
 #include "Animation.h"
-#include "AnimProp.h"
+#include "../../include/AAEngine/Mesh/AnimProp.h"
 #include <string>
 #include <map>
 #include <memory>
@@ -21,6 +21,8 @@ public:
   Animator() = delete;
 
   Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans, AnimProp& anim_prop);
+
+  ~Animator();
 
   void UpdateAnimation(float dt);
 

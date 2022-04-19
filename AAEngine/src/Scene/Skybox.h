@@ -6,7 +6,7 @@
 #include <string>
 #include <memory>
 namespace AA {
-
+class Camera;
 // sticking with this pattern: 
 // https://learnopengl.com/Advanced-OpenGL/Cubemaps
 // although many skybox texture sets found online seem to be in differing order
@@ -15,12 +15,11 @@ class Skybox {
 public:
   Skybox(std::vector<std::string> incomingSkymapFiles);
   ~Skybox();
-  void Render(const std::shared_ptr<Camera>& cam);
+  const unsigned int GetCubeMapTexureID() const;
+  const unsigned int GetVAO() const;
 private:
-  void SetViewMatrix(glm::mat4 view_mat);
-  void SetProjectionMatrix(glm::mat4 proj_mat);
   unsigned int mCubemapTexId = 0;
-  void setup_shader();
+  unsigned int mVAO = 0;  // setup once via setup_cube_geometry operation
   void setup_cube_geometry();
   void setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles);
 };

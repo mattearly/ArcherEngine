@@ -83,9 +83,11 @@ const int OGLShader::GetID() const {
 int OGLShader::getAndCheckShaderUniform(const std::string& name) const {
   const int shader_var_id = glGetUniformLocation(ID, name.c_str());
 
+#ifdef _DEBUG
   if (shader_var_id < 0) {
-    throw("shader_var_id is invalid (bad name?)");
+    throw(std::_Xruntime_error, "shader_var_id is invalid (bad name?)");
   }
+#endif
 
   return shader_var_id;
 }
@@ -99,11 +101,14 @@ void OGLShader::loadShader(const char* vert_source, const char* frag_source) {
   /* determine if vertex shader was successful in compiling */
   int v_success;
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &v_success);
+#ifdef _DEBUG
   if (!v_success) {
     char v_infoLog[512];
     glGetShaderInfoLog(vertexShader, 512, nullptr, v_infoLog);
-    throw(v_infoLog);
+    throw(std::_Xruntime_error, v_infoLog);
   }
+#endif
+
 
   /* compile fragment shader */
   int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -113,11 +118,14 @@ void OGLShader::loadShader(const char* vert_source, const char* frag_source) {
   /* determine if fragment shader was successful in compiling */
   int f_success;
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &f_success);
+#ifdef _DEBUG
   if (!f_success) {
     char f_infoLog[512];
     glGetShaderInfoLog(fragmentShader, 512, nullptr, f_infoLog);
-    throw(f_infoLog);
+    throw(std::_Xruntime_error, f_infoLog);
   }
+#endif
+
 
   /* make the shader program */
   ID = glCreateProgram();
@@ -128,22 +136,22 @@ void OGLShader::loadShader(const char* vert_source, const char* frag_source) {
   /* check that the ID was successful */
   int p_success;
   glGetProgramiv(ID, GL_LINK_STATUS, &p_success);
-  if (!p_success) {
 #ifdef _DEBUG
+  if (!p_success) {
     char p_infoLog[512];
     glGetProgramInfoLog(ID, 512, nullptr, p_infoLog);
     throw(std::_Xruntime_error, p_infoLog);
-#endif
   }
+#endif
 
   /* we don't need them anymore */
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
 
-#ifdef _DEBUG
+
+  // old debug, todo if needed
   //QueryInputAttribs(ID);
   //QueryUniforms(ID);
-#endif
 }
 
 }  // end namespace AA

@@ -1,63 +1,67 @@
-# AncientArcher2
+# ArcherEngine
 
-AncientArcher is a C++ library for game development and simulations.
+*ArcherEngine is a Multi-Media C++ library for setting up and interfacing with 3-D enviorments.*
 
-## Project
- 
- - AAEngine
+## Use Context
 
-   Context Handled: 
-    - 3D/2D Renderering
-    - Model & Texture Loaders with optimized resource management 
-    - Point, Directional, and Spot Lights
-    - Spacial Transformations
-    - Function Based Client Core Loop
-    - Skeletal Animations
-    - Physics (testing)
-    - Input Controls
-    - Windowing
-    - Cameras
-    - Phong GLSL Shaders
-    - Cubemap Skyboxes
-    - 3D Sound
+- 3-D Model Loader and transform controls
+- Texturing & Emissions. 
+- Directional, Point, and Spot Lights.
+- Models with Skeletal Animations and some Controls.
+- Cameras Settings and Controls.
+- 3-D SoundEffects.
+- Background Sound tracks.
+- Customize Run time scripts with C++ Lambdas.
 
-## Documentation
+## The Docs
 
-  - Generate via Doxygen
-  - See header [Interface.h](AAEngine/include/AncientArcher/AncientArcher.h)
+  - Generate at wil via Doxygen
+  - See [Interface.h](AAEngine/include/AncientArcher/Interface.h) Header for User Access Functions
 
-## Compile
+## Build & Run
 
-Recommended: 
- - OS: Windows 10.
- - IDE: MSVC17, x64. Visual Studio 2022 Community Edition.
+Requirements
+ - OS: Windows 10
+ - IDE: [Visual Studio 2022](https://visualstudio.microsoft.com/vs/), MSVC17, x64. 
 
-*While AncientArcher code is generally designed to be crossplatform, at this stage the build system is handled via Visual Studio Solution file. Converting it to CMake will be done at some point. If you are just using some of the code and not the whole project it should work the same on any OS.*
+### Open Source Libraries Used
 
-## Dependencies
+assimp, curl, entt, glfw3, glad, glm, imgui, physx, OpenAL-Soft, sndfile, stb
 
-glm, assimp, entt, glfw3, glad, OpenAL-Soft, sndfile, imgui, physx, stb, curl
-
-*managed by vcpkg manifest*
+- libraries are automatically managed by [vcpkg](https://github.com/microsoft/vcpkg), using a project manifest, which builds them locally for your  All you should have to do is setup vcpkg and when you build these will all build as required.
 
 ## Tests and Samples
 
-- Tests via MicrosoftCPPUnitTests: To Run the tests fully, you must download the RuntimeFiles resources (i.e. run DownloadTestResources and unzip to the RuntimeFiles/ dir).
+### MicrosoftCPPUnitTests
 
-## Sample usage code
+To fully run the tests, you must:
+ - Build & Run the DownloadTestResources project. 
+ - Unzip the files it downloads and put them on the root of `RuntimeFiles/`
+ - Go to `Tests->Run All Tests (Ctrl+R, A)`.
+
+## Example Code
 
 ```cpp
 #include <AAEngine/Interface.h>
-
-AA::Interface instance;
-
+AA::Interface instance; // global so you can access it in lambda scripting
 int main(int argc, char** argv) {
-  instance.Init();
+  WindowOptions opts;
+  instance.Init(opts);  // Initializes Required Hardware Access
   /* 
-   your code here -> implement camera, lights, models, sounds, 
-   input handling, and their logic at will 
+   *your code here* 
+   *add camera, lights, models, sounds, animations, controls, etc*
+   *look at the various Add/Remove functions and their signatures.*
   */
-  // instance.Add...
-  return instance.Run();
+  return instance.Run();  // starts the simulation and stays running until Shutdown() or Window.Close()
 }
 ```
+
+
+## Development
+
+Currently being developed and managed by this repo owner.
+
+Development Schedule (Monthly Release):
+- The `main` should only be updated via pull requests from `dev`. Done once a month, with an accompanied release.
+- The `dev` branch should only be updated via Pull Requests.
+- As for `other-branches`, create them from starting point `dev` to do work, and merge them into `dev` when complete. 

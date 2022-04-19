@@ -1,6 +1,17 @@
 #include "OGLGraphics.h"
-#include <glm/glm.hpp>
-#include <glad/glad.h>
+#include "../MeshInfo.h"
+#include "OGLShader.h"
+#include "InternalShaders/Uber.h"
+#include "InternalShaders/Stencil.h"
+#include "InternalShaders/Skycube.h"
+#include "InternalShaders/Shadow.h"
+#include "InternalShaders/Uber.h"
+#include "../../../include/AAEngine/Mesh/Prop.h"
+#include "../../Scene/Skybox.h"
+
+#include <glm/ext/matrix_transform.hpp>
+#include "glm/glm.hpp"
+
 #include <cstddef>
 
 namespace AA {
@@ -15,13 +26,13 @@ void OGLGraphics::SetTexture(int which, const int& textureID) {
   glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-void OGLGraphics::RenderElements(unsigned int vao, unsigned int numElements) {
+void OGLGraphics::DrawElements(unsigned int vao, unsigned int numElements) {
   glBindVertexArray(vao);
   glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
 }
 
-void OGLGraphics::RenderStrip(unsigned int vao, const int& count) {
+void OGLGraphics::DrawStrip(unsigned int vao, const int& count) {
   glBindVertexArray(vao);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, count);
   glBindVertexArray(0);
@@ -45,6 +56,11 @@ void OGLGraphics::SetViewportClearColor(glm::vec3 color) noexcept {
 /// </summary>
 void OGLGraphics::ClearScreen() noexcept {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
+void OGLGraphics::NewFrame() noexcept {
+  ClearScreen();
+  OGLGraphics::ResetToDefault();
 }
 
 GLuint OGLGraphics::UploadStatic3DMesh(const std::vector<LitVertex>& verts, const std::vector<GLuint>& elems) {
@@ -458,6 +474,13 @@ void OGLGraphics::SetMultiSampling(const bool enabled) {
   }
 }
 
+void OGLGraphics::SetGammaCorrection(const bool enabled) {
+  if (enabled)
+    glEnable(GL_FRAMEBUFFER_SRGB);
+  else
+    glDisable(GL_FRAMEBUFFER_SRGB);
+}
+
 void OGLGraphics::Proc(void* proc) {
   if (!gladLoadGLLoader((GLADloadproc)proc)) {
     throw("contexting window to OpenGL failed\n");
@@ -465,34 +488,38 @@ void OGLGraphics::Proc(void* proc) {
 }
 
 /// <summary>
-/// Buffers and depth map of the specified width and height
+/// Buffers and depth map of the specified width and height.
+/// derived from https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
 /// </summary>
 /// <param name="shadow_width"></param>
 /// <param name="shadow_height"></param>
-/// <returns>depth map FBO</returns>
-GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height) {
+/// <returns>depth map FBO for rendering</returns>
+GLuint OGLGraphics::CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map) {
+  // create framebuffer object for rendering
   GLuint depthMapFBO;
   glGenFramebuffers(1, &depthMapFBO);
 
+  // create 2d texture to use as framebuffer's depth buffer
   const GLuint SHADOW_WIDTH = shadow_width, SHADOW_HEIGHT = shadow_height;
-
-  GLuint depthMap;
-  glGenTextures(1, &depthMap);
-  glBindTexture(GL_TEXTURE_2D, depthMap);
+  //GLuint depth_map;
+  glGenTextures(1, &out_depth_map);
+  glBindTexture(GL_TEXTURE_2D, out_depth_map);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+  // attach to framebuffers depth buffer
   glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, out_depth_map, 0);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   return depthMapFBO;
 }
+
 //Note that this only has effect if depth testing is enabled. 
 void OGLGraphics::SetDepthMask(const bool enabled) {
   if (enabled)
@@ -527,5 +554,198 @@ void OGLGraphics::SetStencilFuncToAlways() {
 void OGLGraphics::SetStencilFuncToNotEqual() {
   glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 }
+
+namespace Primatives {
+
+static unsigned int vao_to_the_cube = 0;
+
+// returns the vao to a -1 by 1 cube
+unsigned int load_cube() {
+  if (vao_to_the_cube != 0) {
+    return vao_to_the_cube;
+  }
+
+  const float cubeVertices[] = {
+    // front
+    -1.0, -1.0,  1.0,
+    1.0, -1.0,  1.0,
+    1.0,  1.0,  1.0,
+    -1.0,  1.0,  1.0,
+    // back
+    -1.0, -1.0, -1.0,
+    1.0, -1.0, -1.0,
+    1.0,  1.0, -1.0,
+    -1.0,  1.0, -1.0
+  };
+
+  const unsigned int faces[] = {
+    // front
+    0, 1, 2,
+    2, 3, 0,
+    // right
+    1, 5, 6,
+    6, 2, 1,
+    // back
+    7, 6, 5,
+    5, 4, 7,
+    // left
+    4, 0, 3,
+    3, 7, 4,
+    // bottom
+    4, 5, 1,
+    1, 0, 4,
+    // top
+    3, 2, 6,
+    6, 7, 3 };
+
+  vao_to_the_cube = OGLGraphics::Upload3DPositionsMesh(cubeVertices, sizeof(cubeVertices) / sizeof(cubeVertices[0]), faces, sizeof(faces) / sizeof(faces[0]));
+
+  return vao_to_the_cube;
+}
+
+void unload_cube() {
+  if (vao_to_the_cube != 0) {
+    OGLGraphics::DeleteMesh(vao_to_the_cube);
+    vao_to_the_cube = 0;
+  }
+}
+
+static unsigned int vao_to_the_plane = 0;
+
+unsigned int load_plane() {
+
+  if (vao_to_the_plane != 0) {
+    return vao_to_the_plane;
+  }
+  const float SIZE = 1.f;
+  const float planeVertices[] = {
+    // positions
+    -SIZE, 0, SIZE,
+    SIZE, 0, SIZE,
+    -SIZE, 0, -SIZE,
+    SIZE, 0, -SIZE
+  };
+
+  unsigned int faces[] = {   //indices
+    1,2,0,1,3,2
+  };
+
+  vao_to_the_plane = OGLGraphics::Upload3DPositionsMesh(planeVertices, sizeof(planeVertices) / sizeof(planeVertices[0]), faces, sizeof(faces) / sizeof(faces[0]));
+  return vao_to_the_plane;
+}
+
+void unload_plane() {
+  if (vao_to_the_plane != 0) {
+    OGLGraphics::DeleteMesh(vao_to_the_plane);
+    vao_to_the_plane = 0;
+  }
+}
+
+void unload_all() {
+  unload_cone();
+  unload_cube();
+  unload_plane();
+}
+
+
+static unsigned int vao_to_the_cone = 0;
+
+unsigned int load_cone(unsigned int& out_num_elements) {
+
+  // todo: fix?
+  unsigned int faces[] = {   //indices
+    1,1,1,33,2,1,2,3,1,
+2,3,2,33,2,2,3,4,2,
+3,4,3,33,2,3,4,5,3,
+4,5,4,33,2,4,5,6,4,
+5,6,5,33,2,5,6,7,5,
+6,7,6,33,2,6,7,8,6,
+7,8,7,33,2,7,8,9,7,
+8,9,8,33,2,8,9,10,8,
+9,10,9,33,2,9,10,11,9,
+10,11,10,33,2,10,11,12,10,
+11,12,11,33,2,11,12,13,11,
+12,13,12,33,2,12,13,14,12,
+13,14,13,33,2,13,14,15,13,
+14,15,14,33,2,14,15,16,14,
+15,16,15,33,2,15,16,17,15,
+16,17,16,33,2,16,17,18,16,
+17,18,17,33,2,17,18,19,17,
+18,19,18,33,2,18,19,20,18,
+19,20,19,33,2,19,20,21,19,
+20,21,20,33,2,20,21,22,20,
+21,22,21,33,2,21,22,23,21,
+22,23,22,33,2,22,23,24,22,
+23,24,23,33,2,23,24,25,23,
+24,25,24,33,2,24,25,26,24,
+25,26,25,33,2,25,26,27,25,
+26,27,26,33,2,26,27,28,26,
+27,28,27,33,2,27,28,29,27,
+28,29,28,33,2,28,29,30,28,
+29,30,29,33,2,29,30,31,29,
+30,31,30,33,2,30,31,32,30,
+1,33,31,2,34,31,3,35,31,4,36,31,5,37,31,6,38,31,7,39,31,8,40,31,9,41,31,10,42,31,11,43,31,12,44,31,13,45,31,14,46,31,15,47,31,16,48,31,17,49,31,18,50,31,19,51,31,20,52,31,21,53,31,22,54,31,23,55,31,24,56,31,25,57,31,26,58,31,27,59,31,28,60,31,29,61,31,30,62,31,31,63,31,32,64,31,
+31,32,32,33,2,32,32,65,32,
+32,65,33,33,2,33,1,1,33
+
+
+  };
+
+  out_num_elements = sizeof(faces) / sizeof(faces[0]);
+
+  if (vao_to_the_cone == 0) {
+    // needs loaded
+    const float coneVertices[] = {
+      // positions
+1.000000,0.000007,-1.000000,
+0.999999,0.195098,-0.980785,
+0.999997,0.382691,-0.923880,
+0.999996,0.555578,-0.831470,
+0.999995,0.707114,-0.707107,
+0.999994,0.831477,-0.555570,
+0.999993,0.923887,-0.382683,
+0.999993,0.980793,-0.195090,
+0.999993,1.000007,0.000000,
+0.999993,0.980793,0.195090,
+0.999993,0.923887,0.382683,
+0.999994,0.831477,0.555570,
+0.999995,0.707114,0.707107,
+0.999996,0.555578,0.831470,
+0.999997,0.382691,0.923880,
+0.999999,0.195098,0.980785,
+1.000000,0.000007,1.000000,
+1.000001,-0.195083,0.980785,
+1.000003,-0.382676,0.923880,
+1.000004,-0.555563,0.831470,
+1.000005,-0.707099,0.707107,
+1.000006,-0.831462,0.555570,
+1.000007,-0.923872,0.382684,
+1.000007,-0.980778,0.195090,
+1.000007,-0.999993,-0.000000,
+1.000007,-0.980778,-0.195090,
+1.000007,-0.923872,-0.382684,
+1.000006,-0.831462,-0.555570,
+1.000005,-0.707099,-0.707107,
+1.000004,-0.555563,-0.831470,
+1.000003,-0.382676,-0.923880,
+1.000001,-0.195083,-0.980785,
+-1.000000,-0.000007,0.000000
+
+    };
+    unsigned int num_verts = sizeof(coneVertices) / sizeof(coneVertices[0]);
+    vao_to_the_cone = OGLGraphics::Upload3DPositionsMesh(coneVertices, sizeof(coneVertices) / sizeof(coneVertices[0]), faces, sizeof(faces) / sizeof(faces[0]));
+  }
+
+  return vao_to_the_cone;
+}
+
+void unload_cone() {
+  if (vao_to_the_cone != 0) {
+    OGLGraphics::DeleteMesh(vao_to_the_cone);
+    vao_to_the_cone = 0;
+  }
+}
+
+}  // end namespace Primatives
 
 }  // end namespace AA

@@ -33,7 +33,7 @@
     <ClInclude Include="src\Sound\Speaker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Mesh\Prop.h">
+    <ClInclude Include="include\AAEngine\Mesh\Prop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AAEngine\Scene\Camera.h">
@@ -90,15 +90,6 @@
     <ClInclude Include="src\Scene\Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\LoadCube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DefaultShaders.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OS\LoadPlane.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\AAEngine\Utility\rand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -114,7 +105,7 @@
     <ClInclude Include="include\AAEngine\Controls\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Mesh\AnimProp.h">
+    <ClInclude Include="include\AAEngine\Mesh\AnimProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\OS\AnimMeshLoader.h">
@@ -136,6 +127,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AAEngine\WindowOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Stencil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Uber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Skycube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Shadow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AAEngine\Scene\Viewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\ShaderUniforms.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Basic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -194,12 +209,6 @@
     <ClCompile Include="src\Scene\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\LoadCube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OS\LoadPlane.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utility\rand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -213,9 +222,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\Interface\Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DefaultShaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Mesh\AnimProp.cpp">
@@ -239,7 +245,22 @@
     <ClCompile Include="src\ECS\entt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\InterfaceRuntime.cpp">
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Stencil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Uber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Skycube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Shadow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntefaceRunetime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Basic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

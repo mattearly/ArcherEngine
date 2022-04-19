@@ -5,11 +5,10 @@ namespace AA {
 class Spacial3D final {
 public:
   Spacial3D();
-  void MoveTo(glm::vec3 location);
-  void ScaleTo(glm::vec3 scale);
-  void RotateTo(glm::vec3 rot);
+  void MoveTo(const glm::vec3& location);
+  void ScaleTo(const glm::vec3& scale);
+  void RotateTo(const glm::vec3& rot);
   void ProcessModifications();
-  void ApplyPhysx(glm::mat4 changes);
 private: 
   physx::PxRigidDynamic* mRigidBody;
   glm::vec3 mCurrentLocation;

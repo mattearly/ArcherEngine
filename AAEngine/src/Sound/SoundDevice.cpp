@@ -5,6 +5,10 @@ namespace AA {
 
 static SoundDevice* p_SoundDevice_instance = nullptr;
 
+ALCdevice* p_ALCDevice;
+
+ALCcontext* p_ALCContext;
+
 SoundDevice* SoundDevice::Get() {
   Init(); // uses default device unless device was custom init
   return p_SoundDevice_instance;
@@ -19,6 +23,13 @@ void SoundDevice::Init() {
 void SoundDevice::Init(const char* devicename) {
   if (!p_SoundDevice_instance) {
     p_SoundDevice_instance = new SoundDevice(devicename);
+  }
+}
+
+void SoundDevice::Shutdown() {
+  if (p_SoundDevice_instance) {
+    delete p_SoundDevice_instance;
+    p_SoundDevice_instance = nullptr;
   }
 }
 

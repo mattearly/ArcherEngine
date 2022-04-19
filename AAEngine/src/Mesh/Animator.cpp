@@ -12,6 +12,11 @@ Animator::Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans, AnimPro
     m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 }
 
+Animator::~Animator() {
+  m_FinalBoneMatrices.clear();
+  m_CurrentAnimation.reset();
+}
+
 void Animator::UpdateAnimation(float dt) {
   m_DeltaTime = dt;
   if (m_CurrentAnimation) {
