@@ -12,8 +12,7 @@
 #include "Sound/SoundEffect.h"
 #include "Sound/LongSound.h"
 #include "GUI/imGUI.h"
-#include "OS/LoadCube.h"
-#include "OS/LoadPlane.h"
+#include "OS/OpenGL/InternalShaders/Init.h"
 #include <string>
 #include <sstream>
 #include <utility>
@@ -117,8 +116,17 @@ void Interface::render() {
       cam->NewFrame();
       OGLGraphics::RenderSkybox(cam->GetSkybox());
       OGLGraphics::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport());
+      if (mDebugLightIndicators) {
+        for (const auto& pl : mPointLights)
+          OGLGraphics::RenderWhiteCubeAt(pl->Position);
+        //for (const auto& sl : mSpotLights)
+        //  OGLGraphics::RenderSpotLightIcon(sl->Position, sl->Direction);
+        //if (mDirectionalLight)
+        //  OGLGraphics::RenderDirectionalLightArrowIcon(mDirectionalLight->Direction);
+      }
     }
   }
+
 
   // render imgui interface
   if (mIMGUI) {
@@ -143,15 +151,11 @@ void Interface::teardown() {
 
   mCameras.clear();
 
-  unload_cube();
-  unload_plane();
+  Primatives::unload_all();
 
   ClearAllRuntimeLamdaFunctions();
 
-  InternalShaders::Stencil::Shutdown();
-  InternalShaders::Uber::Shutdown();
-  InternalShaders::Shadow::Shutdown();
-  InternalShaders::Skycube::Shutdown();
+  InternalShaders::Shutdown();
 
   // delete all the meshes and textures from GPU memory
   for (const auto& p : mProps) {
@@ -172,6 +176,7 @@ void Interface::teardown() {
   mDirectionalLight.reset();
   mPointLights.clear();
   mSpotLights.clear();
+  mDebugLightIndicators = false;
 
   // delete imgui
   if (mIMGUI) {

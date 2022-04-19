@@ -265,6 +265,8 @@ public:
   void ChangePointLight(int which, glm::vec3 new_pos, float new_constant, float new_linear, float new_quad,
     glm::vec3 new_amb, glm::vec3 new_diff, glm::vec3 new_spec);
 
+  void DebugLightIndicatorsOnOrOff(const bool& tf);
+
   /// <summary>
   /// Adds a Spot light (flashlight style) to the default lit shader.
   /// Manages its own unique ids so you can add/remove at will (limited by shader).
@@ -523,6 +525,8 @@ private:
   int mNumSpotLightsInUse;
   const int MAXSPOTLIGHTS = 12;   // needs to match on shader
   std::vector<std::shared_ptr<SpotLight> > mSpotLights;
+
+  bool mDebugLightIndicators = false;
 
   LongSound* mMusic;
   std::vector<std::shared_ptr<SoundEffect> > mSoundEffects;

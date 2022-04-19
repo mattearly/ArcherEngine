@@ -45,11 +45,14 @@ public:
   int GetCurrentMinWidth();
   int GetCurrentMinHeight();
 
+  void SetGammaCorrection(const bool enabled);
+  bool GetGammaCorrection();
+
   void Close();
 
 private:
 
-  std::shared_ptr<WindowOptions> get_and_note_window_options();
+  std::weak_ptr<WindowOptions> get_and_note_window_options();
   void apply_new_window_option_changes();
   void default_init();
   void set_default_callbacks();

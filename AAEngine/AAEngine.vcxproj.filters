@@ -90,12 +90,6 @@
     <ClInclude Include="src\Scene\Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\LoadCube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OS\LoadPlane.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\AAEngine\Utility\rand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -156,6 +150,9 @@
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Basic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sound\SoundDevice.cpp">
@@ -212,12 +209,6 @@
     <ClCompile Include="src\Scene\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\LoadCube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OS\LoadPlane.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utility\rand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -267,6 +258,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\IntefaceRunetime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Basic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

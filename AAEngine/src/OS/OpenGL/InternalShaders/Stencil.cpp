@@ -10,7 +10,8 @@ void Stencil::Init() {
     return;
 
   const std::string VERT_CODE = 
-    R"(#version 430 core
+    R"(
+#version 430 core
 layout(location=0)in vec3 inPos;
 layout(location=2)in vec3 inNorm;
 layout(location=3)in ivec4 inBoneIds;
@@ -49,14 +50,17 @@ void main(){
   } else {
     gl_Position = u_projection_matrix * viewMatrix * totalPosition;
   }
-})";
+}
+)";
 
-  const std::string FRAG_CODE = R"(#version 430
+  const std::string FRAG_CODE = R"(
+#version 430
 out vec4 FragColor;
 uniform vec3 u_stencil_color;
 void main() {
   FragColor = vec4(u_stencil_color, 1.0);
-})";
+}
+)";
 
   STENCILSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());
 }

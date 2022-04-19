@@ -15,6 +15,8 @@ struct MeshInfo {
   unsigned int numElements = 0;
   float shininess = 1.0f;
   glm::mat4 local_transform = glm::mat4(1.0f);
-  bool backface_culled = true;
+
+  bool backface_culled = false;
+
 };
 }  // end namespace AA

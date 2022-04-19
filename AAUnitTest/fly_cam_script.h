@@ -14,7 +14,7 @@ struct Move {
 } move;
 bool is_cursor_on = true;
 glm::vec3 move_diff{ 0 };
-const float DEFAULTMOVESPEED = 16.f;
+const float DEFAULTMOVESPEED = 116.f;
 double FPP_SENSITIVITY = .1f;
 double lastX{ 0 }, lastY{ 0 };
 double xDelta{ 0 }, yDelta{ 0 };
@@ -27,15 +27,17 @@ unsigned int fly_mouse_handling_func = 0;
 unsigned int fly_update_func = 0;
 std::weak_ptr<AA::Window> fly_window;
 std::weak_ptr<AA::Camera> fly_camera;
+AA::Interface* interface_ref = nullptr;
 
-void setup_fpp_fly(unsigned int cam) {
+void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
   if (fly_setup) return;
 
-  cam_id_set_to = cam;
+  cam_id_set_to = cam_id_to_fly;
+  interface_ref = &interface;
 
-  fly_mouse_button_func = g_aa_interface.AddToMouseButtonHandling([](AA::MouseButtons& mb) {
+  fly_mouse_button_func = interface.AddToMouseButtonHandling([](AA::MouseButtons& mb) {
     if (mb.mouseButton2) {
-      fly_window = g_aa_interface.GetWindow();
+      fly_window = interface_ref->GetWindow();
       std::shared_ptr<AA::Window> local_fly_window = fly_window.lock();
       if (!is_cursor_on) {
         local_fly_window->SetCursorToNormal();
@@ -48,7 +50,7 @@ void setup_fpp_fly(unsigned int cam) {
     }
     });
 
-  fly_kb_button_func = g_aa_interface.AddToKeyHandling([](AA::KeyboardButtons& kb) {
+  fly_kb_button_func = interface.AddToKeyHandling([](AA::KeyboardButtons& kb) {
     if (kb.w) { move.forward = true; } else { move.forward = false; }
     if (kb.s) { move.backwards = true; } else { move.backwards = false; }
     if (kb.a) { move.left = true; } else { move.left = false; }
@@ -58,7 +60,7 @@ void setup_fpp_fly(unsigned int cam) {
     if (kb.leftShift) { move.sprint = true; } else { move.sprint = false; }
     });
 
-  fly_mouse_handling_func = g_aa_interface.AddToMouseHandling([](AA::MouseCursorPos& cursor) {
+  fly_mouse_handling_func = interface.AddToMouseHandling([](AA::MouseCursorPos& cursor) {
     if (is_cursor_on) return;
 
     if (snap_to_center) {
@@ -72,7 +74,7 @@ void setup_fpp_fly(unsigned int cam) {
     yDelta = lastY - cursor.yOffset;
 
     if (xDelta != 0.0 || yDelta != 0.0) {
-      fly_camera = g_aa_interface.GetCamera(cam_id_set_to);
+      fly_camera = interface_ref->GetCamera(cam_id_set_to);
       std::shared_ptr<AA::Camera> local_fly_cam = fly_camera.lock();
       local_fly_cam->ShiftPitchAndYaw(yDelta * FPP_SENSITIVITY, xDelta * FPP_SENSITIVITY);
 
@@ -82,8 +84,8 @@ void setup_fpp_fly(unsigned int cam) {
 
     });
 
-  fly_update_func = g_aa_interface.AddToUpdate([](float dt) {
-    fly_camera = g_aa_interface.GetCamera(cam_id_set_to);
+  fly_update_func = interface.AddToUpdate([](float dt) {
+    fly_camera = interface_ref->GetCamera(cam_id_set_to);
     if (move.forward) {
       std::shared_ptr<AA::Camera> local_fly_cam = fly_camera.lock();
       move_diff += local_fly_cam->GetFront();
@@ -158,21 +160,21 @@ void turn_off_fly() {
   UnprocessedMovements = false;
   snap_to_center = false;
 
-  if (g_aa_interface.RemoveFromMouseButtonHandling(fly_mouse_button_func)) {
+  if (interface_ref->RemoveFromMouseButtonHandling(fly_mouse_button_func)) {
     fly_mouse_button_func = 0;
   }
-  if (g_aa_interface.RemoveFromKeyHandling(fly_kb_button_func)) {
+  if (interface_ref->RemoveFromKeyHandling(fly_kb_button_func)) {
     fly_kb_button_func = 0;
-
   }
-  if (g_aa_interface.RemoveFromMouseHandling(fly_mouse_handling_func)) {
+  if (interface_ref->RemoveFromMouseHandling(fly_mouse_handling_func)) {
     fly_mouse_handling_func = 0;
   }
-  if (g_aa_interface.RemoveFromOnUpdate(fly_update_func)) {
+  if (interface_ref->RemoveFromOnUpdate(fly_update_func)) {
     fly_update_func = 0;
   }
 
   fly_window.reset();
   fly_camera.reset();
+  interface_ref = nullptr;
 
 }
