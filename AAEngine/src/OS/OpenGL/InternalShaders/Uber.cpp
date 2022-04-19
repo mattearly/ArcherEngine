@@ -99,14 +99,12 @@ struct SpotLight {
   float Constant, Linear, Quadratic;
   vec3 Ambient, Diffuse, Specular;
 };
-
 struct ReflectionModel {
   bool Phong;
   bool BlinnPhong;
 };
 
-
-uniform vec3 u_view_pos;
+uniform vec3 u_cam_pos;
 
 uniform int u_has_albedo_tex;
 uniform int u_has_specular_tex;
@@ -114,9 +112,27 @@ uniform int u_has_normal_tex;
 uniform int u_has_emission_tex;
 uniform int u_has_shadows;
 
-uniform Material u_material;
+uniform Material u_material; // textures 0 to 3
+
+// cascading shadows 
+	//Shadow
+	const int NUM_CASCADES = 3;
+	struct Cascade
+	{
+		mat4 LightVP;
+		sampler2DShadow ShadowMap;
+		float Distance;
+	};
+	uniform Cascade cascades[NUM_CASCADES];
+	
+	uniform int PcfSamples = 2;
+	uniform float Bias = 0; // 0.001; //depending on if front face culling is used
+
+
+uniform sampler2D u_shadow_map; // texture 4
+uniform mat4 u_light_space_matrix;  
+
 uniform ReflectionModel u_reflection_model;
-uniform sampler2D u_shadow_map;
 
 const vec3 DEFAULTCOLOR = vec3(0.9,0.9,0.9);
 uniform int u_is_dir_light_on;
@@ -143,7 +159,7 @@ void main() {
     //normal = normalize(fs_in.Norm * 2.0 - 1.0);
     normal = fs_in.Norm;
   }
-  vec3 view_dir = normalize(u_view_pos - fs_in.Pos);
+  vec3 view_dir = normalize(u_cam_pos - fs_in.Pos);
   vec3 result;
   if (u_is_dir_light_on > 0) { result += CalculateDirLight(normal, view_dir); }
   int i = 0;
@@ -161,6 +177,39 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
   vec3 lightDir = normalize(-u_dir_light.Direction);
   // diffuse shading
   float diff = max(dot(normal, lightDir), 0.);
+  float dotLightNormal = dot(-u_dir_light.Direction, normal);
+
+  // shadows
+  float shadow = 0.0;
+  if (u_has_shadows > 0) {
+    vec4 FragPosLightSpace = u_light_space_matrix * vec4(fs_in.Pos, 1.0);
+
+    vec3 projCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+    float closestDepth = texture(u_shadow_map, projCoords.xy).r; 
+    float currentDepth = projCoords.z;
+    vec3 normal = normalize(fs_in.Norm);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    vec2 texelSize = 1.0 / textureSize(u_shadow_map, 0);
+    for(int x = -1; x <= 1; ++x) {
+        for(int y = -1; y <= 1; ++y) {
+            float pcfDepth = texture(u_shadow_map, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
+    if(projCoords.z > 1.0) {
+        shadow = 0.0;
+    }
+
+    // simpler method
+    //vec3 pos = FragPosLightSpace.xyz * 0.5 + 0.5;
+    //if (pos.z > 1.0) { pos.z = 1.0; }
+    //float depth = texture(u_shadow_map, pos.xy).r;
+
+    //float bias = max( 0.05 * (1.0 - dotLightNormal), 0.005);
+    //shadow =  (depth + bias) < pos.z ? 0.0 : 1.0;
+  }
 
   // specular shading
   float spec;
@@ -191,7 +240,11 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     specular = u_dir_light.Specular * spec * 0.0;  // no shine    
   }
 
-  return(ambient + diffuse + specular);
+  if (u_has_shadows > 0) {
+    return (ambient + (1.0 - shadow) * (diffuse + specular));
+  } else {
+    return (ambient + shadow * (diffuse + specular));
+  }
 }
 
 
@@ -270,7 +323,6 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   }
   ambient *= attenuation * intensity;
   diffuse *= attenuation * intensity;
-  
 
   vec3 specular;
   if (u_has_specular_tex > 0) {
@@ -281,8 +333,6 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   }
   return (ambient + diffuse + specular);
 }
-
-
 
 )";
 

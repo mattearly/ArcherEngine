@@ -125,7 +125,7 @@ public:
   /// </summary>
   /// <param name="id">id of the prop to access</param>
   /// <returns>a weak ptr to a prop</returns>
-  std::weak_ptr<Prop> GetProp(const unsigned int id) const;
+  [[nodiscard]] std::weak_ptr<Prop> GetProp(const unsigned int id) const;
 
   /// <summary>
   /// Adds a Animated Prop.
@@ -517,6 +517,8 @@ private:
   std::vector<std::shared_ptr<Animation> > mAnimation;
 
   std::shared_ptr<DirectionalLight> mDirectionalLight;
+  unsigned int mShadowDepthMapFBO = 0;
+  unsigned int mShadowDepthMapTextureId = 0;
 
   int mNumPointLightsInUse;
   const int MAXPOINTLIGHTS = 24;  // needs to match on shader

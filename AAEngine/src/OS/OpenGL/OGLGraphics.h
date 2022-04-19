@@ -3,6 +3,7 @@
 #include "../../../include/AAEngine/Mesh/Prop.h"
 #include "../../../include/AAEngine/Mesh/AnimProp.h"
 #include "../../Scene/Skybox.h"
+#include "../../Scene/Lights.h"
 #include "../Vertex.h"
 #include "../MeshInfo.h"
 #include "OGLShader.h"
@@ -37,6 +38,10 @@ unsigned int load_plane();
 void unload_plane();
 void unload_all();
 }
+
+static struct GraphicSettings {
+  bool render_shadows = false;
+} graphic_settings;
 
 class OGLGraphics final {
 public:
@@ -88,13 +93,103 @@ public:
   static void ResetToDefault() {
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glDepthFunc(GL_LESS);
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
   }
 
-  static void BatchRenderToViewport(const std::vector<std::shared_ptr<AA::Prop> >& render_objects, const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects, const Viewport& vp) {
+  /// <summary>
+  /// render depth of scene to texture from light perspective
+  /// </summary>
+  /// <param name="dir_light"></param>
+  /// <param name="render_objects"></param>
+  /// <param name="animated_render_objects"></param>
+  /// <param name="depthMapFBO"></param>
+  static void BatchRenderShadows(
+    const DirectionalLight& dir_light,
+    const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
+    const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
+    GLuint depthMapFBO) {
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+    float near_plane = 1.f, far_plane = 10*7.5f;
+
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(-dir_light.Direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+    lightSpaceMatrix = lightProjection * lightView;
+
+    // render scene from light's point of view
+    auto* depth_shadow_renderer = InternalShaders::Shadow::Get();
+    depth_shadow_renderer->SetMat4("u_light_space_matrix", lightSpaceMatrix);
+
+    const GLuint SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    graphic_settings.render_shadows = false;
+    for (const auto& prop : render_objects) {
+      if (prop->render_shadows) {
+        depth_shadow_renderer->SetMat4("u_model_matrix", prop->GetFMM());
+
+        if (prop->cull_frontface_for_shadows) {
+          glEnable(GL_CULL_FACE);
+          glCullFace(GL_FRONT);
+        }
+        const auto& meshes = prop->GetMeshes();
+        for (const auto& m : meshes) {
+          DrawElements(m.vao, m.numElements);
+        }
+        if (prop->cull_frontface_for_shadows) {
+          glCullFace(GL_BACK);
+          glDisable(GL_CULL_FACE);
+        }
+        graphic_settings.render_shadows = true;  // at least 1 thing has shadows
+      }
+    }
+
+    for (const auto& anim_prop : animated_render_objects) {
+      if (anim_prop->GetRenderShadows()) {
+        depth_shadow_renderer->SetMat4("u_model_matrix", anim_prop->GetFMM());
+        if (anim_prop->cull_frontface_for_shadows) {
+          glEnable(GL_CULL_FACE);
+          glCullFace(GL_FRONT);
+        }
+        const auto& meshes = anim_prop->GetMeshes();
+        for (const auto& m : meshes) {
+          DrawElements(m.vao, m.numElements);
+        }
+        if (anim_prop->cull_frontface_for_shadows) {
+          glCullFace(GL_BACK);
+          glDisable(GL_CULL_FACE);
+        }
+        graphic_settings.render_shadows = true;  // at least 1 thing has shadows
+      }
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    if (graphic_settings.render_shadows) {
+      InternalShaders::Uber::Get()->SetMat4("u_light_space_matrix", lightSpaceMatrix);
+    }
+
+  }
+
+  static void BatchRenderToViewport(
+    const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
+    const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
+    const Viewport& vp, const GLuint& shadow_depth_map_tex) {
     glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
+
+    // render shadow texture stuff
+    if (graphic_settings.render_shadows) {
+      auto* uber_shadows = InternalShaders::Uber::Get();
+      uber_shadows->SetInt("u_shadow_map", 4);
+      OGLGraphics::SetTexture(4, shadow_depth_map_tex);
+    }
+
     for (const auto& render_object : render_objects) {
       if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
       OGLGraphics::RenderProp(render_object);
@@ -114,6 +209,8 @@ public:
       InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
       InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
     }
+
+
 
     // stencils LAST
     for (const auto& render_object : render_objects) {
@@ -138,10 +235,28 @@ public:
         InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
       }
     }
+
+  }
+
+  // no changes to shaders before rendering the meshes of the object
+  static void RenderAsIs(const std::shared_ptr<AA::Prop>& render_object) {
+    const auto& meshes = render_object->GetMeshes();
+    for (const auto& m : meshes) {
+      OGLGraphics::DrawElements(m.vao, m.numElements);
+    }
   }
 
   static void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
     OGLShader* uber_shader = InternalShaders::Uber::Get();
+    if (render_object->render_shadows) {
+      uber_shader->SetBool("u_has_shadows", true);
+      //uber_shader->SetInt("u_shadow_map", 4);  // should be bound from prev step?
+      //SetTexture(4, )
+    }
+    if (render_object->cull_backface) {
+      glEnable(GL_CULL_FACE);
+      glCullFace(GL_BACK);
+    }
     uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
     for (const MeshInfo& m : render_object->GetMeshes()) {
       for (const auto& texture : m.textureDrawIds) {
@@ -166,7 +281,6 @@ public:
           OGLGraphics::SetTexture(3, texture.first);
         }
       }
-      OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::DrawElements(m.vao, m.numElements);
 
       // reset this shader
@@ -174,6 +288,7 @@ public:
       uber_shader->SetBool("u_has_specular_tex", false);
       uber_shader->SetBool("u_has_normal_tex", false);
       uber_shader->SetBool("u_has_emission_tex", false);
+      uber_shader->SetBool("u_has_shadows", false);
       uber_shader->SetFloat("u_material.Shininess", 0.0f);
       uber_shader->SetBool("u_reflection_model.Phong", false);
       uber_shader->SetBool("u_reflection_model.BlinnPhong", false);
@@ -181,8 +296,9 @@ public:
     ResetToDefault();
   }
 
-  static void RenderSkybox(const Skybox* skybox_target) {
+  static void RenderSkybox(const Skybox* skybox_target, const Viewport& vp) {
     if (!skybox_target) { return; }
+    glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
     glDepthFunc(GL_LEQUAL);
     auto skybox_shader = InternalShaders::Skycube::Get();
     SetSamplerCube(0, skybox_target->GetCubeMapTexureID());
@@ -192,6 +308,11 @@ public:
 
   static void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
     // 1st pass: render to stencil buffer with normal draw
+
+    if (render_object->cull_backface) {
+      glEnable(GL_CULL_FACE);
+      glCullFace(GL_BACK);
+    }
 
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -223,7 +344,7 @@ public:
           uber_shader->SetInt(("u_material." + texType).c_str(), 3);
         }
       }
-      OGLGraphics::SetCullFace(m.backface_culled);
+      //OGLGraphics::SetCullFace(m.backface_culled);
       OGLGraphics::DrawElements(m.vao, m.numElements);
 
       // reset this shader
@@ -263,11 +384,11 @@ public:
     stencil_shader->SetBool("u_stencil_with_normals", false);
     ResetToDefault();
   }
-  
+
   /// <summary>
   /// Debug
   /// </summary>
-  static void RenderWhiteCubeAt(glm::vec3 loc) {
+  static void RenderDebugCube(glm::vec3 loc) {
     glm::mat4 model_matrix = glm::mat4(1);
     model_matrix = glm::translate(model_matrix, loc);
     InternalShaders::Basic::Get()->SetMat4("u_model_matrix", model_matrix);
@@ -309,7 +430,7 @@ public:
   /// todo: test and fix
   /// </summary>
   static void RenderSpotLightIcon(glm::vec3 location, glm::vec3 direction) {
-   
+
     // location and direction 
     // need to check that this is correct
     glm::mat4 model_matrix = glm::mat4(1);
@@ -318,14 +439,13 @@ public:
     model_matrix = glm::rotate(model_matrix, direction.x, glm::vec3(0, 1, 0));
     model_matrix = glm::rotate(model_matrix, direction.y, glm::vec3(0, 0, 1));
     model_matrix = glm::rotate(model_matrix, direction.z, glm::vec3(1, 0, 0));
-    
+
     InternalShaders::Basic::Get()->SetMat4("u_model_matrix", model_matrix);
     // needs a better icon than a cube
     OGLGraphics::DrawElements(Primatives::load_cube(), 36);
     ResetToDefault();
   }
 
-  
 private:
   OGLGraphics() = delete;
 };

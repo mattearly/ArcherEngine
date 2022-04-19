@@ -112,13 +112,17 @@ void Interface::pre_render() {
 // Renders visable props every frame
 void Interface::render() {
   if (!mCameras.empty()) {
+    if (mDirectionalLight) {
+      OGLGraphics::BatchRenderShadows(*mDirectionalLight, mProps, mAnimatedProps, mShadowDepthMapFBO);
+    }
     for (const auto& cam : mCameras) {
       cam->NewFrame();
-      OGLGraphics::RenderSkybox(cam->GetSkybox());
-      OGLGraphics::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport());
+      OGLGraphics::RenderSkybox(cam->GetSkybox(), cam->GetViewport());
+      OGLGraphics::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport(), mShadowDepthMapTextureId);
+      
       if (mDebugLightIndicators) {
         for (const auto& pl : mPointLights)
-          OGLGraphics::RenderWhiteCubeAt(pl->Position);
+          OGLGraphics::RenderDebugCube(pl->Position);
         //for (const auto& sl : mSpotLights)
         //  OGLGraphics::RenderSpotLightIcon(sl->Position, sl->Direction);
         //if (mDirectionalLight)
@@ -126,7 +130,6 @@ void Interface::render() {
       }
     }
   }
-
 
   // render imgui interface
   if (mIMGUI) {

@@ -759,21 +759,31 @@ public:
 
       tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
 
+
+
       // ground
-      for (int i = -3; i < 4; i++)
-        for (int j = -3; j < 4; j++)
-          tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i * 400, -30.f, j * 400), glm::vec3(1.f));
+      for (int i = -1; i < 2; i++)
+        for (int j = -1; j < 2; j++)
+          tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i * 400, -1, j * 400), glm::vec3(1.f));
+
+      // untextured cube
+      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(0, 0, 0));
 
       // peasant man
-      tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(1.f));
-      
+      {
+        tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, 0, -200), glm::vec3(1.f));
+        //auto weak = tg->g_aa_interface.GetProp(tg->g_peasant_man_id);
+        //auto strong = weak.lock();
+        //strong->SetBackfaceCull(false);
+      }
+
       // man with walking anim
-      tg->g_walking_man_id = tg->g_aa_interface.AddAnimProp(tg->fullwalking_man.c_str(), glm::vec3(180, -30, -100), glm::vec3(1.f));
+      tg->g_walking_man_id = tg->g_aa_interface.AddAnimProp(tg->fullwalking_man.c_str(), glm::vec3(180, 0, -100), glm::vec3(1.f));
       //tg->g_walking_anim_id = tg->g_aa_interface.AddAnimation(tg->fullwalking_man.c_str(), tg->g_walking_man_id);
       //tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_walking_anim_id, tg->g_walking_man_id);
 
       // zombie with punching anim
-      tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-180, -30, -100), glm::vec3(1.f));
+      tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-180, 0, -100), glm::vec3(1.f));
       tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->fullzombie_.c_str(), tg->g_zombie_id[0]);
       tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
     }
@@ -787,6 +797,7 @@ public:
       bool update_dlight_amb = ImGui::SliderFloat("Sun Ambient", tg->dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
       bool update_dlight_diffuse = ImGui::SliderFloat("Sun Diffuse", tg->dir_light_diff, 0.003f, 1.f, "%f", 1.0f);
       bool update_dlight_specular = ImGui::SliderFloat("Sun Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
+      bool update_sun_shadows = ImGui::Checkbox("Sun Shadows", &tg->sun_shadows);
 
       ImGui::Text("BULB");
       bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
@@ -811,6 +822,9 @@ public:
       bool doToggleFS = ImGui::Button("Toggle Fullscreen");
       bool update_gamma_correction = ImGui::Checkbox("Apply Driver Gamma Correction", &tg->gamma_correction);
 
+      static float xz_loc[2] = { 0.f, 0.f };
+      bool update_cube_loc = ImGui::SliderFloat2("cube loc", xz_loc, -100.f, 100.f, "%f", 1.0f);
+
       tg->g_No = ImGui::Button("report broken");
       tg->g_Yes = ImGui::Button("NEXT TEST");
       ImGui::End();
@@ -822,6 +836,51 @@ public:
           glm::vec3(*tg->dir_light_amb),
           glm::vec3(*tg->dir_light_diff),
           glm::vec3(*tg->dir_light_spec));
+      }
+
+      if (update_sun_shadows) {
+        // ground - no saved ids
+        //for (int i = -3; i < 4; i++)
+        //  for (int j = -3; j < 4; j++)
+        //    tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i * 400, -30.f, j * 400), glm::vec3(1.f));
+
+        {
+          auto weak = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
+          auto strong = weak.lock();
+          strong->SetRenderShadows(tg->sun_shadows);
+        }
+
+
+        {
+          //tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(1.f));
+          auto weak = tg->g_aa_interface.GetProp(tg->g_peasant_man_id);
+          auto strong = weak.lock();
+          strong->SetRenderShadows(tg->sun_shadows);
+        }
+
+        {
+          //tg->g_walking_man_id = tg->g_aa_interface.AddAnimProp(tg->fullwalking_man.c_str(), glm::vec3(180, -30, -100), glm::vec3(1.f));
+          auto weak = tg->g_aa_interface.GetAnimProp(tg->g_walking_man_id);
+          auto strong = weak.lock();
+          strong->SetRenderShadows(tg->sun_shadows);
+        }
+
+        {
+          //tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-180, -30, -100), glm::vec3(1.f));
+          auto weak = tg->g_aa_interface.GetAnimProp(tg->g_zombie_id[0]);
+          auto strong = weak.lock();
+          strong->SetRenderShadows(tg->sun_shadows);
+        }
+      }
+
+      if (update_cube_loc) {
+
+        {
+          auto weak = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
+          auto strong = weak.lock();
+          strong->SetLocation(glm::vec3(xz_loc[0], 1, xz_loc[1]));
+        }
+
       }
 
       if (update_plight1_loc || update_plight1_linear || update_plight1_quadratic || update_plight1_ambient
@@ -867,13 +926,17 @@ public:
         cam->SetFOV(*tg->cam_fov);
       }
 
-      if (doToggleFS) { tg->g_aa_interface.ToggleWindowFullscreen(); };
+      if (doToggleFS) { 
+        tg->g_aa_interface.ToggleWindowFullscreen();
+      };
       if (update_gamma_correction) {
         std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
         local_window_ref->SetGammaCorrection(tg->gamma_correction);
       }
 
-      if (tg->g_Yes || tg->g_No) { tg->g_aa_interface.Shutdown(); };
+      if (tg->g_Yes || tg->g_No) { 
+        tg->g_aa_interface.Shutdown(); 
+      };
 
       });
 

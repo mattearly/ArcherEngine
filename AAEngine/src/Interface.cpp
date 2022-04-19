@@ -26,6 +26,7 @@ bool Interface::Init() {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>();
+  mShadowDepthMapFBO = OGLGraphics::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
   SetIMGUI(true);
   SoundDevice::Init();
   InternalShaders::Init();
@@ -38,6 +39,7 @@ bool Interface::Init(const WindowOptions& winopts) {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>(winopts);
+  mShadowDepthMapFBO = OGLGraphics::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
   SetIMGUI(true);
   SoundDevice::Init();
   InternalShaders::Init();
@@ -50,6 +52,7 @@ bool Interface::Init(std::shared_ptr<WindowOptions> winopts) {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>(winopts);
+  mShadowDepthMapFBO = OGLGraphics::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
   SetIMGUI(true);
   SoundDevice::Init();
   InternalShaders::Init();
@@ -220,7 +223,7 @@ bool Interface::RemoveProp(const unsigned int id) {
   return (before_size != after_size);
 }
 
-std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
+[[nodiscard]] std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       return prop;

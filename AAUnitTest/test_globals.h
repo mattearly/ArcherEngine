@@ -53,6 +53,7 @@ public:
   float* dir_light_diff = new float(0.63f);
   float* dir_light_amb = new float(0.0633f);
   float* dir_light_spec = new float(0.0653f);
+  bool sun_shadows = true;
 
   unsigned int g_plight1_id = 0;
   float  point_light_loc[3] = { 0.0f, 0.0f, 0.0f };

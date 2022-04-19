@@ -31,6 +31,8 @@ public:
 
   const glm::vec3 GetStencilColor() const;
 
+  const bool GetRenderShadows() const;
+
   /// <summary>
   /// Moves a prop to a location
   /// </summary>
@@ -73,15 +75,27 @@ public:
   /// <param name="scale">scale should be > 1 or you probably won't see the stencil</param>
   void SetStencilScale(const float& scale);
 
+  void SetRenderShadows(const bool tf);
+
+  void SetFrontFaceCullForShadows(const bool tf);
+
+  void SetBackfaceCull(const bool tf);
+
 protected:
 
   // mesh loader helps set all these
   friend class MeshLoader;
   friend class OGLGraphics;
+  
   bool stenciled;
   glm::vec3 stencil_color;
   bool stenciled_with_normals;
   float stencil_scale;
+
+  bool cull_backface;
+
+  bool render_shadows;
+  bool cull_frontface_for_shadows;
 
   Spacial3D spacial_data;
   
@@ -89,7 +103,7 @@ protected:
 
   std::string cached_load_path;
 
-  // only intferace calls draw, removecache, and load
+  // only interface calls removecache and load
   friend class Interface;
   virtual void RemoveCache();
   virtual void Load(const std::string& path);
