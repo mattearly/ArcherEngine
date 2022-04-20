@@ -113,9 +113,9 @@ public:
     GLuint depthMapFBO) {
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
-    float near_plane = 1.f, far_plane = 10*7.5f;
+    float near_plane = 1.f, far_plane = 100*7.5f;
 
-    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightProjection = glm::ortho(-1000.0f, 1000.0f, -1000.0f, 1000.0f, near_plane, far_plane);
     lightView = glm::lookAt(-dir_light.Direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
     lightSpaceMatrix = lightProjection * lightView;
 
