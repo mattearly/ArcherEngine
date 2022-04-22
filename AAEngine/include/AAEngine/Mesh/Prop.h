@@ -33,6 +33,10 @@ public:
 
   const bool GetRenderShadows() const;
 
+  const bool GetCullFrontFaceForShadows() const;
+
+  const bool GetBackFaceCull() const;
+
   /// <summary>
   /// Moves a prop to a location
   /// </summary>

@@ -85,6 +85,14 @@ const glm::vec3 Prop::GetStencilColor() const {
 
 const bool Prop::GetRenderShadows() const { return render_shadows; }
 
+const bool Prop::GetCullFrontFaceForShadows() const {
+    return cull_frontface_for_shadows;
+}
+
+const bool Prop::GetBackFaceCull() const {
+    return cull_backface;
+}
+
 void Prop::SetLocation(const glm::vec3& loc) {
   spacial_data.MoveTo(loc);
 }
