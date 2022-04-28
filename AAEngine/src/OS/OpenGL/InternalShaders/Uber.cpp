@@ -114,21 +114,6 @@ uniform int u_has_shadows;
 
 uniform Material u_material; // textures 0 to 3
 
-// cascading shadows 
-	//Shadow
-	const int NUM_CASCADES = 3;
-	struct Cascade
-	{
-		mat4 LightVP;
-		sampler2DShadow ShadowMap;
-		float Distance;
-	};
-	uniform Cascade cascades[NUM_CASCADES];
-	
-	uniform int PcfSamples = 2;
-	uniform float Bias = 0; // 0.001; //depending on if front face culling is used
-
-
 uniform sampler2D u_shadow_map; // texture 4
 uniform mat4 u_light_space_matrix;  
 
@@ -201,14 +186,6 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     if(projCoords.z > 1.0) {
         shadow = 0.0;
     }
-
-    // simpler method
-    //vec3 pos = FragPosLightSpace.xyz * 0.5 + 0.5;
-    //if (pos.z > 1.0) { pos.z = 1.0; }
-    //float depth = texture(u_shadow_map, pos.xy).r;
-
-    //float bias = max( 0.05 * (1.0 - dotLightNormal), 0.005);
-    //shadow =  (depth + bias) < pos.z ? 0.0 : 1.0;
   }
 
   // specular shading
@@ -240,11 +217,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     specular = u_dir_light.Specular * spec * 0.0;  // no shine    
   }
 
-  if (u_has_shadows > 0) {
-    return (ambient + (1.0 - shadow) * (diffuse + specular));
-  } else {
-    return (ambient + shadow * (diffuse + specular));
-  }
+  return (ambient + (1.0 - shadow) * (diffuse + specular));
 }
 
 
