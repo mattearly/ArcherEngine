@@ -1,7 +1,7 @@
 #include "../../../include/AAEngine/OS/Interface/Window.h"
 #include "../../../include/AAEngine/Version.h"
 #include "../../../include/AAEngine/WindowOptions.h"
-#include "../OpenGL/OGLGraphics.h"
+#include "../OpenGL/Graphics.h"
 namespace AA {
 
 static unsigned int window_instance_count = 0;
@@ -92,7 +92,7 @@ std::weak_ptr<WindowOptions> Window::get_and_note_window_options() {
 void Window::apply_new_window_option_changes() {
   //todo: relaunch window if required (msaa change, render tech is prelaunch only)
   if (mWindowOptions->_msaa_samples > 0 && mPrevWindowOptions._msaa_samples != mWindowOptions->_msaa_samples) {
-    OGLGraphics::SetMultiSampling(true);
+    OpenGL::SetMultiSampling(true);
     // locking this at a max of 16
     if (mWindowOptions->_msaa_samples >= 1 && mWindowOptions->_msaa_samples <= 16) {
       glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
@@ -107,10 +107,10 @@ void Window::apply_new_window_option_changes() {
   if (mPrevWindowOptions._stencil_bits != mWindowOptions->_stencil_bits) {
     glfwWindowHint(GLFW_STENCIL_BITS, mWindowOptions->_stencil_bits);
     if (mWindowOptions->_stencil_bits > 0) {
-      OGLGraphics::SetStencil(true);
+      OpenGL::SetStencil(true);
     }
     else {
-      OGLGraphics::SetStencil(false);
+      OpenGL::SetStencil(false);
     }
   }
 
@@ -156,7 +156,7 @@ void Window::apply_new_window_option_changes() {
   }
 
   if (mPrevWindowOptions._gamma_correction != mWindowOptions->_gamma_correction) {
-    OGLGraphics::SetGammaCorrection(mWindowOptions->_gamma_correction);
+    OpenGL::SetGammaCorrection(mWindowOptions->_gamma_correction);
   }
 
   // note (copy) applied settings
@@ -362,14 +362,14 @@ void Window::default_init() {
 
     // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
     glfwMakeContextCurrent(mGLFWwindow);
-    OGLGraphics::Proc(glfwGetProcAddress);
+    OpenGL::Proc(glfwGetProcAddress);
  }
  if (mWindowOptions->_stencil_bits > 0) {
-    OGLGraphics::SetStencil(true);
-    OGLGraphics::SetStencilFuncToNotEqual();
-    OGLGraphics::SetStencilOpDepthPassToReplace();
+    OpenGL::SetStencil(true);
+    OpenGL::SetStencilFuncToNotEqual();
+    OpenGL::SetStencilOpDepthPassToReplace();
   } else {
-    OGLGraphics::SetStencil(false);
+    OpenGL::SetStencil(false);
   }
 
   glfwSetWindowUserPointer(mGLFWwindow, this);  // window pointer goes to this class

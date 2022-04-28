@@ -3,7 +3,7 @@
 #include "../include/AAEngine/OS/Interface/Window.h"
 #include "../include/AAEngine/Mesh/Prop.h"
 #include "../include/AAEngine/Mesh/AnimProp.h"
-#include "OS/OpenGL/OGLGraphics.h"
+#include "OS/OpenGL/Graphics.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
@@ -106,27 +106,27 @@ void Interface::pre_render() {
     settle_window_resize_flag();
   }
 
-  OGLGraphics::NewFrame();
+  OpenGL::NewFrame();
 }
 
 // Renders visable props every frame
 void Interface::render() {
   if (!mCameras.empty()) {
     if (mDirectionalLight) {
-      OGLGraphics::BatchRenderShadows(*mDirectionalLight, mProps, mAnimatedProps, mShadowDepthMapFBO);
+      OpenGL::BatchRenderShadows(*mDirectionalLight, mProps, mAnimatedProps, mShadowDepthMapFBO);
     }
     for (const auto& cam : mCameras) {
       cam->NewFrame();
-      OGLGraphics::RenderSkybox(cam->GetSkybox(), cam->GetViewport());
-      OGLGraphics::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport(), mShadowDepthMapTextureId);
+      OpenGL::RenderSkybox(cam->GetSkybox(), cam->GetViewport());
+      OpenGL::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport(), mShadowDepthMapTextureId);
       
       if (mDebugLightIndicators) {
         for (const auto& pl : mPointLights)
-          OGLGraphics::RenderDebugCube(pl->Position);
+          OpenGL::RenderDebugCube(pl->Position);
         //for (const auto& sl : mSpotLights)
-        //  OGLGraphics::RenderSpotLightIcon(sl->Position, sl->Direction);
+        //  OpenGL::RenderSpotLightIcon(sl->Position, sl->Direction);
         //if (mDirectionalLight)
-        //  OGLGraphics::RenderDirectionalLightArrowIcon(mDirectionalLight->Direction);
+        //  OpenGL::RenderDirectionalLightArrowIcon(mDirectionalLight->Direction);
       }
     }
   }
@@ -154,7 +154,7 @@ void Interface::teardown() {
 
   mCameras.clear();
 
-  Primatives::unload_all();
+  OpenGL::Primitives::unload_all();
 
   ClearAllRuntimeLamdaFunctions();
 

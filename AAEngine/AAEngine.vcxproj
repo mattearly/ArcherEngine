@@ -127,7 +127,7 @@
     <ClInclude Include="src\OS\MeshLoader.h" />
     <ClInclude Include="include\AAEngine\Interface.h" />
     <ClInclude Include="src\OS\MeshInfo.h" />
-    <ClInclude Include="src\OS\OpenGL\OGLGraphics.h" />
+    <ClInclude Include="src\OS\OpenGL\Graphics.h" />
     <ClInclude Include="src\Scene\Lights.h" />
     <ClInclude Include="src\OS\OpenGL\OGLShader.h" />
     <ClInclude Include="src\OS\Vertex.h" />
@@ -169,7 +169,7 @@
     <ClCompile Include="src\Mesh\Prop.cpp" />
     <ClCompile Include="src\Interface.cpp" />
     <ClCompile Include="src\OS\MeshInfo.cpp" />
-    <ClCompile Include="src\OS\OpenGL\OGLGraphics.cpp" />
+    <ClCompile Include="src\OS\OpenGL\Graphics.cpp" />
     <ClCompile Include="src\OS\OpenGL\OGLShader.cpp" />
     <ClCompile Include="src\Utility\rand.cpp" />
     <ClCompile Include="src\OS\Vertex.cpp" />

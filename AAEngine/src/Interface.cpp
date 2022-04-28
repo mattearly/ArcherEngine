@@ -3,7 +3,7 @@
 #include "../include/AAEngine/OS/Interface/Window.h"
 #include "../include/AAEngine/Mesh/Prop.h"
 #include "../include/AAEngine/Mesh/AnimProp.h"
-#include "OS/OpenGL/OGLGraphics.h"
+#include "OS/OpenGL/Graphics.h"
 #include "OS/OpenGL/InternalShaders/Init.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Scene/Lights.h"
@@ -26,7 +26,7 @@ bool Interface::Init() {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>();
-  mShadowDepthMapFBO = OGLGraphics::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
+  mShadowDepthMapFBO = OpenGL::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
   SetIMGUI(true);
   SoundDevice::Init();
   InternalShaders::Init();
@@ -39,7 +39,7 @@ bool Interface::Init(const WindowOptions& winopts) {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>(winopts);
-  mShadowDepthMapFBO = OGLGraphics::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
+  mShadowDepthMapFBO = OpenGL::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
   SetIMGUI(true);
   SoundDevice::Init();
   InternalShaders::Init();
@@ -52,7 +52,7 @@ bool Interface::Init(std::shared_ptr<WindowOptions> winopts) {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>(winopts);
-  mShadowDepthMapFBO = OGLGraphics::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
+  mShadowDepthMapFBO = OpenGL::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
   SetIMGUI(true);
   SoundDevice::Init();
   InternalShaders::Init();
@@ -935,7 +935,7 @@ void Interface::SetIMGUI(const bool value) {
 }
 
 void Interface::SetWindowClearColor(glm::vec3 color) noexcept {
-  OGLGraphics::SetViewportClearColor(color);
+  OpenGL::SetViewportClearColor(color);
 }
 
 std::weak_ptr<Window> Interface::GetWindow() {

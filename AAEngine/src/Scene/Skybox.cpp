@@ -1,6 +1,6 @@
 #include "Skybox.h"
 #include "../../include/AAEngine/Utility/Files.h"
-#include "../OS/OpenGL/OGLGraphics.h"
+#include "../OS/OpenGL/Graphics.h"
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
 #include "../OS/TextureLoader.h"
 namespace AA {
@@ -13,7 +13,7 @@ Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
 
 Skybox::~Skybox() {
   if (mCubemapTexId != 0) {
-    OGLGraphics::DeleteTex(mCubemapTexId);  // todo: cache textures and reuse
+    OpenGL::DeleteTex(mCubemapTexId);  // todo: cache textures and reuse
   }
 }
 
@@ -27,7 +27,7 @@ const unsigned int Skybox::GetVAO() const {
 
 void Skybox::setup_cube_geometry() {
   if (mVAO == 0) {
-    mVAO = Primatives::load_cube();
+    mVAO = OpenGL::Primitives::load_cube();
   }
 }
 

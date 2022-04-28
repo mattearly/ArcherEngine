@@ -1,6 +1,6 @@
 #include "../../include/AAEngine/Mesh/AnimProp.h"
 #include "../../include/AAEngine/Mesh/Prop.h"
-#include "../OS/OpenGL/OGLGraphics.h"
+#include "../OS/OpenGL/Graphics.h"
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/MeshLoader.h"
 #include "../OS/AnimMeshLoader.h"

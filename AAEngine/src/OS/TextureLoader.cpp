@@ -1,5 +1,5 @@
 #include "TextureLoader.h"
-#include "OpenGL/OGLGraphics.h"
+#include "OpenGL/Graphics.h"
 #include "MeshLoader.h"
 #include <stb_image.h>
 #include <assimp/Importer.hpp>
@@ -120,7 +120,7 @@ unsigned int TextureLoader::LoadTexture(const std::string& texture_path) {
       format = GL_RED;
     else if (nrComponents == 3)
       format = GL_RGB;
-    a_new_texture_info.accessId = OGLGraphics::Upload2DTex(texture_data, width, height, format);
+    a_new_texture_info.accessId = OpenGL::Upload2DTex(texture_data, width, height, format);
     if (a_new_texture_info.accessId != 0) {
       // add the new one to our list of loaded textures
       a_new_texture_info.path = texture_path;
@@ -153,7 +153,7 @@ unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& s
       format = GL_RED;
     else if (nrChannel == 3)
       format = GL_RGB;
-    return_id = OGLGraphics::UploadCubeMapTex(data, width, height, format);
+    return_id = OpenGL::UploadCubeMapTex(data, width, height, format);
   }
   for (auto i = 0; i < 6; ++i) {
     stbi_image_free(data[i]);
@@ -167,7 +167,7 @@ void TextureLoader::UnloadTexture(const std::unordered_map<unsigned int, std::st
       if (texIt.first == loaded_tex->accessId) {
         loaded_tex->ref_count--;
         if (loaded_tex->ref_count == 0) {
-          OGLGraphics::DeleteTex(loaded_tex->accessId);
+          OpenGL::DeleteTex(loaded_tex->accessId);
         }
       }
     }
@@ -259,7 +259,7 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
             format = GL_RED;
           else if (nrComponents == 3)
             format = GL_RGB;
-          a_new_texture_info.accessId = OGLGraphics::Upload2DTex(data, width, height, format);
+          a_new_texture_info.accessId = OpenGL::Upload2DTex(data, width, height, format);
           if (a_new_texture_info.accessId != 0) {
             // add the new one to our list of loaded textures
             a_new_texture_info.path = embedded_filename;
@@ -315,7 +315,7 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
             format = GL_RGBA;
           else if (nrComponents == 3)
             format = GL_RGB;
-          a_new_texture_info.accessId = OGLGraphics::Upload2DTex(data, width, height, format);
+          a_new_texture_info.accessId = OpenGL::Upload2DTex(data, width, height, format);
           if (a_new_texture_info.accessId != 0) {
             // add the new one to our list of loaded textures for management
             a_new_texture_info.path = a_path;

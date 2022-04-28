@@ -42,7 +42,7 @@
     <ClInclude Include="include\AAEngine\Interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\OGLGraphics.h">
+    <ClInclude Include="src\OS\OpenGL\Graphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\OS\OpenGL\OGLShader.h">
@@ -176,7 +176,7 @@
     <ClCompile Include="src\Interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\OpenGL\OGLGraphics.cpp">
+    <ClCompile Include="src\OS\OpenGL\Graphics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\OpenGL\OGLShader.cpp">
