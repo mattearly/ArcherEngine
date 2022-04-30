@@ -658,8 +658,8 @@ public:
 
     // Load and Test Models to make sure thy reuse the same VAO if loading from the same file
     {
-      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(-20, 0, -25));
-      tg->g_untextured_cube_id[1] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(20, 0, -25));
+      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(-15, -7.5, -25));
+      tg->g_untextured_cube_id[1] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(15, -7.5, -25));
 
       auto w1 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
       std::shared_ptr<AA::Prop> s1 = w1.lock();
@@ -674,11 +674,11 @@ public:
 
     // Load and Test Animated Models to make sure thy reuse the same VAO if loading from the same file
     {
-      tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-20, -20, -45), glm::vec3(.15f));
+      tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-20, -30, -45), glm::vec3(.15f));
       tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->fullzombie_.c_str(), tg->g_zombie_id[0]);
       tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
 
-      tg->g_zombie_id[1] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(20, -20, -45), glm::vec3(.15f));
+      tg->g_zombie_id[1] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(20, -30, -45), glm::vec3(.15f));
       tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->fullzombie_.c_str(), tg->g_zombie_id[1]);
       tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_punching_anim_id, tg->g_zombie_id[1]);
 
