@@ -3,7 +3,7 @@
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/OpenGL/InternalShaders/Uber.h"
 #include "../OS/OpenGL/InternalShaders/Stencil.h"
-#include "../OS/MeshLoader.h"
+#include "../OS/OpenGL/Loaders/MeshLoader.h"
 #include <glm/gtx/transform.hpp>
 
 namespace AA {

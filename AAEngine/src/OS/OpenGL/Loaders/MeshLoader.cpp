@@ -1,8 +1,8 @@
 #include "MeshLoader.h"
 #include "TextureLoader.h"
-#include "Vertex.h"
-#include "../Math/Conversions.h"
-#include "OpenGL/Graphics.h"
+#include "../../../Mesh/Vertex.h"
+#include "../../../Math/Conversions.h"
+#include "../Graphics.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>

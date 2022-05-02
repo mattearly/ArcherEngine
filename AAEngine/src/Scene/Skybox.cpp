@@ -2,7 +2,7 @@
 #include "../../include/AAEngine/Utility/Files.h"
 #include "../OS/OpenGL/Graphics.h"
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
-#include "../OS/TextureLoader.h"
+#include "../OS/OpenGL/Loaders/TextureLoader.h"
 namespace AA {
 
 Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {

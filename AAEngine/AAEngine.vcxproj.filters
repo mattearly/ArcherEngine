@@ -48,19 +48,19 @@
     <ClInclude Include="src\OS\OpenGL\OGLShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\MeshInfo.h">
+    <ClInclude Include="src\Mesh\MeshInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\Vertex.h">
+    <ClInclude Include="src\Mesh\Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Lights.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\TextureInfo.h">
+    <ClInclude Include="src\OS\OpenGL\Loaders\TextureInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\MeshLoader.h">
+    <ClInclude Include="src\OS\OpenGL\Loaders\MeshLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AAEngine\Utility\Files.h">
@@ -81,7 +81,7 @@
     <ClInclude Include="include\AAEngine\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\TextureLoader.h">
+    <ClInclude Include="src\OS\OpenGL\Loaders\TextureLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\imGUI.h">
@@ -108,7 +108,7 @@
     <ClInclude Include="include\AAEngine\Mesh\AnimProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\AnimMeshLoader.h">
+    <ClInclude Include="src\OS\OpenGL\Loaders\AnimMeshLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Mesh\Animator.h">
@@ -182,10 +182,10 @@
     <ClCompile Include="src\OS\OpenGL\OGLShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\MeshInfo.cpp">
+    <ClCompile Include="src\Mesh\MeshInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\Vertex.cpp">
+    <ClCompile Include="src\Mesh\Vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\Lights.cpp">
@@ -197,10 +197,10 @@
     <ClCompile Include="src\Sound\SoundEffect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\MeshLoader.cpp">
+    <ClCompile Include="src\OS\OpenGL\Loaders\MeshLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\TextureLoader.cpp">
+    <ClCompile Include="src\OS\OpenGL\Loaders\TextureLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GUI\imGUI.cpp">
@@ -227,7 +227,7 @@
     <ClCompile Include="src\Mesh\AnimProp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\AnimMeshLoader.cpp">
+    <ClCompile Include="src\OS\OpenGL\Loaders\AnimMeshLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Mesh\Animator.cpp">

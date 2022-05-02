@@ -1,15 +1,14 @@
 #pragma once
-#include "../Vertex.h"
+#include "../../Mesh/Vertex.h"
 #include "../../Scene/Lights.h"
 #include "../../../include/AAEngine/Scene/Viewport.h"
 
-
+#include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #include <vector>
 #include <memory>
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
 
 namespace AA {
 

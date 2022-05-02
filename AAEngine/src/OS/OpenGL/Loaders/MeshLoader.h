@@ -1,6 +1,6 @@
 #pragma once
-#include "../../include/AAEngine/Mesh/Prop.h"
-#include "MeshInfo.h"
+#include "../../../../include/AAEngine/Mesh/Prop.h"
+#include "../../../Mesh/MeshInfo.h"
 #include "TextureInfo.h"
 #include <assimp/scene.h>
 #include <vector>
@@ -8,7 +8,7 @@
 
 namespace AA {
 
-// ModelLoader is pretty specific to opengl currently
+// ModelLoader is pretty specific to OpenGL currently
 class MeshLoader {
 public:
   static int LoadGameObjectFromFile(Prop& out_model, const std::string& path_to_load);

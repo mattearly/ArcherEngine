@@ -1,7 +1,6 @@
 #pragma once
 #include "../../include/AAEngine/Scene/Camera.h"
 #include "../OS/OpenGL/OGLShader.h"
-#include "../OS/MeshInfo.h"
 #include <vector>
 #include <string>
 #include <memory>

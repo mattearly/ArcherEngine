@@ -926,7 +926,7 @@ public:
         cam->SetFOV(*tg->cam_fov);
       }
 
-      if (doToggleFS) { 
+      if (doToggleFS) {
         tg->g_aa_interface.ToggleWindowFullscreen();
       };
       if (update_gamma_correction) {
@@ -934,8 +934,190 @@ public:
         local_window_ref->SetGammaCorrection(tg->gamma_correction);
       }
 
-      if (tg->g_Yes || tg->g_No) { 
-        tg->g_aa_interface.Shutdown(); 
+      if (tg->g_Yes || tg->g_No) {
+        tg->g_aa_interface.Shutdown();
+      };
+
+      });
+
+    int run_diag = tg->g_aa_interface.Run();
+
+    Assert::AreEqual(run_diag, 0);
+
+    Assert::AreEqual(tg->g_No, false);
+
+    TestGlobals::reset();
+  }
+
+  TEST_METHOD(FireplaceRoom) {
+    TestGlobals::init();
+
+    // init engine
+    {
+      AA::WindowOptions win_opts;
+      win_opts._windowing_mode = AA::WINDOW_MODE::FULLSCREEN_BORDERLESS;
+      win_opts._title = "FIREPLACE ROOM";
+      bool initSuccess = tg->g_aa_interface.Init(win_opts);
+      Assert::AreEqual(initSuccess, true);
+    }
+
+    // Create a Flying Camera, Lights, and Models
+    {
+      tg->g_window_ref = tg->g_aa_interface.GetWindow();
+      std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
+      tg->g_cam_id = tg->g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
+      tg->g_camera_ref = tg->g_aa_interface.GetCamera(tg->g_cam_id);
+      std::shared_ptr<AA::Camera> local_camera_ref = tg->g_camera_ref.lock();
+      local_camera_ref->SetKeepCameraToWindowSize(true);
+      local_camera_ref->SetFOV(*tg->cam_fov);
+      local_camera_ref->SetPosition(glm::vec3(0, 0, 0));
+      local_camera_ref->SetPitch(-10.f);
+      setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
+      tg->g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
+
+      // a flashlight
+      tg->g_slight1_id = tg->g_aa_interface.AddSpotLight(
+        local_camera_ref->GetPosition(),
+        local_camera_ref->GetFront(),
+        *tg->spot_light_inner, // inner
+        *tg->spot_light_outer, // outer
+        1.0f /* constant*/,
+        *tg->spot_light_linear,
+        *tg->spot_light_quadratic,
+        glm::vec3(*tg->spot_light_ambient),
+        glm::vec3(*tg->spot_light_diff),
+        glm::vec3(*tg->spot_light_spec)
+      );
+
+      // a sunlight
+      tg->g_aa_interface.SetDirectionalLight(
+        glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
+        glm::vec3(*tg->dir_light_amb),
+        glm::vec3(*tg->dir_light_diff),
+        glm::vec3(*tg->dir_light_spec));
+
+      // a point light
+      tg->g_plight1_id = tg->g_aa_interface.AddPointLight(
+        glm::vec3(tg->point_light_loc[0], tg->point_light_loc[1], tg->point_light_loc[2]),
+        1.0f /* constant*/,
+        *tg->point_light_linear,
+        *tg->point_light_quadratic,
+        glm::vec3(*tg->point_light_ambient),
+        glm::vec3(*tg->point_light_diff),
+        glm::vec3(*tg->point_light_spec));
+
+      tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
+
+
+
+      // fireplace room
+      {
+        auto id = tg->g_aa_interface.AddProp("../../RuntimeFiles/3dmodels/fireplace_room.obj", glm::vec3(-10, -10, 0), glm::vec3(20));
+        //auto fr_weak = tg->g_aa_interface.GetProp(id);
+        //auto fr_strong = fr_weak.lock();
+        //fr_strong->
+      }
+    }
+
+    // ImGui Controls
+    tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
+      ImGui::Begin("FireplaceSceneTest");
+
+      ImGui::Text("SUN");
+      bool update_dlight_dir = ImGui::SliderFloat3("Sun Direction", tg->dir_light_direction, -1.0f, 1.0f, "%f", 1.0f);
+      bool update_dlight_amb = ImGui::SliderFloat("Sun Ambient", tg->dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
+      bool update_dlight_diffuse = ImGui::SliderFloat("Sun Diffuse", tg->dir_light_diff, 0.003f, 1.f, "%f", 1.0f);
+      bool update_dlight_specular = ImGui::SliderFloat("Sun Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
+
+      ImGui::Text("BULB");
+      bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
+      bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", tg->point_light_loc, -400.f, 400.f, "%f", 1.0f);
+      bool update_plight1_linear = ImGui::SliderFloat("Point Light Linear", tg->point_light_linear, 0.0001f, 0.400f, "%f", 1.0f);
+      bool update_plight1_quadratic = ImGui::SliderFloat("Point Light Quadratic", tg->point_light_quadratic, 0.00001f, 0.200f, "%f", 1.0f);
+      bool update_plight1_ambient = ImGui::SliderFloat("Point Light Ambient", tg->point_light_ambient, 0.f, 1.f, "%f", 1.0f);
+      bool update_plight1_diff = ImGui::SliderFloat("Point Light Diffuse", tg->point_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_plight1_spec = ImGui::SliderFloat("Point Light Spec", tg->point_light_spec, 0.f, 1.f, "%f", 1.0f);
+
+      ImGui::Text("FLASHLIGHT");
+      bool update_slight1_inner = ImGui::SliderFloat("Spot Light Inner", tg->spot_light_inner, 0.03f, 19.f, "%f", 1.0f);
+      bool update_slight1_outer = ImGui::SliderFloat("Spot Light Outer", tg->spot_light_outer, 0.1f, 40.f, "%f", 1.0f);
+      bool update_slight1_linear = ImGui::SliderFloat("Spot Light Linear", tg->spot_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
+      bool update_slight1_quadratic = ImGui::SliderFloat("Spot Light Quadratic", tg->spot_light_quadratic, 0.0001f, 0.300f, "%f", 1.0f);
+      bool update_slight1_ambient = ImGui::SliderFloat("Spot Light Ambient", tg->spot_light_ambient, 0.f, 1.f, "%f", 1.0f);
+      bool update_slight1_diff = ImGui::SliderFloat("Spot Light Diffuse", tg->spot_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_slight1_spec = ImGui::SliderFloat("Spot Light Spec", tg->spot_light_spec, 0.f, 1.f, "%f", 1.0f);
+
+      ImGui::Text("VIEWPORT");
+      bool update_cam_fov = ImGui::SliderFloat("Cam FOV", tg->cam_fov, 30.f, 90.f);
+      bool doToggleFS = ImGui::Button("Toggle Fullscreen");
+      bool update_gamma_correction = ImGui::Checkbox("Apply Driver Gamma Correction", &tg->gamma_correction);
+
+      tg->g_No = ImGui::Button("report broken");
+      tg->g_Yes = ImGui::Button("NEXT TEST");
+      ImGui::End();
+
+      // state update
+      if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular) {
+        tg->g_aa_interface.SetDirectionalLight(
+          glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
+          glm::vec3(*tg->dir_light_amb),
+          glm::vec3(*tg->dir_light_diff),
+          glm::vec3(*tg->dir_light_spec));
+      }
+
+      if (update_plight1_loc || update_plight1_linear || update_plight1_quadratic || update_plight1_ambient
+        || update_plight1_diff || update_plight1_spec) {
+        tg->g_aa_interface.ChangePointLight(tg->g_plight1_id, glm::vec3(tg->point_light_loc[0], tg->point_light_loc[1], tg->point_light_loc[2]), *tg->point_light_constant, *tg->point_light_linear, *tg->point_light_quadratic,
+          glm::vec3(*tg->point_light_ambient), glm::vec3(*tg->point_light_diff), glm::vec3(*tg->point_light_spec));
+      }
+
+      if (/*update_slight1_loc || update_slight1_dir ||*/ update_slight1_inner || update_slight1_outer ||
+        update_slight1_linear || update_slight1_quadratic || update_slight1_ambient || update_slight1_diff || update_slight1_spec) {
+        auto cam = tg->g_camera_ref.lock();
+        auto loc = cam->GetPosition();
+        auto dir = cam->GetFront();
+        tg->g_aa_interface.MoveSpotLight(tg->g_slight1_id, loc, dir);
+        tg->g_aa_interface.ChangeSpotLight(
+          tg->g_slight1_id,
+          loc,
+          dir,
+          *tg->spot_light_inner,
+          *tg->spot_light_outer,
+          *tg->spot_light_constant,
+          *tg->spot_light_linear,
+          *tg->spot_light_quadratic,
+          glm::vec3(*tg->spot_light_ambient),
+          glm::vec3(*tg->spot_light_diff),
+          glm::vec3(*tg->spot_light_spec));
+      }
+
+      if (update_draw_plight1_loc_cube) {
+        tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
+      }
+
+      // keep spot light on cam location and direction
+      {
+        auto cam = tg->g_camera_ref.lock();
+        auto loc = cam->GetPosition();
+        auto dir = cam->GetFront();
+        tg->g_aa_interface.MoveSpotLight(tg->g_slight1_id, loc, dir);
+      }
+
+      if (update_cam_fov) {
+        auto cam = tg->g_camera_ref.lock();
+        cam->SetFOV(*tg->cam_fov);
+      }
+
+      if (doToggleFS) {
+        tg->g_aa_interface.ToggleWindowFullscreen();
+      };
+      if (update_gamma_correction) {
+        std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
+        local_window_ref->SetGammaCorrection(tg->gamma_correction);
+      }
+
+      if (tg->g_Yes || tg->g_No) {
+        tg->g_aa_interface.Shutdown();
       };
 
       });

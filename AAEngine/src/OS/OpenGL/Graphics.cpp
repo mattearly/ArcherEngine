@@ -1,11 +1,9 @@
 #include "Graphics.h"
 #include "OGLShader.h"
-#include "../MeshInfo.h"
-
+#include "../../Mesh/MeshInfo.h"
 #include "../../../include/AAEngine/Mesh/Prop.h"
 #include "../../../include/AAEngine/Mesh/AnimProp.h"
 #include "../../Scene/Skybox.h"
-
 #include "InternalShaders/Uber.h"
 #include "InternalShaders/Stencil.h"
 #include "InternalShaders/Skycube.h"

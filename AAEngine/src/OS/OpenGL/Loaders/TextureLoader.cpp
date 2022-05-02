@@ -1,5 +1,5 @@
 #include "TextureLoader.h"
-#include "OpenGL/Graphics.h"
+#include "../Graphics.h"
 #include "MeshLoader.h"
 #include <stb_image.h>
 #include <assimp/Importer.hpp>
