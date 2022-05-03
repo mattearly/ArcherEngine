@@ -49,13 +49,14 @@ void main(){
       totalPosition += localPosition * inWeights[i];
     }
     vs_out.Pos = (u_model_matrix * totalPosition).xyz;
-    vs_out.Norm = inNorm;
   } else {  // Not Animating
-    mat3 normal_matrix = transpose(inverse(mat3(u_model_matrix)));
     vs_out.Pos = (u_model_matrix * vec4(inPos, 1.0)).xyz;
-    vs_out.Norm = normalize(normal_matrix * inNorm);
     totalPosition = vec4(inPos, 1.0);
   }
+
+  mat3 normalMatrix = transpose(inverse(mat3(u_model_matrix)));
+  vs_out.Norm = normalize(normalMatrix * inNorm);
+
   mat4 viewMatrix = u_view_matrix * u_model_matrix;
   gl_Position = u_projection_matrix * viewMatrix * totalPosition;
 }
