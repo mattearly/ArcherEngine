@@ -9,9 +9,8 @@ void Uber::Init() {
   if (UBERSHADER)
     return;
 
-  const std::string UBERSHADER_VERT_CODE =
-    R"(
-#version 430 core
+  const std::string UBERSHADER_VERT_CODE = R"(
+#version 460 core
 
 layout(location=0)in vec3 inPos;
 layout(location=1)in vec2 inTexUV;
@@ -62,9 +61,8 @@ void main(){
 }
 )";
 
-  const std::string UBERSHADER_FRAG_CODE =
-    R"(
-#version 430 core
+  const std::string UBERSHADER_FRAG_CODE = R"(
+#version 460 core
 
 in VS_OUT
 {
