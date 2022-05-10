@@ -112,7 +112,7 @@ void Interface::SoftReset() noexcept {
   mAnimatedProps.clear();
   mAnimation.clear();
 
-  RemoveDirectionalLight();
+  RemoveSunLight();
 
   for (auto& pointlight : mPointLights) {
     RemovePointLight(pointlight->id);
@@ -390,38 +390,38 @@ void Interface::SimulateWorldPhysics(bool status) {
 //
 // Lights Interface
 //
-void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
-  if (!mDirectionalLight) {
-    mDirectionalLight = std::make_shared<DirectionalLight>(dir, amb, diff, spec);
+void Interface::SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
+  if (!mSunLight) {
+    mSunLight = std::make_shared<SunLight>(dir, amb, diff, spec);
   } else {
-    mDirectionalLight->Direction = dir;
-    mDirectionalLight->Ambient = amb;
-    mDirectionalLight->Diffuse = diff;
-    mDirectionalLight->Specular = spec;
+    mSunLight->Direction = dir;
+    mSunLight->Ambient = amb;
+    mSunLight->Diffuse = diff;
+    mSunLight->Specular = spec;
   }
 
   {
     //assert(DefaultShaders::Get());
     auto uber_shader = InternalShaders::Uber::Get();
     uber_shader->SetInt("u_is_dir_light_on", 1);
-    uber_shader->SetVec3("u_dir_light.Direction", mDirectionalLight->Direction);
-    uber_shader->SetVec3("u_dir_light.Ambient", mDirectionalLight->Ambient);
-    uber_shader->SetVec3("u_dir_light.Diffuse", mDirectionalLight->Diffuse);
-    uber_shader->SetVec3("u_dir_light.Specular", mDirectionalLight->Specular);
+    uber_shader->SetVec3("u_dir_light.Direction", mSunLight->Direction);
+    uber_shader->SetVec3("u_dir_light.Ambient", mSunLight->Ambient);
+    uber_shader->SetVec3("u_dir_light.Diffuse", mSunLight->Diffuse);
+    uber_shader->SetVec3("u_dir_light.Specular", mSunLight->Specular);
   }
 }
 
-void Interface::SetDirectionalLightShadows(bool on_or_off) noexcept {
-  if (!mDirectionalLight) return;
-  mDirectionalLight->Shadows = on_or_off;
+void Interface::SetSunLightShadows(bool on_or_off) noexcept {
+  if (!mSunLight) return;
+  mSunLight->Shadows = on_or_off;
 }
 
-void Interface::RemoveDirectionalLight() {
-  if (mDirectionalLight) {
+void Interface::RemoveSunLight() {
+  if (mSunLight) {
     //assert(DefaultShaders::Get());
     //InternalShaders::Uber::Get()->Use();
     InternalShaders::Uber::Get()->SetInt("u_is_dir_light_on", 0);
-    mDirectionalLight.reset();
+    mSunLight.reset();
   }
 }
 

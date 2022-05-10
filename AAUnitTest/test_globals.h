@@ -50,9 +50,9 @@ public:
   bool g_Yes = false, g_No = false;
 
   float  dir_light_direction[3] = { -0.33f, -1.0f, -0.33f };
-  float* dir_light_diff = new float(0.03f);
   float* dir_light_amb = new float(0.03f);
-  float* dir_light_spec = new float(0.03f);
+  float* dir_light_diff = new float(0.6f);
+  float* dir_light_spec = new float(0.6f);
   bool sun_shadows = true;
 
   unsigned int g_plight1_id = 0;
@@ -73,9 +73,9 @@ public:
   float* spot_light_constant = new float(3.0f);
   float* spot_light_linear = new float(0.0027f);
   float* spot_light_quadratic = new float(0.00028f);
-  float* spot_light_ambient = new float(0.003f);
-  float* spot_light_diff = new float(0.003f);
-  float* spot_light_spec = new float(0.003f);
+  float* spot_light_ambient = new float(0.0f);
+  float* spot_light_diff = new float(1.0f);
+  float* spot_light_spec = new float(1.0f);
 
   float* cam_fov = new float(85.f);
 

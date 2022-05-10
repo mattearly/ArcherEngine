@@ -1,5 +1,6 @@
 #pragma once
 #include "../../Mesh/Vertex.h"
+#include "../../Scene/SunLight.h"
 #include "../../Scene/Lights.h"
 #include "../../../include/AAEngine/Scene/Viewport.h"
 
@@ -73,7 +74,7 @@ void ResetToDefault();
 /// <param name="animated_render_objects"></param>
 /// <param name="depthMapFBO"></param>
 void BatchRenderShadows(
-  const DirectionalLight& dir_light,
+  const SunLight& dir_light,
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
   const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects);
 
@@ -100,7 +101,7 @@ void RenderDebugCube(glm::vec3 loc);
 /// Debug
 /// todo:: test and fix
 /// </summary>
-void RenderDirectionalLightArrowIcon(glm::vec3 dir_from_00);
+void RenderSunLightArrowIcon(glm::vec3 dir_from_00);
 
 /// <summary>
 /// Debug RenderSpotLightIcon

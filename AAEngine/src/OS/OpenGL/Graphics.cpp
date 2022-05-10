@@ -591,7 +591,7 @@ void ResetToDefault() {
 /// <param name="animated_render_objects"></param>
 /// <param name="fbo">the fraembuffer to render the shadwos to</param>
 void BatchRenderShadows(
-  const DirectionalLight& dir_light,
+  const SunLight& dir_light,
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
   const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects) {
   bool assume_shadows = false;
@@ -694,26 +694,25 @@ void BatchRenderToViewport(
 
   // stencils LAST
   for (const auto& render_object : render_objects) {
-    if (render_object->IsStenciled()) {
-      RenderStenciled(render_object);
-    }
+    if (!render_object->IsStenciled()) continue;
+    RenderStenciled(render_object);
   }
 
   for (const auto& render_object : animated_render_objects) {
-    if (render_object->IsStenciled()) {
-      if (render_object->mAnimator) {
-        InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
-        InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
-        auto transforms = render_object->mAnimator->GetFinalBoneMatrices();
-        for (unsigned int i = 0; i < transforms.size(); ++i) {
-          InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-          InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-        }
+    if (!render_object->IsStenciled()) continue;
+    if (render_object->mAnimator) {
+      InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
+      InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
+      auto transforms = render_object->mAnimator->GetFinalBoneMatrices();
+      for (unsigned int i = 0; i < transforms.size(); ++i) {
+        InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+        InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
       }
-      RenderStenciled(std::dynamic_pointer_cast<AA::Prop>(render_object)); 
-      InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-      InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
     }
+    RenderStenciled(std::dynamic_pointer_cast<AA::Prop>(render_object));
+    InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+    InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
+
   }
 }
 
@@ -726,7 +725,7 @@ void RenderAsIs(const std::shared_ptr<AA::Prop>& render_object) {
 }
 
 void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
-  
+
   // shader for this render
   OGLShader* uber_shader = InternalShaders::Uber::Get();
 
@@ -884,7 +883,7 @@ void RenderDebugCube(glm::vec3 loc) {
 /// Debug
 /// todo:: test and fix
 /// </summary>
-void RenderDirectionalLightArrowIcon(glm::vec3 dir_from_00) {
+void RenderSunLightArrowIcon(glm::vec3 dir_from_00) {
 
   // todo: math to spin the arrow icon & keep it at some portion of the screen
   // the below math is WRONG!

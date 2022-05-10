@@ -15,8 +15,8 @@ Prop::Prop() {
   stenciled_with_normals = false;
   stencil_scale = 1.1f;
   render_shadows = true;
-  cull_frontface_for_shadows = false;
-  cull_backface = false;
+  cull_frontface_for_shadows = true;
+  cull_backface = true;
 }
 
 Prop::Prop(const char* path) {
@@ -27,8 +27,8 @@ Prop::Prop(const char* path) {
   stenciled_with_normals = false;
   stencil_scale = 1.1f;
   render_shadows = true;
-  cull_frontface_for_shadows = false;
-  cull_backface = false;
+  cull_frontface_for_shadows = true;
+  cull_backface = true;
 }
 
 void Prop::RemoveCache() {

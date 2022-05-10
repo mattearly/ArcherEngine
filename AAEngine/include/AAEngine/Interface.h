@@ -25,7 +25,7 @@ namespace AA {
 class imGUI;
 class AnimProp;
 class Animation;
-struct DirectionalLight;
+class SunLight;
 struct PointLight;
 struct SpotLight;
 class LongSound;
@@ -214,20 +214,20 @@ public:
   /// <param name="amb">Ambient</param>
   /// <param name="diff">Diffuse</param>
   /// <param name="spec">Specular</param>
-  void SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
+  void SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
 
   /// <summary>
   /// Turns shadows cast from the directional light on or off at your request. 
-  /// Does nothing if mDirectionalLight is not in use.
-  /// Effects the Render Pipeline for Directional Lighting Calculations if it mDirectionalLight is in use.
+  /// Does nothing if mSunLight is not in use.
+  /// Effects the Render Pipeline for Directional Lighting Calculations if it mSunLight is in use.
   /// </summary>
   /// <param name="on_off"></param>
-  void SetDirectionalLightShadows(bool on_off) noexcept;
+  void SetSunLightShadows(bool on_off) noexcept;
 
   /// <summary>
   /// Removes the directional light.
   /// </summary>
-  void RemoveDirectionalLight();
+  void RemoveSunLight();
 
   /// <summary>
   /// Adds a point light to the default lit shader.
@@ -524,7 +524,7 @@ private:
 
   std::vector<std::shared_ptr<Animation> > mAnimation;
 
-  std::shared_ptr<DirectionalLight> mDirectionalLight;
+  std::shared_ptr<SunLight> mSunLight;
 
   int mNumPointLightsInUse;
   const int MAXPOINTLIGHTS = 24;  // needs to match on shader

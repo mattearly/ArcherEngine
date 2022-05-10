@@ -5,6 +5,7 @@
 #include "../include/AAEngine/Mesh/AnimProp.h"
 #include "OS/OpenGL/Graphics.h"
 #include "Physics/NVidiaPhysx.h"
+#include "Scene/SunLight.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
 #include "Sound/SoundDevice.h"
@@ -106,12 +107,12 @@ void Interface::pre_render() {
     settle_window_resize_flag();
   }
   OpenGL::NewFrame();
+  if (mSunLight) { OpenGL::BatchRenderShadows(*mSunLight, mProps, mAnimatedProps); }
 }
 
 // Renders visable props every frame
 void Interface::render() {
   if (!mCameras.empty()) {
-    if (mDirectionalLight) { OpenGL::BatchRenderShadows(*mDirectionalLight, mProps, mAnimatedProps); }
     for (const auto& cam : mCameras) {
       cam->NewFrame();
       OpenGL::RenderSkybox(cam->GetSkybox(), cam->GetViewport());
@@ -121,8 +122,8 @@ void Interface::render() {
           OpenGL::RenderDebugCube(pl->Position);
         //for (const auto& sl : mSpotLights)
         //  OpenGL::RenderSpotLightIcon(sl->Position, sl->Direction);
-        //if (mDirectionalLight)
-        //  OpenGL::RenderDirectionalLightArrowIcon(mDirectionalLight->Direction);
+        //if (mSunLight)
+        //  OpenGL::RenderDirectionalLightArrowIcon(mSunLight->Direction);
       }
     }
   }
@@ -171,7 +172,7 @@ void Interface::teardown() {
   }
   mAnimation.clear();
 
-  mDirectionalLight.reset();
+  mSunLight.reset();
   mPointLights.clear();
   mSpotLights.clear();
   mDebugLightIndicators = false;

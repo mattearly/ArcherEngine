@@ -139,6 +139,7 @@
     <ClInclude Include="include\AAEngine\Base\UniqueInstance.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Stencil.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Uber.h" />
+    <ClInclude Include="src\Scene\SunLight.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Mesh\Material.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="src\Mesh\Vertex.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Stencil.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Uber.cpp" />
+    <ClCompile Include="src\Scene\SunLight.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

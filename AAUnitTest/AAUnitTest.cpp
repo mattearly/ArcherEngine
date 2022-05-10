@@ -229,7 +229,7 @@ public:
     // default light and background
     tg->g_aa_interface.SetWindowClearColor();
 
-    tg->g_aa_interface.SetDirectionalLight(
+    tg->g_aa_interface.SetSunLight(
       glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
       glm::vec3(*tg->dir_light_amb),
       glm::vec3(*tg->dir_light_diff),
@@ -248,7 +248,7 @@ public:
 
       // state update
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
-        tg->g_aa_interface.SetDirectionalLight(
+        tg->g_aa_interface.SetSunLight(
           glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
           glm::vec3(*tg->dir_light_amb),
           glm::vec3(*tg->dir_light_diff),
@@ -293,7 +293,7 @@ public:
     // default light and background
     tg->g_aa_interface.SetWindowClearColor();
 
-    tg->g_aa_interface.SetDirectionalLight(
+    tg->g_aa_interface.SetSunLight(
       glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
       glm::vec3(*tg->dir_light_amb),
       glm::vec3(*tg->dir_light_diff),
@@ -312,7 +312,7 @@ public:
 
       // state update
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
-        tg->g_aa_interface.SetDirectionalLight(
+        tg->g_aa_interface.SetSunLight(
           glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
           glm::vec3(*tg->dir_light_amb),
           glm::vec3(*tg->dir_light_diff),
@@ -402,7 +402,7 @@ public:
     // default light and background
     //tg->g_aa_interface.SetWindowClearColor();
 
-    tg->g_aa_interface.SetDirectionalLight(
+    tg->g_aa_interface.SetSunLight(
       glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
       glm::vec3(*tg->dir_light_amb),
       glm::vec3(*tg->dir_light_diff),
@@ -423,7 +423,7 @@ public:
 
       // state update
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
-        tg->g_aa_interface.SetDirectionalLight(
+        tg->g_aa_interface.SetSunLight(
           glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
           glm::vec3(*tg->dir_light_amb),
           glm::vec3(*tg->dir_light_diff),
@@ -512,7 +512,7 @@ public:
 
     // default light and background
     tg->g_aa_interface.SetWindowClearColor();
-    tg->g_aa_interface.SetDirectionalLight(
+    tg->g_aa_interface.SetSunLight(
       glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
       glm::vec3(*tg->dir_light_amb),
       glm::vec3(*tg->dir_light_diff),
@@ -531,7 +531,7 @@ public:
 
       // state update
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
-        tg->g_aa_interface.SetDirectionalLight(
+        tg->g_aa_interface.SetSunLight(
           glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
           glm::vec3(*tg->dir_light_amb),
           glm::vec3(*tg->dir_light_diff),
@@ -610,7 +610,7 @@ public:
 
       setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
 
-      tg->g_aa_interface.SetDirectionalLight(
+      tg->g_aa_interface.SetSunLight(
         glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
         glm::vec3(*tg->dir_light_amb),
         glm::vec3(*tg->dir_light_diff),
@@ -636,7 +636,7 @@ public:
       if (doToggleFS) { tg->g_aa_interface.ToggleWindowFullscreen(); };
 
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular) {
-        tg->g_aa_interface.SetDirectionalLight(
+        tg->g_aa_interface.SetSunLight(
           glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
           glm::vec3(*tg->dir_light_amb),
           glm::vec3(*tg->dir_light_diff),
@@ -741,7 +741,7 @@ public:
       );
 
       // a sunlight
-      tg->g_aa_interface.SetDirectionalLight(
+      tg->g_aa_interface.SetSunLight(
         glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
         glm::vec3(*tg->dir_light_amb),
         glm::vec3(*tg->dir_light_diff),
@@ -829,7 +829,7 @@ public:
 
       // state update
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular) {
-        tg->g_aa_interface.SetDirectionalLight(
+        tg->g_aa_interface.SetSunLight(
           glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
           glm::vec3(*tg->dir_light_amb),
           glm::vec3(*tg->dir_light_diff),
@@ -837,7 +837,7 @@ public:
       }
 
       if (update_sun_shadows) {
-        tg->g_aa_interface.SetDirectionalLightShadows(tg->sun_shadows);
+        tg->g_aa_interface.SetSunLightShadows(tg->sun_shadows);
       }
 
       if (update_cube_loc) {
@@ -953,7 +953,7 @@ public:
       );
 
       // a sunlight
-      tg->g_aa_interface.SetDirectionalLight(
+      tg->g_aa_interface.SetSunLight(
         glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
         glm::vec3(*tg->dir_light_amb),
         glm::vec3(*tg->dir_light_diff),
@@ -1021,7 +1021,7 @@ public:
 
       // state update
       if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular) {
-        tg->g_aa_interface.SetDirectionalLight(
+        tg->g_aa_interface.SetSunLight(
           glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
           glm::vec3(*tg->dir_light_amb),
           glm::vec3(*tg->dir_light_diff),

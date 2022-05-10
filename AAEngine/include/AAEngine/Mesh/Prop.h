@@ -95,16 +95,11 @@ protected:
   glm::vec3 stencil_color;
   bool stenciled_with_normals;
   float stencil_scale;
-
   bool cull_backface;
-
   bool render_shadows;
   bool cull_frontface_for_shadows;
-
   Spacial3D spacial_data;
-  
   std::vector<MeshInfo> mMeshes;
-
   std::string cached_load_path;
 
   // only interface calls removecache and load
