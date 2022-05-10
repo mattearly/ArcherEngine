@@ -28,7 +28,7 @@ GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int for
 GLuint UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, int format);
 void DeleteTex(const GLsizei num_to_del, const GLuint& tex_d);
 
-GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map);
+GLuint CreateDepthMapFBO(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map_tex_id);
 void DeleteFramebuffer(const GLsizei num_to_del, GLuint& fbo);
 
 void SetSamplerCube(int which, const unsigned int& cubetexID);
