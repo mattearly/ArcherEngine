@@ -759,8 +759,6 @@ public:
 
       tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
 
-
-
       // ground
       for (int i = -1; i < 2; i++)
         for (int j = -1; j < 2; j++)
@@ -802,8 +800,8 @@ public:
       ImGui::Text("BULB");
       bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
       bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", tg->point_light_loc, -400.f, 400.f, "%f", 1.0f);
-      bool update_plight1_linear = ImGui::SliderFloat("Point Light Linear", tg->point_light_linear, 0.0001f, 0.400f, "%f", 1.0f);
-      bool update_plight1_quadratic = ImGui::SliderFloat("Point Light Quadratic", tg->point_light_quadratic, 0.00001f, 0.200f, "%f", 1.0f);
+      bool update_plight1_linear = ImGui::SliderFloat("Point Light Linear", tg->point_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
+      bool update_plight1_quadratic = ImGui::SliderFloat("Point Light Quadratic", tg->point_light_quadratic, 0.000001f, 0.005f, "%f", 1.0f);
       bool update_plight1_ambient = ImGui::SliderFloat("Point Light Ambient", tg->point_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_diff = ImGui::SliderFloat("Point Light Diffuse", tg->point_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_spec = ImGui::SliderFloat("Point Light Spec", tg->point_light_spec, 0.f, 1.f, "%f", 1.0f);
@@ -811,8 +809,8 @@ public:
       ImGui::Text("FLASHLIGHT");
       bool update_slight1_inner = ImGui::SliderFloat("Spot Light Inner", tg->spot_light_inner, 0.03f, 19.f, "%f", 1.0f);
       bool update_slight1_outer = ImGui::SliderFloat("Spot Light Outer", tg->spot_light_outer, 0.1f, 40.f, "%f", 1.0f);
-      bool update_slight1_linear = ImGui::SliderFloat("Spot Light Linear", tg->spot_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
-      bool update_slight1_quadratic = ImGui::SliderFloat("Spot Light Quadratic", tg->spot_light_quadratic, 0.0001f, 0.300f, "%f", 1.0f);
+      bool update_slight1_linear = ImGui::SliderFloat("Spot Light Linear", tg->spot_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
+      bool update_slight1_quadratic = ImGui::SliderFloat("Spot Light Quadratic", tg->spot_light_quadratic, 0.0001f, 0.005f, "%f", 1.0f);
       bool update_slight1_ambient = ImGui::SliderFloat("Spot Light Ambient", tg->spot_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_slight1_diff = ImGui::SliderFloat("Spot Light Diffuse", tg->spot_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_slight1_spec = ImGui::SliderFloat("Spot Light Spec", tg->spot_light_spec, 0.f, 1.f, "%f", 1.0f);
@@ -823,10 +821,10 @@ public:
       bool update_gamma_correction = ImGui::Checkbox("Apply Driver Gamma Correction", &tg->gamma_correction);
 
       static float xz_loc[2] = { 0.f, 0.f };
-      bool update_cube_loc = ImGui::SliderFloat2("cube loc", xz_loc, -100.f, 100.f, "%f", 1.0f);
+      bool update_cube_loc = ImGui::SliderFloat2("CubeLoc", xz_loc, -100.f, 100.f, "%f", 1.0f);
 
-      tg->g_No = ImGui::Button("report broken");
-      tg->g_Yes = ImGui::Button("NEXT TEST");
+      tg->g_No = ImGui::Button("Report Broken");
+      tg->g_Yes = ImGui::Button("Next Test");
       ImGui::End();
 
       // state update
@@ -839,48 +837,13 @@ public:
       }
 
       if (update_sun_shadows) {
-        // ground - no saved ids
-        //for (int i = -3; i < 4; i++)
-        //  for (int j = -3; j < 4; j++)
-        //    tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i * 400, -30.f, j * 400), glm::vec3(1.f));
-
-        {
-          auto weak = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
-          auto strong = weak.lock();
-          strong->SetRenderShadows(tg->sun_shadows);
-        }
-
-
-        {
-          //tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(1.f));
-          auto weak = tg->g_aa_interface.GetProp(tg->g_peasant_man_id);
-          auto strong = weak.lock();
-          strong->SetRenderShadows(tg->sun_shadows);
-        }
-
-        {
-          //tg->g_walking_man_id = tg->g_aa_interface.AddAnimProp(tg->fullwalking_man.c_str(), glm::vec3(180, -30, -100), glm::vec3(1.f));
-          auto weak = tg->g_aa_interface.GetAnimProp(tg->g_walking_man_id);
-          auto strong = weak.lock();
-          strong->SetRenderShadows(tg->sun_shadows);
-        }
-
-        {
-          //tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-180, -30, -100), glm::vec3(1.f));
-          auto weak = tg->g_aa_interface.GetAnimProp(tg->g_zombie_id[0]);
-          auto strong = weak.lock();
-          strong->SetRenderShadows(tg->sun_shadows);
-        }
+        tg->g_aa_interface.SetDirectionalLightShadows(tg->sun_shadows);
       }
 
       if (update_cube_loc) {
-
-        {
-          auto weak = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
-          auto strong = weak.lock();
-          strong->SetLocation(glm::vec3(xz_loc[0], 1, xz_loc[1]));
-        }
-
+        auto weak = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
+        auto strong = weak.lock();
+        strong->SetLocation(glm::vec3(xz_loc[0], 1, xz_loc[1]));
       }
 
       if (update_plight1_loc || update_plight1_linear || update_plight1_quadratic || update_plight1_ambient
@@ -1032,8 +995,8 @@ public:
       ImGui::Text("BULB");
       bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
       bool update_plight1_loc = ImGui::SliderFloat3("Point Light Location", tg->point_light_loc, -400.f, 400.f, "%f", 1.0f);
-      bool update_plight1_linear = ImGui::SliderFloat("Point Light Linear", tg->point_light_linear, 0.0001f, 0.400f, "%f", 1.0f);
-      bool update_plight1_quadratic = ImGui::SliderFloat("Point Light Quadratic", tg->point_light_quadratic, 0.00001f, 0.200f, "%f", 1.0f);
+      bool update_plight1_linear = ImGui::SliderFloat("Point Light Linear", tg->point_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
+      bool update_plight1_quadratic = ImGui::SliderFloat("Point Light Quadratic", tg->point_light_quadratic, 0.000001f, 0.005f, "%f", 1.0f);
       bool update_plight1_ambient = ImGui::SliderFloat("Point Light Ambient", tg->point_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_diff = ImGui::SliderFloat("Point Light Diffuse", tg->point_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_plight1_spec = ImGui::SliderFloat("Point Light Spec", tg->point_light_spec, 0.f, 1.f, "%f", 1.0f);
@@ -1041,8 +1004,8 @@ public:
       ImGui::Text("FLASHLIGHT");
       bool update_slight1_inner = ImGui::SliderFloat("Spot Light Inner", tg->spot_light_inner, 0.03f, 19.f, "%f", 1.0f);
       bool update_slight1_outer = ImGui::SliderFloat("Spot Light Outer", tg->spot_light_outer, 0.1f, 40.f, "%f", 1.0f);
-      bool update_slight1_linear = ImGui::SliderFloat("Spot Light Linear", tg->spot_light_linear, 0.0001f, 0.300f, "%f", 1.0f);
-      bool update_slight1_quadratic = ImGui::SliderFloat("Spot Light Quadratic", tg->spot_light_quadratic, 0.0001f, 0.300f, "%f", 1.0f);
+      bool update_slight1_linear = ImGui::SliderFloat("Spot Light Linear", tg->spot_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
+      bool update_slight1_quadratic = ImGui::SliderFloat("Spot Light Quadratic", tg->spot_light_quadratic, 0.00001f, 0.005f, "%f", 1.0f);
       bool update_slight1_ambient = ImGui::SliderFloat("Spot Light Ambient", tg->spot_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_slight1_diff = ImGui::SliderFloat("Spot Light Diffuse", tg->spot_light_diff, 0.f, 1.f, "%f", 1.0f);
       bool update_slight1_spec = ImGui::SliderFloat("Spot Light Spec", tg->spot_light_spec, 0.f, 1.f, "%f", 1.0f);
@@ -1130,6 +1093,5 @@ public:
 
     TestGlobals::reset();
   }
-
 };
 }
