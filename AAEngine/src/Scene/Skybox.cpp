@@ -13,7 +13,7 @@ Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
 
 Skybox::~Skybox() {
   if (mCubemapTexId != 0) {
-    OpenGL::DeleteTex(mCubemapTexId);  // todo: cache textures and reuse
+    OpenGL::DeleteTex(1u, mCubemapTexId);  // todo: cache textures and reuse
   }
 }
 

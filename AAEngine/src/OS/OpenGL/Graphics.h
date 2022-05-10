@@ -9,7 +9,6 @@
 #include <vector>
 #include <memory>
 
-
 namespace AA {
 
 class Prop;
@@ -23,13 +22,14 @@ GLuint UploadStatic3DMesh(const std::vector<TanVertex>& verts, const std::vector
 GLuint UploadStatic3DMesh(const std::vector<AnimVertex>& verts, const std::vector<GLuint>& elems);
 GLuint Upload3DPositionsMesh(const float* points, const int num_points, const GLuint* indices, const int ind_count);
 GLuint Upload2DVerts(const std::vector<glm::vec2>& points);
-void DeleteMesh(const GLuint& VAO);
+void DeleteMesh(const GLsizei num_to_del, const GLuint& VAO);
 
 GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int format);
 GLuint UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, int format);
-void DeleteTex(const GLuint& id);
+void DeleteTex(const GLsizei num_to_del, const GLuint& tex_d);
 
 GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map);
+void DeleteFramebuffer(const GLsizei num_to_del, GLuint& fbo);
 
 void SetSamplerCube(int which, const int& cubetexID);
 void SetTexture(int which, const int& textureID);
@@ -75,13 +75,12 @@ void ResetToDefault();
 void BatchRenderShadows(
   const DirectionalLight& dir_light,
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
-  const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
-  GLuint depthMapFBO);
+  const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects);
 
 void BatchRenderToViewport(
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
   const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
-  const Viewport& vp, const GLuint& shadow_depth_map_tex);
+  const Viewport& vp);
 
 // no changes to shaders before rendering the meshes of the object
 void RenderAsIs(const std::shared_ptr<AA::Prop>& render_object);

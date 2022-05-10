@@ -163,7 +163,7 @@ void MeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const s
     local_helper_decrement_all_loaded_models_ref(path_to_unload);
 
     // delete mesh data from graphics card
-    OpenGL::DeleteMesh(a_mesh.vao);
+    OpenGL::DeleteMesh(1u, a_mesh.vao);
 
     // delete texture (or reduce reference count of them if others still in use)
     TextureLoader::UnloadTexture(a_mesh.textureDrawIds);

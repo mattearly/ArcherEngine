@@ -88,7 +88,7 @@ static std::string LastLoadedAnimPath;
 void AnimMeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
   for (const auto& a_mesh : toUnload) {
     local_helper_decrement_all_loaded_anim_models_ref(path_to_unload);
-    OpenGL::DeleteMesh(a_mesh.vao);
+    OpenGL::DeleteMesh(1u, a_mesh.vao);
     TextureLoader::UnloadTexture(a_mesh.textureDrawIds);
   }
 }

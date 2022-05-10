@@ -167,7 +167,7 @@ void TextureLoader::UnloadTexture(const std::unordered_map<unsigned int, std::st
       if (texIt.first == loaded_tex->accessId) {
         loaded_tex->ref_count--;
         if (loaded_tex->ref_count == 0) {
-          OpenGL::DeleteTex(loaded_tex->accessId);
+          OpenGL::DeleteTex(1u, loaded_tex->accessId);
         }
       }
     }

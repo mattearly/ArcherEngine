@@ -372,8 +372,8 @@ GLuint Upload2DVerts(const std::vector<glm::vec2>& points) {
 /// removes the mesh from our GPU memory
 /// </summary>
 /// <param name="VAO">vao to delete</param>
-void DeleteMesh(const GLuint& VAO) {
-  glDeleteBuffers(1, &VAO);
+void DeleteMesh(const GLsizei num_to_del, const GLuint& VAO) {
+  glDeleteBuffers(num_to_del, &VAO);
 }
 
 GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int format) {
@@ -436,8 +436,8 @@ GLuint UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int hei
   return out_texID;
 }
 
-void DeleteTex(const GLuint& id) {
-  glDeleteTextures(1, &id);
+void DeleteTex(const GLsizei num_to_del, const GLuint& tex_id) {
+  glDeleteTextures(num_to_del, &tex_id);
 }
 
 void SetBlend(const bool enabled) {
@@ -530,6 +530,15 @@ GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_dep
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   return depthMapFBO;
+}
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="num_to_del"></param>
+/// <param name="fbo"></param>
+void DeleteFramebuffer(GLsizei num_to_del, GLuint& fbo) {
+  glDeleteFramebuffers(num_to_del, &fbo);
 }
 
 //Note that this only has effect if depth testing is enabled. 
@@ -977,7 +986,7 @@ unsigned int load_cube() {
 
 void unload_cube() {
   if (vao_to_the_cube != 0) {
-    DeleteMesh(vao_to_the_cube);
+    DeleteMesh(1u, vao_to_the_cube);
     vao_to_the_cube = 0;
   }
 }
@@ -1008,7 +1017,7 @@ unsigned int load_plane() {
 
 void unload_plane() {
   if (vao_to_the_plane != 0) {
-    DeleteMesh(vao_to_the_plane);
+    DeleteMesh(1u, vao_to_the_plane);
     vao_to_the_plane = 0;
   }
 }
@@ -1113,7 +1122,7 @@ unsigned int load_cone(unsigned int& out_num_elements) {
 
 void unload_cone() {
   if (vao_to_the_cone != 0) {
-    DeleteMesh(vao_to_the_cone);
+    DeleteMesh(1u, vao_to_the_cone);
     vao_to_the_cone = 0;
   }
 }

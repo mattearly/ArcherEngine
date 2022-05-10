@@ -405,12 +405,12 @@ void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff
 
   {
     //assert(DefaultShaders::Get());
-    InternalShaders::Uber::Get()->Use();
-    InternalShaders::Uber::Get()->SetInt("u_is_dir_light_on", 1);
-    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Direction", mDirectionalLight->Direction);
-    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Ambient", mDirectionalLight->Ambient);
-    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Diffuse", mDirectionalLight->Diffuse);
-    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Specular", mDirectionalLight->Specular);
+    auto uber_shader = InternalShaders::Uber::Get();
+    uber_shader->SetInt("u_is_dir_light_on", 1);
+    uber_shader->SetVec3("u_dir_light.Direction", mDirectionalLight->Direction);
+    uber_shader->SetVec3("u_dir_light.Ambient", mDirectionalLight->Ambient);
+    uber_shader->SetVec3("u_dir_light.Diffuse", mDirectionalLight->Diffuse);
+    uber_shader->SetVec3("u_dir_light.Specular", mDirectionalLight->Specular);
   }
 }
 
