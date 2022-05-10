@@ -68,16 +68,16 @@ public:
   unsigned int g_slight1_id = 0;
   float  spot_light_loc[3] = { 0.0f, 0.0f, 0.0f };
   float  spot_light_dir[3] = { 1.f, 1.f, 1.f };
-  float* spot_light_inner = new float(1.2f);
-  float* spot_light_outer = new float(6.0f);
+  float* spot_light_inner = new float(0.05f);
+  float* spot_light_outer = new float(1.50f);
   float* spot_light_constant = new float(3.0f);
-  float* spot_light_linear = new float(0.027f);
-  float* spot_light_quadratic = new float(0.028f);
+  float* spot_light_linear = new float(0.0027f);
+  float* spot_light_quadratic = new float(0.00028f);
   float* spot_light_ambient = new float(0.003f);
   float* spot_light_diff = new float(0.003f);
   float* spot_light_spec = new float(0.003f);
 
-  float* cam_fov = new float(45.f);
+  float* cam_fov = new float(85.f);
 
   bool gamma_correction = false;
 } *tg;
