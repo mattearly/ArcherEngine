@@ -15,14 +15,8 @@
 #include <cstddef>
 #include <cmath>
 
-
 namespace AA {
 namespace OpenGL {
-
-static struct OpenGLState {
-  bool render_shadows = false;
-} ogl_state;
-
 
 void SetSamplerCube(int which, const unsigned int& cubetexID) {
   glActiveTexture(GL_TEXTURE0 + which);
@@ -592,98 +586,96 @@ void ResetToDefault() {
 /// <summary>
 /// render depth of scene to texture from light perspective
 /// </summary>
-/// <param name="dir_light"></param>
+/// <param name="dir_light">this should only ever get called if the dir light being passed in is valid</param>
 /// <param name="render_objects"></param>
 /// <param name="animated_render_objects"></param>
-/// <param name="depthMapFBO"></param>
+/// <param name="fbo">the fraembuffer to render the shadwos to</param>
 void BatchRenderShadows(
   const DirectionalLight& dir_light,
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
-  const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
-  GLuint depthMapFBO) {
+  const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects) {
+  bool assume_shadows = false;
+
+  // shadows to default: off
+  {
+    InternalShaders::Uber::Get()->SetBool("u_has_dir_light_shadows", assume_shadows);  // discarding return value b/c switching shaders later in func
+  }
+  if (!dir_light.Shadows)
+    return;
+
   glm::mat4 lightProjection, lightView;
   glm::mat4 lightSpaceMatrix;
-  float near_plane = 1.f, far_plane = 100 * 7.5f;
 
-  lightProjection = glm::ortho(-1000.0f, 1000.0f, -1000.0f, 1000.0f, near_plane, far_plane);
-  lightView = glm::lookAt(-dir_light.Direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+  lightProjection = glm::ortho(
+    -dir_light.ShadowOrthoSize,
+    dir_light.ShadowOrthoSize,
+    -dir_light.ShadowOrthoSize,
+    dir_light.ShadowOrthoSize,
+    dir_light.ShadowNearPlane,
+    dir_light.ShadowFarPlane);
+
+  lightView = glm::lookAt(
+    -dir_light.Direction,
+    glm::vec3(0.0f),
+    glm::vec3(0.0, 1.0, 0.0));
+
   lightSpaceMatrix = lightProjection * lightView;
 
   // render scene from light's point of view
   auto* depth_shadow_renderer = InternalShaders::Shadow::Get();
   depth_shadow_renderer->SetMat4("u_light_space_matrix", lightSpaceMatrix);
 
-  const GLuint SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-
-  glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-  glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+  glViewport(0, 0, dir_light.ShadowWidth, dir_light.ShadowWidth);
+  glBindFramebuffer(GL_FRAMEBUFFER, dir_light.GetFBO());
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  ogl_state.render_shadows = false;
   for (const auto& prop : render_objects) {
     if (prop->GetRenderShadows()) {
       depth_shadow_renderer->SetMat4("u_model_matrix", prop->GetFMM());
-
-      if (prop->GetCullFrontFaceForShadows()) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-      }
+      bool front_cull = prop->GetCullFrontFaceForShadows();
+      if (front_cull) { glEnable(GL_CULL_FACE); glCullFace(GL_FRONT); }
       const auto& meshes = prop->GetMeshes();
-      for (const auto& m : meshes) {
-        DrawElements(m.vao, m.numElements);
-      }
-      if (prop->GetCullFrontFaceForShadows()) {
-        glCullFace(GL_BACK);
-        glDisable(GL_CULL_FACE);
-      }
-      ogl_state.render_shadows = true;  // at least 1 thing has shadows
+      for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); }
+      if (front_cull) { glCullFace(GL_BACK); glDisable(GL_CULL_FACE); }
+      assume_shadows = true;  // at least 1 thing has shadows
     }
   }
 
   for (const auto& anim_prop : animated_render_objects) {
     if (anim_prop->GetRenderShadows()) {
       depth_shadow_renderer->SetMat4("u_model_matrix", anim_prop->GetFMM());
-      if (anim_prop->GetCullFrontFaceForShadows()) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-      }
+      bool front_cull = anim_prop->GetCullFrontFaceForShadows();
+      if (front_cull) { glEnable(GL_CULL_FACE); glCullFace(GL_FRONT); }
       const auto& meshes = anim_prop->GetMeshes();
-      for (const auto& m : meshes) {
-        DrawElements(m.vao, m.numElements);
-      }
-      if (anim_prop->GetCullFrontFaceForShadows()) {
-        glCullFace(GL_BACK);
-        glDisable(GL_CULL_FACE);
-      }
-      ogl_state.render_shadows = true;  // at least 1 thing has shadows
+      for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); }
+      if (front_cull) { glCullFace(GL_BACK); glDisable(GL_CULL_FACE); }
+      assume_shadows = true;  // at least 1 thing has shadows
     }
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-  if (ogl_state.render_shadows) {
-    InternalShaders::Uber::Get()->SetMat4("u_light_space_matrix", lightSpaceMatrix);
+  {
+    if (assume_shadows) {  // at least 1 object needs dir light rendered shadows
+      auto* uber_shadows = InternalShaders::Uber::Get();
+      uber_shadows->SetInt("u_shadow_map", 4);
+      uber_shadows->SetBool("u_has_dir_light_shadows", true);
+      SetTexture(4, dir_light.GetTexID());
+    }
   }
-
 }
 
 void BatchRenderToViewport(
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
   const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
-  const Viewport& vp, const GLuint& shadow_depth_map_tex) {
+  const Viewport& vp) {
   glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
-
-  // render shadow texture stuff
-  if (ogl_state.render_shadows) {
-    auto* uber_shadows = InternalShaders::Uber::Get();
-    uber_shadows->SetInt("u_shadow_map", 4);
-    SetTexture(4, shadow_depth_map_tex);
-  }
 
   for (const auto& render_object : render_objects) {
     if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
     RenderProp(render_object);
   }
+
   for (const auto& render_object : animated_render_objects) {
     if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
     if (render_object->mAnimator) {
@@ -699,8 +691,6 @@ void BatchRenderToViewport(
     InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
     InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
   }
-
-
 
   // stencils LAST
   for (const auto& render_object : render_objects) {
@@ -720,12 +710,11 @@ void BatchRenderToViewport(
           InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
         }
       }
-      RenderStenciled(std::dynamic_pointer_cast<AA::Prop>(render_object));
+      RenderStenciled(std::dynamic_pointer_cast<AA::Prop>(render_object)); 
       InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
       InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
     }
   }
-
 }
 
 // no changes to shaders before rendering the meshes of the object
@@ -737,16 +726,22 @@ void RenderAsIs(const std::shared_ptr<AA::Prop>& render_object) {
 }
 
 void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
+  
+  // shader for this render
   OGLShader* uber_shader = InternalShaders::Uber::Get();
+
+  // is the prop set to have shadows on
   if (render_object->GetRenderShadows()) {
-    uber_shader->SetBool("u_has_shadows", true);
-    //uber_shader->SetInt("u_shadow_map", 4);  // should be bound from prev step?
-    //SetTexture(4, )
+    uber_shader->SetInt("u_mesh_does_shadow", 1);
+  } else {
+    uber_shader->SetInt("u_mesh_does_shadow", 0);
   }
+
   if (render_object->GetBackFaceCull()) {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
   }
+
   uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
   for (const MeshInfo& m : render_object->GetMeshes()) {
     for (const auto& texture : m.textureDrawIds) {
@@ -778,9 +773,8 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
     uber_shader->SetBool("u_has_specular_tex", false);
     uber_shader->SetBool("u_has_normal_tex", false);
     uber_shader->SetBool("u_has_emission_tex", false);
-    uber_shader->SetBool("u_has_shadows", false);
     uber_shader->SetFloat("u_material.Shininess", 0.0f);
-    uber_shader->SetBool("u_reflection_model.Phong", false);
+    // uber_shader->SetBool("u_reflection_model.Phong", false);
     uber_shader->SetBool("u_reflection_model.BlinnPhong", false);
   }
   ResetToDefault();

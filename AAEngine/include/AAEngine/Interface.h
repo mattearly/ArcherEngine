@@ -217,6 +217,14 @@ public:
   void SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
 
   /// <summary>
+  /// Turns shadows cast from the directional light on or off at your request. 
+  /// Does nothing if mDirectionalLight is not in use.
+  /// Effects the Render Pipeline for Directional Lighting Calculations if it mDirectionalLight is in use.
+  /// </summary>
+  /// <param name="on_off"></param>
+  void SetDirectionalLightShadows(bool on_off) noexcept;
+
+  /// <summary>
   /// Removes the directional light.
   /// </summary>
   void RemoveDirectionalLight();
@@ -517,8 +525,6 @@ private:
   std::vector<std::shared_ptr<Animation> > mAnimation;
 
   std::shared_ptr<DirectionalLight> mDirectionalLight;
-  unsigned int mShadowDepthMapFBO = 0;
-  unsigned int mShadowDepthMapTextureId = 0;
 
   int mNumPointLightsInUse;
   const int MAXPOINTLIGHTS = 24;  // needs to match on shader

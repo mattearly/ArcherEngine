@@ -64,16 +64,13 @@ void main(){
 
   const std::string UBERSHADER_FRAG_CODE = R"(
 #version 460 core
-
+layout(location=0)out vec4 out_Color;
 in VS_OUT
 {
   vec3 Pos;
   vec2 TexUV;
   vec3 Norm;
 } fs_in;
-
-layout(location=0)out vec4 out_Color;
-
 struct Material {
   sampler2D Albedo;
   sampler2D Specular;
@@ -103,28 +100,26 @@ struct ReflectionModel {
   bool BlinnPhong;
 };
 
-uniform vec3 u_cam_pos;
-
 uniform int u_has_albedo_tex;
 uniform int u_has_specular_tex;
 uniform int u_has_normal_tex;
 uniform int u_has_emission_tex;
-uniform int u_has_shadows;
+uniform int u_has_dir_light_shadows;
+uniform int u_mesh_does_shadow;
+uniform int u_is_dir_light_on;
 
 uniform Material u_material; // textures 0 to 3
-
 uniform sampler2D u_shadow_map; // texture 4
-uniform mat4 u_light_space_matrix;  
 
 uniform ReflectionModel u_reflection_model;
+uniform vec3 u_cam_pos;
+uniform mat4 u_light_space_matrix;  
 
-const vec3 DEFAULTCOLOR = vec3(0.9,0.9,0.9);
-uniform int u_is_dir_light_on;
 uniform DirectionalLight u_dir_light;
 
 const int MAXPOINTLIGHTS = 24; // if changed, needs to match on light controllers
-uniform PointLight u_point_lights[MAXPOINTLIGHTS];
 uniform int u_num_point_lights_in_use;
+uniform PointLight u_point_lights[MAXPOINTLIGHTS];
 
 const int MAXSPOTLIGHTS = 12;
 uniform SpotLight u_spot_lights[MAXSPOTLIGHTS];
@@ -133,6 +128,8 @@ uniform int u_num_spot_lights_in_use;
 vec3 CalculateDirLight(vec3 normal, vec3 viewDir);
 vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir);
+
+const vec3 DEFAULTCOLOR = vec3(1.0, 0.0, 0.0);
 
 void main() {
   vec3 normal;
@@ -165,7 +162,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
 
   // shadows
   float shadow = 0.0;
-  if (u_has_shadows > 0) {
+  if (u_has_dir_light_shadows > 0 && u_mesh_does_shadow > 0) {
     vec4 FragPosLightSpace = u_light_space_matrix * vec4(fs_in.Pos, 1.0);
 
     vec3 projCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
@@ -181,7 +178,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
             shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
         }    
     }
-    shadow /= 9.0;
+    shadow /= 9.0; 
     if(projCoords.z > 1.0) {
         shadow = 0.0;
     }

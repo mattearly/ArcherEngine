@@ -26,7 +26,6 @@ bool Interface::Init() {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>();
-  mShadowDepthMapFBO = OpenGL::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
   SetIMGUI(true);
   SoundDevice::Init();
   InternalShaders::Init();
@@ -39,7 +38,6 @@ bool Interface::Init(const WindowOptions& winopts) {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>(winopts);
-  mShadowDepthMapFBO = OpenGL::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
   SetIMGUI(true);
   SoundDevice::Init();
   InternalShaders::Init();
@@ -52,7 +50,6 @@ bool Interface::Init(std::shared_ptr<WindowOptions> winopts) {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>(winopts);
-  mShadowDepthMapFBO = OpenGL::CreateDepthMap(1024, 1024, mShadowDepthMapTextureId);
   SetIMGUI(true);
   SoundDevice::Init();
   InternalShaders::Init();
@@ -412,6 +409,11 @@ void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff
     uber_shader->SetVec3("u_dir_light.Diffuse", mDirectionalLight->Diffuse);
     uber_shader->SetVec3("u_dir_light.Specular", mDirectionalLight->Specular);
   }
+}
+
+void Interface::SetDirectionalLightShadows(bool on_or_off) noexcept {
+  if (!mDirectionalLight) return;
+  mDirectionalLight->Shadows = on_or_off;
 }
 
 void Interface::RemoveDirectionalLight() {

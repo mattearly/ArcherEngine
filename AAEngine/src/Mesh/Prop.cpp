@@ -9,24 +9,25 @@
 namespace AA {
 
 Prop::Prop() {
+  cached_load_path.clear();
   stenciled = false;
   stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
   stenciled_with_normals = false;
   stencil_scale = 1.1f;
   render_shadows = true;
-  cull_frontface_for_shadows = true;
-  cached_load_path.clear();
+  cull_frontface_for_shadows = false;
   cull_backface = false;
 }
 
 Prop::Prop(const char* path) {
+  cached_load_path.clear();
   Load(path);
   stenciled = false;
   stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
   stenciled_with_normals = false;
   stencil_scale = 1.1f;
   render_shadows = true;
-  cull_frontface_for_shadows = true;
+  cull_frontface_for_shadows = false;
   cull_backface = false;
 }
 

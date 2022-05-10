@@ -105,21 +105,17 @@ void Interface::pre_render() {
   if (g_os_window_resized) {
     settle_window_resize_flag();
   }
-
   OpenGL::NewFrame();
 }
 
 // Renders visable props every frame
 void Interface::render() {
   if (!mCameras.empty()) {
-    if (mDirectionalLight) {
-      OpenGL::BatchRenderShadows(*mDirectionalLight, mProps, mAnimatedProps, mShadowDepthMapFBO);
-    }
+    if (mDirectionalLight) { OpenGL::BatchRenderShadows(*mDirectionalLight, mProps, mAnimatedProps); }
     for (const auto& cam : mCameras) {
       cam->NewFrame();
       OpenGL::RenderSkybox(cam->GetSkybox(), cam->GetViewport());
-      OpenGL::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport(), mShadowDepthMapTextureId);
-      
+      OpenGL::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport());
       if (mDebugLightIndicators) {
         for (const auto& pl : mPointLights)
           OpenGL::RenderDebugCube(pl->Position);
@@ -137,7 +133,6 @@ void Interface::render() {
     for (auto& oIU : onImGuiUpdate) { oIU.second(); }
     mIMGUI->Render();
   }
-
 }
 
 void Interface::post_render() {
