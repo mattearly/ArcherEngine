@@ -495,6 +495,7 @@ void Proc(void* proc) {
   }
 }
 
+
 /// <summary>
 /// Buffers and depth map of the specified width and height.
 /// derived from https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
@@ -502,7 +503,7 @@ void Proc(void* proc) {
 /// <param name="shadow_width"></param>
 /// <param name="shadow_height"></param>
 /// <returns>depth map FBO for rendering</returns>
-GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map) {
+GLuint CreateDepthMapFBO(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map_tex_id) {
   // create framebuffer object for rendering
   GLuint depthMapFBO;
   glGenFramebuffers(1, &depthMapFBO);
@@ -510,8 +511,8 @@ GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_dep
   // create 2d texture to use as framebuffer's depth buffer
   const GLuint SHADOW_WIDTH = shadow_width, SHADOW_HEIGHT = shadow_height;
   //GLuint depth_map;
-  glGenTextures(1, &out_depth_map);
-  glBindTexture(GL_TEXTURE_2D, out_depth_map);
+  glGenTextures(1, &out_depth_map_tex_id);
+  glBindTexture(GL_TEXTURE_2D, out_depth_map_tex_id);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -524,7 +525,7 @@ GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_dep
 
   // attach to framebuffers depth buffer
   glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, out_depth_map, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, out_depth_map_tex_id, 0);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -575,7 +576,6 @@ void SetStencilFuncToAlways() {
 void SetStencilFuncToNotEqual() {
   glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 }
-
 
 //
 // render graph stuff
