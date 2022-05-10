@@ -24,12 +24,12 @@ static struct OpenGLState {
 } ogl_state;
 
 
-void SetSamplerCube(int which, const int& cubetexID) {
+void SetSamplerCube(int which, const unsigned int& cubetexID) {
   glActiveTexture(GL_TEXTURE0 + which);
   glBindTexture(GL_TEXTURE_CUBE_MAP, cubetexID);
 }
 
-void SetTexture(int which, const int& textureID) {
+void SetTexture(int which, const unsigned int& textureID) {
   glActiveTexture(GL_TEXTURE0 + which);
   glBindTexture(GL_TEXTURE_2D, textureID);
 }

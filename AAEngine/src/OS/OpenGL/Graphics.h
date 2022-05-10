@@ -31,8 +31,8 @@ void DeleteTex(const GLsizei num_to_del, const GLuint& tex_d);
 GLuint CreateDepthMap(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map);
 void DeleteFramebuffer(const GLsizei num_to_del, GLuint& fbo);
 
-void SetSamplerCube(int which, const int& cubetexID);
-void SetTexture(int which, const int& textureID);
+void SetSamplerCube(int which, const unsigned int& cubetexID);
+void SetTexture(int which, const unsigned int& textureID);
 void DrawElements(unsigned int vao, unsigned int numElements);
 void DrawStrip(unsigned int vao, const int& count);
 void SetViewportSize(GLint x, GLint y, GLsizei w, GLsizei h);
