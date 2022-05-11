@@ -727,6 +727,7 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
   // is the prop set to have shadows on
   if (render_object->GetRenderShadows()) {
     uber_shader->SetInt("u_mesh_does_shadow", 1);
+    uber_shader->SetInt("u_shadow_map", 4);
   } else {
     uber_shader->SetInt("u_mesh_does_shadow", 0);
   }
@@ -768,7 +769,7 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
     uber_shader->SetBool("u_has_normal_tex", false);
     uber_shader->SetBool("u_has_emission_tex", false);
     uber_shader->SetFloat("u_material.Shininess", 0.0f);
-    // uber_shader->SetBool("u_reflection_model.Phong", false);
+    uber_shader->SetBool("u_reflection_model.Phong", false);
     uber_shader->SetBool("u_reflection_model.BlinnPhong", false);
   }
   ResetToDefault();
