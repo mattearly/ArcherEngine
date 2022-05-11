@@ -224,6 +224,8 @@ public:
   /// <param name="on_off"></param>
   void SetSunLightShadows(bool on_off) noexcept;
 
+  std::weak_ptr<SunLight> GetSunLight() noexcept;
+
   /// <summary>
   /// Removes the directional light.
   /// </summary>
