@@ -178,7 +178,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
             shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
         }    
     }
-    shadow /= 9.0; 
+    shadow /= 9.0;
     if(projCoords.z > 1.0) {
         shadow = 0.0;
     }

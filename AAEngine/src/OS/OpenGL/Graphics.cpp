@@ -707,7 +707,6 @@ void BatchRenderToViewport(
     RenderStenciled(std::dynamic_pointer_cast<AA::Prop>(render_object));
     InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
     InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
-
   }
 }
 
