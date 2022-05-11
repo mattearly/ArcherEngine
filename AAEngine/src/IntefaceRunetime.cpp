@@ -107,6 +107,10 @@ void Interface::pre_render() {
     settle_window_resize_flag();
   }
   OpenGL::NewFrame();
+
+  // shadows to default: off
+  InternalShaders::Uber::Get()->SetInt("u_has_dir_light_shadows", 0);
+  // handle sunlight if avail
   if (mSunLight) { OpenGL::BatchRenderShadows(*mSunLight, mProps, mAnimatedProps); }
 }
 

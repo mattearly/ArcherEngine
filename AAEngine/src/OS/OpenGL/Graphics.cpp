@@ -594,12 +594,7 @@ void BatchRenderShadows(
   const SunLight& dir_light,
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
   const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects) {
-  bool assume_shadows = false;
 
-  // shadows to default: off
-  {
-    InternalShaders::Uber::Get()->SetBool("u_has_dir_light_shadows", assume_shadows);  // discarding return value b/c switching shaders later in func
-  }
   if (!dir_light.Shadows)
     return;
 
@@ -629,40 +624,40 @@ void BatchRenderShadows(
   glBindFramebuffer(GL_FRAMEBUFFER, dir_light.GetFBO());
   glClear(GL_DEPTH_BUFFER_BIT);
 
+  bool assume_shadows = false;
   for (const auto& prop : render_objects) {
     if (prop->GetRenderShadows()) {
+      assume_shadows = true;  // at least 1 thing has shadows
       depth_shadow_renderer->SetMat4("u_model_matrix", prop->GetFMM());
       bool front_cull = prop->GetCullFrontFaceForShadows();
       if (front_cull) { glEnable(GL_CULL_FACE); glCullFace(GL_FRONT); }
       const auto& meshes = prop->GetMeshes();
       for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); }
       if (front_cull) { glCullFace(GL_BACK); glDisable(GL_CULL_FACE); }
-      assume_shadows = true;  // at least 1 thing has shadows
     }
   }
 
   for (const auto& anim_prop : animated_render_objects) {
     if (anim_prop->GetRenderShadows()) {
+      assume_shadows = true;  // at least 1 thing has shadows
       depth_shadow_renderer->SetMat4("u_model_matrix", anim_prop->GetFMM());
       bool front_cull = anim_prop->GetCullFrontFaceForShadows();
       if (front_cull) { glEnable(GL_CULL_FACE); glCullFace(GL_FRONT); }
       const auto& meshes = anim_prop->GetMeshes();
       for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); }
       if (front_cull) { glCullFace(GL_BACK); glDisable(GL_CULL_FACE); }
-      assume_shadows = true;  // at least 1 thing has shadows
     }
+  }
+  
+  if (assume_shadows) {  // at least 1 object needs dir light rendered shadows
+    auto* uber_shadows = InternalShaders::Uber::Get();
+    uber_shadows->SetInt("u_has_dir_light_shadows", 1);
+    uber_shadows->SetMat4("u_light_space_matrix", lightSpaceMatrix);
+    SetTexture(4, dir_light.GetTexID());
+
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-  {
-    if (assume_shadows) {  // at least 1 object needs dir light rendered shadows
-      auto* uber_shadows = InternalShaders::Uber::Get();
-      uber_shadows->SetInt("u_shadow_map", 4);
-      uber_shadows->SetBool("u_has_dir_light_shadows", true);
-      SetTexture(4, dir_light.GetTexID());
-    }
-  }
 }
 
 void BatchRenderToViewport(
