@@ -94,6 +94,10 @@ const bool Prop::GetBackFaceCull() const {
     return cull_backface;
 }
 
+const glm::vec3& Prop::GetLocation() const {
+  return spacial_data.mCurrentLocation;
+}
+
 void Prop::SetLocation(const glm::vec3& loc) {
   spacial_data.MoveTo(loc);
 }

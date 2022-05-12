@@ -37,6 +37,8 @@ public:
 
   const bool GetBackFaceCull() const;
 
+  const glm::vec3& GetLocation() const;
+
   /// <summary>
   /// Moves a prop to a location
   /// </summary>
