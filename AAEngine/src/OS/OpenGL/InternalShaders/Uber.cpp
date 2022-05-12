@@ -164,7 +164,6 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
   float shadow = 0.0;
   if (u_has_dir_light_shadows > 0 && u_mesh_does_shadow > 0) {
     vec4 FragPosLightSpace = u_light_space_matrix * vec4(fs_in.Pos, 1.0);
-
     vec3 projCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
     float closestDepth = texture(u_shadow_map, projCoords.xy).r; 
@@ -175,7 +174,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     for(int x = -1; x <= 1; ++x) {
         for(int y = -1; y <= 1; ++y) {
             float pcfDepth = texture(u_shadow_map, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
         }    
     }
     shadow /= 9.0;

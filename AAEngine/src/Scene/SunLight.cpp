@@ -11,8 +11,8 @@ SunLight::SunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec)
   Shadows = true;
 
   ShadowNearPlane = 1.0f;
-  ShadowFarPlane = 7.5f;
-  ShadowOrthoSize = 10.f;
+  ShadowFarPlane = 7.5f * 500;
+  ShadowOrthoSize = 10.f * 50;
 
   ShadowWidth = 1024;
   ShadowHeight = 1024;

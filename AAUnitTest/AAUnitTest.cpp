@@ -728,6 +728,7 @@ public:
       setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
       tg->g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
 
+
       // a flashlight
       tg->g_slight1_id = tg->g_aa_interface.AddSpotLight(
         local_camera_ref->GetPosition(),
@@ -741,6 +742,7 @@ public:
         glm::vec3(*tg->spot_light_diff),
         glm::vec3(*tg->spot_light_spec)
       );
+
 
       // a sunlight
       tg->g_aa_interface.SetSunLight(
@@ -770,17 +772,10 @@ public:
       tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(0, 0, 0));
 
       // peasant man
-      {
-        tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, 0, -200), glm::vec3(1.f));
-        //auto weak = tg->g_aa_interface.GetProp(tg->g_peasant_man_id);
-        //auto strong = weak.lock();
-        //strong->SetBackfaceCull(false);
-      }
+      tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, 0, -200), glm::vec3(1.f));
 
       // man with walking anim
       tg->g_walking_man_id = tg->g_aa_interface.AddAnimProp(tg->fullwalking_man.c_str(), glm::vec3(180, 0, -100), glm::vec3(1.f));
-      //tg->g_walking_anim_id = tg->g_aa_interface.AddAnimation(tg->fullwalking_man.c_str(), tg->g_walking_man_id);
-      //tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_walking_anim_id, tg->g_walking_man_id);
 
       // zombie with punching anim
       tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-180, 0, -100), glm::vec3(1.f));

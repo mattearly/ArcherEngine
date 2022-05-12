@@ -108,10 +108,10 @@ void Interface::pre_render() {
   }
   OpenGL::NewFrame();
 
-  // shadows to default: off
-  InternalShaders::Uber::Get()->SetInt("u_has_dir_light_shadows", 0);
-  // handle sunlight if avail
-  if (mSunLight) { OpenGL::BatchRenderShadows(*mSunLight, mProps, mAnimatedProps); }
+  InternalShaders::Uber::Get()->SetInt("u_has_dir_light_shadows", 0);  // shadows to default: off
+
+  if (mSunLight) { OpenGL::BatchRenderShadows(*mSunLight, mProps, mAnimatedProps); }  // may turn on dir shadows
+
 }
 
 // Renders visable props every frame

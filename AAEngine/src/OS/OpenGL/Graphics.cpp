@@ -503,11 +503,9 @@ GLuint CreateDepthMapFBO(GLuint shadow_width, GLuint shadow_height, GLuint& out_
   glGenFramebuffers(1, &depthMapFBO);
 
   // create 2d texture to use as framebuffer's depth buffer
-  const GLuint SHADOW_WIDTH = shadow_width, SHADOW_HEIGHT = shadow_height;
-  //GLuint depth_map;
   glGenTextures(1, &out_depth_map_tex_id);
   glBindTexture(GL_TEXTURE_2D, out_depth_map_tex_id);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_width, shadow_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -610,7 +608,7 @@ void BatchRenderShadows(
     dir_light.ShadowFarPlane);
 
   lightView = glm::lookAt(
-    -dir_light.Direction,
+    200.f * -dir_light.Direction,
     glm::vec3(0.0f),
     glm::vec3(0.0, 1.0, 0.0));
 
