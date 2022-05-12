@@ -139,7 +139,7 @@
     <ClInclude Include="include\AAEngine\Base\UniqueInstance.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Stencil.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Uber.h" />
-    <ClInclude Include="src\Scene\SunLight.h" />
+    <ClInclude Include="include\AAEngine\Scene\SunLight.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Mesh\Material.cpp" />

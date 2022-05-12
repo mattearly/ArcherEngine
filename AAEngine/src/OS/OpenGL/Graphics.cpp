@@ -3,6 +3,7 @@
 #include "../../Mesh/MeshInfo.h"
 #include "../../../include/AAEngine/Mesh/Prop.h"
 #include "../../../include/AAEngine/Mesh/AnimProp.h"
+#include "../../../include/AAEngine/Scene/SunLight.h"
 #include "../../Scene/Skybox.h"
 #include "InternalShaders/Uber.h"
 #include "InternalShaders/Stencil.h"
@@ -649,10 +650,8 @@ void BatchRenderShadows(
   
   if (assume_shadows) {  // at least 1 object needs dir light rendered shadows
     auto* uber_shadows = InternalShaders::Uber::Get();
-    uber_shadows->SetInt("u_has_dir_light_shadows", 1);
     uber_shadows->SetMat4("u_light_space_matrix", lightSpaceMatrix);
     SetTexture(4, dir_light.GetTexID());
-
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);

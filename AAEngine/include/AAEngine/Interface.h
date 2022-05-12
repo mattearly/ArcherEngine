@@ -15,6 +15,7 @@
 // internal
 #include "Controls/Input.h"
 #include "Scene/Camera.h"
+#include "Scene/SunLight.h"
 #include "OS/Interface/Window.h"
 #include "WindowOptions.h"
 #include "Mesh/Prop.h"
@@ -215,14 +216,6 @@ public:
   /// <param name="diff">Diffuse</param>
   /// <param name="spec">Specular</param>
   void SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
-
-  /// <summary>
-  /// Turns shadows cast from the directional light on or off at your request. 
-  /// Does nothing if mSunLight is not in use.
-  /// Effects the Render Pipeline for Directional Lighting Calculations if it mSunLight is in use.
-  /// </summary>
-  /// <param name="on_off"></param>
-  void SetSunLightShadows(bool on_off) noexcept;
 
   std::weak_ptr<SunLight> GetSunLight() noexcept;
 

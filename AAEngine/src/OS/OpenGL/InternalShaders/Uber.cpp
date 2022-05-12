@@ -83,6 +83,7 @@ struct DirectionalLight {
   vec3 Ambient;
   vec3 Diffuse;
   vec3 Specular;
+  int Shadows;  // true or false
 };
 struct PointLight {
   vec3 Position;
@@ -104,7 +105,6 @@ uniform int u_has_albedo_tex;
 uniform int u_has_specular_tex;
 uniform int u_has_normal_tex;
 uniform int u_has_emission_tex;
-uniform int u_has_dir_light_shadows;
 uniform int u_mesh_does_shadow;
 uniform int u_is_dir_light_on;
 
@@ -162,7 +162,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
 
   // shadows
   float shadow = 0.0;
-  if (u_has_dir_light_shadows > 0 && u_mesh_does_shadow > 0) {
+  if (u_dir_light.Shadows > 0 && u_mesh_does_shadow > 0) {
     vec4 FragPosLightSpace = u_light_space_matrix * vec4(fs_in.Pos, 1.0);
     vec3 projCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;

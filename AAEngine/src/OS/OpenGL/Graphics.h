@@ -1,7 +1,7 @@
 #pragma once
 #include "../../Mesh/Vertex.h"
-#include "../../Scene/SunLight.h"
 #include "../../Scene/Lights.h"
+#include "../../../include/AAEngine/Scene/SunLight.h"
 #include "../../../include/AAEngine/Scene/Viewport.h"
 
 #include <glad/glad.h>

@@ -406,11 +406,7 @@ void Interface::SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::v
   uber_shader->SetVec3("u_dir_light.Ambient", mSunLight->Ambient);
   uber_shader->SetVec3("u_dir_light.Diffuse", mSunLight->Diffuse);
   uber_shader->SetVec3("u_dir_light.Specular", mSunLight->Specular);
-}
-
-void Interface::SetSunLightShadows(bool on_or_off) noexcept {
-  if (!mSunLight) return;
-  mSunLight->Shadows = on_or_off;
+  uber_shader->SetBool("u_dir_light.Shadows", mSunLight->Shadows);
 }
 
 std::weak_ptr<SunLight> Interface::GetSunLight() noexcept {
@@ -419,8 +415,6 @@ std::weak_ptr<SunLight> Interface::GetSunLight() noexcept {
 
 void Interface::RemoveSunLight() {
   if (mSunLight) {
-    //assert(DefaultShaders::Get());
-    //InternalShaders::Uber::Get()->Use();
     InternalShaders::Uber::Get()->SetInt("u_is_dir_light_on", 0);
     mSunLight.reset();
   }

@@ -743,7 +743,6 @@ public:
         glm::vec3(*tg->spot_light_spec)
       );
 
-
       // a sunlight
       tg->g_aa_interface.SetSunLight(
         glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
@@ -752,6 +751,7 @@ public:
         glm::vec3(*tg->dir_light_spec));
 
       // a point light
+      tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
       tg->g_plight1_id = tg->g_aa_interface.AddPointLight(
         glm::vec3(tg->point_light_loc[0], tg->point_light_loc[1], tg->point_light_loc[2]),
         1.0f /* constant*/,
@@ -761,15 +761,14 @@ public:
         glm::vec3(*tg->point_light_diff),
         glm::vec3(*tg->point_light_spec));
 
-      tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
-
       // ground
       for (int i = -1; i < 2; i++)
         for (int j = -1; j < 2; j++)
           tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i * 400, -1, j * 400), glm::vec3(1.f));
 
       // untextured cube
-      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(0, 0, 0));
+      const int CUBE_SIZE = 20;
+      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(0, CUBE_SIZE, 0), glm::vec3(CUBE_SIZE));
 
       // peasant man
       tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, 0, -200), glm::vec3(1.f));
@@ -792,10 +791,11 @@ public:
       bool update_dlight_amb = ImGui::SliderFloat("Ambient", tg->dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
       bool update_dlight_diffuse = ImGui::SliderFloat("Diffuse", tg->dir_light_diff, 0.003f, 1.f, "%f", 1.0f);
       bool update_dlight_specular = ImGui::SliderFloat("Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
-      bool update_sun_shadows = ImGui::Checkbox("Shadows", &tg->sun_shadows);
+      bool update_sun_shadows = ImGui::Checkbox("RenderShadows", &tg->sun_shadows);
+      bool update_dlight_shadow_ = ImGui::SliderFloat("Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
 
       ImGui::Text("BULB");
-      bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
+      bool update_draw_plight1_loc_cube = ImGui::Checkbox("DrawBulb", &tg->debug_point_light);
       bool update_plight1_loc = ImGui::SliderFloat3("Location", tg->point_light_loc, -400.f, 400.f, "%f", 1.0f);
       bool update_plight1_linear = ImGui::SliderFloat("Linear", tg->point_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
       bool update_plight1_quadratic = ImGui::SliderFloat("Quadratic", tg->point_light_quadratic, 0.000001f, 0.005f, "%f", 1.0f);
@@ -813,12 +813,12 @@ public:
       bool update_slight1_spec = ImGui::SliderFloat("Spec", tg->spot_light_spec, 0.f, 1.f, "%f", 1.0f);
 
       ImGui::Text("VIEWPORT");
-      bool update_cam_fov = ImGui::SliderFloat("Cam FOV", tg->cam_fov, 30.f, 90.f);
+      bool update_cam_fov = ImGui::SliderFloat("FOV", tg->cam_fov, 30.f, 90.f);
       bool doToggleFS = ImGui::Button("Fullscreen");
       bool update_gamma_correction = ImGui::Checkbox("Apply Driver Gamma Correction", &tg->gamma_correction);
 
       static float xz_loc[2] = { 0.f, 0.f };
-      bool update_cube_loc = ImGui::SliderFloat2("CubeLoc", xz_loc, -100.f, 100.f, "%f", 1.0f);
+      bool update_cube_loc = ImGui::SliderFloat2("CubeLoc", xz_loc, -200.f, 200.f, "%f", 1.0f);
 
       tg->g_No = ImGui::Button("Report Broken");
       tg->g_Yes = ImGui::Button("Next Test");
@@ -834,19 +834,27 @@ public:
       }
 
       if (update_sun_shadows) {
-        tg->g_aa_interface.SetSunLightShadows(tg->sun_shadows);
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->Shadows = tg->sun_shadows;
       }
 
       if (update_cube_loc) {
         auto weak = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
         auto strong = weak.lock();
-        strong->SetLocation(glm::vec3(xz_loc[0], 1, xz_loc[1]));
+        strong->SetLocation(glm::vec3(xz_loc[0], strong->GetLocation().y, xz_loc[1]));
       }
 
-      if (update_plight1_loc || update_plight1_linear || update_plight1_quadratic || update_plight1_ambient
-        || update_plight1_diff || update_plight1_spec) {
-        tg->g_aa_interface.ChangePointLight(tg->g_plight1_id, glm::vec3(tg->point_light_loc[0], tg->point_light_loc[1], tg->point_light_loc[2]), *tg->point_light_constant, *tg->point_light_linear, *tg->point_light_quadratic,
-          glm::vec3(*tg->point_light_ambient), glm::vec3(*tg->point_light_diff), glm::vec3(*tg->point_light_spec));
+      if (update_plight1_loc || update_plight1_linear || update_plight1_quadratic || update_plight1_ambient || update_plight1_diff || update_plight1_spec) {
+        tg->g_aa_interface.ChangePointLight(
+          tg->g_plight1_id,
+          glm::vec3(tg->point_light_loc[0], tg->point_light_loc[1], tg->point_light_loc[2]),
+          *tg->point_light_constant,
+          *tg->point_light_linear,
+          *tg->point_light_quadratic,
+          glm::vec3(*tg->point_light_ambient),
+          glm::vec3(*tg->point_light_diff),
+          glm::vec3(*tg->point_light_spec));
       }
 
       if (/*update_slight1_loc || update_slight1_dir ||*/ update_slight1_inner || update_slight1_outer ||
@@ -982,10 +990,10 @@ public:
       ImGui::Begin("FireplaceSceneTest");
 
       ImGui::Text("SUN");
-      bool update_dlight_dir = ImGui::SliderFloat3("Sun Direction", tg->dir_light_direction, -1.0f, 1.0f, "%f", 1.0f);
-      bool update_dlight_amb = ImGui::SliderFloat("Sun Ambient", tg->dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
-      bool update_dlight_diffuse = ImGui::SliderFloat("Sun Diffuse", tg->dir_light_diff, 0.003f, 1.f, "%f", 1.0f);
-      bool update_dlight_specular = ImGui::SliderFloat("Sun Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
+      bool update_dlight_dir = ImGui::SliderFloat3("Direction", tg->dir_light_direction, -1.0f, 1.0f, "%f", 1.0f);
+      bool update_dlight_amb = ImGui::SliderFloat("Ambient", tg->dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
+      bool update_dlight_diffuse = ImGui::SliderFloat("Diffuse", tg->dir_light_diff, 0.003f, 1.f, "%f", 1.0f);
+      bool update_dlight_specular = ImGui::SliderFloat("Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
 
       ImGui::Text("BULB");
       bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
@@ -1006,12 +1014,12 @@ public:
       bool update_slight1_spec = ImGui::SliderFloat("Spec", tg->spot_light_spec, 0.f, 1.f, "%f", 1.0f);
 
       ImGui::Text("VIEWPORT");
-      bool update_cam_fov = ImGui::SliderFloat("Cam FOV", tg->cam_fov, 30.f, 90.f);
+      bool update_cam_fov = ImGui::SliderFloat("FOV", tg->cam_fov, 30.f, 90.f);
       bool doToggleFS = ImGui::Button("Toggle Fullscreen");
-      bool update_gamma_correction = ImGui::Checkbox("Apply Driver Gamma Correction", &tg->gamma_correction);
+      bool update_gamma_correction = ImGui::Checkbox("Driver Gamma Correction", &tg->gamma_correction);
 
-      tg->g_No = ImGui::Button("report broken");
-      tg->g_Yes = ImGui::Button("NEXT TEST");
+      tg->g_No = ImGui::Button("Report Broken");
+      tg->g_Yes = ImGui::Button("Quit");
       ImGui::End();
 
       // state update
@@ -1077,7 +1085,6 @@ public:
       if (tg->g_Yes || tg->g_No) {
         tg->g_aa_interface.Shutdown();
       };
-
       });
 
     int run_diag = tg->g_aa_interface.Run();

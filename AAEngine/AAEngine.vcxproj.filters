@@ -156,7 +156,7 @@
     <ClInclude Include="src\Mesh\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\SunLight.h">
+    <ClInclude Include="include\AAEngine\Scene\SunLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

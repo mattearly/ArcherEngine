@@ -5,7 +5,6 @@
 #include "../include/AAEngine/Mesh/AnimProp.h"
 #include "OS/OpenGL/Graphics.h"
 #include "Physics/NVidiaPhysx.h"
-#include "Scene/SunLight.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
 #include "Sound/SoundDevice.h"
@@ -108,10 +107,7 @@ void Interface::pre_render() {
   }
   OpenGL::NewFrame();
 
-  InternalShaders::Uber::Get()->SetInt("u_has_dir_light_shadows", 0);  // shadows to default: off
-
-  if (mSunLight) { OpenGL::BatchRenderShadows(*mSunLight, mProps, mAnimatedProps); }  // may turn on dir shadows
-
+  if (mSunLight) { OpenGL::BatchRenderShadows(*mSunLight, mProps, mAnimatedProps); }
 }
 
 // Renders visable props every frame

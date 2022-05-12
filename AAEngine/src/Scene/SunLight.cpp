@@ -1,4 +1,4 @@
-#include "SunLight.h"
+#include "../../include/AAEngine/Scene/SunLight.h"
 #include "../OS/OpenGL/Graphics.h"
 namespace AA {
 
