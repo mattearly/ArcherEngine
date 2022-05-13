@@ -84,6 +84,7 @@ struct DirectionalLight {
   vec3 Diffuse;
   vec3 Specular;
   int Shadows;  // true or false
+  float ShadowBiasMin, ShadowBiasMax;
 };
 struct PointLight {
   vec3 Position;
@@ -105,8 +106,8 @@ uniform int u_has_albedo_tex;
 uniform int u_has_specular_tex;
 uniform int u_has_normal_tex;
 uniform int u_has_emission_tex;
-uniform int u_mesh_does_shadow;
 uniform int u_is_dir_light_on;
+uniform int u_mesh_does_shadow;
 
 uniform Material u_material; // textures 0 to 3
 uniform sampler2D u_shadow_map; // texture 4
@@ -169,7 +170,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     float closestDepth = texture(u_shadow_map, projCoords.xy).r; 
     float currentDepth = projCoords.z;
     vec3 normal = normalize(fs_in.Norm);
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float bias = max(u_dir_light.ShadowBiasMax * (1.0 - dot(normal, lightDir)), u_dir_light.ShadowBiasMin);
     vec2 texelSize = 1.0 / textureSize(u_shadow_map, 0);
     for(int x = -1; x <= 1; ++x) {
         for(int y = -1; y <= 1; ++y) {

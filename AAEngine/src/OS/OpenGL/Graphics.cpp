@@ -593,10 +593,10 @@ void BatchRenderShadows(
   const SunLight& dir_light,
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
   const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects) {
-
-  if (!dir_light.Shadows)
+  if (!dir_light.Shadows) {
+    InternalShaders::Uber::Get()->SetInt("u_dir_light.Shadows", 0);
     return;
-
+  }
   glm::mat4 lightProjection, lightView;
   glm::mat4 lightSpaceMatrix;
 
@@ -650,6 +650,7 @@ void BatchRenderShadows(
   
   if (assume_shadows) {  // at least 1 object needs dir light rendered shadows
     auto* uber_shadows = InternalShaders::Uber::Get();
+    uber_shadows->SetInt("u_dir_light.Shadows", 1);
     uber_shadows->SetMat4("u_light_space_matrix", lightSpaceMatrix);
     SetTexture(4, dir_light.GetTexID());
   }
@@ -724,8 +725,6 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
   if (render_object->GetRenderShadows()) {
     uber_shader->SetInt("u_mesh_does_shadow", 1);
     uber_shader->SetInt("u_shadow_map", 4);
-  } else {
-    uber_shader->SetInt("u_mesh_does_shadow", 0);
   }
 
   if (render_object->GetBackFaceCull()) {
@@ -767,6 +766,8 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
     uber_shader->SetFloat("u_material.Shininess", 0.0f);
     uber_shader->SetBool("u_reflection_model.Phong", false);
     uber_shader->SetBool("u_reflection_model.BlinnPhong", false);
+    uber_shader->SetInt("u_mesh_does_shadow", 0);
+
   }
   ResetToDefault();
 }

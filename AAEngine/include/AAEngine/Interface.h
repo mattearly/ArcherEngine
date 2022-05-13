@@ -26,7 +26,6 @@ namespace AA {
 class imGUI;
 class AnimProp;
 class Animation;
-class SunLight;
 struct PointLight;
 struct SpotLight;
 class LongSound;

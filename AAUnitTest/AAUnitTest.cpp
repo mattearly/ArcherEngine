@@ -192,16 +192,21 @@ public:
     TestGlobals::reset();
   }
 
-  TEST_METHOD(Models) {
+  TEST_METHOD(SunLightShadows) {
     TestGlobals::init();
 
     // init engine
     {
+      AA::WindowOptions win_opts;
+      win_opts._windowing_mode = AA::WINDOW_MODE::WINDOWED;
+      win_opts._height = 480;
+      win_opts._width = 640;
+      win_opts._title = "SunLightShadowsTests";
       bool initSuccess = tg->g_aa_interface.Init();
       Assert::AreEqual(initSuccess, true);
     }
 
-    // camera that stays screen size
+    // camera that stays screen size & fly controls
     {
       tg->g_window_ref = tg->g_aa_interface.GetWindow();
       std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
@@ -236,25 +241,67 @@ public:
       glm::vec3(*tg->dir_light_spec));
 
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
-      ImGui::Begin("Model Test");
-      bool update_dlight_dir = ImGui::SliderFloat3("Light Direction", tg->dir_light_direction, -1.f, 1.f, "%f", 1.0f);
-      bool update_dlight_amb = ImGui::SliderFloat("Light Ambient", tg->dir_light_amb, 0.f, 1.f, "%f", 1.0f);
-      bool update_dlight_diffuse = ImGui::SliderFloat("Light Diffuse", tg->dir_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_dlight_specular = ImGui::SliderFloat("Light Spec", tg->dir_light_spec, 0.f, 1.f, "%f", 1.0f);
+      ImGui::Begin("SunLightShadowsTest");
+      bool update_sun_dir = ImGui::SliderFloat3("Direction", tg->dir_light_direction, -1.f, 1.f, "%f", 1.0f);
+      bool update_sun_amb = ImGui::SliderFloat("Ambient", tg->dir_light_amb, 0.f, 1.f, "%f", 1.0f);
+      bool update_sun_diffuse = ImGui::SliderFloat("Diffuse", tg->dir_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_sun_specular = ImGui::SliderFloat("Spec", tg->dir_light_spec, 0.f, 1.f, "%f", 1.0f);
+
+      bool update_sun_shadows = ImGui::Checkbox("RenderShadows", &tg->sun_shadows);
+      bool update_sun_shadow_far = ImGui::SliderFloat("ShadowFarPlane", tg->sun_far_shadow, 10.f, 750.f, "%f", 1.0f);
+      bool update_sun_shadow_bias_min = ImGui::SliderFloat("ShadowBiasMin", tg->sun_bias_min, 0.00005f, 0.06f, "%f", 1.0f);
+      bool update_sun_shadow_bias_max = ImGui::SliderFloat("ShadowBiasMax", tg->sun_bias_max_multi, 0.001f, 0.06f, "%f", 1.0f);
+
+      bool update_sun_shadow_ortho_size = ImGui::SliderFloat("ShadowOrthoSize", tg->sun_shadow_ortho_size, 10.f, 500.f, "%f", 1.0f);
+
+
+
       ImGui::Text("Does everything look right?");
       tg->g_Yes = ImGui::Button("Yes");
       tg->g_No = ImGui::Button("No");
       ImGui::End();
 
       // state update
-      if (update_dlight_dir || update_dlight_amb || update_dlight_diffuse || update_dlight_specular)
+      if (update_sun_dir || update_sun_amb || update_sun_diffuse || update_sun_specular)
         tg->g_aa_interface.SetSunLight(
           glm::vec3(tg->dir_light_direction[0], tg->dir_light_direction[1], tg->dir_light_direction[2]),
           glm::vec3(*tg->dir_light_amb),
           glm::vec3(*tg->dir_light_diff),
           glm::vec3(*tg->dir_light_spec));
+
+      if (update_sun_shadows) {
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->Shadows = tg->sun_shadows;
+      }
+
+      if (update_sun_shadow_far) {
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->ShadowFarPlane = *tg->sun_far_shadow;
+      }
+
+      if (update_sun_shadow_bias_min) {
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->SetShadowBiasMin(*tg->sun_bias_min);
+      }
+
+      if (update_sun_shadow_bias_max) {
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->SetShadowBiasMax(*tg->sun_bias_max_multi);
+      }
+      
+      if (update_sun_shadow_ortho_size) {
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->ShadowOrthoSize = *tg->sun_shadow_ortho_size;
+      }
+
       if (tg->g_Yes || tg->g_No) { tg->g_aa_interface.Shutdown(); };
       });
+
 
     tg->g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
 
@@ -792,7 +839,6 @@ public:
       bool update_dlight_diffuse = ImGui::SliderFloat("Diffuse", tg->dir_light_diff, 0.003f, 1.f, "%f", 1.0f);
       bool update_dlight_specular = ImGui::SliderFloat("Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
       bool update_sun_shadows = ImGui::Checkbox("RenderShadows", &tg->sun_shadows);
-      bool update_dlight_shadow_ = ImGui::SliderFloat("Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
 
       ImGui::Text("BULB");
       bool update_draw_plight1_loc_cube = ImGui::Checkbox("DrawBulb", &tg->debug_point_light);
