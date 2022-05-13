@@ -398,9 +398,12 @@ void Interface::SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::v
     mSunLight->Ambient = amb;
     mSunLight->Diffuse = diff;
     mSunLight->Specular = spec;
+    auto uber_shader = InternalShaders::Uber::Get();
+    uber_shader->SetVec3("u_dir_light.Direction", mSunLight->Direction);
+    uber_shader->SetVec3("u_dir_light.Ambient",   mSunLight->Ambient);
+    uber_shader->SetVec3("u_dir_light.Diffuse",   mSunLight->Diffuse);
+    uber_shader->SetVec3("u_dir_light.Specular",  mSunLight->Specular);
   }
-
-
 }
 
 std::weak_ptr<SunLight> Interface::GetSunLight() noexcept {
