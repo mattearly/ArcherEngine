@@ -15,6 +15,7 @@
 // internal
 #include "Controls/Input.h"
 #include "Scene/Camera.h"
+#include "Scene/SunLight.h"
 #include "OS/Interface/Window.h"
 #include "WindowOptions.h"
 #include "Mesh/Prop.h"
@@ -25,7 +26,6 @@ namespace AA {
 class imGUI;
 class AnimProp;
 class Animation;
-struct DirectionalLight;
 struct PointLight;
 struct SpotLight;
 class LongSound;
@@ -125,7 +125,7 @@ public:
   /// </summary>
   /// <param name="id">id of the prop to access</param>
   /// <returns>a weak ptr to a prop</returns>
-  std::weak_ptr<Prop> GetProp(const unsigned int id) const;
+  [[nodiscard]] std::weak_ptr<Prop> GetProp(const unsigned int id) const;
 
   /// <summary>
   /// Adds a Animated Prop.
@@ -214,12 +214,14 @@ public:
   /// <param name="amb">Ambient</param>
   /// <param name="diff">Diffuse</param>
   /// <param name="spec">Specular</param>
-  void SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
+  void SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
+
+  std::weak_ptr<SunLight> GetSunLight() noexcept;
 
   /// <summary>
   /// Removes the directional light.
   /// </summary>
-  void RemoveDirectionalLight();
+  void RemoveSunLight();
 
   /// <summary>
   /// Adds a point light to the default lit shader.
@@ -516,7 +518,7 @@ private:
 
   std::vector<std::shared_ptr<Animation> > mAnimation;
 
-  std::shared_ptr<DirectionalLight> mDirectionalLight;
+  std::shared_ptr<SunLight> mSunLight;
 
   int mNumPointLightsInUse;
   const int MAXPOINTLIGHTS = 24;  // needs to match on shader

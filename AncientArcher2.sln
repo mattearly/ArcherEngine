@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DownloadTestResources", "Do
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AAUnitTest", "AAUnitTest\AAUnitTest.vcxproj", "{DCFE0D4D-C2D3-4040-9045-9C57CE5C6A1C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AAEditor", "AAEditor\AAEditor.vcxproj", "{206255CA-88C3-4F3A-BD09-686C6D975019}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -27,6 +29,10 @@ Global
 		{DCFE0D4D-C2D3-4040-9045-9C57CE5C6A1C}.Debug|x64.Build.0 = Debug|x64
 		{DCFE0D4D-C2D3-4040-9045-9C57CE5C6A1C}.Release|x64.ActiveCfg = Release|x64
 		{DCFE0D4D-C2D3-4040-9045-9C57CE5C6A1C}.Release|x64.Build.0 = Release|x64
+		{206255CA-88C3-4F3A-BD09-686C6D975019}.Debug|x64.ActiveCfg = Debug|x64
+		{206255CA-88C3-4F3A-BD09-686C6D975019}.Debug|x64.Build.0 = Debug|x64
+		{206255CA-88C3-4F3A-BD09-686C6D975019}.Release|x64.ActiveCfg = Release|x64
+		{206255CA-88C3-4F3A-BD09-686C6D975019}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

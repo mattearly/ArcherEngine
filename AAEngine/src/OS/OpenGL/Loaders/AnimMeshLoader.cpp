@@ -1,7 +1,7 @@
 #include "AnimMeshLoader.h"
 #include "TextureLoader.h"
-#include "OpenGL/OGLGraphics.h"
-#include "../../include/AAEngine/Mesh/AnimProp.h"
+#include "../Graphics.h"
+#include "../../../../include/AAEngine/Mesh/AnimProp.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
@@ -88,7 +88,7 @@ static std::string LastLoadedAnimPath;
 void AnimMeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
   for (const auto& a_mesh : toUnload) {
     local_helper_decrement_all_loaded_anim_models_ref(path_to_unload);
-    OGLGraphics::DeleteMesh(a_mesh.vao);
+    OpenGL::DeleteMesh(1u, a_mesh.vao);
     TextureLoader::UnloadTexture(a_mesh.textureDrawIds);
   }
 }
@@ -247,10 +247,9 @@ void AnimMeshLoader::recursive_processNode(AnimProp& out_model, aiNode* node, co
 
     extractBoneWeightForVertices(out_model, loaded_verts, ai_mesh, scene);
 
-    tmp_mesh.backface_culled = false;
     tmp_mesh.local_transform = aiMat4_to_glmMat4(node->mTransformation);
     tmp_mesh.shininess = 1.f;
-    tmp_mesh.vao = OGLGraphics::UploadStatic3DMesh(loaded_verts, loaded_indices);  // upload for rendering capabilites
+    tmp_mesh.vao = OpenGL::UploadStatic3DMesh(loaded_verts, loaded_indices);  // upload for rendering capabilites
     tmp_mesh.numElements = static_cast<unsigned int>(loaded_indices.size());
 
     out_model.mMeshes.push_back(tmp_mesh);  // populate our our model file

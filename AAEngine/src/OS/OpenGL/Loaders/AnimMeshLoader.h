@@ -1,5 +1,5 @@
 #pragma once
-#include "../../include/AAEngine/Mesh/AnimProp.h"
+#include "../../../../AAEngine/include/AAEngine/Mesh/AnimProp.h"
 namespace AA {
 
 // ModelLoader is pretty specific to opengl currently

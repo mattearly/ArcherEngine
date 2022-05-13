@@ -50,33 +50,38 @@ public:
   bool g_Yes = false, g_No = false;
 
   float  dir_light_direction[3] = { -0.33f, -1.0f, -0.33f };
-  float* dir_light_diff = new float(0.63f);
-  float* dir_light_amb = new float(0.0633f);
-  float* dir_light_spec = new float(0.0653f);
+  float* dir_light_amb = new float(0.03f);
+  float* dir_light_diff = new float(0.6f);
+  float* dir_light_spec = new float(0.6f);
+  bool sun_shadows = true;
+  float* sun_far_shadow = new float(750.f);
+  float* sun_bias_min = new float(0.0005f);
+  float* sun_bias_max_multi = new float(0.025f);
+  float* sun_shadow_ortho_size = new float(50.f);
 
   unsigned int g_plight1_id = 0;
-  float  point_light_loc[3] = { 0.0f, 0.0f, 0.0f };
+  float  point_light_loc[3] = { -194.0f, 125.0f, -32.0f };
   float* point_light_constant = new float(1.0f);
   float* point_light_linear = new float(0.027f);
   float* point_light_quadratic = new float(0.0028f);
   float* point_light_ambient = new float(.3f);
   float* point_light_diff = new float(.5f);
   float* point_light_spec = new float(.3f);
-  bool debug_point_light = false;
+  bool debug_point_light = true;
 
   unsigned int g_slight1_id = 0;
   float  spot_light_loc[3] = { 0.0f, 0.0f, 0.0f };
   float  spot_light_dir[3] = { 1.f, 1.f, 1.f };
-  float* spot_light_inner = new float(1.2f);
-  float* spot_light_outer = new float(6.0f);
-  float* spot_light_constant = new float(1.0f);
-  float* spot_light_linear = new float(0.027f);
-  float* spot_light_quadratic = new float(0.0028f);
-  float* spot_light_ambient = new float(1.0f);
+  float* spot_light_inner = new float(0.05f);
+  float* spot_light_outer = new float(1.50f);
+  float* spot_light_constant = new float(3.0f);
+  float* spot_light_linear = new float(0.0027f);
+  float* spot_light_quadratic = new float(0.00028f);
+  float* spot_light_ambient = new float(0.0f);
   float* spot_light_diff = new float(1.0f);
   float* spot_light_spec = new float(1.0f);
 
-  float* cam_fov = new float(45.f);
+  float* cam_fov = new float(85.f);
 
   bool gamma_correction = false;
 } *tg;

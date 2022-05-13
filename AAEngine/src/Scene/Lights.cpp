@@ -2,9 +2,6 @@
 
 namespace AA {
 
-DirectionalLight::DirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec)
-  : Direction(dir), Ambient(amb), Diffuse(diff), Specular(spec) {}
-
 SpotLight::SpotLight(glm::vec3 pos, glm::vec3 dir, float inner,
   float outer, float constant, float linear, float quad,
   glm::vec3 amb, glm::vec3 diff, glm::vec3 spec)

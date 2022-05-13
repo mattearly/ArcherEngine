@@ -3,7 +3,7 @@
 #include "../include/AAEngine/OS/Interface/Window.h"
 #include "../include/AAEngine/Mesh/Prop.h"
 #include "../include/AAEngine/Mesh/AnimProp.h"
-#include "OS/OpenGL/OGLGraphics.h"
+#include "OS/OpenGL/Graphics.h"
 #include "OS/OpenGL/InternalShaders/Init.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Scene/Lights.h"
@@ -112,7 +112,7 @@ void Interface::SoftReset() noexcept {
   mAnimatedProps.clear();
   mAnimation.clear();
 
-  RemoveDirectionalLight();
+  RemoveSunLight();
 
   for (auto& pointlight : mPointLights) {
     RemovePointLight(pointlight->id);
@@ -220,7 +220,7 @@ bool Interface::RemoveProp(const unsigned int id) {
   return (before_size != after_size);
 }
 
-std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
+[[nodiscard]] std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       return prop;
@@ -390,33 +390,27 @@ void Interface::SimulateWorldPhysics(bool status) {
 //
 // Lights Interface
 //
-void Interface::SetDirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
-  if (!mDirectionalLight) {
-    mDirectionalLight = std::make_shared<DirectionalLight>(dir, amb, diff, spec);
+void Interface::SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
+  if (!mSunLight) {
+    mSunLight = std::make_shared<SunLight>(dir, amb, diff, spec);
   } else {
-    mDirectionalLight->Direction = dir;
-    mDirectionalLight->Ambient = amb;
-    mDirectionalLight->Diffuse = diff;
-    mDirectionalLight->Specular = spec;
+    mSunLight->Direction = dir;
+    mSunLight->Ambient = amb;
+    mSunLight->Diffuse = diff;
+    mSunLight->Specular = spec;
   }
 
-  {
-    //assert(DefaultShaders::Get());
-    InternalShaders::Uber::Get()->Use();
-    InternalShaders::Uber::Get()->SetInt("u_is_dir_light_on", 1);
-    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Direction", mDirectionalLight->Direction);
-    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Ambient", mDirectionalLight->Ambient);
-    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Diffuse", mDirectionalLight->Diffuse);
-    InternalShaders::Uber::Get()->SetVec3("u_dir_light.Specular", mDirectionalLight->Specular);
-  }
+
 }
 
-void Interface::RemoveDirectionalLight() {
-  if (mDirectionalLight) {
-    //assert(DefaultShaders::Get());
-    //InternalShaders::Uber::Get()->Use();
+std::weak_ptr<SunLight> Interface::GetSunLight() noexcept {
+  return mSunLight;
+}
+
+void Interface::RemoveSunLight() {
+  if (mSunLight) {
     InternalShaders::Uber::Get()->SetInt("u_is_dir_light_on", 0);
-    mDirectionalLight.reset();
+    mSunLight.reset();
   }
 }
 
@@ -932,7 +926,7 @@ void Interface::SetIMGUI(const bool value) {
 }
 
 void Interface::SetWindowClearColor(glm::vec3 color) noexcept {
-  OGLGraphics::SetViewportClearColor(color);
+  OpenGL::SetViewportClearColor(color);
 }
 
 std::weak_ptr<Window> Interface::GetWindow() {

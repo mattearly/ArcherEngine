@@ -1,27 +1,34 @@
 #include "../../include/AAEngine/Mesh/Prop.h"
-#include "../OS/OpenGL/OGLGraphics.h"
+#include "../OS/OpenGL/Graphics.h"
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/OpenGL/InternalShaders/Uber.h"
 #include "../OS/OpenGL/InternalShaders/Stencil.h"
-#include "../OS/MeshLoader.h"
+#include "../OS/OpenGL/Loaders/MeshLoader.h"
 #include <glm/gtx/transform.hpp>
 
 namespace AA {
 
 Prop::Prop() {
+  cached_load_path.clear();
   stenciled = false;
   stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
   stenciled_with_normals = false;
   stencil_scale = 1.1f;
-  cached_load_path.clear();
+  render_shadows = true;
+  cull_frontface_for_shadows = true;
+  cull_backface = true;
 }
 
 Prop::Prop(const char* path) {
+  cached_load_path.clear();
   Load(path);
   stenciled = false;
   stencil_color = glm::vec3(0.1f, 0.87f, 0.1f);
   stenciled_with_normals = false;
   stencil_scale = 1.1f;
+  render_shadows = true;
+  cull_frontface_for_shadows = true;
+  cull_backface = true;
 }
 
 void Prop::RemoveCache() {
@@ -77,6 +84,20 @@ const glm::vec3 Prop::GetStencilColor() const {
   return stencil_color;
 }
 
+const bool Prop::GetRenderShadows() const { return render_shadows; }
+
+const bool Prop::GetCullFrontFaceForShadows() const {
+    return cull_frontface_for_shadows;
+}
+
+const bool Prop::GetBackFaceCull() const {
+    return cull_backface;
+}
+
+const glm::vec3& Prop::GetLocation() const {
+  return spacial_data.mCurrentLocation;
+}
+
 void Prop::SetLocation(const glm::vec3& loc) {
   spacial_data.MoveTo(loc);
 }
@@ -103,6 +124,18 @@ void Prop::SetStencilWithNormals(const bool& tf) {
 
 void Prop::SetStencilScale(const float& scale) {
   stencil_scale = scale;
+}
+
+void Prop::SetRenderShadows(const bool tf) {
+  render_shadows = tf;
+}
+
+void Prop::SetFrontFaceCullForShadows(const bool tf) {
+  cull_frontface_for_shadows = tf;
+}
+
+void Prop::SetBackfaceCull(const bool tf) {
+  cull_backface = tf;
 }
 
 }  // end namespace AA

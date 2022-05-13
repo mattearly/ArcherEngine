@@ -1,19 +1,22 @@
 #pragma once
+
+#include "../../include/AAEngine/Base/UniqueInstance.h"
+#include "../../include/AAEngine/Mesh/AnimProp.h"
+#include "../Math/Conversions.h"
+#include "Vertex.h"
+#include "Bone.h"
+#include "Skeleton.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 #include <string>
 #include <fstream>
 #include <sstream>  
 #include <vector>
 #include <map>
-#include "Bone.h"
-#include "../../include/AAEngine/Mesh/AnimProp.h"
-#include "../Math/Conversions.h"
-#include "../OS/Vertex.h"
-#include "../../include/AAEngine/Base/UniqueInstance.h"
-#include "Skeleton.h"
 
 namespace AA {
 
