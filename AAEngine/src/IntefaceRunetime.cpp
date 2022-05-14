@@ -107,12 +107,12 @@ void Interface::pre_render() {
   }
   OpenGL::NewFrame();
 
-  if (mSunLight) { OpenGL::BatchRenderShadows(*mSunLight, mProps, mAnimatedProps); }
 }
 
 // Renders visable props every frame
 void Interface::render() {
   if (!mCameras.empty()) {
+    if (mSunLight) { OpenGL::BatchRenderShadows(mCameras.front()->GetPosition(), *mSunLight, mProps, mAnimatedProps); }
     for (const auto& cam : mCameras) {
       cam->NewFrame();
       OpenGL::RenderSkybox(cam->GetSkybox(), cam->GetViewport());

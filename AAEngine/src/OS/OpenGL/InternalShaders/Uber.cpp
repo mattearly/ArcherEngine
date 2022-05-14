@@ -113,7 +113,7 @@ uniform Material u_material; // textures 0 to 3
 uniform sampler2D u_shadow_map; // texture 4
 
 uniform ReflectionModel u_reflection_model;
-uniform vec3 u_cam_pos;
+uniform vec3 u_view_pos;
 uniform mat4 u_light_space_matrix;  
 
 uniform DirectionalLight u_dir_light;
@@ -141,7 +141,7 @@ void main() {
     //normal = normalize(fs_in.Norm * 2.0 - 1.0);
     normal = fs_in.Norm;
   }
-  vec3 view_dir = normalize(u_cam_pos - fs_in.Pos);
+  vec3 view_dir = normalize(u_view_pos - fs_in.Pos);
   vec3 result;
   if (u_is_dir_light_on > 0) { result += CalculateDirLight(normal, view_dir); }
   int i = 0;
@@ -173,10 +173,10 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     float bias = max(u_dir_light.ShadowBiasMax * (1.0 - dot(normal, lightDir)), u_dir_light.ShadowBiasMin);
     vec2 texelSize = 1.0 / textureSize(u_shadow_map, 0);
     for(int x = -1; x <= 1; ++x) {
-        for(int y = -1; y <= 1; ++y) {
-            float pcfDepth = texture(u_shadow_map, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
-        }    
+      for(int y = -1; y <= 1; ++y) {
+        float pcfDepth = texture(u_shadow_map, projCoords.xy + vec2(x, y) * texelSize).r; 
+        shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+      }    
     }
     shadow /= 9.0;
     if(projCoords.z > 1.0) {
@@ -215,7 +215,6 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
 
   return (ambient + (1.0 - shadow) * (diffuse + specular));
 }
-
 
 vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
   vec3 lightDir = normalize(light.Position - fs_in.Pos);
@@ -302,7 +301,6 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   }
   return (ambient + diffuse + specular);
 }
-
 )";
 
   UBERSHADER = new OGLShader(UBERSHADER_VERT_CODE.c_str(), UBERSHADER_FRAG_CODE.c_str());

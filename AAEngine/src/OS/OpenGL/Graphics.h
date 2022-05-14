@@ -69,11 +69,13 @@ void ResetToDefault();
 /// <summary>
 /// render depth of scene to texture from light perspective
 /// </summary>
+/// <param name="view_pos"></param>
 /// <param name="dir_light"></param>
 /// <param name="render_objects"></param>
 /// <param name="animated_render_objects"></param>
 /// <param name="depthMapFBO"></param>
 void BatchRenderShadows(
+  const glm::vec3 view_pos,
   const SunLight& dir_light,
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
   const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects);

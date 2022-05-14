@@ -16,8 +16,8 @@ public:
   const unsigned int& GetTexID() const;
   void SetShadowBiasMin(float min) noexcept;
   void SetShadowBiasMax(float max) noexcept;
-  unsigned int ShadowWidth;
-  unsigned int ShadowHeight;
+
+  unsigned int ShadowWidth, ShadowHeight;
   float ShadowNearPlane, ShadowFarPlane;
   float ShadowOrthoSize;
 

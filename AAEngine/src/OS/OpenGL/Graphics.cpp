@@ -582,14 +582,8 @@ void ResetToDefault() {
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 }
 
-/// <summary>
-/// render depth of scene to texture from light perspective
-/// </summary>
-/// <param name="dir_light">this should only ever get called if the dir light being passed in is valid</param>
-/// <param name="render_objects"></param>
-/// <param name="animated_render_objects"></param>
-/// <param name="fbo">the fraembuffer to render the shadwos to</param>
 void BatchRenderShadows(
+  const glm::vec3 view_pos, 
   const SunLight& dir_light,
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
   const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects) {
@@ -609,8 +603,8 @@ void BatchRenderShadows(
     dir_light.ShadowFarPlane);
 
   lightView = glm::lookAt(
-    200.f * -dir_light.Direction,
-    glm::vec3(0.0f),
+    view_pos + (200.f * -dir_light.Direction),
+    view_pos + glm::vec3(0.0f),
     glm::vec3(0.0, 1.0, 0.0));
 
   lightSpaceMatrix = lightProjection * lightView;
