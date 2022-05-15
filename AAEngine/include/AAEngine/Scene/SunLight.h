@@ -9,7 +9,7 @@ public:
   glm::vec3 Direction, Ambient, Diffuse, Specular;
 
   // directional shadows
-  bool Shadows = true;
+  bool Shadows;
 
   // oglshadersettings
   const unsigned int& GetFBO() const;

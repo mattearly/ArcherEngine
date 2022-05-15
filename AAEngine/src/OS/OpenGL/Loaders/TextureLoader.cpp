@@ -207,15 +207,8 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
     std::size_t the_last_slash = orginalFilePath.find_last_of("/\\") + 1;
     std::size_t the_last_dot = orginalFilePath.find_last_of(".");
     std::string model_dir = orginalFilePath.substr(0, the_last_slash);  // path to filename's dir
-    std::string model_file_extension = orginalFilePath.substr(
-      static_cast<std::basic_string<char,
-      std::char_traits<char>,
-      std::allocator<char>>::size_type>(the_last_dot) + 1);  // get the file extension (type of file)
-    std::string model_file_name = orginalFilePath.substr(
-      the_last_slash,
-      static_cast<std::basic_string<char,
-      std::char_traits<char>,
-      std::allocator<char>>::size_type>(the_last_dot) - the_last_slash);  // get the name of the file
+    std::string model_file_extension = orginalFilePath.substr(the_last_dot + 1u);  // get the file extension (type of file)
+    std::string model_file_name = orginalFilePath.substr(the_last_slash, the_last_dot - the_last_slash);  // get the name of the file
 
     // starting attempts at loading textures from a variety of possibilities
     // try from embedded

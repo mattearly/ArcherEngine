@@ -471,6 +471,7 @@ public:
   /// <returns>unique access id</returns>
   unsigned int AddToOnQuit(void(*function)());
 
+
   /// <summary>
   /// Removes by id
   /// </summary>
