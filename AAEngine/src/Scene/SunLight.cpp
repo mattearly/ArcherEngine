@@ -13,12 +13,12 @@ SunLight::SunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec)
 
   ShadowNearPlane = 1.0f;
   ShadowFarPlane = 7.5f * 100;
-  ShadowOrthoSize = 10.f * 50;
+  ShadowOrthoSize = 500.f;
 
   ShadowWidth = 1024;
   ShadowHeight = 1024;
 
-  ShadowBiasMin = 0.05f;
+  ShadowBiasMin = 0.025f;
   ShadowBiasMax = 0.0005f;
 
   auto uber_shader = InternalShaders::Uber::Get();

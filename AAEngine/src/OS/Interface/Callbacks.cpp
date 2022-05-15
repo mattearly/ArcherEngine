@@ -1,4 +1,5 @@
 #include "../../../include/AAEngine/OS/Interface/Window.h"
+#include "../../../include/AAEngine/Support.h"
 #include <memory>
 
 namespace AA {
@@ -23,15 +24,15 @@ void GLFWERRORCALLBACK(int e, const char* msg) {
 }
 
 void FRAMEBUFFERSIZESETCALLBACK(GLFWwindow* window, int w, int h) {
-  // be sure size is valid for our mins
-  if (w < WindowOptions::_MIN_WIDTH)
-    w = WindowOptions::_MIN_WIDTH;
-  if (h < WindowOptions::_MIN_HEIGHT)
-    h = WindowOptions::_MIN_HEIGHT;
+  // be sure size is valid for default mins
+  if (w < WindowOptions::ENGINE_MIN_WIDTH)
+    w = WindowOptions::ENGINE_MIN_WIDTH;
+  if (h < WindowOptions::ENGINE_MIN_HEIGHT)
+    h = WindowOptions::ENGINE_MIN_HEIGHT;
 
-  // Update Cached Width & Height
   Window* self = (Window*)glfwGetWindowUserPointer(window);
 
+  // Update Cached Width & Height
   // be sure size is valid for our user preferred mins
   if (w < self->mWindowOptions->_min_width)
     w = self->mWindowOptions->_min_width;
@@ -65,6 +66,49 @@ void ONWINDOWFOCUSCALLBACK(GLFWwindow* window, int focused) {
     //std::cout << "Focus left window\n";
   //}
 }
+
+bool is_model_file(const char* path) {
+  const std::string tmp = path;
+  const std::size_t last_dot = tmp.find_last_of(".");
+  const std::string tmp_ext = tmp.substr(last_dot);
+  bool valid = false;
+
+  for (auto s : valid_model_handles) {
+    if (tmp_ext == s) {
+      valid = true;
+      break;  // valid model extension
+    }
+  }
+
+  return valid; // didn't determine valid
+}
+
+bool is_sound_file(const char* path) {
+  for (auto s : valid_sound_handles) {
+    std::string tmp = path;
+    std::size_t last_dot = tmp.find_last_of(".");
+    std::string tmp_ext = tmp.substr(last_dot);
+    if (tmp_ext == s) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void ONDRAGANDDROP(GLFWwindow* window, int count, const char** paths) {
+  int i = 0;
+  while (i < count) {
+    if (is_model_file(paths[i])) {
+      Window* self = (Window*)glfwGetWindowUserPointer(window);
+      self->dropped_paths.push(paths[i]);
+    } /*else if (is_sound_file(paths[i])) {
+      Window* self = (Window*)glfwGetWindowUserPointer(window);
+      self->dropped_paths.push(paths[i]);
+    }*/
+    i++;
+  }
+}
+
 
 void KEYCALLBACK(GLFWwindow* w, int key, int scancode, int action, int mods) {
   // esc

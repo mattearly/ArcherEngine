@@ -92,6 +92,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\AAEngine\Support.h" />
     <ClInclude Include="src\Mesh\Material.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Basic.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\ShaderUniforms.h" />

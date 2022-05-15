@@ -159,6 +159,9 @@
     <ClInclude Include="include\AAEngine\Scene\SunLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\AAEngine\Support.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sound\SoundDevice.cpp">

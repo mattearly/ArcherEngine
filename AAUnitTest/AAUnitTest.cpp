@@ -68,7 +68,7 @@ public:
         std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
         int new_width = local_window_ref->GetCurrentWidth() + 50;
         int new_height = local_window_ref->GetCurrentHeight() + 50;
-        local_window_ref->SetNewWidthAndHeight(new_width, new_height);
+        local_window_ref->SetCurrentWidthAndHeight(new_width, new_height);
         Assert::AreEqual(local_window_ref->GetCurrentWidth(), new_width);
         Assert::AreEqual(local_window_ref->GetCurrentHeight(), new_height);
       }
@@ -76,7 +76,7 @@ public:
       if (!MinSizeChanged) {
         tg->g_window_ref = tg->g_aa_interface.GetWindow();
         std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
-        local_window_ref->SetNewMinWidthAndHeight(min_w_h[0], min_w_h[1]);
+        local_window_ref->SetMinWidthAndHeight(min_w_h[0], min_w_h[1]);
         min_w_h[0] = local_window_ref->GetCurrentMinWidth();
         min_w_h[1] = local_window_ref->GetCurrentMinHeight();
       }
@@ -85,7 +85,7 @@ public:
         std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
         int new_width = local_window_ref->GetCurrentWidth() - 50;
         int new_height = local_window_ref->GetCurrentHeight() - 50;
-        local_window_ref->SetNewWidthAndHeight(new_width, new_height);
+        local_window_ref->SetCurrentWidthAndHeight(new_width, new_height);
       }
       if (tg->g_Yes || tg->g_No) { tg->g_aa_interface.Shutdown(); };
       });

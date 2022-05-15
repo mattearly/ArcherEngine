@@ -139,6 +139,10 @@ void Interface::render() {
 void Interface::post_render() {
   mWindow->swap_buffers();
   g_poll_input_events();
+  if (mWindow) if (mWindow->mWindowOptions->_editor_drag_and_drop) if (!mWindow->dropped_paths.empty()) {
+    AddProp(mWindow->dropped_paths.front().c_str());  // process queue item
+    mWindow->dropped_paths.pop();  // remove from queue
+  }
 }
 
 // Runs Once on Engine Shutdown

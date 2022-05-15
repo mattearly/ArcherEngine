@@ -7,6 +7,7 @@
 #include <utility>
 #include <memory>
 #include <string>
+#include <queue>
 
 namespace AA {
 
@@ -34,22 +35,24 @@ public:
   /// </summary>
   void SetCursorToNormal() noexcept;
 
-  void SetNewWidthAndHeight(int w, int h) noexcept;
-  void SetNewMinWidthAndHeight(int w, int h) noexcept;
-
   bool GetShouldClose();
 
   int GetCurrentWidth();
   int GetCurrentHeight();
 
-  int GetCurrentMinWidth();
-  int GetCurrentMinHeight();
+  void SetCurrentWidthAndHeight(int w, int h) noexcept;
+  void SetMinWidthAndHeight(int w, int h) noexcept;
+
+  int GetCurrentMinWidth() const;
+  int GetCurrentMinHeight() const;
 
   void SetGammaCorrection(const bool enabled);
-  bool GetGammaCorrection();
+  bool GetGammaCorrection() const;
 
   void Close();
 
+  void SetDragAndDrop(const bool enabled);
+  bool IsDragAndDropEnabled() const;
 private:
 
   std::weak_ptr<WindowOptions> get_and_note_window_options();
@@ -57,7 +60,6 @@ private:
   void default_init();
   void set_default_callbacks();
   void apply_window_sizings_from_current_options() noexcept;
-  void swap_buffers();
 
   GLFWwindow* mGLFWwindow = nullptr;
   std::shared_ptr<WindowOptions> mWindowOptions;
@@ -67,9 +69,11 @@ private:
   // any callback that casts the glfwwindow to user_ptr and then accesses private members needs to be a friend
   friend void FRAMEBUFFERSIZESETCALLBACK(GLFWwindow* window, int w, int h);
   friend void ONWINDOWFOCUSCALLBACK(GLFWwindow* window, int focused);
+  friend void ONDRAGANDDROP(GLFWwindow* window, int count, const char** paths);
 
-  // the Instance class is a controller of this class
-  friend class Interface;
+  friend class Interface;  // to call swap_buffers when needed, todo: come up with a better solution, as we don't really want the interface to have full access to the window but it is okay for now.
+  void swap_buffers();
+  std::queue<std::string> dropped_paths;
 };
 
 }  // end namespace AA
