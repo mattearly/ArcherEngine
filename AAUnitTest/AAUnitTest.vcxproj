@@ -99,6 +99,7 @@
   <ItemGroup>
     <ClInclude Include="fly_cam_script.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="sun_light_script.h" />
     <ClInclude Include="test_globals.h" />
   </ItemGroup>
   <ItemGroup>

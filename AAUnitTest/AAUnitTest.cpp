@@ -240,6 +240,16 @@ public:
       glm::vec3(*tg->dir_light_diff),
       glm::vec3(*tg->dir_light_spec));
 
+    { // set shadow defaults
+      auto weak = tg->g_aa_interface.GetSunLight();
+      auto strong = weak.lock();
+      strong->Shadows = tg->sun_shadows;
+      strong->ShadowFarPlane = *tg->sun_far_shadow;
+      strong->ShadowOrthoSize = *tg->sun_shadow_ortho_size;
+      strong->SetShadowBiasMin(*tg->sun_bias_min);
+      strong->SetShadowBiasMax(*tg->sun_bias_max_multi);
+    }
+
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("SunLightShadowsTest");
       bool update_sun_dir = ImGui::SliderFloat3("Direction", tg->dir_light_direction, -1.f, 1.f, "%f", 1.0f);
@@ -251,8 +261,7 @@ public:
       bool update_sun_shadow_far = ImGui::SliderFloat("ShadowFarPlane", tg->sun_far_shadow, 10.f, 750.f, "%f", 1.0f);
       bool update_sun_shadow_bias_min = ImGui::SliderFloat("ShadowBiasMin", tg->sun_bias_min, 0.00005f, 0.06f, "%f", 1.0f);
       bool update_sun_shadow_bias_max = ImGui::SliderFloat("ShadowBiasMax", tg->sun_bias_max_multi, 0.001f, 0.06f, "%f", 1.0f);
-
-      bool update_sun_shadow_ortho_size = ImGui::SliderFloat("ShadowOrthoSize", tg->sun_shadow_ortho_size, 10.f, 500.f, "%f", 1.0f);
+      bool update_sun_shadow_ortho_size = ImGui::SliderFloat("ShadowOrthoSize", tg->sun_shadow_ortho_size, 10.f, 1024.f, "%f", 1.0f);
 
 
 
@@ -507,8 +516,9 @@ public:
       tg->g_camera_ref = tg->g_aa_interface.GetCamera(tg->g_cam_id);
       std::shared_ptr<AA::Camera> local_camera_ref = tg->g_camera_ref.lock();
       local_camera_ref->SetKeepCameraToWindowSize(true);
-      local_camera_ref->SetFOV(75.f);
+      local_camera_ref->SetFOV(*tg->cam_fov);
       setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
+      tg->g_aa_interface.AddToOnQuit([]() {turn_off_fly(); });
     }
 
     // load models
@@ -796,6 +806,16 @@ public:
         glm::vec3(*tg->dir_light_amb),
         glm::vec3(*tg->dir_light_diff),
         glm::vec3(*tg->dir_light_spec));
+      
+      { // set shadow defaults
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->Shadows = tg->sun_shadows;
+        strong->ShadowFarPlane = *tg->sun_far_shadow;
+        strong->ShadowOrthoSize = *tg->sun_shadow_ortho_size;
+        strong->SetShadowBiasMin(*tg->sun_bias_min);
+        strong->SetShadowBiasMax(*tg->sun_bias_max_multi);
+      }
 
       // a point light
       tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
@@ -838,25 +858,30 @@ public:
       bool update_dlight_amb = ImGui::SliderFloat("Ambient", tg->dir_light_amb, 0.003f, 1.f, "%f", 1.0f);
       bool update_dlight_diffuse = ImGui::SliderFloat("Diffuse", tg->dir_light_diff, 0.003f, 1.f, "%f", 1.0f);
       bool update_dlight_specular = ImGui::SliderFloat("Spec", tg->dir_light_spec, 0.003f, 1.f, "%f", 1.0f);
-      bool update_sun_shadows = ImGui::Checkbox("RenderShadows", &tg->sun_shadows);
+      // sun shadows
+      bool update_sun_shadows = ImGui::Checkbox("RenderSunShadows", &tg->sun_shadows);
+      bool update_sun_shadow_far = ImGui::SliderFloat("ShadowFarPlane", tg->sun_far_shadow, 10.f, 750.f, "%f", 1.0f);
+      bool update_sun_shadow_bias_min = ImGui::SliderFloat("ShadowBiasMin", tg->sun_bias_min, 0.00005f, 0.06f, "%f", 1.0f);
+      bool update_sun_shadow_bias_max = ImGui::SliderFloat("ShadowBiasMax", tg->sun_bias_max_multi, 0.001f, 0.06f, "%f", 1.0f);
+      bool update_sun_shadow_ortho_size = ImGui::SliderFloat("ShadowOrthoSize", tg->sun_shadow_ortho_size, 10.f, 1024.f, "%f", 1.0f);
 
       ImGui::Text("BULB");
       bool update_draw_plight1_loc_cube = ImGui::Checkbox("DrawBulb", &tg->debug_point_light);
-      bool update_plight1_loc = ImGui::SliderFloat3("Location", tg->point_light_loc, -400.f, 400.f, "%f", 1.0f);
-      bool update_plight1_linear = ImGui::SliderFloat("Linear", tg->point_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
-      bool update_plight1_quadratic = ImGui::SliderFloat("Quadratic", tg->point_light_quadratic, 0.000001f, 0.005f, "%f", 1.0f);
-      bool update_plight1_ambient = ImGui::SliderFloat("Ambient", tg->point_light_ambient, 0.f, 1.f, "%f", 1.0f);
-      bool update_plight1_diff = ImGui::SliderFloat("Diffuse", tg->point_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_plight1_spec = ImGui::SliderFloat("Spec", tg->point_light_spec, 0.f, 1.f, "%f", 1.0f);
+      bool update_plight1_loc = ImGui::SliderFloat3("Location_p", tg->point_light_loc, -400.f, 400.f, "%f", 1.0f);
+      bool update_plight1_linear = ImGui::SliderFloat("Linear_p", tg->point_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
+      bool update_plight1_quadratic = ImGui::SliderFloat("Quadratic_p", tg->point_light_quadratic, 0.000001f, 0.005f, "%f", 1.0f);
+      bool update_plight1_ambient = ImGui::SliderFloat("Ambient_p", tg->point_light_ambient, 0.f, 1.f, "%f", 1.0f);
+      bool update_plight1_diff = ImGui::SliderFloat("Diffuse_p", tg->point_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_plight1_spec = ImGui::SliderFloat("Spec_p", tg->point_light_spec, 0.f, 1.f, "%f", 1.0f);
 
       ImGui::Text("FLASHLIGHT");
-      bool update_slight1_inner = ImGui::SliderFloat("Inner", tg->spot_light_inner, 0.03f, 19.f, "%f", 1.0f);
-      bool update_slight1_outer = ImGui::SliderFloat("Outer", tg->spot_light_outer, 0.1f, 40.f, "%f", 1.0f);
-      bool update_slight1_linear = ImGui::SliderFloat("Linear", tg->spot_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
-      bool update_slight1_quadratic = ImGui::SliderFloat("Quadratic", tg->spot_light_quadratic, 0.0001f, 0.005f, "%f", 1.0f);
-      bool update_slight1_ambient = ImGui::SliderFloat("Ambient", tg->spot_light_ambient, 0.f, 1.f, "%f", 1.0f);
-      bool update_slight1_diff = ImGui::SliderFloat("Diffuse", tg->spot_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_slight1_spec = ImGui::SliderFloat("Spec", tg->spot_light_spec, 0.f, 1.f, "%f", 1.0f);
+      bool update_slight1_inner = ImGui::SliderFloat("Inner_s", tg->spot_light_inner, 0.03f, 19.f, "%f", 1.0f);
+      bool update_slight1_outer = ImGui::SliderFloat("Outer_s", tg->spot_light_outer, 0.1f, 40.f, "%f", 1.0f);
+      bool update_slight1_linear = ImGui::SliderFloat("Linear_s", tg->spot_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
+      bool update_slight1_quadratic = ImGui::SliderFloat("Quadratic_s", tg->spot_light_quadratic, 0.0001f, 0.005f, "%f", 1.0f);
+      bool update_slight1_ambient = ImGui::SliderFloat("Ambient_s", tg->spot_light_ambient, 0.f, 1.f, "%f", 1.0f);
+      bool update_slight1_diff = ImGui::SliderFloat("Diffuse_s", tg->spot_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_slight1_spec = ImGui::SliderFloat("Spec_s", tg->spot_light_spec, 0.f, 1.f, "%f", 1.0f);
 
       ImGui::Text("VIEWPORT");
       bool update_cam_fov = ImGui::SliderFloat("FOV", tg->cam_fov, 30.f, 90.f);
@@ -884,6 +909,31 @@ public:
         auto strong = weak.lock();
         strong->Shadows = tg->sun_shadows;
       }
+
+      if (update_sun_shadow_far) {
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->ShadowFarPlane = *tg->sun_far_shadow;
+      }
+
+      if (update_sun_shadow_bias_min) {
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->SetShadowBiasMin(*tg->sun_bias_min);
+      }
+
+      if (update_sun_shadow_bias_max) {
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->SetShadowBiasMax(*tg->sun_bias_max_multi);
+      }
+
+      if (update_sun_shadow_ortho_size) {
+        auto weak = tg->g_aa_interface.GetSunLight();
+        auto strong = weak.lock();
+        strong->ShadowOrthoSize = *tg->sun_shadow_ortho_size;
+      }
+
 
       if (update_cube_loc) {
         auto weak = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);

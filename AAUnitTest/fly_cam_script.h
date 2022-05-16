@@ -2,7 +2,7 @@
 #include "test_globals.h"
 
 // globals local to this file
-bool fly_setup = false;
+static bool fly_setup = false;
 struct Move {
   bool forward = false;
   bool backwards = false;
@@ -27,7 +27,7 @@ unsigned int fly_mouse_handling_func = 0;
 unsigned int fly_update_func = 0;
 std::weak_ptr<AA::Window> fly_window;
 std::weak_ptr<AA::Camera> fly_camera;
-AA::Interface* interface_ref = nullptr;
+static AA::Interface* interface_ref = nullptr;
 
 void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
   if (fly_setup) return;
