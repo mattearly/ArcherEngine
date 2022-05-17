@@ -564,11 +564,11 @@ public:
 
     }
 
-      setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
+    setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
 
-      // load sun
-      load_sun(tg->g_aa_interface);
-      tg->g_aa_interface.AddToOnQuit([]() {unload_sun(); });
+    // load sun
+    load_sun(tg->g_aa_interface);
+    tg->g_aa_interface.AddToOnQuit([]() {unload_sun(); });
 
     tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("ReuseModelResources");
@@ -899,8 +899,8 @@ public:
 
 
     // load sun
-      load_sun(tg->g_aa_interface);
-      tg->g_aa_interface.AddToOnQuit([]() {unload_sun(); });
+    load_sun(tg->g_aa_interface);
+    tg->g_aa_interface.AddToOnQuit([]() {unload_sun(); });
 
     // ImGui Controls
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
