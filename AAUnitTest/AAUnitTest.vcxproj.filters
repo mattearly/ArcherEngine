@@ -32,5 +32,8 @@
     <ClInclude Include="test_globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sun_light_script.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
