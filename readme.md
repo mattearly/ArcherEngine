@@ -10,7 +10,7 @@
 - Models with Skeletal Animations and some Controls.
 - Cameras Settings and Controls.
 - 3-D SoundEffects.
-- Background Sound tracks.
+- Background Soundtracks.
 - Customize Run time scripts with C++ Lambdas.
 
 ## The Docs

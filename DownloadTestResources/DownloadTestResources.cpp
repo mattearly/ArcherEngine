@@ -1,6 +1,6 @@
 /*  Written to download the files necessary to run all the tests.
-    Run this before running all the tests to have it download yoru assest.
-    You then need to unzip the assests into the 'RuntimeFiles' directory.
+    Run this before running all the tests to have it download your assets.
+    You then need to unzip the assets into the 'RuntimeFiles' directory.
 - MJE
 */
 
