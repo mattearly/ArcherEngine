@@ -49,15 +49,7 @@ public:
 
   bool g_Yes = false, g_No = false;
 
-  float  dir_light_direction[3] = { -0.33f, -1.0f, -0.33f };
-  float* dir_light_amb = new float(0.03f);
-  float* dir_light_diff = new float(0.6f);
-  float* dir_light_spec = new float(0.6f);
-  bool sun_shadows = true;
-  float* sun_far_shadow = new float(1024.f);
-  float* sun_bias_min = new float(0.0005f);
-  float* sun_bias_max_multi = new float(0.025f);
-  float* sun_shadow_ortho_size = new float(1024.f);
+
 
   unsigned int g_plight1_id = 0;
   float  point_light_loc[3] = { -194.0f, 125.0f, -32.0f };

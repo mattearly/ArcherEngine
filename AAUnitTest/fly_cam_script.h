@@ -1,5 +1,4 @@
 #pragma once
-#include "test_globals.h"
 
 // globals local to this file
 static bool fly_setup = false;
