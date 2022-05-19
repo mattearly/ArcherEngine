@@ -9,9 +9,8 @@ void Uber::Init() {
   if (UBERSHADER)
     return;
 
-  const std::string UBERSHADER_VERT_CODE =
-    R"(
-#version 430 core
+  const std::string UBERSHADER_VERT_CODE = R"(
+#version 460 core
 
 layout(location=0)in vec3 inPos;
 layout(location=1)in vec2 inTexUV;
@@ -50,31 +49,28 @@ void main(){
       totalPosition += localPosition * inWeights[i];
     }
     vs_out.Pos = (u_model_matrix * totalPosition).xyz;
-    vs_out.Norm = inNorm;
   } else {  // Not Animating
-    mat3 normal_matrix = transpose(inverse(mat3(u_model_matrix)));
     vs_out.Pos = (u_model_matrix * vec4(inPos, 1.0)).xyz;
-    vs_out.Norm = normalize(normal_matrix * inNorm);
     totalPosition = vec4(inPos, 1.0);
   }
+
+  mat3 normalMatrix = transpose(inverse(mat3(u_model_matrix)));
+  vs_out.Norm = normalize(normalMatrix * inNorm);
+
   mat4 viewMatrix = u_view_matrix * u_model_matrix;
   gl_Position = u_projection_matrix * viewMatrix * totalPosition;
 }
 )";
 
-  const std::string UBERSHADER_FRAG_CODE =
-    R"(
-#version 430 core
-
+  const std::string UBERSHADER_FRAG_CODE = R"(
+#version 460 core
+layout(location=0)out vec4 out_Color;
 in VS_OUT
 {
   vec3 Pos;
   vec2 TexUV;
   vec3 Norm;
 } fs_in;
-
-layout(location=0)out vec4 out_Color;
-
 struct Material {
   sampler2D Albedo;
   sampler2D Specular;
@@ -87,6 +83,8 @@ struct DirectionalLight {
   vec3 Ambient;
   vec3 Diffuse;
   vec3 Specular;
+  int Shadows;  // true or false
+  float ShadowBiasMin, ShadowBiasMax;
 };
 struct PointLight {
   vec3 Position;
@@ -99,32 +97,30 @@ struct SpotLight {
   float Constant, Linear, Quadratic;
   vec3 Ambient, Diffuse, Specular;
 };
-
 struct ReflectionModel {
   bool Phong;
   bool BlinnPhong;
 };
 
-
-uniform vec3 u_view_pos;
-
 uniform int u_has_albedo_tex;
 uniform int u_has_specular_tex;
 uniform int u_has_normal_tex;
 uniform int u_has_emission_tex;
-uniform int u_has_shadows;
-
-uniform Material u_material;
-uniform ReflectionModel u_reflection_model;
-uniform sampler2D u_shadow_map;
-
-const vec3 DEFAULTCOLOR = vec3(0.9,0.9,0.9);
 uniform int u_is_dir_light_on;
+uniform int u_mesh_does_shadow;
+
+uniform Material u_material; // textures 0 to 3
+uniform sampler2D u_shadow_map; // texture 4
+
+uniform ReflectionModel u_reflection_model;
+uniform vec3 u_view_pos;
+uniform mat4 u_light_space_matrix;  
+
 uniform DirectionalLight u_dir_light;
 
 const int MAXPOINTLIGHTS = 24; // if changed, needs to match on light controllers
-uniform PointLight u_point_lights[MAXPOINTLIGHTS];
 uniform int u_num_point_lights_in_use;
+uniform PointLight u_point_lights[MAXPOINTLIGHTS];
 
 const int MAXSPOTLIGHTS = 12;
 uniform SpotLight u_spot_lights[MAXSPOTLIGHTS];
@@ -133,6 +129,8 @@ uniform int u_num_spot_lights_in_use;
 vec3 CalculateDirLight(vec3 normal, vec3 viewDir);
 vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir);
+
+const vec3 DEFAULTCOLOR = vec3(1.0, 0.0, 0.0);
 
 void main() {
   vec3 normal;
@@ -161,6 +159,30 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
   vec3 lightDir = normalize(-u_dir_light.Direction);
   // diffuse shading
   float diff = max(dot(normal, lightDir), 0.);
+  float dotLightNormal = dot(-u_dir_light.Direction, normal);
+
+  // shadows
+  float shadow = 0.0;
+  if (u_dir_light.Shadows > 0 && u_mesh_does_shadow > 0) {
+    vec4 FragPosLightSpace = u_light_space_matrix * vec4(fs_in.Pos, 1.0);
+    vec3 projCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+    float closestDepth = texture(u_shadow_map, projCoords.xy).r; 
+    float currentDepth = projCoords.z;
+    vec3 normal = normalize(fs_in.Norm);
+    float bias = max(u_dir_light.ShadowBiasMax * (1.0 - dot(normal, lightDir)), u_dir_light.ShadowBiasMin);
+    vec2 texelSize = 1.0 / textureSize(u_shadow_map, 0);
+    for(int x = -1; x <= 1; ++x) {
+      for(int y = -1; y <= 1; ++y) {
+        float pcfDepth = texture(u_shadow_map, projCoords.xy + vec2(x, y) * texelSize).r; 
+        shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+      }    
+    }
+    shadow /= 9.0;
+    if(projCoords.z > 1.0) {
+        shadow = 0.0;
+    }
+  }
 
   // specular shading
   float spec;
@@ -191,9 +213,8 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     specular = u_dir_light.Specular * spec * 0.0;  // no shine    
   }
 
-  return(ambient + diffuse + specular);
+  return (ambient + (1.0 - shadow) * (diffuse + specular));
 }
-
 
 vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
   vec3 lightDir = normalize(light.Position - fs_in.Pos);
@@ -270,7 +291,6 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   }
   ambient *= attenuation * intensity;
   diffuse *= attenuation * intensity;
-  
 
   vec3 specular;
   if (u_has_specular_tex > 0) {
@@ -281,9 +301,6 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   }
   return (ambient + diffuse + specular);
 }
-
-
-
 )";
 
   UBERSHADER = new OGLShader(UBERSHADER_VERT_CODE.c_str(), UBERSHADER_FRAG_CODE.c_str());

@@ -118,6 +118,8 @@ public:
   /// <returns>render depth variable</returns>
   const int GetRenderDepth() const;
 
+  const float GetRenderDistance() const;
+
   /// <summary>
   /// Gets the snapping current option
   /// </summary>
@@ -211,10 +213,10 @@ protected:
 
 private:
 
-  bool camera_projection_changed = true;
+  bool camera_projection_changed;
   void update_cached_projection_matrix();
 
-  bool camera_vectors_changed = true;
+  bool camera_vectors_changed;
   void update_camera_vectors_tick();
   void update_cached_view_matrix();
 

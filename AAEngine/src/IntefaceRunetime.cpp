@@ -3,7 +3,7 @@
 #include "../include/AAEngine/OS/Interface/Window.h"
 #include "../include/AAEngine/Mesh/Prop.h"
 #include "../include/AAEngine/Mesh/AnimProp.h"
-#include "OS/OpenGL/OGLGraphics.h"
+#include "OS/OpenGL/Graphics.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
@@ -105,28 +105,28 @@ void Interface::pre_render() {
   if (g_os_window_resized) {
     settle_window_resize_flag();
   }
+  OpenGL::NewFrame();
 
-  OGLGraphics::NewFrame();
 }
 
 // Renders visable props every frame
 void Interface::render() {
   if (!mCameras.empty()) {
+    if (mSunLight) { OpenGL::BatchRenderShadows(mCameras.front()->GetPosition(), *mSunLight, mProps, mAnimatedProps); }
     for (const auto& cam : mCameras) {
       cam->NewFrame();
-      OGLGraphics::RenderSkybox(cam->GetSkybox());
-      OGLGraphics::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport());
+      OpenGL::RenderSkybox(cam->GetSkybox(), cam->GetViewport());
+      OpenGL::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport());
       if (mDebugLightIndicators) {
         for (const auto& pl : mPointLights)
-          OGLGraphics::RenderWhiteCubeAt(pl->Position);
+          OpenGL::RenderDebugCube(pl->Position);
         //for (const auto& sl : mSpotLights)
-        //  OGLGraphics::RenderSpotLightIcon(sl->Position, sl->Direction);
-        //if (mDirectionalLight)
-        //  OGLGraphics::RenderDirectionalLightArrowIcon(mDirectionalLight->Direction);
+        //  OpenGL::RenderSpotLightIcon(sl->Position, sl->Direction);
+        //if (mSunLight)
+        //  OpenGL::RenderDirectionalLightArrowIcon(mSunLight->Direction);
       }
     }
   }
-
 
   // render imgui interface
   if (mIMGUI) {
@@ -134,12 +134,15 @@ void Interface::render() {
     for (auto& oIU : onImGuiUpdate) { oIU.second(); }
     mIMGUI->Render();
   }
-
 }
 
 void Interface::post_render() {
   mWindow->swap_buffers();
   g_poll_input_events();
+  if (mWindow) if (mWindow->mWindowOptions->_editor_drag_and_drop) if (!mWindow->dropped_paths.empty()) {
+    AddProp(mWindow->dropped_paths.front().c_str());  // process queue item
+    mWindow->dropped_paths.pop();  // remove from queue
+  }
 }
 
 // Runs Once on Engine Shutdown
@@ -151,7 +154,7 @@ void Interface::teardown() {
 
   mCameras.clear();
 
-  Primatives::unload_all();
+  OpenGL::Primitives::unload_all();
 
   ClearAllRuntimeLamdaFunctions();
 
@@ -173,7 +176,7 @@ void Interface::teardown() {
   }
   mAnimation.clear();
 
-  mDirectionalLight.reset();
+  mSunLight.reset();
   mPointLights.clear();
   mSpotLights.clear();
   mDebugLightIndicators = false;

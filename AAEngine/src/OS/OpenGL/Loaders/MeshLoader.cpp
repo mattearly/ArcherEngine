@@ -1,8 +1,8 @@
 #include "MeshLoader.h"
 #include "TextureLoader.h"
-#include "Vertex.h"
-#include "../Math/Conversions.h"
-#include "OpenGL/OGLGraphics.h"
+#include "../../../Mesh/Vertex.h"
+#include "../../../Math/Conversions.h"
+#include "../Graphics.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -163,7 +163,7 @@ void MeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const s
     local_helper_decrement_all_loaded_models_ref(path_to_unload);
 
     // delete mesh data from graphics card
-    OGLGraphics::DeleteMesh(a_mesh.vao);
+    OpenGL::DeleteMesh(1u, a_mesh.vao);
 
     // delete texture (or reduce reference count of them if others still in use)
     TextureLoader::UnloadTexture(a_mesh.textureDrawIds);
@@ -208,7 +208,7 @@ MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x
   // Step3: Send the vertex data to the graphic memory
   unsigned int vao = 0;
 
-  vao = OGLGraphics::UploadStatic3DMesh(loaded_vertices, loaded_elements);
+  vao = OpenGL::UploadStatic3DMesh(loaded_vertices, loaded_elements);
 
   // Step4: Return this draw data to the user
   MeshInfo return_info(

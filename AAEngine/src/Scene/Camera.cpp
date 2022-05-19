@@ -11,13 +11,12 @@ namespace AA {
 #define UP glm::vec3(0,1,0)
 
 Camera::Camera(int width, int height) {
+  ResetToDefault();
   if (width == 0 || height == 0) {
     SetKeepCameraToWindowSize(true);
-  } else {
-    mViewport.Width = width;
-    mViewport.Height = height;
-  }
-  ResetToDefault();
+  } 
+  mViewport.Width = width;
+  mViewport.Height = height;
   static int LastRenderDepth = 0;
   RenderDepth = LastRenderDepth++;
 }
@@ -144,6 +143,10 @@ const Skybox* Camera::GetSkybox() const {
 
 const int Camera::GetRenderDepth() const {
   return RenderDepth;
+}
+
+const float Camera::GetRenderDistance() const {
+  return MaxRenderDistance;
 }
 
 const bool Camera::GetIsAlwaysScreenSize() const {

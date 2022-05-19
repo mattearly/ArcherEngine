@@ -3,10 +3,6 @@
 
 namespace AA {
 
-struct DirectionalLight {
-  DirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
-  glm::vec3 Direction, Ambient, Diffuse, Specular;
-};
 
 
 /* Point Light Examples

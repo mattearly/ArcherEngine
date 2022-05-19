@@ -10,13 +10,13 @@
 - Models with Skeletal Animations and some Controls.
 - Cameras Settings and Controls.
 - 3-D SoundEffects.
-- Background Sound tracks.
+- Background Soundtracks.
 - Customize Run time scripts with C++ Lambdas.
 
 ## The Docs
 
   - Generate at wil via Doxygen
-  - See [Interface.h](AAEngine/include/AncientArcher/Interface.h) Header for User Access Functions
+  - See [Interface.h](AAEngine/include/ArcherEngine/Interface.h) Header for User Access Functions
 
 ## Build & Run
 

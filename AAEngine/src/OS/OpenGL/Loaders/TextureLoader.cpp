@@ -1,5 +1,5 @@
 #include "TextureLoader.h"
-#include "OpenGL/OGLGraphics.h"
+#include "../Graphics.h"
 #include "MeshLoader.h"
 #include <stb_image.h>
 #include <assimp/Importer.hpp>
@@ -120,7 +120,7 @@ unsigned int TextureLoader::LoadTexture(const std::string& texture_path) {
       format = GL_RED;
     else if (nrComponents == 3)
       format = GL_RGB;
-    a_new_texture_info.accessId = OGLGraphics::Upload2DTex(texture_data, width, height, format);
+    a_new_texture_info.accessId = OpenGL::Upload2DTex(texture_data, width, height, format);
     if (a_new_texture_info.accessId != 0) {
       // add the new one to our list of loaded textures
       a_new_texture_info.path = texture_path;
@@ -153,7 +153,7 @@ unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& s
       format = GL_RED;
     else if (nrChannel == 3)
       format = GL_RGB;
-    return_id = OGLGraphics::UploadCubeMapTex(data, width, height, format);
+    return_id = OpenGL::UploadCubeMapTex(data, width, height, format);
   }
   for (auto i = 0; i < 6; ++i) {
     stbi_image_free(data[i]);
@@ -167,7 +167,7 @@ void TextureLoader::UnloadTexture(const std::unordered_map<unsigned int, std::st
       if (texIt.first == loaded_tex->accessId) {
         loaded_tex->ref_count--;
         if (loaded_tex->ref_count == 0) {
-          OGLGraphics::DeleteTex(loaded_tex->accessId);
+          OpenGL::DeleteTex(1u, loaded_tex->accessId);
         }
       }
     }
@@ -207,15 +207,8 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
     std::size_t the_last_slash = orginalFilePath.find_last_of("/\\") + 1;
     std::size_t the_last_dot = orginalFilePath.find_last_of(".");
     std::string model_dir = orginalFilePath.substr(0, the_last_slash);  // path to filename's dir
-    std::string model_file_extension = orginalFilePath.substr(
-      static_cast<std::basic_string<char,
-      std::char_traits<char>,
-      std::allocator<char>>::size_type>(the_last_dot) + 1);  // get the file extension (type of file)
-    std::string model_file_name = orginalFilePath.substr(
-      the_last_slash,
-      static_cast<std::basic_string<char,
-      std::char_traits<char>,
-      std::allocator<char>>::size_type>(the_last_dot) - the_last_slash);  // get the name of the file
+    std::string model_file_extension = orginalFilePath.substr(the_last_dot + 1u);  // get the file extension (type of file)
+    std::string model_file_name = orginalFilePath.substr(the_last_slash, the_last_dot - the_last_slash);  // get the name of the file
 
     // starting attempts at loading textures from a variety of possibilities
     // try from embedded
@@ -259,7 +252,7 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
             format = GL_RED;
           else if (nrComponents == 3)
             format = GL_RGB;
-          a_new_texture_info.accessId = OGLGraphics::Upload2DTex(data, width, height, format);
+          a_new_texture_info.accessId = OpenGL::Upload2DTex(data, width, height, format);
           if (a_new_texture_info.accessId != 0) {
             // add the new one to our list of loaded textures
             a_new_texture_info.path = embedded_filename;
@@ -315,7 +308,7 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
             format = GL_RGBA;
           else if (nrComponents == 3)
             format = GL_RGB;
-          a_new_texture_info.accessId = OGLGraphics::Upload2DTex(data, width, height, format);
+          a_new_texture_info.accessId = OpenGL::Upload2DTex(data, width, height, format);
           if (a_new_texture_info.accessId != 0) {
             // add the new one to our list of loaded textures for management
             a_new_texture_info.path = a_path;
