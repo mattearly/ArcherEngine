@@ -72,10 +72,18 @@ in VS_OUT
   vec3 Norm;
 } fs_in;
 struct Material {
+  int has_albedo_tex;
   sampler2D Albedo;
+
+  int has_specular_tex;
   sampler2D Specular;
+
+  int has_normal_tex;
   sampler2D Normal;
+
+  int has_emission_tex;
   sampler2D Emission;
+
   float Shininess;
 };
 struct DirectionalLight {
@@ -102,10 +110,7 @@ struct ReflectionModel {
   bool BlinnPhong;
 };
 
-uniform int u_has_albedo_tex;
-uniform int u_has_specular_tex;
-uniform int u_has_normal_tex;
-uniform int u_has_emission_tex;
+
 uniform int u_is_dir_light_on;
 uniform int u_mesh_does_shadow;
 
@@ -134,7 +139,7 @@ const vec3 DEFAULTCOLOR = vec3(1.0, 0.0, 0.0);
 
 void main() {
   vec3 normal;
-  if (u_has_normal_tex > 0) {
+  if (u_material.has_normal_tex > 0) {
     normal = texture(u_material.Normal, fs_in.TexUV).rgb;
     normal = normalize(normal * 2.0 - 1.0);
   } else {
@@ -147,7 +152,7 @@ void main() {
   int i = 0;
   for (i; i < u_num_point_lights_in_use; i++) { result += CalculatePointLights(u_point_lights[i], normal, view_dir); }
   for (i = 0; i < u_num_spot_lights_in_use; i++) { result += CalcSpotLight(u_spot_lights[i], normal, view_dir); }
-  if (u_has_emission_tex > 0) {
+  if (u_material.has_emission_tex > 0) {
     vec3 emission = texture(u_material.Emission, fs_in.TexUV).rgb;
     result += emission;
   }
@@ -199,7 +204,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
   // combine results
   vec3 ambient;
   vec3 diffuse;
-  if (u_has_albedo_tex > 0) { 
+  if (u_material.has_albedo_tex > 0) { 
     ambient = u_dir_light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = u_dir_light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
@@ -207,7 +212,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     diffuse = u_dir_light.Diffuse * diff * DEFAULTCOLOR;
   }
   vec3 specular;
-  if (u_has_specular_tex > 0) {
+  if (u_material.has_specular_tex > 0) {
     specular = u_dir_light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
   } else {
     specular = u_dir_light.Specular * spec * 0.0;  // no shine    
@@ -236,7 +241,7 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
   float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * (dist * dist));
   vec3 ambient;
   vec3 diffuse;
-  if (u_has_albedo_tex > 0) {
+  if (u_material.has_albedo_tex > 0) {
     ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
@@ -244,7 +249,7 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
     diffuse = light.Diffuse * diff * DEFAULTCOLOR;
   }
   vec3 specular;
-  if (u_has_specular_tex > 0) {
+  if (u_material.has_specular_tex > 0) {
     specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
   } else {
     specular = light.Specular * spec * 0.0; // no shine
@@ -282,7 +287,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   // combine results
    vec3 ambient;
    vec3 diffuse;
-  if (u_has_albedo_tex > 0) {
+  if (u_material.has_albedo_tex > 0) {
     ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
@@ -293,7 +298,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   diffuse *= attenuation * intensity;
 
   vec3 specular;
-  if (u_has_specular_tex > 0) {
+  if (u_material.has_specular_tex > 0) {
     specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
     specular *= attenuation * intensity;
   } else {

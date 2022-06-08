@@ -731,21 +731,21 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
     for (const auto& texture : m.textureDrawIds) {
       const std::string texType = texture.second;  // get the texture type
       if (texType == "Albedo") {
-        uber_shader->SetBool("u_has_albedo_tex", true);
+        uber_shader->SetBool("u_material.has_albedo_tex", true);
         uber_shader->SetInt(("u_material." + texType).c_str(), 0);
         SetTexture(0, texture.first);
       } else if (texType == "Specular") {
-        uber_shader->SetBool("u_has_specular_tex", true);
+        uber_shader->SetBool("u_material.has_specular_tex", true);
         uber_shader->SetInt(("u_material." + texType).c_str(), 1);
         uber_shader->SetFloat("u_material.Shininess", m.shininess);
         uber_shader->SetBool("u_reflection_model.BlinnPhong", true);
         SetTexture(1, texture.first);
       } else if (texType == "Normal") {
-        uber_shader->SetBool("u_has_normal_tex", true);
+        uber_shader->SetBool("u_material.has_normal_tex", true);
         uber_shader->SetInt(("u_material." + texType).c_str(), 2);
         SetTexture(2, texture.first);
       } else if (texType == "Emission") {
-        uber_shader->SetBool("u_has_emission_tex", true);
+        uber_shader->SetBool("u_material.has_emission_tex", true);
         uber_shader->SetInt(("u_material." + texType).c_str(), 3);
         SetTexture(3, texture.first);
       }
@@ -753,10 +753,10 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
     DrawElements(m.vao, m.numElements);
 
     // reset this shader
-    uber_shader->SetBool("u_has_albedo_tex", false);
-    uber_shader->SetBool("u_has_specular_tex", false);
-    uber_shader->SetBool("u_has_normal_tex", false);
-    uber_shader->SetBool("u_has_emission_tex", false);
+    uber_shader->SetBool("u_material.has_albedo_tex", false);
+    uber_shader->SetBool("u_material.has_specular_tex", false);
+    uber_shader->SetBool("u_material.has_normal_tex", false);
+    uber_shader->SetBool("u_material.has_emission_tex", false);
     uber_shader->SetFloat("u_material.Shininess", 0.0f);
     uber_shader->SetBool("u_reflection_model.Phong", false);
     uber_shader->SetBool("u_reflection_model.BlinnPhong", false);
@@ -795,21 +795,21 @@ void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
     for (const auto& texture : m.textureDrawIds) {
       const std::string texType = texture.second;  // get the texture type
       if (texType == "Albedo") {
-        uber_shader->SetBool("u_has_albedo_tex", true);
+        uber_shader->SetBool("u_material.has_albedo_tex", true);
         SetTexture(0, texture.first);
         uber_shader->SetInt(("u_material." + texType).c_str(), 0);
       } else if (texType == "Specular") {
-        uber_shader->SetBool("u_has_specular_tex", true);
+        uber_shader->SetBool("u_material.has_specular_tex", true);
         uber_shader->SetInt(("u_material." + texType).c_str(), 1);
         uber_shader->SetFloat("u_material.Shininess", m.shininess);
         uber_shader->SetBool("u_reflection_model.BlinnPhong", true);
         SetTexture(1, texture.first);
       } else if (texType == "Normal") {
-        uber_shader->SetBool("u_has_normal_tex", true);
+        uber_shader->SetBool("u_material.has_normal_tex", true);
         SetTexture(2, texture.first);
         uber_shader->SetInt(("u_material." + texType).c_str(), 2);
       } else if (texType == "Emission") {
-        uber_shader->SetBool("u_has_emission_tex", true);
+        uber_shader->SetBool("u_material.has_emission_tex", true);
         SetTexture(3, texture.first);
         uber_shader->SetInt(("u_material." + texType).c_str(), 3);
       }
@@ -818,10 +818,10 @@ void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
     DrawElements(m.vao, m.numElements);
 
     // reset this shader
-    uber_shader->SetBool("u_has_albedo_tex", false);
-    uber_shader->SetBool("u_has_specular_tex", false);
-    uber_shader->SetBool("u_has_normal_tex", false);
-    uber_shader->SetBool("u_has_emission_tex", false);
+    uber_shader->SetBool("u_material.has_albedo_tex", false);
+    uber_shader->SetBool("u_material.has_specular_tex", false);
+    uber_shader->SetBool("u_material.has_normal_tex", false);
+    uber_shader->SetBool("u_material.has_emission_tex", false);
     uber_shader->SetFloat("u_material.Shininess", 0.0f);
     uber_shader->SetBool("u_reflection_model.Phong", false);
     uber_shader->SetBool("u_reflection_model.BlinnPhong", false);
