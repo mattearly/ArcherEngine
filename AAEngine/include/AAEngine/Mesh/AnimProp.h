@@ -31,7 +31,7 @@ public:
 
 protected:
 
-  friend class AnimMeshLoader;
+  friend class AnimModelLoader;
 
 
   friend class Interface;

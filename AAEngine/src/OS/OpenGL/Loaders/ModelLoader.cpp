@@ -1,4 +1,4 @@
-#include "MeshLoader.h"
+#include "ModelLoader.h"
 #include "TextureLoader.h"
 #include "../../../Mesh/Vertex.h"
 #include "../../../Math/Conversions.h"
@@ -105,7 +105,7 @@ static std::string LastLoadedPath;
 // retursn false (0) on model loaded
 //    0 = model loaded from given path
 // otherwise returns 0 if the import is successful
-int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path_to_load) {
+int ModelLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path_to_load) {
   int return_code = 0;
   return_code = local_helper_reuse_if_already_loaded(out_model.mMeshes, path_to_load);
 
@@ -157,7 +157,7 @@ int MeshLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path_
 }
 
 // unloads all textures and vao's from a list of nodeinfos
-void MeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
+void ModelLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
   for (const auto& a_mesh : toUnload) {
     // remove reference of path
     local_helper_decrement_all_loaded_models_ref(path_to_unload);
@@ -222,7 +222,7 @@ MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x
 }
 
 // recursive helper function for LoadGameObjectFromFile
-void MeshLoader::recursive_processNode(aiNode* node, const aiScene* scene, Prop& out_model) {
+void ModelLoader::recursive_processNode(aiNode* node, const aiScene* scene, Prop& out_model) {
   for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
     aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
     out_model.mMeshes.push_back(local_helper_processMesh(mesh, scene, &node->mTransformation));

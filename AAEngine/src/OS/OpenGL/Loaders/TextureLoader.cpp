@@ -1,7 +1,6 @@
 #include "TextureLoader.h"
+#include "ModelLoader.h"
 #include "../Graphics.h"
-#include "MeshLoader.h"
-#include <stb_image.h>
 #include <assimp/Importer.hpp>
 #include <string>
 

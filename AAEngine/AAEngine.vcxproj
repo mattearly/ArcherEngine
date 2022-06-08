@@ -107,7 +107,7 @@
     <ClInclude Include="src\Mesh\Skeleton.h" />
     <ClInclude Include="src\Mesh\Bone.h" />
     <ClInclude Include="src\Mesh\Animator.h" />
-    <ClInclude Include="src\OS\OpenGL\Loaders\AnimMeshLoader.h" />
+    <ClInclude Include="src\OS\OpenGL\Loaders\AnimModelLoader.h" />
     <ClInclude Include="include\AAEngine\Mesh\AnimProp.h" />
     <ClInclude Include="include\AAEngine\Controls\Input.h" />
     <ClInclude Include="include\AAEngine\OS\Interface\Window.h" />
@@ -129,7 +129,7 @@
     <ClInclude Include="src\Sound\LongSound.h" />
     <ClInclude Include="include\AAEngine\Utility\Files.h" />
     <ClInclude Include="KHR\khrplatform.h" />
-    <ClInclude Include="src\OS\OpenGL\Loaders\MeshLoader.h" />
+    <ClInclude Include="src\OS\OpenGL\Loaders\ModelLoader.h" />
     <ClInclude Include="include\AAEngine\Interface.h" />
     <ClInclude Include="src\Mesh\MeshInfo.h" />
     <ClInclude Include="src\OS\OpenGL\Graphics.h" />
@@ -154,14 +154,14 @@
     <ClCompile Include="src\Mesh\Skeleton.cpp" />
     <ClCompile Include="src\Mesh\Bone.cpp" />
     <ClCompile Include="src\Mesh\Animator.cpp" />
-    <ClCompile Include="src\OS\OpenGL\Loaders\AnimMeshLoader.cpp" />
+    <ClCompile Include="src\OS\OpenGL\Loaders\AnimModelLoader.cpp" />
     <ClCompile Include="src\Mesh\AnimProp.cpp" />
     <ClCompile Include="src\OS\Interface\Callbacks.cpp" />
     <ClCompile Include="src\OS\Interface\Window.cpp" />
     <ClCompile Include="src\Mesh\Animation.cpp" />
     <ClCompile Include="src\Physics\NVidiaPhysx.cpp" />
     <ClCompile Include="src\GUI\imGUI.cpp" />
-    <ClCompile Include="src\OS\OpenGL\Loaders\MeshLoader.cpp" />
+    <ClCompile Include="src\OS\OpenGL\Loaders\ModelLoader.cpp" />
     <ClCompile Include="src\OS\OpenGL\Loaders\TextureLoader.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Mesh\Spacial3D.cpp" />

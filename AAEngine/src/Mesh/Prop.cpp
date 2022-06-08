@@ -3,7 +3,7 @@
 #include "../OS/OpenGL/OGLShader.h"
 #include "../OS/OpenGL/InternalShaders/Uber.h"
 #include "../OS/OpenGL/InternalShaders/Stencil.h"
-#include "../OS/OpenGL/Loaders/MeshLoader.h"
+#include "../OS/OpenGL/Loaders/ModelLoader.h"
 #include <glm/gtx/transform.hpp>
 
 namespace AA {
@@ -33,7 +33,7 @@ Prop::Prop(const char* path) {
 
 void Prop::RemoveCache() {
   if (!mMeshes.empty()) {
-    MeshLoader::UnloadGameObject(mMeshes, cached_load_path);
+    ModelLoader::UnloadGameObject(mMeshes, cached_load_path);
     mMeshes.clear();
   }
 }
@@ -46,7 +46,7 @@ void Prop::Load(const std::string& path) {
   if (!mMeshes.empty())
     throw(std::_Xruntime_error, "Meshes are loaded already. Remove cache first.");
 
-  int load_code = MeshLoader::LoadGameObjectFromFile(*this, path);
+  int load_code = ModelLoader::LoadGameObjectFromFile(*this, path);
   if (load_code == 0) {  // loaded from path
     cached_load_path = path;
   } else if (load_code == 1) {  // reused already loaded cache

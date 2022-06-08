@@ -90,7 +90,7 @@ public:
 protected:
 
   // mesh loader helps set all these
-  friend class MeshLoader;
+  friend class ModelLoader;
   friend class OGLGraphics;
   
   bool stenciled;

@@ -60,7 +60,7 @@
     <ClInclude Include="src\OS\OpenGL\Loaders\TextureInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\Loaders\MeshLoader.h">
+    <ClInclude Include="src\OS\OpenGL\Loaders\ModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AAEngine\Utility\Files.h">
@@ -108,7 +108,7 @@
     <ClInclude Include="include\AAEngine\Mesh\AnimProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\Loaders\AnimMeshLoader.h">
+    <ClInclude Include="src\OS\OpenGL\Loaders\AnimModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Mesh\Animator.h">
@@ -206,7 +206,7 @@
     <ClCompile Include="src\Sound\SoundEffect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\OpenGL\Loaders\MeshLoader.cpp">
+    <ClCompile Include="src\OS\OpenGL\Loaders\ModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\OpenGL\Loaders\TextureLoader.cpp">
@@ -236,7 +236,7 @@
     <ClCompile Include="src\Mesh\AnimProp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\OpenGL\Loaders\AnimMeshLoader.cpp">
+    <ClCompile Include="src\OS\OpenGL\Loaders\AnimModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Mesh\Animator.cpp">

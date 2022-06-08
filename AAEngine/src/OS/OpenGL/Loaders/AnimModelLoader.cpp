@@ -1,4 +1,4 @@
-#include "AnimMeshLoader.h"
+#include "AnimModelLoader.h"
 #include "TextureLoader.h"
 #include "../Graphics.h"
 #include "../../../../include/AAEngine/Mesh/AnimProp.h"
@@ -85,7 +85,7 @@ void local_helper_decrement_all_loaded_anim_models_ref(const std::string& path_t
 
 static std::string LastLoadedAnimPath;
 
-void AnimMeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
+void AnimModelLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, const std::string& path_to_unload) {
   for (const auto& a_mesh : toUnload) {
     local_helper_decrement_all_loaded_anim_models_ref(path_to_unload);
     OpenGL::DeleteMesh(1u, a_mesh.vao);
@@ -93,7 +93,7 @@ void AnimMeshLoader::UnloadGameObject(const std::vector<MeshInfo>& toUnload, con
   }
 }
 
-int AnimMeshLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::string& path_to_load) {
+int AnimModelLoader::LoadGameObjectFromFile(AnimProp& out_model, const std::string& path_to_load) {
   int return_code = 0;
   return_code = local_helper_reuse_anim_model_if_already_loaded(out_model.mMeshes, out_model.m_Skeleton, path_to_load);
 
@@ -168,7 +168,7 @@ void local_helper_setVertexBoneData(AnimVertex& vertex, int boneID, float weight
 }
 
 // helper
-void AnimMeshLoader::extractBoneWeightForVertices(AnimProp& out_model, std::vector<AnimVertex>& vertices, aiMesh* mesh, const aiScene* scene) {
+void AnimModelLoader::extractBoneWeightForVertices(AnimProp& out_model, std::vector<AnimVertex>& vertices, aiMesh* mesh, const aiScene* scene) {
   for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
     int boneID = -1;
     std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
@@ -234,7 +234,7 @@ void local_helper_processMesh(std::vector<AnimVertex>& out_loaded_verts, std::ve
 }
 
 // helper
-void AnimMeshLoader::recursive_processNode(AnimProp& out_model, aiNode* node, const aiScene* scene) {
+void AnimModelLoader::recursive_processNode(AnimProp& out_model, aiNode* node, const aiScene* scene) {
   for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
     aiMesh* ai_mesh = scene->mMeshes[node->mMeshes[i]];
     std::vector<AnimVertex> loaded_verts;
