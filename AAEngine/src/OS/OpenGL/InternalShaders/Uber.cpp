@@ -65,12 +65,14 @@ void main(){
   const std::string UBERSHADER_FRAG_CODE = R"(
 #version 460 core
 layout(location=0)out vec4 out_Color;
+
 in VS_OUT
 {
   vec3 Pos;
   vec2 TexUV;
   vec3 Norm;
 } fs_in;
+
 struct Material {
   int has_albedo_tex;
   sampler2D Albedo;
@@ -84,8 +86,14 @@ struct Material {
   int has_emission_tex;
   sampler2D Emission;
 
+  vec3 Tint;
+  vec3 Ambient;
+  vec3 SpecularColor;
+  vec3 EmissionColor;  
+
   float Shininess;
 };
+
 struct DirectionalLight {
   vec3 Direction;
   vec3 Ambient;
@@ -94,22 +102,24 @@ struct DirectionalLight {
   int Shadows;  // true or false
   float ShadowBiasMin, ShadowBiasMax;
 };
+
 struct PointLight {
   vec3 Position;
   float Constant, Linear, Quadratic;
   vec3 Ambient, Diffuse, Specular;
 };
+
 struct SpotLight {
   vec3 Position, Direction;
   float CutOff, OuterCutOff;
   float Constant, Linear, Quadratic;
   vec3 Ambient, Diffuse, Specular;
 };
+
 struct ReflectionModel {
   bool Phong;
   bool BlinnPhong;
 };
-
 
 uniform int u_is_dir_light_on;
 uniform int u_mesh_does_shadow;
@@ -135,7 +145,7 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir);
 vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir);
 
-const vec3 DEFAULTCOLOR = vec3(1.0, 0.0, 0.0);
+//const vec3 DEFAULTCOLOR = vec3(1.0, 0.0, 0.0);
 
 void main() {
   vec3 normal;
@@ -156,6 +166,8 @@ void main() {
     vec3 emission = texture(u_material.Emission, fs_in.TexUV).rgb;
     result += emission;
   }
+  result += u_material.EmissionColor;
+
   out_Color = vec4(result, 1.0);
 }
 
@@ -208,14 +220,13 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     ambient = u_dir_light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = u_dir_light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
-    ambient = u_dir_light.Ambient * DEFAULTCOLOR;
-    diffuse = u_dir_light.Diffuse * diff * DEFAULTCOLOR;
+    diffuse = u_dir_light.Diffuse * diff * u_material.Tint;
+    ambient = u_dir_light.Ambient * u_material.Ambient;
   }
-  vec3 specular;
+
+  vec3 specular = vec3(0.0, 0.0, 0.0);
   if (u_material.has_specular_tex > 0) {
-    specular = u_dir_light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
-  } else {
-    specular = u_dir_light.Specular * spec * 0.0;  // no shine    
+    specular = ((u_dir_light.Specular + u_material.SpecularColor)/2.0) * spec * texture(u_material.Specular, fs_in.TexUV).r;
   }
 
   return (ambient + (1.0 - shadow) * (diffuse + specular));
@@ -244,10 +255,13 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
   if (u_material.has_albedo_tex > 0) {
     ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
-  } else {
-    ambient = light.Ambient * DEFAULTCOLOR;
-    diffuse = light.Diffuse * diff * DEFAULTCOLOR;
   }
+
+//else {
+//    ambient = light.Ambient * DEFAULTCOLOR;
+//    diffuse = light.Diffuse * diff * DEFAULTCOLOR;
+//  }
+
   vec3 specular;
   if (u_material.has_specular_tex > 0) {
     specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
@@ -285,15 +299,17 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   float epsilon = light.CutOff - light.OuterCutOff;
   float intensity = clamp((theta - light.OuterCutOff) / epsilon, 0.0, 1.0);
   // combine results
-   vec3 ambient;
-   vec3 diffuse;
+  vec3 ambient;
+  vec3 diffuse;
   if (u_material.has_albedo_tex > 0) {
     ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
-  } else {
-    ambient = light.Ambient * DEFAULTCOLOR;
-    diffuse = light.Diffuse * diff * DEFAULTCOLOR;
   }
+
+// else {
+//    ambient = light.Ambient * DEFAULTCOLOR;
+//    diffuse = light.Diffuse * diff * DEFAULTCOLOR;
+//  }
   ambient *= attenuation * intensity;
   diffuse *= attenuation * intensity;
 
@@ -330,6 +346,5 @@ void Uber::Shutdown() {
 bool Uber::IsActive() {
   return UBERSHADER;
 }
-
 
 }

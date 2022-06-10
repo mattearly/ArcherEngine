@@ -2,6 +2,7 @@
 #include "../../../../include/AAEngine/Mesh/Prop.h"
 #include "../../../Mesh/MeshInfo.h"
 #include "TextureInfo.h"
+#include "MaterialLoader.h"
 #include <assimp/scene.h>
 #include <vector>
 #include <forward_list>

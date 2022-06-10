@@ -1,5 +1,6 @@
 #include "ModelLoader.h"
 #include "TextureLoader.h"
+#include "MaterialLoader.h"
 #include "../../../Mesh/Vertex.h"
 #include "../../../Math/Conversions.h"
 #include "../Graphics.h"
@@ -22,10 +23,8 @@ namespace AA {
 /// Holds info for reusing models that are already loaded.
 /// </summary>
 struct RefModelInfo {
-  uint32_t vao;
-  uint32_t numElements = 0;
+  std::vector<MeshInfo> meshes;
   std::string path = "";
-  std::unordered_map<uint32_t, std::string> textureDrawIds{};   // id:type
   int ref_count = 1;
 };
 
@@ -44,8 +43,10 @@ bool local_helper_reuse_if_already_loaded(std::vector<MeshInfo>& out_meshes, con
       continue;
     if (path == ref_model_info.path.data()) {
       ref_model_info.ref_count++;
-      TextureLoader::increment_given_texture_ids(ref_model_info.textureDrawIds);
-      out_meshes.emplace_back(MeshInfo(ref_model_info.vao, ref_model_info.numElements, ref_model_info.textureDrawIds, glm::mat4(1)));
+      for (const auto& m : ref_model_info.meshes) {
+        TextureLoader::increment_given_texture_ids(m.textureDrawIds);
+        out_meshes.emplace_back(MeshInfo(m.vao, m.numElements, m.textureDrawIds, m.material, m.local_transform));
+      }
       return true;  // already loaded
     }
   }
@@ -144,13 +145,10 @@ int ModelLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path
       recursive_processNode(scene->mRootNode, scene, out_model);
       // if it loaded correctly, save a ref to this loaded up model (certainly a new entry at this point because we checked for copy at the beginning of this function LoadGameObjectFromFile)
       RefModelInfo temp_mesh_info;
-      temp_mesh_info.vao = out_model.mMeshes.front().vao; // todo: save all the vaos, issue #26
-      temp_mesh_info.numElements = out_model.mMeshes.front().numElements;
       temp_mesh_info.path = path_to_load;
-      temp_mesh_info.textureDrawIds = out_model.mMeshes.front().textureDrawIds;   // id:type
+      temp_mesh_info.meshes = out_model.mMeshes;
       AllLoadedModels.push_front(temp_mesh_info);
     }
-
   }
 
   return return_code;
@@ -215,8 +213,8 @@ MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x
     vao,
     static_cast<unsigned int>(loaded_elements.size()),
     TextureLoader::LoadAllTextures(scene, scene->mMaterials[mesh->mMaterialIndex], LastLoadedPath),  // get all the textures that belong with this mesh
+    MaterialLoader::LoadAll(scene, scene->mMaterials[mesh->mMaterialIndex]),
     aiMat4_to_glmMat4(*trans));
-
 
   return return_info;
 }

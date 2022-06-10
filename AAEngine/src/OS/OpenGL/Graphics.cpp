@@ -750,6 +750,14 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
         SetTexture(3, texture.first);
       }
     }
+
+    // set non-image-texture materials
+    uber_shader->SetVec3("u_material.Tint", m.material.Diffuse);
+    uber_shader->SetVec3("u_material.Ambient", m.material.Ambient);
+    uber_shader->SetVec3("u_material.SpecularColor", m.material.SpecularColor);
+    uber_shader->SetVec3("u_material.EmissionColor", m.material.Emission);
+
+    // draw after setting all these
     DrawElements(m.vao, m.numElements);
 
     // reset this shader
