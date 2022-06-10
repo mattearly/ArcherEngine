@@ -841,7 +841,7 @@ public:
     // init engine
     {
       AA::WindowOptions win_opts;
-      win_opts._windowing_mode = AA::WINDOW_MODE::FULLSCREEN_BORDERLESS;
+      win_opts._windowing_mode = AA::WINDOW_MODE::MAXIMIZED;
       win_opts._title = "FIREPLACE ROOM";
       bool initSuccess = tg->g_aa_interface.Init(win_opts);
       Assert::AreEqual(initSuccess, true);
@@ -909,16 +909,16 @@ public:
       ImGui::Text("BULB");
       bool update_draw_plight1_loc_cube = ImGui::Checkbox("Draw Debug Cube", &tg->debug_point_light);
       bool update_plight1_loc = ImGui::SliderFloat3("Location", tg->point_light_loc, -400.f, 400.f, "%f", 1.0f);
-      bool update_plight1_linear = ImGui::SliderFloat("Linear", tg->point_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
-      bool update_plight1_quadratic = ImGui::SliderFloat("Quadratic", tg->point_light_quadratic, 0.000001f, 0.005f, "%f", 1.0f);
-      bool update_plight1_ambient = ImGui::SliderFloat("Ambient", tg->point_light_ambient, 0.f, 1.f, "%f", 1.0f);
-      bool update_plight1_diff = ImGui::SliderFloat("Diffuse", tg->point_light_diff, 0.f, 1.f, "%f", 1.0f);
-      bool update_plight1_spec = ImGui::SliderFloat("Spec", tg->point_light_spec, 0.f, 1.f, "%f", 1.0f);
+      bool update_plight1_linear = ImGui::SliderFloat("Linear_p", tg->point_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
+      bool update_plight1_quadratic = ImGui::SliderFloat("Quadratic_p", tg->point_light_quadratic, 0.000001f, 0.005f, "%f", 1.0f);
+      bool update_plight1_ambient = ImGui::SliderFloat("Ambient_p", tg->point_light_ambient, 0.f, 1.f, "%f", 1.0f);
+      bool update_plight1_diff = ImGui::SliderFloat("Diffuse_p", tg->point_light_diff, 0.f, 1.f, "%f", 1.0f);
+      bool update_plight1_spec = ImGui::SliderFloat("Spec_p", tg->point_light_spec, 0.f, 1.f, "%f", 1.0f);
 
       ImGui::Text("FLASHLIGHT");
       bool update_slight1_inner = ImGui::SliderFloat("Inner", tg->spot_light_inner, 0.03f, 19.f, "%f", 1.0f);
       bool update_slight1_outer = ImGui::SliderFloat("Outer", tg->spot_light_outer, 0.1f, 40.f, "%f", 1.0f);
-      bool update_slight1_linear = ImGui::SliderFloat("Linear", tg->spot_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
+      bool update_slight1_linear = ImGui::SliderFloat("Linear_", tg->spot_light_linear, 0.0001f, 0.200f, "%f", 1.0f);
       bool update_slight1_quadratic = ImGui::SliderFloat("Quadratic", tg->spot_light_quadratic, 0.00001f, 0.005f, "%f", 1.0f);
       bool update_slight1_ambient = ImGui::SliderFloat("Ambient", tg->spot_light_ambient, 0.f, 1.f, "%f", 1.0f);
       bool update_slight1_diff = ImGui::SliderFloat("Diffuse", tg->spot_light_diff, 0.f, 1.f, "%f", 1.0f);
