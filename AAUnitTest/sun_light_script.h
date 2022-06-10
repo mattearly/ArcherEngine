@@ -15,8 +15,8 @@ static struct Sunlight {
 
   float shadow_ortho_size = 1024.f;
 
-  float shadow_bias_min = .00025f;
-  float shadow_bias_max_multi = .025f;
+  float shadow_bias_min = 0.00025f;
+  float shadow_bias_max_multi = 0.001f;
 
 } *sun;
 
