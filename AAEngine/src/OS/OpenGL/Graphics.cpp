@@ -728,7 +728,7 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
 
   uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
   for (const MeshInfo& m : render_object->GetMeshes()) {
-    for (const auto& texture : m.textureDrawIds) {
+    for (const auto& texture : m.textureDrawIds) {  // set all the textures on the shader
       const std::string texType = texture.second;  // get the texture type
       if (texType == "Albedo") {
         uber_shader->SetBool("u_material.has_albedo_tex", true);
@@ -760,7 +760,7 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
     uber_shader->SetFloat("u_material.Shininess", 0.0f);
     uber_shader->SetBool("u_reflection_model.Phong", false);
     uber_shader->SetBool("u_reflection_model.BlinnPhong", false);
-    uber_shader->SetInt("u_mesh_does_shadow", 0);
+    uber_shader->SetBool("u_mesh_does_shadow", false);
 
   }
   ResetToDefault();

@@ -1,12 +1,11 @@
 #pragma once
 #include <glm/glm.hpp>
-#include <vector>
 namespace AA {
 struct Material {
 public:
   ~Material();
-  glm::vec3 Ambient{};
   glm::vec3 Diffuse{};
+  glm::vec3 Ambient{};
   glm::vec3 Specular{};
   glm::vec3 Emission{};
   // float SpecularHightlights{};  // 0 to 1000   - aka shininess
