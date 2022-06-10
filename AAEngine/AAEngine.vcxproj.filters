@@ -162,6 +162,9 @@
     <ClInclude Include="include\AAEngine\Support.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\Loaders\MaterialLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sound\SoundDevice.cpp">
@@ -276,6 +279,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\SunLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\Loaders\MaterialLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

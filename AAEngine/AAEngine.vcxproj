@@ -113,6 +113,7 @@
     <ClInclude Include="include\AAEngine\OS\Interface\Window.h" />
     <ClInclude Include="src\Mesh\Animation.h" />
     <ClInclude Include="include\AAEngine\Utility\rand.h" />
+    <ClInclude Include="src\OS\OpenGL\Loaders\MaterialLoader.h" />
     <ClInclude Include="src\Physics\NVidiaPhysx.h" />
     <ClInclude Include="src\GUI\imGUI.h" />
     <ClInclude Include="src\OS\OpenGL\Loaders\TextureLoader.h" />
@@ -159,6 +160,7 @@
     <ClCompile Include="src\OS\Interface\Callbacks.cpp" />
     <ClCompile Include="src\OS\Interface\Window.cpp" />
     <ClCompile Include="src\Mesh\Animation.cpp" />
+    <ClCompile Include="src\OS\OpenGL\Loaders\MaterialLoader.cpp" />
     <ClCompile Include="src\Physics\NVidiaPhysx.cpp" />
     <ClCompile Include="src\GUI\imGUI.cpp" />
     <ClCompile Include="src\OS\OpenGL\Loaders\ModelLoader.cpp" />
