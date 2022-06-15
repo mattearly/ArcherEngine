@@ -1,6 +1,6 @@
 {
 	"name": "aaengine",
-	"version": "9",
+	"version": "1.4",
 	"dependencies": [
 		"glm",
 		"assimp",
