@@ -52,7 +52,7 @@ public:
   /// </summary>
   /// <param name="winopts"></param>
   /// <returns>True if successful, False if already initialized.</returns>
-  bool Init(const WindowOptions& winopts);
+  bool Init(WindowOptions winopts);
 
   /// <summary>
   /// Init Window and Renderer with user specificed WindowOptions to share.

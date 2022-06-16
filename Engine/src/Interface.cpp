@@ -33,7 +33,7 @@ bool Interface::Init() {
   return true;
 }
 
-bool Interface::Init(const WindowOptions& winopts) {
+bool Interface::Init(WindowOptions winopts) {
   if (isInit)
     return false;
   mWindow = std::make_shared<Window>(winopts);

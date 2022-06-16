@@ -1008,6 +1008,7 @@ public:
       winopts._vsync = true;
       winopts._title = "WindowStartingSize";
       winopts._cursor_mode = AA::CURSOR_MODE::NORMAL;
+      winopts._windowing_mode = AA::WINDOW_MODE::WINDOWED; // this must be set, if left default, width and height will snap back to 800x600
       winopts._width = TEST_INIT_WINDOW_WIDTH;
       winopts._height = TEST_INIT_WINDOW_HEIGHT;
       bool initSuccess = tg->g_aa_interface.Init(winopts);
