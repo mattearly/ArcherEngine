@@ -10,6 +10,7 @@ public:
   // test globals
   AA::Interface g_aa_interface;
   unsigned int g_imgui_func = 0;
+  unsigned int g_begin_func = 0;
   unsigned int g_update_func = 0;
   unsigned int g_cam_id = 0;
   std::weak_ptr<AA::Camera> g_camera_ref;

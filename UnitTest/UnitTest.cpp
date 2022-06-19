@@ -998,5 +998,50 @@ public:
 
     TestGlobals::reset();
   }
+
+  TEST_METHOD(WindowStartingSize) {
+    TestGlobals::init();
+    static const int TEST_INIT_WINDOW_WIDTH = 1600, TEST_INIT_WINDOW_HEIGHT = 900;
+
+    {
+      AA::WindowOptions winopts;
+      winopts._vsync = true;
+      winopts._title = "WindowStartingSize";
+      winopts._cursor_mode = AA::CURSOR_MODE::NORMAL;
+      winopts._windowing_mode = AA::WINDOW_MODE::WINDOWED; // this must be set, if left default, width and height will snap back to 800x600
+      winopts._width = TEST_INIT_WINDOW_WIDTH;
+      winopts._height = TEST_INIT_WINDOW_HEIGHT;
+      bool initSuccess = tg->g_aa_interface.Init(winopts);
+      Assert::AreEqual(initSuccess, true);
+    }
+
+    tg->g_begin_func = tg->g_aa_interface.AddToOnBegin([]() {
+      // check that the window is the size it was initiated to
+      auto local_window_ref = tg->g_aa_interface.GetWindow().lock();
+      Assert::AreEqual(TEST_INIT_WINDOW_WIDTH, local_window_ref->GetCurrentWidth());
+      Assert::AreEqual(TEST_INIT_WINDOW_HEIGHT, local_window_ref->GetCurrentHeight());
+
+      });
+
+    tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
+      ImGui::Begin("WindowStartingSize Test");
+      bool doToggleFS = ImGui::Button("ToggleFullscreen");
+      ImGui::Text("Does Everything Work As Expected?");
+      tg->g_Yes = ImGui::Button("Yes");
+      tg->g_No = ImGui::Button("No");
+      ImGui::End();
+
+      // update state
+      if (doToggleFS) { tg->g_aa_interface.ToggleWindowFullscreen(); };
+      if (tg->g_Yes || tg->g_No) { tg->g_aa_interface.Shutdown(); };
+      });
+
+    int run_diag = tg->g_aa_interface.Run();
+    Assert::AreEqual(run_diag, 0);
+    Assert::AreEqual(tg->g_No, false);
+
+    TestGlobals::reset();
+  }
+
 };
 }
