@@ -369,14 +369,33 @@ void DeleteMesh(const GLsizei num_to_del, const GLuint& VAO) {
   glDeleteBuffers(num_to_del, &VAO);
 }
 
-GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int format) {
+GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int format, aiTextureMapMode map_mode) {
   unsigned int out_texID = 0;
   glGenTextures(1, &out_texID);
   glBindTexture(GL_TEXTURE_2D, out_texID);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  // map mode: aiTextureMapMode 
+
+  if (map_mode == aiTextureMapMode::aiTextureMapMode_Clamp) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  } else if (map_mode == aiTextureMapMode::aiTextureMapMode_Wrap) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  } else if (map_mode == aiTextureMapMode::aiTextureMapMode_Decal) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  } else if (map_mode == aiTextureMapMode::aiTextureMapMode_Mirror) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+  } else {
+// default type
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  }
+
   //try: https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
   //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -581,7 +600,7 @@ void ResetToDefault() {
 }
 
 void BatchRenderShadows(
-  const glm::vec3 view_pos, 
+  const glm::vec3 view_pos,
   const SunLight& dir_light,
   const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
   const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects) {
@@ -639,7 +658,7 @@ void BatchRenderShadows(
       if (front_cull) { glCullFace(GL_BACK); glDisable(GL_CULL_FACE); }
     }
   }
-  
+
   if (assume_shadows) {  // at least 1 object needs dir light rendered shadows
     auto* uber_shadows = InternalShaders::Uber::Get();
     uber_shadows->SetInt("u_dir_light.Shadows", 1);

@@ -5,6 +5,7 @@
 #include "../../Scene/Lights.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <assimp/material.h>
 #include <vector>
 #include <memory>
 
@@ -23,7 +24,7 @@ GLuint Upload3DPositionsMesh(const float* points, const int num_points, const GL
 GLuint Upload2DVerts(const std::vector<glm::vec2>& points);
 void DeleteMesh(const GLsizei num_to_del, const GLuint& VAO);
 
-GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int format);
+GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int format, aiTextureMapMode map_mode);
 GLuint UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, int format);
 void DeleteTex(const GLsizei num_to_del, const GLuint& tex_d);
 

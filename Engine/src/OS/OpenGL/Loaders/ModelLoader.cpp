@@ -117,7 +117,7 @@ int ModelLoader::LoadGameObjectFromFile(Prop& out_model, const std::string& path
     //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
     post_processing_flags |= aiProcess_JoinIdenticalVertices |
       aiProcess_Triangulate |
-      aiProcess_FlipUVs |
+      //aiProcess_FlipUVs |
       //#ifdef D3D
       //	aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | 
       //#endif
@@ -185,7 +185,7 @@ MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x
   std::vector<LitVertex> loaded_vertices;
   if (mesh->mTextureCoords[0]) { // case for when texture coordinantes exist
     for (unsigned int i = 0; i < num_of_vertices_on_mesh; ++i) {
-      loaded_vertices.emplace_back(LitVertex(aiVec3_to_glmVec3(mesh->mVertices[i]), glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y), aiVec3_to_glmVec3(mesh->mNormals[i])));
+      loaded_vertices.emplace_back(LitVertex(aiVec3_to_glmVec3(mesh->mVertices[i]), glm::vec2(mesh->mTextureCoords[0][i].x, 1 - mesh->mTextureCoords[0][i].y), aiVec3_to_glmVec3(mesh->mNormals[i])));
     }
   } else {  // case for when texture coordinantes do not exist
     for (unsigned int i = 0; i < num_of_vertices_on_mesh; ++i) {
