@@ -224,9 +224,9 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     ambient = u_dir_light.Ambient * u_material.Ambient;
   }
 
-  vec3 specular = vec3(0.0, 0.0, 0.0);
+  vec3 specular = vec3(0.0);
   if (u_material.has_specular_tex > 0) {
-    specular = ((u_dir_light.Specular + u_material.SpecularColor)/2.0) * spec * texture(u_material.Specular, fs_in.TexUV).r;
+    specular = u_dir_light.Specular * u_material.SpecularColor * spec * texture(u_material.Specular, fs_in.TexUV).r;
   }
 
   return (ambient + (1.0 - shadow) * (diffuse + specular));
@@ -260,12 +260,11 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
     ambient = light.Ambient * u_material.Ambient;
   }
 
-  vec3 specular;
+  vec3 specular = vec3(0.0);
   if (u_material.has_specular_tex > 0) {
-    specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
-  } else {
-    specular = light.Specular * spec * 0.0; // no shine
+    specular = light.Specular * u_material.SpecularColor * spec * texture(u_material.Specular, fs_in.TexUV).r;
   }
+
   ambient *= attenuation;
   diffuse *= attenuation;
   specular *= attenuation;
@@ -310,13 +309,12 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   ambient *= attenuation * intensity;
   diffuse *= attenuation * intensity;
 
-  vec3 specular;
+  vec3 specular = vec3(0.0);
   if (u_material.has_specular_tex > 0) {
-    specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
+    specular = light.Specular * u_material.SpecularColor * spec * texture(u_material.Specular, fs_in.TexUV).r;
     specular *= attenuation * intensity;
-  } else {
-    specular = vec3(0.0);  // no shine
   }
+
   return (ambient + diffuse + specular);
 }
 )";
