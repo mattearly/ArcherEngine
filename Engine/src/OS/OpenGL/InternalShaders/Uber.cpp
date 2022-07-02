@@ -220,8 +220,8 @@ vec3 CalculateDirLight(vec3 normal, vec3 viewDir) {
     ambient = u_dir_light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = u_dir_light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
+    ambient = u_dir_light.Ambient * mix(u_material.Ambient, u_material.Tint, 0.5);
     diffuse = u_dir_light.Diffuse * diff * u_material.Tint;
-    ambient = u_dir_light.Ambient * u_material.Ambient;
   }
 
   vec3 specular = vec3(0.0);
@@ -253,11 +253,11 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
   vec3 ambient;
   vec3 diffuse;
   if (u_material.has_albedo_tex > 0) {
-    diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
     ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
+    diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
+    ambient = light.Ambient * mix(u_material.Ambient, u_material.Tint, 0.5);
     diffuse = light.Diffuse * diff * u_material.Tint;
-    ambient = light.Ambient * u_material.Ambient;
   }
 
   vec3 specular = vec3(0.0);
@@ -276,7 +276,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   // diffuse shading
   float diff = max(dot(normal, lightDir), 0.0);
 
-  // specular shading
+  // specular shading power
   float spec;
   if (u_reflection_model.BlinnPhong) {
     vec3 halfwayDir = normalize(lightDir + viewDir);
@@ -299,11 +299,11 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   vec3 ambient;
   vec3 diffuse;
   if (u_material.has_albedo_tex > 0) {
-    diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
     ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
+    diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
   } else {
+    ambient = light.Ambient * mix(u_material.Ambient, u_material.Tint, 0.5);
     diffuse = light.Diffuse * diff * u_material.Tint;
-    ambient = light.Ambient * u_material.Ambient;
   }
 
   ambient *= attenuation * intensity;
