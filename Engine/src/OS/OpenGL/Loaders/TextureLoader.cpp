@@ -204,25 +204,11 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
     }
 
     // store the map mode so we can upload it correctly
-    aiTextureMapMode enum_map_mode;
+    aiTextureMapMode enum_map_mode{};
     if (AI_SUCCESS != mat->Get(AI_MATKEY_MAPPING(type, i), enum_map_mode)) {
       // handle epic failure here
       //return -3; // there is no mapping
     }
-
-    aiTextureMapMode enum_map_mode_u;
-    if (AI_SUCCESS != mat->Get(AI_MATKEY_MAPPINGMODE_U(type, i), enum_map_mode_u)) {
-      // handle epic failure here
-      //return -3; // there is no mapping
-    }
-
-
-    aiTextureMapMode enum_map_mode_v;
-    if (AI_SUCCESS != mat->Get(AI_MATKEY_MAPPINGMODE_V(type, i), enum_map_mode_v)) {
-      // handle epic failure here
-      //return -3; // there is no mapping
-    }
-
 
     // pathing options we use later to help finding textures based on model path
     std::size_t the_last_slash = orginalFilePath.find_last_of("/\\") + 1;
