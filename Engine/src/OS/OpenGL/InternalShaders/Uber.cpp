@@ -253,14 +253,12 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
   vec3 ambient;
   vec3 diffuse;
   if (u_material.has_albedo_tex > 0) {
-    ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
+    ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
+  } else {
+    diffuse = light.Diffuse * diff * u_material.Tint;
+    ambient = light.Ambient * u_material.Ambient;
   }
-
-//else {
-//    ambient = light.Ambient * DEFAULTCOLOR;
-//    diffuse = light.Diffuse * diff * DEFAULTCOLOR;
-//  }
 
   vec3 specular;
   if (u_material.has_specular_tex > 0) {
@@ -302,14 +300,13 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
   vec3 ambient;
   vec3 diffuse;
   if (u_material.has_albedo_tex > 0) {
-    ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
     diffuse = light.Diffuse * diff * texture(u_material.Albedo, fs_in.TexUV).rgb;
+    ambient = light.Ambient * texture(u_material.Albedo, fs_in.TexUV).rgb;
+  } else {
+    diffuse = light.Diffuse * diff * u_material.Tint;
+    ambient = light.Ambient * u_material.Ambient;
   }
 
-// else {
-//    ambient = light.Ambient * DEFAULTCOLOR;
-//    diffuse = light.Diffuse * diff * DEFAULTCOLOR;
-//  }
   ambient *= attenuation * intensity;
   diffuse *= attenuation * intensity;
 
