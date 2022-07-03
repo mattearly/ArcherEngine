@@ -18,8 +18,6 @@ public:
 
   static void increment_given_texture_ids(const std::unordered_map<uint32_t, std::string>& list);
 
-  static unsigned int LoadTexture(const std::string& texture_path);
-
   static unsigned int LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths);
 
   static void UnloadTexture(const std::unordered_map<unsigned int, std::string>& texture_draw_ids);

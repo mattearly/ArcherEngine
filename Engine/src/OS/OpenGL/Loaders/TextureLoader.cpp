@@ -34,8 +34,37 @@
 
 namespace AA {
 
+inline int helper_get_ogl_of_stb_internal_format(int stbi_internal_format) {
+  int ogl_internal_format(0);
+  switch (stbi_internal_format) {
+  case 1:
+    ogl_internal_format = GL_RED;
+    break;
+  case 2:
+    ogl_internal_format = GL_RG;
+    break;
+  case 3:
+    ogl_internal_format = GL_RGB;
+    break;
+  case 4:
+    ogl_internal_format = GL_RGBA;
+    break;
+  }
+  return ogl_internal_format;
+}
+
 // internal saved list of loaded textures to manage
 static std::forward_list<TextureInfo> AllLoadedTextures;
+
+void TextureLoader::increment_given_texture_ids(const std::unordered_map<uint32_t, std::string>& list) {
+  for (const auto& l : list) {
+    for (auto& t : AllLoadedTextures) {
+      if (l.first == t.accessId) {
+        t.ref_count++;
+      }
+    }
+  }
+}
 
 std::unordered_map<unsigned int, std::string> TextureLoader::LoadAllTextures(const aiScene* scene, const aiMaterial* ai_material, const std::string& orig_filepath) {
   std::unordered_map<unsigned int, std::string> all_loaded_textures;
@@ -82,77 +111,20 @@ std::unordered_map<unsigned int, std::string> TextureLoader::LoadAllTextures(con
   return all_loaded_textures;
 }
 
-void TextureLoader::increment_given_texture_ids(const std::unordered_map<uint32_t, std::string>& list) {
-  for (const auto& l : list) {
-    for (auto& t : AllLoadedTextures) {
-      if (l.first == t.accessId) {
-        t.ref_count++;
-      }
-    }
-  }
-}
-//  hold, might not need
-//unsigned int TextureLoader::LoadTexture(const std::string& texture_path) {
-//  for (auto& a_tex : AllLoadedTextures) {
-//    if (texture_path == a_tex.path.data()) {
-//      // texture already loaded, just give the mesh the details
-//      a_tex.ref_count++;
-//      return a_tex.accessId;  // the buck stops here
-//    }
-//  }
-//
-//  //auto rgb_type = ((load_alpha) ? STBI_rgb_alpha : STBI_rgb);
-//  auto rgb_type = 0;  // auto?
-//
-//  TextureInfo a_new_texture_info;
-//  unsigned char* texture_data = nullptr;
-//  int width = 0, height = 0, nrComponents = 0;
-//  // for unflipped opengl coords, flip vertically on load to true
-//  stbi_set_flip_vertically_on_load(0);
-//  texture_data = stbi_load(texture_path.c_str(), &width, &height, &nrComponents, rgb_type);
-//
-//
-//  if (texture_data) {
-//    int format = 0;
-//    if (nrComponents == 4)
-//      format = GL_RGBA;
-//    else if (nrComponents == 1)
-//      format = GL_RED;
-//    else if (nrComponents == 3)
-//      format = GL_RGB;
-//    a_new_texture_info.accessId = OpenGL::Upload2DTex(texture_data, width, height, format, enum_map_mode);
-//    if (a_new_texture_info.accessId != 0) {
-//      // add the new one to our list of loaded textures
-//      a_new_texture_info.path = texture_path;
-//      a_new_texture_info.type = "Albedo";  // todo: make this sync better
-//      a_new_texture_info.ref_count = 1;
-//      AllLoadedTextures.push_front(a_new_texture_info);
-//    }
-//    stbi_image_free(texture_data);
-//  }
-//  return a_new_texture_info.accessId;
-//}
-
-// Note that this only loads up textures that have alpha channels. Todo: make more versions
 unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths) {
   if (six_texture_paths.size() != 6)
     throw("wrong number of textures");
-  int width = 0, height = 0, nrChannel = 0;
+  int width(0), height(0), nrChannel(0);
   unsigned int return_id(0u);
   std::vector<unsigned char*> data;
   data.resize(6);
   stbi_set_flip_vertically_on_load(0); // tell stb_image.h to not flip loaded texture's on the y-axis.
   for (auto i = 0; i < 6; ++i) {
     data[i] = stbi_load(six_texture_paths[i].c_str(), &width, &height, &nrChannel, 0);
+
   }
   if (data[0] && data[5]) {  // ensure first and last data pics are there (middle not checked but assumed)
-    int format = 0;
-    if (nrChannel == 4)
-      format = GL_RGBA;
-    else if (nrChannel == 1)
-      format = GL_RED;
-    else if (nrChannel == 3)
-      format = GL_RGB;
+    int format = helper_get_ogl_of_stb_internal_format(nrChannel);
     return_id = OpenGL::UploadCubeMapTex(data, width, height, format);
   }
   for (auto i = 0; i < 6; ++i) {
@@ -179,13 +151,12 @@ void TextureLoader::UnloadTexture(const std::unordered_map<unsigned int, std::st
 
 int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* mat, aiTextureType type, std::string typeName,
   std::string orginalFilePath, std::unordered_map<unsigned int, std::string>& out_texInfo) {
+
   unsigned int num_textures = mat->GetTextureCount(type);
   if (num_textures == 0) {
     return -3;
   }
 
-  //auto rgb_type = ((load_alpha) ? STBI_rgb_alpha : STBI_rgb);
-  auto rgb_type = 0;
   int width(0), height(0), nrComponents(0);
 
   for (unsigned int i = 0; i < num_textures; ++i) {
@@ -251,18 +222,9 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
         // for unflipped opengl coords, flip vertically on load to true
         stbi_set_flip_vertically_on_load(0);
         int texture_size = ai_embedded_texture->mWidth * std::max(ai_embedded_texture->mHeight, 1u);
-        unsigned char* data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(ai_embedded_texture->pcData), texture_size, &width, &height, &nrComponents, rgb_type);
+        unsigned char* data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(ai_embedded_texture->pcData), texture_size, &width, &height, &nrComponents, 0);
         if (data) {
-          int format = 0;
-          if (nrComponents == 4) {
-            format = GL_RGBA;
-          } else if (nrComponents == 1) {
-            format = GL_RED;
-          } else if (nrComponents == 3) {
-            format = GL_RGB;
-          }
-          // get the uv mapping type before uploading
-
+          int format = helper_get_ogl_of_stb_internal_format(nrComponents);
           a_new_texture_info.accessId = OpenGL::Upload2DTex(data, width, height, format, enum_map_mode);
           if (a_new_texture_info.accessId != 0) {
             // add the new one to our list of loaded textures
@@ -312,13 +274,7 @@ int TextureLoader::loadMaterialTextures(const aiScene* scn, const aiMaterial* ma
         data = stbi_load(a_path.c_str(), &width, &height, &nrComponents, 0);
         if (data) {
           // we have data that goes to the graphics card
-          int format = 0;
-          if (nrComponents == 1)
-            format = GL_RED;
-          else if (nrComponents == 4)
-            format = GL_RGBA;
-          else if (nrComponents == 3)
-            format = GL_RGB;
+          int format = helper_get_ogl_of_stb_internal_format(nrComponents);
           a_new_texture_info.accessId = OpenGL::Upload2DTex(data, width, height, format, enum_map_mode);
           if (a_new_texture_info.accessId != 0) {
             // add the new one to our list of loaded textures for management
