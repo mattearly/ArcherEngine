@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../Mesh/Material.h"
+#include "Cache.h"
 #include <assimp/scene.h>
 #include <assimp/material.h>
 namespace AA {

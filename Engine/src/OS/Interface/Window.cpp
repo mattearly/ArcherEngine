@@ -93,7 +93,7 @@ std::weak_ptr<WindowOptions> Window::get_and_note_window_options() {
 void Window::apply_new_window_option_changes() {
   //todo: relaunch window if required (msaa change, render tech is prelaunch only)
   if (mWindowOptions->_msaa_samples > 0 && mPrevWindowOptions._msaa_samples != mWindowOptions->_msaa_samples) {
-    OpenGL::SetMultiSampling(true);
+    OpenGL::GetGL()->SetMultiSampling(true);
     // locking this at a max of 16
     if (mWindowOptions->_msaa_samples >= 1 && mWindowOptions->_msaa_samples <= 16) {
       glfwWindowHint(GLFW_SAMPLES, mWindowOptions->_msaa_samples);
@@ -107,9 +107,9 @@ void Window::apply_new_window_option_changes() {
   if (mPrevWindowOptions._stencil_bits != mWindowOptions->_stencil_bits) {
     glfwWindowHint(GLFW_STENCIL_BITS, mWindowOptions->_stencil_bits);
     if (mWindowOptions->_stencil_bits > 0) {
-      OpenGL::SetStencil(true);
+      OpenGL::GetGL()->SetStencil(true);
     } else {
-      OpenGL::SetStencil(false);
+      OpenGL::GetGL()->SetStencil(false);
     }
   }
 
@@ -154,7 +154,7 @@ void Window::apply_new_window_option_changes() {
   }
 
   if (mPrevWindowOptions._gamma_correction != mWindowOptions->_gamma_correction) {
-    OpenGL::SetGammaCorrection(mWindowOptions->_gamma_correction);
+    OpenGL::GetGL()->SetGammaCorrection(mWindowOptions->_gamma_correction);
   }
 
   // if drag and drop changed
@@ -374,14 +374,14 @@ void Window::default_init() {
 
     // todo (multithreading): consider making this rendering context on its own thread : src https://discourse.glfw.org/t/question-about-glfwpollevents/1524
     glfwMakeContextCurrent(mGLFWwindow);
-    OpenGL::Proc(glfwGetProcAddress);
+    OpenGL::GetGL()->Proc(glfwGetProcAddress);
   }
   if (mWindowOptions->_stencil_bits > 0) {
-    OpenGL::SetStencil(true);
-    OpenGL::SetStencilFuncToNotEqual();
-    OpenGL::SetStencilOpDepthPassToReplace();
+    OpenGL::GetGL()->SetStencil(true);
+    OpenGL::GetGL()->SetStencilFuncToNotEqual();
+    OpenGL::GetGL()->SetStencilOpDepthPassToReplace();
   } else {
-    OpenGL::SetStencil(false);
+    OpenGL::GetGL()->SetStencil(false);
   }
 
   glfwSetWindowUserPointer(mGLFWwindow, this);  // window pointer goes to this class

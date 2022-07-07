@@ -1,9 +1,8 @@
-#include <Mesh/Prop.h>
-#include <Mesh/AnimProp.h>
+#include <Scene/Scene.h>
 #include <Scene/SunLight.h>
 #include "Graphics.h"
 #include "OGLShader.h"
-#include "../../Mesh/MeshInfo.h"
+#include "Loaders/PrimativeMaker.h"
 #include "../../Scene/Skybox.h"
 #include "InternalShaders/Uber.h"
 #include "InternalShaders/Stencil.h"
@@ -13,33 +12,33 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <cstddef>
 #include <cmath>
+#include "Loaders/Cache.h"
 
 namespace AA {
-namespace OpenGL {
 
-void SetSamplerCube(int which, const unsigned int& cubetexID) {
+void OpenGL::SetSamplerCube(int which, const unsigned int& cubetexID) {
   glActiveTexture(GL_TEXTURE0 + which);
   glBindTexture(GL_TEXTURE_CUBE_MAP, cubetexID);
 }
 
-void SetTexture(int which, const unsigned int& textureID) {
+void OpenGL::SetTexture(int which, const unsigned int& textureID) {
   glActiveTexture(GL_TEXTURE0 + which);
   glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-void DrawElements(unsigned int vao, unsigned int numElements) {
+void OpenGL::DrawElements(unsigned int vao, unsigned int numElements) {
   glBindVertexArray(vao);
   glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
 }
 
-void DrawStrip(unsigned int vao, const int& count) {
+void OpenGL::DrawStrip(unsigned int vao, const int& count) {
   glBindVertexArray(vao);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, count);
   glBindVertexArray(0);
 }
 
-void SetViewportSize(GLint x, GLint y, GLsizei w, GLsizei h) {
+void OpenGL::SetViewportSize(GLint x, GLint y, GLsizei w, GLsizei h) {
   glViewport(x, y, w, h);
 }
 
@@ -48,23 +47,28 @@ void SetViewportSize(GLint x, GLint y, GLsizei w, GLsizei h) {
 /// </summary>
 /// <param name="vec3">rgb floats between 0 and 1</param>
 /// <returns></returns>
-void SetViewportClearColor(glm::vec3 color) noexcept {
+void OpenGL::SetViewportClearColor(glm::vec3 color) noexcept {
   glClearColor(color.x, color.y, color.z, 0.0f);
 }
 
 /// <summary>
 /// pre-render function that clears the current context
 /// </summary>
-void ClearScreen() noexcept {
+void OpenGL::ClearScreen() noexcept {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void NewFrame() noexcept {
+void OpenGL::NewFrame() noexcept {
   ClearScreen();
   ResetToDefault();
 }
 
-GLuint UploadStatic3DMesh(const std::vector<LitVertex>& verts, const std::vector<GLuint>& elems) {
+OpenGL* OpenGL::GetGL() {
+  static OpenGL* gl = new OpenGL();
+  return gl;
+}
+
+GLuint OpenGL::UploadStatic3DMesh(const std::vector<LitVertex>& verts, const std::vector<GLuint>& elems) {
   bool use_43 = false;
   if (use_43) {
     // 4.3
@@ -80,21 +84,21 @@ GLuint UploadStatic3DMesh(const std::vector<LitVertex>& verts, const std::vector
     GLuint stride_size = sizeof(LitVertex);
 
     /* REFERENCE
-    void glVertexAttribFormat(	GLuint attribindex,
+    void OpenGL::glVertexAttribFormat(	GLuint attribindex,
                   GLint size,
-                  GLenum type,
+                  GLenum textureType,
                   GLboolean normalized,
                   GLuint relativeoffset);
 
-    void glVertexAttribBinding(	GLuint attribindex,
+    void OpenGL::glVertexAttribBinding(	GLuint attribindex,
                   GLuint bindingindex);
 
-    void glBindVertexBuffer(	GLuint bindingindex,
+    void OpenGL::glBindVertexBuffer(	GLuint bindingindex,
                   GLuint buffer,
                   GLintptr offset,
                   GLsizei stride);
 
-    void glEnableVertexAttribArray(	GLuint index);
+    void OpenGL::glEnableVertexAttribArray(	GLuint index);
     END REFERENCE */
 
     // POSITION
@@ -165,7 +169,7 @@ GLuint UploadStatic3DMesh(const std::vector<LitVertex>& verts, const std::vector
 /// <param name="verts">vertices to upload</param>
 /// <param name="elems">relevant indicies</param>
 /// <returns>the VAO</returns>
-GLuint UploadStatic3DMesh(const std::vector<TanVertex>& verts, const std::vector<GLuint>& elems) {
+GLuint OpenGL::UploadStatic3DMesh(const std::vector<TanVertex>& verts, const std::vector<GLuint>& elems) {
   bool use_43 = false;
   if (use_43) {
     // 4.3
@@ -260,7 +264,7 @@ GLuint UploadStatic3DMesh(const std::vector<TanVertex>& verts, const std::vector
 /// <param name="verts">vertices to upload</param>
 /// <param name="elems">relevant indicies</param>
 /// <returns>the VAO</returns>
-GLuint UploadStatic3DMesh(const std::vector<AnimVertex>& verts, const std::vector<GLuint>& elems) {
+GLuint OpenGL::UploadStatic3DMesh(const std::vector<AnimVertex>& verts, const std::vector<GLuint>& elems) {
   GLuint VAO, VBO, EBO;
   glGenBuffers(1, &VBO);
 
@@ -293,7 +297,7 @@ GLuint UploadStatic3DMesh(const std::vector<AnimVertex>& verts, const std::vecto
   return VAO;
 }
 
-GLuint Upload3DPositionsMesh(const float* points, const int num_points, const GLuint* indices, const int ind_count) {
+GLuint OpenGL::Upload3DPositionsMesh(const float* points, const int num_points, const GLuint* indices, const int ind_count) {
   //4.3 version
   GLuint vaoHandle;
   GLuint vboHandles[1];
@@ -341,7 +345,7 @@ GLuint Upload3DPositionsMesh(const float* points, const int num_points, const GL
   //return VAO;
 }
 
-GLuint Upload2DVerts(const std::vector<glm::vec2>& points) {
+GLuint OpenGL::Upload2DVerts(const std::vector<glm::vec2>& points) {
   GLuint VAO, VBO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
@@ -365,11 +369,11 @@ GLuint Upload2DVerts(const std::vector<glm::vec2>& points) {
 /// removes the mesh from our GPU memory
 /// </summary>
 /// <param name="VAO">vao to delete</param>
-void DeleteMesh(const GLsizei num_to_del, const GLuint& VAO) {
+void OpenGL::DeleteMesh(const GLsizei num_to_del, const GLuint& VAO) {
   glDeleteBuffers(num_to_del, &VAO);
 }
 
-GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int format, aiTextureMapMode map_mode) {
+GLuint OpenGL::Upload2DTex(const unsigned char* tex_data, int width, int height, int format, aiTextureMapMode map_mode) {
   unsigned int out_texID = 0;
   glGenTextures(1, &out_texID);
   glBindTexture(GL_TEXTURE_2D, out_texID);
@@ -392,7 +396,7 @@ GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int for
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
   } else {
-    // default type
+    // default textureType
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
@@ -414,7 +418,7 @@ GLuint Upload2DTex(const unsigned char* tex_data, int width, int height, int for
   return out_texID;
 }
 
-GLuint UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, int format) {
+GLuint OpenGL::UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int height, int format) {
   assert(tex_data.size() == 6);
   GLuint out_texID;
   glGenTextures(1, &out_texID);
@@ -445,11 +449,11 @@ GLuint UploadCubeMapTex(std::vector<unsigned char*> tex_data, int width, int hei
   return out_texID;
 }
 
-void DeleteTex(const GLsizei num_to_del, const GLuint& tex_id) {
+void OpenGL::DeleteTex(const GLsizei num_to_del, const GLuint& tex_id) {
   glDeleteTextures(num_to_del, &tex_id);
 }
 
-void SetBlend(const bool enabled) {
+void OpenGL::SetBlend(const bool enabled) {
   if (enabled) {
     //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -459,7 +463,7 @@ void SetBlend(const bool enabled) {
   }
 }
 
-void SetCullFace(const bool enabled) {
+void OpenGL::SetCullFace(const bool enabled) {
   if (enabled) {
     glEnable(GL_CULL_FACE);
   } else {
@@ -467,11 +471,11 @@ void SetCullFace(const bool enabled) {
   }
 }
 
-void SetCullMode(int mode) {
+void OpenGL::SetCullMode(int mode) {
   glCullFace(static_cast<GLenum>(mode));
 }
 
-void SetDepthTest(const bool enabled) {
+void OpenGL::SetDepthTest(const bool enabled) {
   if (enabled) {
     glEnable(GL_DEPTH_TEST);
   } else {
@@ -479,11 +483,11 @@ void SetDepthTest(const bool enabled) {
   }
 }
 
-void SetDepthMode(int mode) {
+void OpenGL::SetDepthMode(int mode) {
   glDepthFunc(static_cast<GLenum>(mode));
 }
 
-void SetMultiSampling(const bool enabled) {
+void OpenGL::SetMultiSampling(const bool enabled) {
   if (enabled) {
     glEnable(GL_MULTISAMPLE);
   } else {
@@ -491,14 +495,14 @@ void SetMultiSampling(const bool enabled) {
   }
 }
 
-void SetGammaCorrection(const bool enabled) {
+void OpenGL::SetGammaCorrection(const bool enabled) {
   if (enabled)
     glEnable(GL_FRAMEBUFFER_SRGB);
   else
     glDisable(GL_FRAMEBUFFER_SRGB);
 }
 
-void Proc(void* proc) {
+void OpenGL::Proc(void* proc) {
   if (!gladLoadGLLoader((GLADloadproc)proc)) {
     throw("contexting window to OpenGL failed\n");
   }
@@ -512,7 +516,7 @@ void Proc(void* proc) {
 /// <param name="shadow_width"></param>
 /// <param name="shadow_height"></param>
 /// <returns>depth map FBO for rendering</returns>
-GLuint CreateDepthMapFBO(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map_tex_id) {
+GLuint OpenGL::CreateDepthMapFBO(GLuint shadow_width, GLuint shadow_height, GLuint& out_depth_map_tex_id) {
   // create framebuffer object for rendering
   GLuint depthMapFBO;
   glGenFramebuffers(1, &depthMapFBO);
@@ -545,19 +549,19 @@ GLuint CreateDepthMapFBO(GLuint shadow_width, GLuint shadow_height, GLuint& out_
 /// </summary>
 /// <param name="num_to_del"></param>
 /// <param name="fbo"></param>
-void DeleteFramebuffer(GLsizei num_to_del, GLuint& fbo) {
+void OpenGL::DeleteFramebuffer(GLsizei num_to_del, GLuint& fbo) {
   glDeleteFramebuffers(num_to_del, &fbo);
 }
 
 //Note that this only has effect if depth testing is enabled. 
-void SetDepthMask(const bool enabled) {
+void OpenGL::SetDepthMask(const bool enabled) {
   if (enabled)
     glDepthMask(GL_FALSE);
   else
     glDepthMask(GL_TRUE);
 }
 
-void SetStencil(const bool enabled) {
+void OpenGL::SetStencil(const bool enabled) {
   if (enabled)
     glEnable(GL_STENCIL_TEST);
   else
@@ -565,29 +569,29 @@ void SetStencil(const bool enabled) {
 }
 
 // enable or disable writes
-void SetStencilMask(const bool enabled) {
+void OpenGL::SetStencilMask(const bool enabled) {
   if (enabled)
     glStencilMask(0xFF); // enable writes
   else
     glStencilMask(0x00); // disable writes
 }
 
-void SetStencilOpDepthPassToReplace() {
+void OpenGL::SetStencilOpDepthPassToReplace() {
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 }
 
-void SetStencilFuncToAlways() {
+void OpenGL::SetStencilFuncToAlways() {
   glStencilFunc(GL_ALWAYS, 1, 0xFF);
 }
 
-void SetStencilFuncToNotEqual() {
+void OpenGL::SetStencilFuncToNotEqual() {
   glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 }
 
 //
 // render graph stuff
 //
-void ResetToDefault() {
+void OpenGL::ResetToDefault() {
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -596,11 +600,10 @@ void ResetToDefault() {
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 }
 
-void BatchRenderShadows(
+void OpenGL::BatchRenderShadows(
   const glm::vec3 view_pos,
   const SunLight& dir_light,
-  const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
-  const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects) {
+  const std::vector<std::shared_ptr<AA::Scene> >& render_objects) {
   if (!dir_light.Shadows) {
     InternalShaders::Uber::Get()->SetInt("u_dir_light.Shadows", 0);
     return;
@@ -644,17 +647,17 @@ void BatchRenderShadows(
     }
   }
 
-  for (const auto& anim_prop : animated_render_objects) {
-    if (anim_prop->GetRenderShadows()) {
-      assume_shadows = true;  // at least 1 thing has shadows
-      depth_shadow_renderer->SetMat4("u_model_matrix", anim_prop->GetFMM());
-      bool front_cull = anim_prop->GetCullFrontFaceForShadows();
-      if (front_cull) { glEnable(GL_CULL_FACE); glCullFace(GL_FRONT); }
-      const auto& meshes = anim_prop->GetMeshes();
-      for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); }
-      if (front_cull) { glCullFace(GL_BACK); glDisable(GL_CULL_FACE); }
-    }
-  }
+  //for (const auto& anim_prop : animated_render_objects) {
+  //  if (anim_prop->GetRenderShadows()) {
+  //    assume_shadows = true;  // at least 1 thing has shadows
+  //    depth_shadow_renderer->SetMat4("u_model_matrix", anim_prop->GetFMM());
+  //    bool front_cull = anim_prop->GetCullFrontFaceForShadows();
+  //    if (front_cull) { glEnable(GL_CULL_FACE); glCullFace(GL_FRONT); }
+  //    const auto& meshes = anim_prop->GetMeshes();
+  //    for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); }
+  //    if (front_cull) { glCullFace(GL_BACK); glDisable(GL_CULL_FACE); }
+  //  }
+  //}
 
   if (assume_shadows) {  // at least 1 object needs dir light rendered shadows
     auto* uber_shadows = InternalShaders::Uber::Get();
@@ -666,9 +669,8 @@ void BatchRenderShadows(
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void BatchRenderToViewport(
-  const std::vector<std::shared_ptr<AA::Prop> >& render_objects,
-  const std::vector<std::shared_ptr<AA::AnimProp> >& animated_render_objects,
+void OpenGL::BatchRenderToViewport(
+  const std::vector<std::shared_ptr<AA::Scene> >& render_objects,
   const Viewport& vp) {
   glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
 
@@ -677,21 +679,21 @@ void BatchRenderToViewport(
     RenderProp(render_object);
   }
 
-  for (const auto& render_object : animated_render_objects) {
-    if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
-    if (render_object->mAnimator) {
-      InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
-      InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
-      auto transforms = render_object->mAnimator->GetFinalBoneMatrices();
-      for (unsigned int i = 0; i < transforms.size(); ++i) {
-        InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-        InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-      }
-    }
-    RenderProp(std::dynamic_pointer_cast<AA::Prop>(render_object));
-    InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-    InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
-  }
+  //for (const auto& render_object : animated_render_objects) {
+  //  if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
+  //  if (render_object->mAnimator) {
+  //    InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
+  //    InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
+  //    auto transforms = render_object->mAnimator->GetFinalBoneMatrices();
+  //    for (unsigned int i = 0; i < transforms.size(); ++i) {
+  //      InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+  //      InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+  //    }
+  //  }
+  //  RenderProp(std::dynamic_pointer_cast<AA::Scene>(render_object));
+  //  InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+  //  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
+  //}
 
   // stencils LAST
   for (const auto& render_object : render_objects) {
@@ -699,32 +701,32 @@ void BatchRenderToViewport(
     RenderStenciled(render_object);
   }
 
-  for (const auto& render_object : animated_render_objects) {
-    if (!render_object->IsStenciled()) continue;
-    if (render_object->mAnimator) {
-      InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
-      InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
-      auto transforms = render_object->mAnimator->GetFinalBoneMatrices();
-      for (unsigned int i = 0; i < transforms.size(); ++i) {
-        InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-        InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-      }
-    }
-    RenderStenciled(std::dynamic_pointer_cast<AA::Prop>(render_object));
-    InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-    InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
-  }
+  //for (const auto& render_object : animated_render_objects) {
+  //  if (!render_object->IsStenciled()) continue;
+  //  if (render_object->mAnimator) {
+  //    InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
+  //    InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
+  //    auto transforms = render_object->mAnimator->GetFinalBoneMatrices();
+  //    for (unsigned int i = 0; i < transforms.size(); ++i) {
+  //      InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+  //      InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+  //    }
+  //  }
+  //  RenderStenciled(std::dynamic_pointer_cast<AA::Scene>(render_object));
+  //  InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+  //  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
+  //}
 }
 
 // no changes to shaders before rendering the meshes of the object
-void RenderAsIs(const std::shared_ptr<AA::Prop>& render_object) {
+void OpenGL::RenderAsIs(const std::shared_ptr<AA::Scene>& render_object) {
   const auto& meshes = render_object->GetMeshes();
   for (const auto& m : meshes) {
     DrawElements(m.vao, m.numElements);
   }
 }
 
-void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
+void OpenGL::RenderProp(const std::shared_ptr<AA::Scene>& render_object) {
 
   // shader for this render
   OGLShader* uber_shader = InternalShaders::Uber::Get();
@@ -743,25 +745,31 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
   uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
   for (const MeshInfo& m : render_object->GetMeshes()) {
     for (const auto& texture : m.textureDrawIds) {  // set all the textures on the shader
-      const std::string texType = texture.second;  // get the texture type
-      if (texType == "Albedo") {
+      switch (texture.textureType) {
+      case TextureType::ALBEDO:
         uber_shader->SetBool("u_material.has_albedo_tex", true);
-        uber_shader->SetInt(("u_material." + texType).c_str(), 0);
-        SetTexture(0, texture.first);
-      } else if (texType == "Specular") {
+        uber_shader->SetInt("u_material." + toString(texture.textureType), 0);
+        SetTexture(0, texture.accessId);
+        break;
+      case TextureType::SPECULAR:
         uber_shader->SetBool("u_material.has_specular_tex", true);
-        uber_shader->SetInt(("u_material." + texType).c_str(), 1);
+        uber_shader->SetInt("u_material." + toString(texture.textureType), 1);
         uber_shader->SetFloat("u_material.Shininess", m.shininess);
         uber_shader->SetBool("u_reflection_model.BlinnPhong", true);
-        SetTexture(1, texture.first);
-      } else if (texType == "Normal") {
+        SetTexture(1, texture.accessId);
+        break;
+      case TextureType::NORMAL:
         uber_shader->SetBool("u_material.has_normal_tex", true);
-        uber_shader->SetInt(("u_material." + texType).c_str(), 2);
-        SetTexture(2, texture.first);
-      } else if (texType == "Emission") {
+        uber_shader->SetInt("u_material." + toString(texture.textureType), 2);
+        SetTexture(2, texture.accessId);
+        break;
+      case TextureType::EMISSION:
         uber_shader->SetBool("u_material.has_emission_tex", true);
-        uber_shader->SetInt(("u_material." + texType).c_str(), 3);
-        SetTexture(3, texture.first);
+        uber_shader->SetInt("u_material." + toString(texture.textureType), 3);
+        SetTexture(3, texture.accessId);
+        break;
+      case TextureType::UNKNOWN:
+        break;
       }
     }
 
@@ -788,7 +796,7 @@ void RenderProp(const std::shared_ptr<AA::Prop>& render_object) {
   ResetToDefault();
 }
 
-void RenderSkybox(const Skybox* skybox_target, const Viewport& vp) {
+void OpenGL::RenderSkybox(const Skybox* skybox_target, const Viewport& vp) {
   if (!skybox_target) { return; }
   glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
   glDepthFunc(GL_LEQUAL);
@@ -798,7 +806,7 @@ void RenderSkybox(const Skybox* skybox_target, const Viewport& vp) {
   ResetToDefault();
 }
 
-void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
+void OpenGL::RenderStenciled(const std::shared_ptr<AA::Scene>& render_object) {
   // 1st pass: render to stencil buffer with normal draw
 
   if (render_object->GetBackFaceCull()) {
@@ -814,28 +822,36 @@ void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
   auto uber_shader = InternalShaders::Uber::Get();
   uber_shader->SetMat4("u_model_matrix", render_object->GetFMM());
   for (const MeshInfo& m : render_object->GetMeshes()) {
-    for (const auto& texture : m.textureDrawIds) {
-      const std::string texType = texture.second;  // get the texture type
-      if (texType == "Albedo") {
+
+    for (const auto& texture : m.textureDrawIds) {  // set all the textures on the shader
+      switch (texture.textureType) {
+      case TextureType::ALBEDO:
         uber_shader->SetBool("u_material.has_albedo_tex", true);
-        SetTexture(0, texture.first);
-        uber_shader->SetInt(("u_material." + texType).c_str(), 0);
-      } else if (texType == "Specular") {
+        uber_shader->SetInt("u_material." + toString(texture.textureType), 0);
+        SetTexture(0, texture.accessId);
+        break;
+      case TextureType::SPECULAR:
         uber_shader->SetBool("u_material.has_specular_tex", true);
-        uber_shader->SetInt(("u_material." + texType).c_str(), 1);
+        uber_shader->SetInt("u_material." + toString(texture.textureType), 1);
         uber_shader->SetFloat("u_material.Shininess", m.shininess);
         uber_shader->SetBool("u_reflection_model.BlinnPhong", true);
-        SetTexture(1, texture.first);
-      } else if (texType == "Normal") {
+        SetTexture(1, texture.accessId);
+        break;
+      case TextureType::NORMAL:
         uber_shader->SetBool("u_material.has_normal_tex", true);
-        SetTexture(2, texture.first);
-        uber_shader->SetInt(("u_material." + texType).c_str(), 2);
-      } else if (texType == "Emission") {
+        uber_shader->SetInt("u_material." + toString(texture.textureType), 2);
+        SetTexture(2, texture.accessId);
+        break;
+      case TextureType::EMISSION:
         uber_shader->SetBool("u_material.has_emission_tex", true);
-        SetTexture(3, texture.first);
-        uber_shader->SetInt(("u_material." + texType).c_str(), 3);
+        uber_shader->SetInt("u_material." + toString(texture.textureType), 3);
+        SetTexture(3, texture.accessId);
+        break;
+      case TextureType::UNKNOWN:
+        break;
       }
     }
+
     //SetCullFace(m.backface_culled);
     DrawElements(m.vao, m.numElements);
 
@@ -880,11 +896,11 @@ void RenderStenciled(const std::shared_ptr<AA::Prop>& render_object) {
 /// <summary>
 /// Debug
 /// </summary>
-void RenderDebugCube(glm::vec3 loc) {
+void OpenGL::RenderDebugCube(glm::vec3 loc) {
   glm::mat4 model_matrix = glm::mat4(1);
   model_matrix = glm::translate(model_matrix, loc);
   InternalShaders::Basic::Get()->SetMat4("u_model_matrix", model_matrix);
-  DrawElements(Primitives::load_cube(), 36);
+  DrawElements(PrimativeMaker::load_cube(), 36);
   ResetToDefault();
 }
 
@@ -892,7 +908,7 @@ void RenderDebugCube(glm::vec3 loc) {
 /// Debug
 /// todo:: test and fix
 /// </summary>
-void RenderSunLightArrowIcon(glm::vec3 dir_from_00) {
+void OpenGL::RenderSunLightArrowIcon(glm::vec3 dir_from_00) {
 
   // todo: math to spin the arrow icon & keep it at some portion of the screen
   // the below math is WRONG!
@@ -911,7 +927,7 @@ void RenderSunLightArrowIcon(glm::vec3 dir_from_00) {
   InternalShaders::Basic::Get()->SetMat4("u_model_matrix", model_matrix);
   unsigned int num_elements;
   // figure out how to draw an arrow better
-  unsigned int cone_vao = Primitives::load_cone(num_elements);
+  unsigned int cone_vao = PrimativeMaker::load_cone(num_elements);
   DrawElements(cone_vao, num_elements);
 
   ResetToDefault();
@@ -921,7 +937,7 @@ void RenderSunLightArrowIcon(glm::vec3 dir_from_00) {
 /// Debug RenderSpotLightIcon
 /// todo: test and fix
 /// </summary>
-void RenderSpotLightIcon(glm::vec3 location, glm::vec3 direction) {
+void OpenGL::RenderSpotLightIcon(glm::vec3 location, glm::vec3 direction) {
 
   // location and direction 
   // need to check that this is correct
@@ -934,201 +950,10 @@ void RenderSpotLightIcon(glm::vec3 location, glm::vec3 direction) {
 
   InternalShaders::Basic::Get()->SetMat4("u_model_matrix", model_matrix);
   // needs a better icon than a cube
-  DrawElements(Primitives::load_cube(), 36);
+  DrawElements(PrimativeMaker::load_cube(), 36);
   ResetToDefault();
 }
 
-namespace Primitives {
-
-unsigned int vao_to_the_cube = 0;
-
-// returns the vao to a -1 by 1 cube
-unsigned int load_cube() {
-  if (vao_to_the_cube != 0) {
-    return vao_to_the_cube;
-  }
-
-  const float cubeVertices[] = {
-    // front
-    -1.0, -1.0,  1.0,
-    1.0, -1.0,  1.0,
-    1.0,  1.0,  1.0,
-    -1.0,  1.0,  1.0,
-    // back
-    -1.0, -1.0, -1.0,
-    1.0, -1.0, -1.0,
-    1.0,  1.0, -1.0,
-    -1.0,  1.0, -1.0
-  };
-
-  const unsigned int faces[] = {
-    // front
-    0, 1, 2,
-    2, 3, 0,
-    // right
-    1, 5, 6,
-    6, 2, 1,
-    // back
-    7, 6, 5,
-    5, 4, 7,
-    // left
-    4, 0, 3,
-    3, 7, 4,
-    // bottom
-    4, 5, 1,
-    1, 0, 4,
-    // top
-    3, 2, 6,
-    6, 7, 3 };
-
-  vao_to_the_cube = Upload3DPositionsMesh(cubeVertices, sizeof(cubeVertices) / sizeof(cubeVertices[0]), faces, sizeof(faces) / sizeof(faces[0]));
-
-  return vao_to_the_cube;
-}
-
-void unload_cube() {
-  if (vao_to_the_cube != 0) {
-    DeleteMesh(1u, vao_to_the_cube);
-    vao_to_the_cube = 0;
-  }
-}
-
-unsigned int vao_to_the_plane = 0;
-
-unsigned int load_plane() {
-
-  if (vao_to_the_plane != 0) {
-    return vao_to_the_plane;
-  }
-  const float SIZE = 1.f;
-  const float planeVertices[] = {
-    // positions
-    -SIZE, 0, SIZE,
-    SIZE, 0, SIZE,
-    -SIZE, 0, -SIZE,
-    SIZE, 0, -SIZE
-  };
-
-  unsigned int faces[] = {   //indices
-    1,2,0,1,3,2
-  };
-
-  vao_to_the_plane = Upload3DPositionsMesh(planeVertices, sizeof(planeVertices) / sizeof(planeVertices[0]), faces, sizeof(faces) / sizeof(faces[0]));
-  return vao_to_the_plane;
-}
-
-void unload_plane() {
-  if (vao_to_the_plane != 0) {
-    DeleteMesh(1u, vao_to_the_plane);
-    vao_to_the_plane = 0;
-  }
-}
-
-void unload_all() {
-  unload_cone();
-  unload_cube();
-  unload_plane();
-}
 
 
-unsigned int vao_to_the_cone = 0;
-
-unsigned int load_cone(unsigned int& out_num_elements) {
-
-  // todo: fix?
-  unsigned int faces[] = {   //indices
-    1,1,1,33,2,1,2,3,1,
-2,3,2,33,2,2,3,4,2,
-3,4,3,33,2,3,4,5,3,
-4,5,4,33,2,4,5,6,4,
-5,6,5,33,2,5,6,7,5,
-6,7,6,33,2,6,7,8,6,
-7,8,7,33,2,7,8,9,7,
-8,9,8,33,2,8,9,10,8,
-9,10,9,33,2,9,10,11,9,
-10,11,10,33,2,10,11,12,10,
-11,12,11,33,2,11,12,13,11,
-12,13,12,33,2,12,13,14,12,
-13,14,13,33,2,13,14,15,13,
-14,15,14,33,2,14,15,16,14,
-15,16,15,33,2,15,16,17,15,
-16,17,16,33,2,16,17,18,16,
-17,18,17,33,2,17,18,19,17,
-18,19,18,33,2,18,19,20,18,
-19,20,19,33,2,19,20,21,19,
-20,21,20,33,2,20,21,22,20,
-21,22,21,33,2,21,22,23,21,
-22,23,22,33,2,22,23,24,22,
-23,24,23,33,2,23,24,25,23,
-24,25,24,33,2,24,25,26,24,
-25,26,25,33,2,25,26,27,25,
-26,27,26,33,2,26,27,28,26,
-27,28,27,33,2,27,28,29,27,
-28,29,28,33,2,28,29,30,28,
-29,30,29,33,2,29,30,31,29,
-30,31,30,33,2,30,31,32,30,
-1,33,31,2,34,31,3,35,31,4,36,31,5,37,31,6,38,31,7,39,31,8,40,31,9,41,31,10,42,31,11,43,31,12,44,31,13,45,31,14,46,31,15,47,31,16,48,31,17,49,31,18,50,31,19,51,31,20,52,31,21,53,31,22,54,31,23,55,31,24,56,31,25,57,31,26,58,31,27,59,31,28,60,31,29,61,31,30,62,31,31,63,31,32,64,31,
-31,32,32,33,2,32,32,65,32,
-32,65,33,33,2,33,1,1,33
-
-
-  };
-
-  out_num_elements = sizeof(faces) / sizeof(faces[0]);
-
-  if (vao_to_the_cone == 0) {
-    // needs loaded
-    const float coneVertices[] = {
-      // positions
-1.000000f,0.000007f,-1.000000f,
-0.999999f,0.195098f,-0.980785f,
-0.999997f,0.382691f,-0.923880f,
-0.999996f,0.555578f,-0.831470f,
-0.999995f,0.707114f,-0.707107f,
-0.999994f,0.831477f,-0.555570f,
-0.999993f,0.923887f,-0.382683f,
-0.999993f,0.980793f,-0.195090f,
-0.999993f,1.000007f,0.000000f,
-0.999993f,0.980793f,0.195090f,
-0.999993f,0.923887f,0.382683f,
-0.999994f,0.831477f,0.555570f,
-0.999995f,0.707114f,0.707107f,
-0.999996f,0.555578f,0.831470f,
-0.999997f,0.382691f,0.923880f,
-0.999999f,0.195098f,0.980785f,
-1.000000f,0.000007f,1.000000f,
-1.000001f,-0.195083f,0.980785f,
-1.000003f,-0.382676f,0.923880f,
-1.000004f,-0.555563f,0.831470f,
-1.000005f,-0.707099f,0.707107f,
-1.000006f,-0.831462f,0.555570f,
-1.000007f,-0.923872f,0.382684f,
-1.000007f,-0.980778f,0.195090f,
-1.000007f,-0.999993f,-0.000000f,
-1.000007f,-0.980778f,-0.195090f,
-1.000007f,-0.923872f,-0.382684f,
-1.000006f,-0.831462f,-0.555570f,
-1.000005f,-0.707099f,-0.707107f,
-1.000004f,-0.555563f,-0.831470f,
-1.000003f,-0.382676f,-0.923880f,
-1.000001f,-0.195083f,-0.980785f,
--1.000000f,-0.000007f,0.000000f
-
-    };
-    unsigned int num_verts = sizeof(coneVertices) / sizeof(coneVertices[0]);
-    vao_to_the_cone = Upload3DPositionsMesh(coneVertices, sizeof(coneVertices) / sizeof(coneVertices[0]), faces, sizeof(faces) / sizeof(faces[0]));
-  }
-
-  return vao_to_the_cone;
-}
-
-void unload_cone() {
-  if (vao_to_the_cone != 0) {
-    DeleteMesh(1u, vao_to_the_cone);
-    vao_to_the_cone = 0;
-  }
-}
-
-}  // end namespace Primitives
-}  // end namespace OpenGL
 }  // end namespace AA

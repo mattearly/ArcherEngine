@@ -3,6 +3,7 @@
 #include "../OS/OpenGL/Graphics.h"
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
 #include "../OS/OpenGL/Loaders/TextureLoader.h"
+#include "../OS/OpenGL/Loaders/PrimativeMaker.h"
 namespace AA {
 
 Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
@@ -13,7 +14,7 @@ Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
 
 Skybox::~Skybox() {
   if (mCubemapTexId != 0) {
-    OpenGL::DeleteTex(1u, mCubemapTexId);  // todo: cache textures and reuse
+    OpenGL::GetGL()->DeleteTex(1u, mCubemapTexId);  // todo: cache textures and reuse
   }
 }
 
@@ -27,7 +28,7 @@ const unsigned int Skybox::GetVAO() const {
 
 void Skybox::setup_cube_geometry() {
   if (mVAO == 0) {
-    mVAO = OpenGL::Primitives::load_cube();
+    mVAO = PrimativeMaker::load_cube();
   }
 }
 

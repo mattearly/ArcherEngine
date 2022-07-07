@@ -2,24 +2,32 @@
 #include "../../../src/Base/UniqueInstance.h"
 #include "../../../src/Mesh/Spacial3D.h"
 #include "../../../src/Mesh/MeshInfo.h"
+#include "../../../src/Mesh/Skeleton.h"
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace AA {
+
+class Spacial3D;
+
+class UniqueInstance;
+
+class Animation;
+
+struct SceneData;
+
+struct AnimationData;
 
 /// <summary>
 /// AKA Static Mesh
 /// </summary>
-class Prop : public UniqueInstance {
+class Scene : public UniqueInstance {
 public:
-  Prop();
-  Prop(const char* path);
-
-  /// <summary>
-  /// Read only access to mesh data
-  /// </summary>
-  /// <returns>const mesh vec</returns>
-  const std::vector<MeshInfo>& GetMeshes() const;
+  Scene();
+  Scene(const char* path, const bool& get_bones);
+  Scene(const char* path);
+  ~Scene();
 
   const glm::mat4 GetFMM() const;
 
@@ -87,27 +95,32 @@ public:
 
   void SetBackfaceCull(const bool tf);
 
-protected:
+  void UpdateAnim(float dt);
+
+
+  const std::vector<unsigned int> GetVAOList() noexcept;
+
+private:
 
   // mesh loader helps set all these
-  friend class ModelLoader;
-  friend class OGLGraphics;
-  
-  bool stenciled;
-  glm::vec3 stencil_color;
-  bool stenciled_with_normals;
-  float stencil_scale;
-  bool cull_backface;
-  bool render_shadows;
-  bool cull_frontface_for_shadows;
-  Spacial3D spacial_data;
-  std::vector<MeshInfo> mMeshes;
-  std::string cached_load_path;
-
-  // only interface calls removecache and load
+  friend class SceneLoader;
   friend class Interface;
-  virtual void RemoveCache();
-  virtual void Load(const std::string& path);
+  friend class OpenGL;
 
+  void Update();
+  const std::vector<MeshInfo>& GetMeshes();
+
+  void ClearAnimator();
+  void SetAnimator(std::shared_ptr<Animation>& anim);
+  void SetGlobalInverseTransform(const glm::mat4& inv_trans);
+  void SetMeshes(const std::vector<MeshInfo>& meshes);
+  void SetPathID(const std::string& path);
+  void SetSkeleton(const Skeleton& skel);
+  Skeleton* GetSkeleton();
+  
+  void Load(const std::string& path, const bool& getanimdata);
+
+  std::unique_ptr<SceneData> scenedata_;
+  std::unique_ptr<AnimationData> animdata_;
 };
 }  // end namespace AA

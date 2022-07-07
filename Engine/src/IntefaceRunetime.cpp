@@ -1,9 +1,9 @@
 #include <Interface.h>
 #include <Scene/Camera.h>
 #include <OS/Interface/Window.h>
-#include <Mesh/Prop.h>
-#include <Mesh/AnimProp.h>
+#include <Scene/Scene.h>
 #include "OS/OpenGL/Graphics.h"
+#include "OS/OpenGL/Loaders/PrimativeMaker.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
@@ -58,14 +58,9 @@ void Interface::update() {
   }
 
   for (auto& p : mProps) {
-    p->spacial_data.ProcessModifications();
-  }
-
-  for (auto& ap : mAnimatedProps) {
-    ap->spacial_data.ProcessModifications();
-    if (ap->mAnimator) {
-      ap->UpdateAnim(elapsedTime);
-    }
+    p->Update();
+    if (p->animdata_)
+      p->UpdateAnim(elapsedTime);
   }
 
   if (mMusic) {
@@ -105,25 +100,25 @@ void Interface::pre_render() {
   if (g_os_window_resized) {
     settle_window_resize_flag();
   }
-  OpenGL::NewFrame();
+  OpenGL::GetGL()->NewFrame();
 
 }
 
 // Renders visable props every frame
 void Interface::render() {
   if (!mCameras.empty()) {
-    if (mSunLight) { OpenGL::BatchRenderShadows(mCameras.front()->GetPosition(), *mSunLight, mProps, mAnimatedProps); }
+    if (mSunLight) { OpenGL::GetGL()->BatchRenderShadows(mCameras.front()->GetPosition(), *mSunLight, mProps/*, mAnimatedProps*/); }
     for (const auto& cam : mCameras) {
       cam->NewFrame();
-      OpenGL::RenderSkybox(cam->GetSkybox(), cam->GetViewport());
-      OpenGL::BatchRenderToViewport(mProps, mAnimatedProps, cam->GetViewport());
+      OpenGL::GetGL()->RenderSkybox(cam->GetSkybox(), cam->GetViewport());
+      OpenGL::GetGL()->BatchRenderToViewport(mProps, /*mAnimatedProps, */cam->GetViewport());
       if (mDebugLightIndicators) {
         for (const auto& pl : mPointLights)
-          OpenGL::RenderDebugCube(pl->Position);
+          OpenGL::GetGL()->RenderDebugCube(pl->Position);
         //for (const auto& sl : mSpotLights)
-        //  OpenGL::RenderSpotLightIcon(sl->Position, sl->Direction);
+        //  OpenGL::GetGL()->RenderSpotLightIcon(sl->Position, sl->Direction);
         //if (mSunLight)
-        //  OpenGL::RenderDirectionalLightArrowIcon(mSunLight->Direction);
+        //  OpenGL::GetGL()->RenderDirectionalLightArrowIcon(mSunLight->Direction);
       }
     }
   }
@@ -140,7 +135,7 @@ void Interface::post_render() {
   mWindow->swap_buffers();
   g_poll_input_events();
   if (mWindow) if (mWindow->mWindowOptions->_editor_drag_and_drop) if (!mWindow->dropped_paths.empty()) {
-    AddProp(mWindow->dropped_paths.front().c_str());  // process queue item
+    AddProp(mWindow->dropped_paths.front().c_str(), false);  // process queue item
     mWindow->dropped_paths.pop();  // remove from queue
   }
 }
@@ -154,22 +149,14 @@ void Interface::teardown() {
 
   mCameras.clear();
 
-  OpenGL::Primitives::unload_all();
+  PrimativeMaker::unload_all();
 
   ClearAllRuntimeLamdaFunctions();
 
   InternalShaders::Shutdown();
 
   // delete all the meshes and textures from GPU memory
-  for (const auto& p : mProps) {
-    p->RemoveCache();
-  }
   mProps.clear();
-
-  for (const auto& ap : mAnimatedProps) {
-    ap->RemoveCache();
-  }
-  mAnimatedProps.clear();
 
   for (auto& anim : mAnimation) {
     anim.reset();

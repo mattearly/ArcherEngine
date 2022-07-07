@@ -95,11 +95,17 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Mesh\AnimationData.h" />
+    <ClInclude Include="src\OS\OpenGL\Loaders\PrimativeMaker.h" />
+    <ClInclude Include="src\Mesh\Material.h" />
+    <ClInclude Include="src\Mesh\MeshInfo.h" />
+    <ClInclude Include="src\Mesh\TextureTypes.h" />
+    <ClInclude Include="src\OS\OpenGL\Loaders\Cache.h" />
+    <ClInclude Include="src\OS\OpenGL\InternalShaders\Fog.h" />
     <ClInclude Include="src\Base\UniqueInstance.h" />
     <ClInclude Include="include\ArcherEngine\Controls\Input.h" />
     <ClInclude Include="include\ArcherEngine\Interface.h" />
-    <ClInclude Include="include\ArcherEngine\Mesh\AnimProp.h" />
-    <ClInclude Include="include\ArcherEngine\Mesh\Prop.h" />
+    <ClInclude Include="include\ArcherEngine\Scene\Scene.h" />
     <ClInclude Include="include\ArcherEngine\OS\Interface\Window.h" />
     <ClInclude Include="include\ArcherEngine\Scene\Camera.h" />
     <ClInclude Include="include\ArcherEngine\Scene\SunLight.h" />
@@ -110,7 +116,6 @@
     <ClInclude Include="include\ArcherEngine\Version.h" />
     <ClInclude Include="include\ArcherEngine\WindowOptions.h" />
     <ClInclude Include="include\Engine\Support.h" />
-    <ClInclude Include="src\Mesh\Material.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Basic.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\ShaderUniforms.h" />
     <ClInclude Include="include\Engine\Scene\Viewport.h" />
@@ -122,7 +127,6 @@
     <ClInclude Include="src\Mesh\Skeleton.h" />
     <ClInclude Include="src\Mesh\Bone.h" />
     <ClInclude Include="src\Mesh\Animator.h" />
-    <ClInclude Include="src\OS\OpenGL\Loaders\AnimModelLoader.h" />
     <ClInclude Include="include\Engine\Mesh\AnimProp.h" />
     <ClInclude Include="include\Engine\Controls\Input.h" />
     <ClInclude Include="include\Engine\OS\Interface\Window.h" />
@@ -136,7 +140,6 @@
     <ClInclude Include="src\Scene\Skybox.h" />
     <ClInclude Include="src\Mesh\Spacial3D.h" />
     <ClInclude Include="src\Sound\SoundEffect.h" />
-    <ClInclude Include="src\OS\OpenGL\Loaders\TextureInfo.h" />
     <ClInclude Include="include\Engine\Scene\Camera.h" />
     <ClInclude Include="include\Engine\Mesh\Prop.h" />
     <ClInclude Include="glad\glad.h" />
@@ -145,9 +148,8 @@
     <ClInclude Include="src\Sound\LongSound.h" />
     <ClInclude Include="include\Engine\Utility\Files.h" />
     <ClInclude Include="KHR\khrplatform.h" />
-    <ClInclude Include="src\OS\OpenGL\Loaders\ModelLoader.h" />
+    <ClInclude Include="src\OS\OpenGL\Loaders\SceneLoader.h" />
     <ClInclude Include="include\Engine\Interface.h" />
-    <ClInclude Include="src\Mesh\MeshInfo.h" />
     <ClInclude Include="src\OS\OpenGL\Graphics.h" />
     <ClInclude Include="src\Scene\Lights.h" />
     <ClInclude Include="src\OS\OpenGL\OGLShader.h" />
@@ -161,7 +163,10 @@
     <ClInclude Include="include\Engine\Scene\SunLight.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Mesh\Material.cpp" />
+    <ClCompile Include="src\OS\OpenGL\Loaders\PrimativeMaker.cpp" />
+    <ClCompile Include="src\Mesh\MeshInfo.cpp" />
+    <ClCompile Include="src\OS\OpenGL\Loaders\Cache.cpp" />
+    <ClCompile Include="src\OS\OpenGL\InternalShaders\Fog.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Basic.cpp" />
     <ClCompile Include="src\IntefaceRunetime.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Shadow.cpp" />
@@ -170,15 +175,13 @@
     <ClCompile Include="src\Mesh\Skeleton.cpp" />
     <ClCompile Include="src\Mesh\Bone.cpp" />
     <ClCompile Include="src\Mesh\Animator.cpp" />
-    <ClCompile Include="src\OS\OpenGL\Loaders\AnimModelLoader.cpp" />
-    <ClCompile Include="src\Mesh\AnimProp.cpp" />
     <ClCompile Include="src\OS\Interface\Callbacks.cpp" />
     <ClCompile Include="src\OS\Interface\Window.cpp" />
     <ClCompile Include="src\Mesh\Animation.cpp" />
     <ClCompile Include="src\OS\OpenGL\Loaders\MaterialLoader.cpp" />
     <ClCompile Include="src\Physics\NVidiaPhysx.cpp" />
     <ClCompile Include="src\GUI\imGUI.cpp" />
-    <ClCompile Include="src\OS\OpenGL\Loaders\ModelLoader.cpp" />
+    <ClCompile Include="src\OS\OpenGL\Loaders\SceneLoader.cpp" />
     <ClCompile Include="src\OS\OpenGL\Loaders\TextureLoader.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Mesh\Spacial3D.cpp" />
@@ -190,9 +193,8 @@
     <ClCompile Include="src\Sound\Speaker.cpp" />
     <ClCompile Include="src\Sound\SoundDevice.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
-    <ClCompile Include="src\Mesh\Prop.cpp" />
+    <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Interface.cpp" />
-    <ClCompile Include="src\Mesh\MeshInfo.cpp" />
     <ClCompile Include="src\OS\OpenGL\Graphics.cpp" />
     <ClCompile Include="src\OS\OpenGL\OGLShader.cpp" />
     <ClCompile Include="src\Utility\rand.cpp" />

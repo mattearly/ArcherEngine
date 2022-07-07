@@ -35,10 +35,10 @@ void imGUI::NewFrame() {
 //}
 
 void imGUI::Render() {
-  OpenGL::SetDepthTest(false);
+  OpenGL::GetGL()->SetDepthTest(false);
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-  OpenGL::SetDepthTest(true);
+  OpenGL::GetGL()->SetDepthTest(true);
 }
 
 

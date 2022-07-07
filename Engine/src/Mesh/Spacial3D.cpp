@@ -4,7 +4,7 @@
 
 namespace AA {
 
-Spacial3D::Spacial3D() : mRigidBody() {
+Spacial3D::Spacial3D() /*: mRigidBody() */{
   mCurrentLocation = glm::vec3(0);
   mCurrentRot = glm::vec3(0);
   mCurrentScale = glm::vec3(1);

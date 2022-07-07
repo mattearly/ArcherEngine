@@ -76,9 +76,9 @@ void SoundListener::SetOrientation(const float& atx, const float& aty, const flo
 /// AL_LINEAR_DISTANCE_CLAMPED, AL_EXPONENT_DISTANCE,
 /// AL_EXPONENT_DISTANCE_CLAMPED, or AL_NONE.
 /// </summary>
-/// <param name="type">option</param>
-void SoundListener::SetDistanceModel(ALint type) {
-  switch (type) {
+/// <param name="textureType">option</param>
+void SoundListener::SetDistanceModel(ALint textureType) {
+  switch (textureType) {
   case AL_INVERSE_DISTANCE:
   case AL_INVERSE_DISTANCE_CLAMPED:
   case AL_LINEAR_DISTANCE:
@@ -90,7 +90,7 @@ void SoundListener::SetDistanceModel(ALint type) {
   default:
     throw("invalid distance model");
   }
-  alDistanceModel(type);
+  alDistanceModel(textureType);
   if (alGetError() != AL_NO_ERROR) {
     throw("error setting listener distance model");
   }
