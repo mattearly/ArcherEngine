@@ -27,7 +27,7 @@ public:
 
   void CalculateBoneTransform(const AnimationNodeTree* node, glm::mat4 parentTransform);
 
-  std::vector<glm::mat4> GetFinalBoneMatrices();
+  std::vector<glm::mat4> GetFinalBoneMatrices() const;
 
 private:
 

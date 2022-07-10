@@ -1,9 +1,8 @@
-#include "SceneLoader.h"
-#include "TextureLoader.h"
-#include "MaterialLoader.h"
+#include "AssimpSceneLoader.h"
+
+#include "../Graphics.h"
 #include "../../../Mesh/Vertex.h"
 #include "../../../Math/Conversions.h"
-#include "../Graphics.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -16,20 +15,19 @@
 #include <forward_list>
 #include <unordered_map>
 #include <map>
-#include "SceneLoader.h"
 
 namespace AA {
 
-// local helper
-void local_helper_setVertexBoneDataToDefault(AnimVertex& out_vertex) {
+// local helper to set vertex bone data by default
+static void set_vertex_bone_data_to_default(AnimVertex& out_vertex) {
   for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
     out_vertex.m_BoneIDs[i] = -1;
     out_vertex.m_Weights[i] = 0.0f;
   }
 }
 
-// local helper
-void local_helper_setVertexBoneData(AnimVertex& out_vertex, int boneID, float weight) {
+// local helper to set a single AnimVertex with bone & weight
+static void set_vertex_bone_data(AnimVertex& out_vertex, int boneID, float weight) {
   for (int i = 0; i < MAX_BONE_INFLUENCE; ++i) {
     if (out_vertex.m_BoneIDs[i] < 0) {
       out_vertex.m_Weights[i] = weight;
@@ -39,9 +37,8 @@ void local_helper_setVertexBoneData(AnimVertex& out_vertex, int boneID, float we
   }
 }
 
-
-// helper
-void local_helper_extractBoneWeightForVertices(aiMesh* mesh, const aiScene* scene, Skeleton& out_skel, std::vector<AnimVertex>& out_vertices) {
+// local helper to set the bone weights on verticies from aimesh and scene
+static void extract_bone_weights_for_verts(aiMesh* mesh, const aiScene* scene, Skeleton& out_skel, std::vector<AnimVertex>& out_vertices) {
   for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
     int boneID = -1;
     std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
@@ -67,86 +64,16 @@ void local_helper_extractBoneWeightForVertices(aiMesh* mesh, const aiScene* scen
       int vertexId = weights[weightIndex].mVertexId;
       float weight = weights[weightIndex].mWeight;
       assert(vertexId < out_vertices.size());
-      local_helper_setVertexBoneData(out_vertices[vertexId], boneID, weight);
+      set_vertex_bone_data(out_vertices[vertexId], boneID, weight);
     }
   }
 }
-
-
-// local helper
-void local_helper_processMesh(
-  aiMesh* mesh,
-  const aiScene* scene,
-  const std::string& in_path,
-  std::vector<AnimVertex>& out_loaded_verts,
-  std::vector<GLuint>& out_loaded_indices,
-  TextureMapType& out_loaded_textures) {
-
-  unsigned int num_of_vertices_on_mesh = mesh->mNumVertices;
-  if (num_of_vertices_on_mesh == 0)
-    throw("mesh has no out_vertices");
-
-  // Get the out_vertices
-  if (mesh->mTextureCoords[0]) {  // textured
-    for (unsigned int i = 0; i < num_of_vertices_on_mesh; ++i) {
-      out_loaded_verts.emplace_back(AnimVertex(aiVec3_to_glmVec3(mesh->mVertices[i]), glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y), aiVec3_to_glmVec3(mesh->mNormals[i])));
-      local_helper_setVertexBoneDataToDefault(out_loaded_verts.back());
-    }
-  } else {  // not textured
-    for (unsigned int i = 0; i < num_of_vertices_on_mesh; ++i) {
-      out_loaded_verts.emplace_back(AnimVertex(aiVec3_to_glmVec3(mesh->mVertices[i]), glm::vec2(0), aiVec3_to_glmVec3(mesh->mNormals[i])));
-      local_helper_setVertexBoneDataToDefault(out_loaded_verts.back());
-    }
-  }
-
-  // Get the Indices to draw triangle faces with
-  unsigned int num_faces = mesh->mNumFaces;
-  for (unsigned int i = 0; i < num_faces; ++i) {
-    aiFace face = mesh->mFaces[i];
-    for (unsigned int j = 0; j < face.mNumIndices; ++j) {
-      out_loaded_indices.push_back(face.mIndices[j]);
-    }
-
-    // get the materials
-    const aiMaterial* ai_material = scene->mMaterials[mesh->mMaterialIndex];
-    out_loaded_textures = TextureLoader::LoadAllTextures(scene, ai_material, in_path);
-  }
-}
-
-
-
-// helper
-void recursive_processNode(aiNode* node, const aiScene* scene, const std::string& in_path, std::vector<MeshInfo>& out_meshes, Skeleton& out_skel) {
-  for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
-    aiMesh* ai_mesh = scene->mMeshes[node->mMeshes[i]];
-
-    std::vector<AnimVertex> loaded_verts;
-    std::vector<GLuint> loaded_indices;
-    TextureMapType loaded_textures;
-
-    local_helper_processMesh(ai_mesh, scene, in_path, loaded_verts, loaded_indices, loaded_textures);
-
-    local_helper_extractBoneWeightForVertices(ai_mesh, scene, out_skel, loaded_verts);
-    
-    MeshInfo tmp_mesh(0, 0);
-    tmp_mesh.local_transform = aiMat4_to_glmMat4(node->mTransformation);
-    tmp_mesh.vao = OpenGL::GetGL()->UploadStatic3DMesh(loaded_verts, loaded_indices);  // upload for rendering capabilites
-    tmp_mesh.numElements = static_cast<unsigned int>(loaded_indices.size());
-
-    out_meshes.push_back(tmp_mesh);  // populate our our model file
-  }
-
-  for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-    recursive_processNode(node->mChildren[i], scene, in_path, out_meshes, out_skel);
-  }
-}
-
 
 /// <summary>
-/// 4 step helper function for Load_MeshesTexturesMaterials & recursive_processNode
+/// 4 step helper function for Load_MeshesTexturesMaterials & recursive_process_node
 /// </summary>
 /// <returns>MeshInfo: data for drawing a Mesh</returns>
-static MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x4* trans, const std::string& in_load_path) {
+static MeshInfo extract_all_mesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x4* trans, const std::string& in_load_path) {
   // Sanity Check
   unsigned int num_of_vertices_on_mesh = mesh->mNumVertices;
   if (num_of_vertices_on_mesh == 0)
@@ -176,15 +103,67 @@ static MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiM
 
   // Step3: Send the vertex data to the graphic memory
   unsigned int vao = 0;
-
   vao = OpenGL::GetGL()->UploadStatic3DMesh(loaded_vertices, loaded_elements);
 
   // Step4: GetTextures&Materials
   MeshInfo return_info(
     vao,
     static_cast<unsigned int>(loaded_elements.size()),
-    TextureLoader::LoadAllTextures(scene, scene->mMaterials[mesh->mMaterialIndex], in_load_path),  // get all the textures that belong with this mesh
-    MaterialLoader::LoadAll(scene, scene->mMaterials[mesh->mMaterialIndex]),
+    AssimpSceneLoader::LoadAllTextures(scene, scene->mMaterials[mesh->mMaterialIndex], in_load_path),  // get all the textures that belong with this mesh
+    AssimpSceneLoader::LoadAll(scene, scene->mMaterials[mesh->mMaterialIndex]),
+    aiMat4_to_glmMat4(*trans));
+
+  // Return this draw data to the user
+  return return_info;
+}
+
+/// <summary>
+/// 4 step helper function for Load_MeshesTexturesMaterialsBones & recursive_process_node
+/// </summary>
+/// <returns>MeshInfo: data for drawing a Mesh</returns>
+static MeshInfo extract_all_mesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x4* trans, Skeleton& out_skel, const std::string& in_load_path) {
+  // Sanity Check
+  unsigned int num_of_vertices_on_mesh = mesh->mNumVertices;
+  if (num_of_vertices_on_mesh == 0)
+    throw("mesh has no vertices");
+
+  // Step1: Get the Vertices
+  std::vector<AnimVertex> loaded_vertices;
+
+  if (mesh->mTextureCoords[0]) { // case for when texture coordinantes exist
+    for (unsigned int i = 0; i < num_of_vertices_on_mesh; ++i) {
+      loaded_vertices.emplace_back(AnimVertex(aiVec3_to_glmVec3(mesh->mVertices[i]), glm::vec2(mesh->mTextureCoords[0][i].x, 1 - mesh->mTextureCoords[0][i].y), aiVec3_to_glmVec3(mesh->mNormals[i])));
+      set_vertex_bone_data_to_default(loaded_vertices.back());
+    }
+  } else {  // case for when texture coordinantes do not exist
+    for (unsigned int i = 0; i < num_of_vertices_on_mesh; ++i) {
+      loaded_vertices.emplace_back(AnimVertex(aiVec3_to_glmVec3(mesh->mVertices[i]), glm::vec2(0), aiVec3_to_glmVec3(mesh->mNormals[i])));
+      set_vertex_bone_data_to_default(loaded_vertices.back());
+    }
+  }
+
+  extract_bone_weights_for_verts(mesh, scene, out_skel, loaded_vertices);
+
+  // Step2: Get the Indices to draw triangle faces with
+  std::vector<unsigned int> loaded_elements;
+  unsigned int num_faces = mesh->mNumFaces;
+  for (unsigned int i = 0; i < num_faces; ++i) {
+    aiFace face = mesh->mFaces[i];
+    for (unsigned int j = 0; j < face.mNumIndices; ++j) {
+      loaded_elements.push_back(face.mIndices[j]);
+    }
+  }
+
+  // Step3: Send the vertex data to the graphic memory
+  unsigned int vao = 0;
+  vao = OpenGL::GetGL()->UploadStatic3DMesh(loaded_vertices, loaded_elements);
+
+  // Step4: GetTextures&Materials
+  MeshInfo return_info(
+    vao,
+    static_cast<unsigned int>(loaded_elements.size()),
+    AssimpSceneLoader::LoadAllTextures(scene, scene->mMaterials[mesh->mMaterialIndex], in_load_path),  // get all the textures that belong with this mesh
+    AssimpSceneLoader::LoadAll(scene, scene->mMaterials[mesh->mMaterialIndex]),
     aiMat4_to_glmMat4(*trans));
 
   // Return this draw data to the user
@@ -192,14 +171,25 @@ static MeshInfo local_helper_processMesh(aiMesh* mesh, const aiScene* scene, aiM
 }
 
 // recursive helper function for Load_MeshesTexturesMaterials
-static void recursive_processNode(aiNode* node, const aiScene* scene, std::vector<MeshInfo>& out_mesh_info, const std::string& in_load_path) {
+static void recursive_process_node(aiNode* node, const aiScene* scene, std::vector<MeshInfo>& out_mesh_info, const std::string& in_load_path) {
   for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
     aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-    out_mesh_info.push_back(local_helper_processMesh(mesh, scene, &node->mTransformation, in_load_path));
+    out_mesh_info.push_back(extract_all_mesh(mesh, scene, &node->mTransformation, in_load_path));
+  }
+  for (unsigned int i = 0; i < node->mNumChildren; ++i) {
+    recursive_process_node(node->mChildren[i], scene, out_mesh_info, in_load_path);
+  }
+}
+
+// recursive helper function for Load_MeshesTexturesMaterialsBones
+static void recursive_process_node(aiNode* node, const aiScene* scene, std::vector<MeshInfo>& out_mesh_info, Skeleton& out_skel, const std::string& in_load_path) {
+  for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
+    aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+    out_mesh_info.push_back(extract_all_mesh(mesh, scene, &node->mTransformation, out_skel, in_load_path));
   }
 
   for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-    recursive_processNode(node->mChildren[i], scene, out_mesh_info, in_load_path);
+    recursive_process_node(node->mChildren[i], scene, out_mesh_info, out_skel, in_load_path);
   }
 }
 
@@ -214,7 +204,7 @@ static void recursive_processNode(aiNode* node, const aiScene* scene, std::vecto
 // retursn false (0) on model loaded
 //    0 = model loaded from given path
 // otherwise returns 0 if the import is successful
-int SceneLoader::Load_MeshesTexturesMaterials(Scene& out_model, const std::string& in_path_to_load) {
+int AssimpSceneLoader::Load_MeshesTexturesMaterials(Scene& out_model, const std::string& in_path_to_load) {
   int load_status_code = 0;
   std::vector<MeshInfo> mesh_builder;
 
@@ -236,7 +226,7 @@ int SceneLoader::Load_MeshesTexturesMaterials(Scene& out_model, const std::strin
       load_status_code = -3; // no root node
 
     if (load_status_code == 0) {
-      recursive_processNode(scene->mRootNode, scene, mesh_builder, in_path_to_load);
+      recursive_process_node(scene->mRootNode, scene, mesh_builder, in_path_to_load);
       out_model.SetMeshes(mesh_builder);
       out_model.SetPathID(in_path_to_load);
 
@@ -251,17 +241,27 @@ int SceneLoader::Load_MeshesTexturesMaterials(Scene& out_model, const std::strin
   return load_status_code;
 }
 
-int SceneLoader::Load_MeshesTexturesMaterialsBones(Scene& out_model, const std::string& path_to_load) {
+int AssimpSceneLoader::Load_MeshesTexturesMaterialsBones(Scene& out_model, const std::string& in_path_to_load) {
   int return_code = 0;
   std::vector<MeshInfo> mesh_builder{};
   Skeleton skeleton_builder{};
-  return_code = Cache::Instance()->try_load_from_cache(mesh_builder, skeleton_builder, path_to_load);
-  if (return_code != 1) {
+  glm::mat4 inv_trans{};
+
+  return_code = Cache::Instance()->try_load_from_cache(mesh_builder, skeleton_builder, inv_trans, in_path_to_load);
+  
+  if (return_code == 1) {
+    out_model.SetMeshes(mesh_builder);
+    out_model.SetSkeleton(skeleton_builder);
+    out_model.SetPathID(in_path_to_load);
+    out_model.SetGlobalInverseTransform(inv_trans);
+
+  } else /*if (return_code != 1)*/ {
+    
     Assimp::Importer importer;
-    int post_processing_flags = 0;
     //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
-    post_processing_flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_ValidateDataStructure;
-    const aiScene* scene = importer.ReadFile(path_to_load, post_processing_flags);
+    int post_processing_flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_ValidateDataStructure;
+    const aiScene* scene = importer.ReadFile(in_path_to_load, post_processing_flags);
+    
     // check if errors on load
     if (!scene)
       return_code = -1;
@@ -270,26 +270,30 @@ int SceneLoader::Load_MeshesTexturesMaterialsBones(Scene& out_model, const std::
     else if (!scene->mRootNode)
       return_code = -3;
 
-    if (scene && return_code == 0) {
-      // save global inverse transform for bone animations later
-      out_model.SetGlobalInverseTransform(glm::inverse(aiMat4_to_glmMat4(scene->mRootNode->mTransformation)));
-      recursive_processNode(scene->mRootNode, scene, path_to_load, mesh_builder, skeleton_builder);
-
+    if (return_code == 0) {
+      // put together the model
+      recursive_process_node(scene->mRootNode, scene, mesh_builder, skeleton_builder, in_path_to_load);
+      
+      // set output
       out_model.SetMeshes(mesh_builder);
+      out_model.SetPathID(in_path_to_load);
       out_model.SetSkeleton(skeleton_builder);
+      out_model.SetGlobalInverseTransform(glm::inverse(aiMat4_to_glmMat4(scene->mRootNode->mTransformation)));
 
       // cache for later reloads of the same model
-      AnimSceneInfo temp_mesh_info;
+      SceneInfo temp_mesh_info;
       temp_mesh_info.meshes = mesh_builder;
+      temp_mesh_info.path = in_path_to_load;
       temp_mesh_info.skelly = skeleton_builder;
-      temp_mesh_info.path = path_to_load;
+      temp_mesh_info.inverse_transform = glm::inverse(aiMat4_to_glmMat4(scene->mRootNode->mTransformation));
       Cache::Instance()->add(temp_mesh_info);
     }
   }
+
   return return_code;
 }
 
-void SceneLoader::Unload(const std::string& path_to_unload) {
+void AssimpSceneLoader::Unload(const std::string& path_to_unload) {
   Cache::Instance()->remove_scene_at_path(path_to_unload);
 }
 

@@ -54,9 +54,6 @@
     <ClInclude Include="src\Scene\Lights.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\Loaders\SceneLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Utility\Files.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -73,9 +70,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Version.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\Loaders\TextureLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\imGUI.h">
@@ -150,9 +144,6 @@
     <ClInclude Include="include\Engine\Support.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\Loaders\MaterialLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Base\UniqueInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -211,6 +202,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Mesh\AnimationData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OS\OpenGL\Loaders\AssimpSceneLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -330,6 +324,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\OpenGL\Loaders\PrimativeMaker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\Loaders\AssimpSceneLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

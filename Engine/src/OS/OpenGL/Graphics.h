@@ -78,7 +78,7 @@ public:
   /// <param name="animated_render_objects"></param>
   /// <param name="depthMapFBO"></param>
   void BatchRenderShadows(
-    const glm::vec3 view_pos,
+    const glm::vec3& view_pos,
     const SunLight& dir_light,
     const std::vector<std::shared_ptr<AA::Scene> >& render_objects);
 
@@ -91,9 +91,13 @@ public:
 
   void RenderProp(const std::shared_ptr<AA::Scene>& render_object);
 
+  void RenderAnimProp(const std::shared_ptr<AA::Scene>& render_object);
+
   void RenderSkybox(const Skybox* skybox_target, const Viewport& vp);
 
   void RenderStenciled(const std::shared_ptr<AA::Scene>& render_object);
+
+  void RenderAnimStenciled(const std::shared_ptr<AA::Scene>& render_object);
 
   /// <summary>
   /// Debug

@@ -51,7 +51,7 @@ void Animator::CalculateBoneTransform(const AnimationNodeTree* node, glm::mat4 p
     CalculateBoneTransform(&node->children[i], accum_transform);
 }
 
-std::vector<glm::mat4> Animator::GetFinalBoneMatrices() {
+std::vector<glm::mat4> Animator::GetFinalBoneMatrices() const{
   return m_FinalBoneMatrices;
 }
 

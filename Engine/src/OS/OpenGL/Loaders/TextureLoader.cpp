@@ -1,5 +1,4 @@
-#include "TextureLoader.h"
-#include "SceneLoader.h"
+#include "AssimpSceneLoader.h"
 #include "../Graphics.h"
 #include <assimp/Importer.hpp>
 #include <string>
@@ -108,7 +107,7 @@ static int load_textures_from_scene(
       // see if it has already been loaded previously to reuse
       auto reused_tex_info = Cache::Instance()->try_load_from_cache(out_texInfo, embedded_filename);
 
-       // not already loaded, lets try from embedded, this should succeed if it gets here
+      // not already loaded, lets try from embedded, this should succeed if it gets here
       if (reused_tex_info == 0) {
         Texture2DInfo a_new_texture_info;
         //bool compressed = (ai_embedded_texture->mHeight == 0) ? true : false;
@@ -131,10 +130,9 @@ static int load_textures_from_scene(
         }
         stbi_image_free(data);
       }
-    }
-    // ELSE: textures are not embedded
-    // try from 3 most likely paths as detailed below
-    else {
+    } else {
+      // ELSE: textures are not embedded
+      // try from 3 most likely paths as detailed below
       //regular file, check if it exists and read it
       // the 3 paths to try
       std::vector<std::string> potential_paths;
@@ -147,7 +145,7 @@ static int load_textures_from_scene(
       std::string from_model_path = model_dir + literal_path.substr(literal_path.find_last_of("/\\") + 1);  // all the way to the end
       potential_paths.emplace_back(from_model_path);
       // routine to see if we already have this texture loaded
-      
+
       for (const auto& a_path : potential_paths) {
         auto already_loaded = Cache::Instance()->try_load_from_cache(out_texInfo, a_path);
         if (already_loaded == 0)
@@ -187,7 +185,7 @@ static int load_textures_from_scene(
   return 0;
 }
 
-TextureMapType TextureLoader::LoadAllTextures(const aiScene* scene, const aiMaterial* ai_material, const std::string& orig_filepath) {
+TextureMapType AssimpSceneLoader::LoadAllTextures(const aiScene* scene, const aiMaterial* ai_material, const std::string& orig_filepath) {
   TextureMapType all_loaded_textures;
 
   // get the albedo (diffuse) textures
@@ -232,7 +230,7 @@ TextureMapType TextureLoader::LoadAllTextures(const aiScene* scene, const aiMate
   return all_loaded_textures;
 }
 
-unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths) {
+unsigned int AssimpSceneLoader::LoadCubeMapTexture(const std::vector<std::string>& six_texture_paths) {
   if (six_texture_paths.size() != 6)
     throw("wrong number of textures");
   int width(0), height(0), nrChannel(0);
@@ -254,9 +252,9 @@ unsigned int TextureLoader::LoadCubeMapTexture(const std::vector<std::string>& s
   return return_id;
 }
 
-void TextureLoader::UnloadTexture(const TextureMapType& textures_to_remove) {
-  Cache::Instance()->remove_textures(textures_to_remove);
-}
+//void AssimpSceneLoader::UnloadTexture(const TextureMapType& textures_to_remove) {
+//  Cache::Instance()->remove_textures(textures_to_remove);
+//}
 
 
 } // end namespace AA

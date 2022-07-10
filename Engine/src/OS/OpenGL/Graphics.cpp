@@ -12,7 +12,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <cstddef>
 #include <cmath>
-#include "Loaders/Cache.h"
 
 namespace AA {
 
@@ -601,7 +600,7 @@ void OpenGL::ResetToDefault() {
 }
 
 void OpenGL::BatchRenderShadows(
-  const glm::vec3 view_pos,
+  const glm::vec3& view_pos,
   const SunLight& dir_light,
   const std::vector<std::shared_ptr<AA::Scene> >& render_objects) {
   if (!dir_light.Shadows) {
@@ -676,7 +675,15 @@ void OpenGL::BatchRenderToViewport(
 
   for (const auto& render_object : render_objects) {
     if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
-    RenderProp(render_object);
+    if (render_object->animdata_) RenderAnimProp(render_object);
+    else RenderProp(render_object);
+  }
+
+  // stencils LAST
+  for (const auto& render_object : render_objects) {
+    if (!render_object->IsStenciled()) continue;  // skip, already rendered
+    if (render_object->animdata_) RenderAnimStenciled(render_object);
+    else RenderStenciled(render_object);
   }
 
   //for (const auto& render_object : animated_render_objects) {
@@ -695,11 +702,7 @@ void OpenGL::BatchRenderToViewport(
   //  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
   //}
 
-  // stencils LAST
-  for (const auto& render_object : render_objects) {
-    if (!render_object->IsStenciled()) continue;
-    RenderStenciled(render_object);
-  }
+
 
   //for (const auto& render_object : animated_render_objects) {
   //  if (!render_object->IsStenciled()) continue;
@@ -796,6 +799,23 @@ void OpenGL::RenderProp(const std::shared_ptr<AA::Scene>& render_object) {
   ResetToDefault();
 }
 
+void OpenGL::RenderAnimProp(const std::shared_ptr<AA::Scene>& render_object) {
+  if (render_object->HasAnimation()) {
+    InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
+    InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
+    auto transforms = render_object->GetFinalBoneMatrices();
+    for (unsigned int i = 0; i < transforms.size(); ++i) {
+      InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+      InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+    }
+  }
+
+  RenderProp(render_object);
+
+  InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
+}
+
 void OpenGL::RenderSkybox(const Skybox* skybox_target, const Viewport& vp) {
   if (!skybox_target) { return; }
   glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
@@ -852,6 +872,12 @@ void OpenGL::RenderStenciled(const std::shared_ptr<AA::Scene>& render_object) {
       }
     }
 
+    // set non-image-texture materials
+    uber_shader->SetVec3("u_material.Tint", m.material.Diffuse);
+    uber_shader->SetVec3("u_material.Ambient", m.material.Ambient);
+    uber_shader->SetVec3("u_material.SpecularColor", m.material.SpecularColor);
+    uber_shader->SetVec3("u_material.EmissionColor", m.material.Emission);
+
     //SetCullFace(m.backface_culled);
     DrawElements(m.vao, m.numElements);
 
@@ -891,6 +917,21 @@ void OpenGL::RenderStenciled(const std::shared_ptr<AA::Scene>& render_object) {
   glEnable(GL_DEPTH_TEST);
   stencil_shader->SetBool("u_stencil_with_normals", false);
   ResetToDefault();
+}
+
+void OpenGL::RenderAnimStenciled(const std::shared_ptr<AA::Scene>& render_object) {
+  if (render_object->HasAnimation()) {
+    InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
+    InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
+    auto transforms = render_object->GetFinalBoneMatrices();
+    for (unsigned int i = 0; i < transforms.size(); ++i) {
+      InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+      InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+    }
+  }
+  RenderStenciled(render_object);
+  InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
+  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
 }
 
 /// <summary>

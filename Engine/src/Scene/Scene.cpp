@@ -1,5 +1,4 @@
 #include <Scene/Scene.h>
-#include "../OS/OpenGL/Loaders/SceneLoader.h"
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <vector>
@@ -7,6 +6,7 @@
 #include <memory>
 #include "../Mesh/Animator.h"
 #include "../Mesh/AnimationData.h"
+#include "../OS/OpenGL/Loaders/AssimpSceneLoader.h"
 
 namespace AA {
 
@@ -39,15 +39,15 @@ Scene::Scene(const char* path) {
 }
 
 Scene::~Scene() {
-  if (scenedata_) {
-    if (!scenedata_->mMeshes.empty()) {
-      SceneLoader::Unload(scenedata_->cached_load_path);
-    }
-    scenedata_.reset();
-  }
-  if (animdata_) {
-    animdata_.reset();
-  }
+  //if (scenedata_) {
+  //  if (!scenedata_->mMeshes.empty()) {
+  //    AssimpSceneLoader::Unload(scenedata_->cached_load_path);
+  //  }
+  //  scenedata_.reset();
+  //}
+  //if (animdata_) {
+  //  animdata_.reset();
+  //}
 }
 
 void Scene::Update() {
@@ -72,6 +72,12 @@ Skeleton* Scene::GetSkeleton() {
     return &animdata_->m_Skeleton;
 }
 
+std::vector<glm::mat4> Scene::GetFinalBoneMatrices() const {
+  if (HasAnimation())
+    return animdata_->mAnimator->GetFinalBoneMatrices();
+  else return std::vector<glm::mat4>();
+}
+
 const std::vector<MeshInfo>& Scene::GetMeshes() {
   return scenedata_->mMeshes;
 }
@@ -89,9 +95,9 @@ void Scene::Load(const std::string& path, const bool& getanimdata) {
   int load_code = 0;
 
   if (getanimdata) {
-    load_code = SceneLoader::Load_MeshesTexturesMaterials(*this, path);
+    load_code = AssimpSceneLoader::Load_MeshesTexturesMaterialsBones(*this, path);
   } else {
-    load_code = SceneLoader::Load_MeshesTexturesMaterialsBones(*this, path);
+    load_code = AssimpSceneLoader::Load_MeshesTexturesMaterials(*this, path);
   }
 
   if (load_code == 0) {  // loaded from path
@@ -121,6 +127,18 @@ const bool Scene::IsStenciled() const {
 
 const bool Scene::IsStenciledWithNormals() const {
   return scenedata_->stenciled_with_normals;
+}
+
+const bool Scene::IsAnimated() const {
+  return (animdata_) ? true : false;
+}
+
+const bool Scene::HasAnimation() const {
+  if (animdata_)
+    if (animdata_->mAnimator)
+      return true;
+
+  return false;
 }
 
 const float Scene::GetStencilScale() const {

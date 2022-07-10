@@ -183,7 +183,7 @@ std::weak_ptr<Camera> Interface::GetCamera(uidtype camId) {
 // Props Access
 //
 unsigned int Interface::AddProp(const char* path, const bool& try_animated, const glm::vec3 location, const glm::vec3 scale) {
-  mProps.emplace_back(std::make_shared<Scene>(path));
+  mProps.emplace_back(std::make_shared<Scene>(path, try_animated));
   mProps.back()->SetLocation(location);
   mProps.back()->SetScale(scale);
   return mProps.back()->GetUID();
@@ -221,7 +221,7 @@ unsigned int Interface::AddAnimation(const char* path, const unsigned int prop_i
     if (prop->GetUID() == prop_id_to_match_bones_with) {
       auto* skel = prop->GetSkeleton();
       if (skel) {
-        mAnimation.emplace_back(std::make_shared<Animation>(path, *prop->GetSkeleton()));
+        mAnimation.emplace_back(std::make_shared<Animation>(path, *skel));
         return mAnimation.back()->GetUID();
       }
     }

@@ -3,6 +3,7 @@
 #include "../../../src/Mesh/Spacial3D.h"
 #include "../../../src/Mesh/MeshInfo.h"
 #include "../../../src/Mesh/Skeleton.h"
+#include "../../../src/OS/OpenGL/Loaders/AssimpSceneLoader.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -34,6 +35,10 @@ public:
   const bool IsStenciled() const;
 
   const bool IsStenciledWithNormals() const;
+
+  const bool IsAnimated() const;
+  
+  const bool HasAnimation() const;
 
   const float GetStencilScale() const;
 
@@ -97,13 +102,12 @@ public:
 
   void UpdateAnim(float dt);
 
-
   const std::vector<unsigned int> GetVAOList() noexcept;
 
 private:
 
   // mesh loader helps set all these
-  friend class SceneLoader;
+  friend class AssimpSceneLoader;
   friend class Interface;
   friend class OpenGL;
 
@@ -117,6 +121,7 @@ private:
   void SetPathID(const std::string& path);
   void SetSkeleton(const Skeleton& skel);
   Skeleton* GetSkeleton();
+  std::vector<glm::mat4> GetFinalBoneMatrices() const;
   
   void Load(const std::string& path, const bool& getanimdata);
 

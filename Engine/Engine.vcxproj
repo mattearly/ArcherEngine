@@ -95,6 +95,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\OS\OpenGL\Loaders\AssimpSceneLoader.h" />
     <ClInclude Include="src\Mesh\AnimationData.h" />
     <ClInclude Include="src\OS\OpenGL\Loaders\PrimativeMaker.h" />
     <ClInclude Include="src\Mesh\Material.h" />
@@ -132,10 +133,8 @@
     <ClInclude Include="include\Engine\OS\Interface\Window.h" />
     <ClInclude Include="src\Mesh\Animation.h" />
     <ClInclude Include="include\Engine\Utility\rand.h" />
-    <ClInclude Include="src\OS\OpenGL\Loaders\MaterialLoader.h" />
     <ClInclude Include="src\Physics\NVidiaPhysx.h" />
     <ClInclude Include="src\GUI\imGUI.h" />
-    <ClInclude Include="src\OS\OpenGL\Loaders\TextureLoader.h" />
     <ClInclude Include="include\Engine\Version.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
     <ClInclude Include="src\Mesh\Spacial3D.h" />
@@ -148,7 +147,6 @@
     <ClInclude Include="src\Sound\LongSound.h" />
     <ClInclude Include="include\Engine\Utility\Files.h" />
     <ClInclude Include="KHR\khrplatform.h" />
-    <ClInclude Include="src\OS\OpenGL\Loaders\SceneLoader.h" />
     <ClInclude Include="include\Engine\Interface.h" />
     <ClInclude Include="src\OS\OpenGL\Graphics.h" />
     <ClInclude Include="src\Scene\Lights.h" />
@@ -163,6 +161,7 @@
     <ClInclude Include="include\Engine\Scene\SunLight.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\OS\OpenGL\Loaders\AssimpSceneLoader.cpp" />
     <ClCompile Include="src\OS\OpenGL\Loaders\PrimativeMaker.cpp" />
     <ClCompile Include="src\Mesh\MeshInfo.cpp" />
     <ClCompile Include="src\OS\OpenGL\Loaders\Cache.cpp" />

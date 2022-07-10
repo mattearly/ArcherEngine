@@ -2,8 +2,8 @@
 #include <Utility/Files.h>
 #include "../OS/OpenGL/Graphics.h"
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
-#include "../OS/OpenGL/Loaders/TextureLoader.h"
 #include "../OS/OpenGL/Loaders/PrimativeMaker.h"
+#include "../OS/OpenGL/Loaders/AssimpSceneLoader.h"
 namespace AA {
 
 Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
@@ -33,7 +33,7 @@ void Skybox::setup_cube_geometry() {
 }
 
 void Skybox::setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles) {
-  mCubemapTexId = TextureLoader::LoadCubeMapTexture(incomingSkymapFiles);     // todo: load up debug box if skymap files are wrong
+  mCubemapTexId = AssimpSceneLoader::LoadCubeMapTexture(incomingSkymapFiles);     // todo: load up debug box if skymap files are wrong
 }
 
 }  // end namespace AA

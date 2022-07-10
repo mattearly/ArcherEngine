@@ -1,6 +1,6 @@
-#include "MaterialLoader.h"
+#include "AssimpSceneLoader.h"
 namespace AA {
-Material MaterialLoader::LoadAll(const aiScene* scene, const aiMaterial* ai_material) {
+Material AssimpSceneLoader::LoadAll(const aiScene* scene, const aiMaterial* ai_material) {
   aiString name{};
   ai_material->Get(AI_MATKEY_NAME, name);
 

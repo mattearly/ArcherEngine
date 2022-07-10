@@ -59,7 +59,7 @@ void Interface::update() {
 
   for (auto& p : mProps) {
     p->Update();
-    if (p->animdata_)
+    if (p->HasAnimation())
       p->UpdateAnim(elapsedTime);
   }
 
@@ -107,11 +107,11 @@ void Interface::pre_render() {
 // Renders visable props every frame
 void Interface::render() {
   if (!mCameras.empty()) {
-    if (mSunLight) { OpenGL::GetGL()->BatchRenderShadows(mCameras.front()->GetPosition(), *mSunLight, mProps/*, mAnimatedProps*/); }
+    if (mSunLight) { OpenGL::GetGL()->BatchRenderShadows(mCameras.front()->GetPosition(), *mSunLight, mProps); }
     for (const auto& cam : mCameras) {
       cam->NewFrame();
       OpenGL::GetGL()->RenderSkybox(cam->GetSkybox(), cam->GetViewport());
-      OpenGL::GetGL()->BatchRenderToViewport(mProps, /*mAnimatedProps, */cam->GetViewport());
+      OpenGL::GetGL()->BatchRenderToViewport(mProps, cam->GetViewport());
       if (mDebugLightIndicators) {
         for (const auto& pl : mPointLights)
           OpenGL::GetGL()->RenderDebugCube(pl->Position);

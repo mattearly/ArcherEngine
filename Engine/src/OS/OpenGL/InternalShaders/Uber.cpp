@@ -66,8 +66,7 @@ void main(){
 #version 460 core
 layout(location=0)out vec4 out_Color;
 
-in VS_OUT
-{
+in VS_OUT {
   vec3 Pos;
   vec2 TexUV;
   vec3 Norm;
