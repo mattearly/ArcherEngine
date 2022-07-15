@@ -160,6 +160,8 @@ public:
   /// <param name="spec">Specular</param>
   void SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
 
+  void SetSunLight(const SunLight& other);
+
   std::weak_ptr<SunLight> GetSunLight() noexcept;
 
   /// <summary>

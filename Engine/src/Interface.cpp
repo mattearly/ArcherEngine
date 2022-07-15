@@ -340,6 +340,10 @@ void Interface::SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::v
   }
 }
 
+void Interface::SetSunLight(const SunLight& other) {
+  mSunLight = std::make_shared<SunLight>(other);
+}
+
 std::weak_ptr<SunLight> Interface::GetSunLight() noexcept {
   return mSunLight;
 }
