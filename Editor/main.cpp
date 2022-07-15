@@ -10,6 +10,10 @@ int main() {
     if (!engine.Init(winopts)) return -1;
   }
 
+  // turn on log stream to console since we have our console going
+  engine.SetLogStream(true, false);
+
+
   engine.SetSunLight(glm::vec3(-.33f, -1.f, -.33f), glm::vec3(.1f), glm::vec3(0.6f), glm::vec3(0.9f));
 
 
