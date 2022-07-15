@@ -29,7 +29,9 @@ Scene::Scene() {
 
 Scene::Scene(const char* path, const bool& do_get_bones) {
   scenedata_ = std::make_unique<SceneData>();
-  if (do_get_bones) animdata_ = std::make_unique<AnimationData>();
+  if (do_get_bones) {
+    animdata_ = std::make_unique<AnimationData>();
+  }
   Load(path, do_get_bones);
 }
 
@@ -39,15 +41,15 @@ Scene::Scene(const char* path) {
 }
 
 Scene::~Scene() {
-  //if (scenedata_) {
-  //  if (!scenedata_->mMeshes.empty()) {
-  //    AssimpSceneLoader::Unload(scenedata_->cached_load_path);
-  //  }
-  //  scenedata_.reset();
-  //}
-  //if (animdata_) {
-  //  animdata_.reset();
-  //}
+  if (scenedata_) {
+    if (!scenedata_->mMeshes.empty()) {
+      AssimpSceneLoader::Unload(scenedata_->cached_load_path);
+    }
+    scenedata_.reset();
+  }
+  if (animdata_) {
+    animdata_.reset();
+  }
 }
 
 void Scene::Update() {
@@ -55,6 +57,7 @@ void Scene::Update() {
     scenedata_->spacial_data.ProcessModifications();
 }
 
+// copy meshes
 void Scene::SetMeshes(const std::vector<MeshInfo>& meshes) {
   scenedata_->mMeshes = meshes;
 }

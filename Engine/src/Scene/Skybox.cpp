@@ -2,7 +2,6 @@
 #include <Utility/Files.h>
 #include "../OS/OpenGL/Graphics.h"
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
-#include "../OS/OpenGL/Loaders/PrimativeMaker.h"
 #include "../OS/OpenGL/Loaders/AssimpSceneLoader.h"
 namespace AA {
 
@@ -28,12 +27,12 @@ const unsigned int Skybox::GetVAO() const {
 
 void Skybox::setup_cube_geometry() {
   if (mVAO == 0) {
-    mVAO = PrimativeMaker::load_cube();
+    mVAO = OpenGL::GetGL()->MakeCube();
   }
 }
 
 void Skybox::setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles) {
-  mCubemapTexId = AssimpSceneLoader::LoadCubeMapTexture(incomingSkymapFiles);     // todo: load up debug box if skymap files are wrong
+  mCubemapTexId = AssimpSceneLoader::LoadCubeMapTexture(incomingSkymapFiles);  // todo: load up debug box if skymap files are wrong
 }
 
 }  // end namespace AA

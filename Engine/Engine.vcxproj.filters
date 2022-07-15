@@ -108,9 +108,6 @@
     <ClInclude Include="src\Mesh\Skeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\WindowOptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -198,7 +195,7 @@
     <ClInclude Include="src\Mesh\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\Loaders\PrimativeMaker.h">
+    <ClInclude Include="src\OS\OpenGL\PrimativeMaker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Mesh\AnimationData.h">
@@ -287,9 +284,6 @@
     <ClCompile Include="src\Mesh\Skeleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\entt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Stencil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -323,10 +317,13 @@
     <ClCompile Include="src\Mesh\MeshInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS\OpenGL\Loaders\PrimativeMaker.cpp">
+    <ClCompile Include="src\OS\OpenGL\PrimativeMaker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OS\OpenGL\Loaders\AssimpSceneLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS\OpenGL\RenderPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

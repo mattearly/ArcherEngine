@@ -1,5 +1,5 @@
 #include "PrimativeMaker.h"
-#include "../Graphics.h"
+#include "Graphics.h"
 namespace AA {
 
 static unsigned int vao_to_the_cube = 0;
@@ -85,7 +85,7 @@ void PrimativeMaker::unload_plane() {
 
 static unsigned int vao_to_the_cone = 0;
 // creates and returns vao to a botched cone
-unsigned int PrimativeMaker::load_cone(unsigned int& out_num_elements) {
+unsigned int PrimativeMaker::load_cone() {
 
   // todo: fix?
   unsigned int faces[] = {   //indices
@@ -126,7 +126,7 @@ unsigned int PrimativeMaker::load_cone(unsigned int& out_num_elements) {
 
   };
 
-  out_num_elements = sizeof(faces) / sizeof(faces[0]);
+ unsigned int out_num_elements = sizeof(faces) / sizeof(faces[0]);
 
   if (vao_to_the_cone == 0) {
     // needs loaded

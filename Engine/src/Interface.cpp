@@ -245,7 +245,7 @@ bool Interface::RemoveAnimation(const unsigned int animation_id) {
   return (before_size != after_size);
 }
 
-void Interface::SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int prop_id) {
+void Interface::SetAnimationOnProp(const unsigned int animation_id, const unsigned int prop_id) {
   // this is terribly inefficient, but it should work
   for (auto& p : mProps) {
     if (!p->animdata_) {
@@ -878,6 +878,10 @@ void Interface::SetWindowTitle(const char* name) noexcept {
   auto shared = temp.lock();
   shared->_title = name;
   mWindow->apply_new_window_option_changes();
+}
+
+void Interface::SetLogStream(const bool& on_or_off, const bool& file_or_stdout) {
+  OpenGL::GetGL()->SetLogStream(on_or_off, file_or_stdout);
 }
 
 // toggles fullscreen as expected, does nothign if window is null

@@ -53,6 +53,7 @@ inline int helper_get_ogl_of_stb_internal_format(int stbi_internal_format) {
   return ogl_internal_format;
 }
 
+// caches textures that are loaded
 static int load_textures_from_scene(
   const aiScene* scn,
   const aiMaterial* mat,
@@ -105,7 +106,7 @@ static int load_textures_from_scene(
       if (embedded_filename == "") { embedded_filename = model_file_name + "." + model_file_extension + "/" + toString(typeName); }
 
       // see if it has already been loaded previously to reuse
-      auto reused_tex_info = Cache::Instance()->try_load_from_cache(out_texInfo, embedded_filename);
+      auto reused_tex_info = Cache::Get()->try_load_from_cache(out_texInfo, embedded_filename);
 
       // not already loaded, lets try from embedded, this should succeed if it gets here
       if (reused_tex_info == 0) {
@@ -123,18 +124,19 @@ static int load_textures_from_scene(
             a_new_texture_info.path = embedded_filename;
             a_new_texture_info.textureType = typeName;
             // update our list of loaded textures
-            Cache::Instance()->add(a_new_texture_info);
+            Cache::Get()->add(a_new_texture_info);
             // to return for draw info on this current mesh
             out_texInfo.emplace_back(a_new_texture_info);
           }
         }
         stbi_image_free(data);
       }
-    } else {
-      // ELSE: textures are not embedded
-      // try from 3 most likely paths as detailed below
-      //regular file, check if it exists and read it
-      // the 3 paths to try
+    }
+    // ELSE: textures are not embedded
+    // try from 3 most likely paths as detailed below
+    // regular file, check if it exists and read it
+    // the 3 paths to try 
+    else {
       std::vector<std::string> potential_paths;
       // 1. the direct string (will probably fail)
       potential_paths.emplace_back(aiTmpStr.C_Str());
@@ -147,7 +149,7 @@ static int load_textures_from_scene(
       // routine to see if we already have this texture loaded
 
       for (const auto& a_path : potential_paths) {
-        auto already_loaded = Cache::Instance()->try_load_from_cache(out_texInfo, a_path);
+        auto already_loaded = Cache::Get()->try_load_from_cache(out_texInfo, a_path);
         if (already_loaded == 0)
           continue;
         else
@@ -170,7 +172,7 @@ static int load_textures_from_scene(
             // add the new one to our list of loaded textures for management
             a_new_texture_info.path = a_path;
             a_new_texture_info.textureType = typeName;
-            Cache::Instance()->add(a_new_texture_info);
+            Cache::Get()->add(a_new_texture_info);
             // to return for draw info on this current mesh
             out_texInfo.emplace_back(a_new_texture_info);
             break;  // break out of for loop
@@ -251,10 +253,5 @@ unsigned int AssimpSceneLoader::LoadCubeMapTexture(const std::vector<std::string
   }
   return return_id;
 }
-
-//void AssimpSceneLoader::UnloadTexture(const TextureMapType& textures_to_remove) {
-//  Cache::Instance()->remove_textures(textures_to_remove);
-//}
-
 
 } // end namespace AA

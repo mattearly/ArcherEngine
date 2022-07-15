@@ -23,11 +23,15 @@ public:
   std::vector<std::string> CaveTextures;
 
   // model paths
-  const std::string fullcubepath = runtime_dir + "3dmodels/cube.glb";
-  const std::string fullgroundplane = runtime_dir + "3dmodels/large_green_plane.obj";
-  const std::string fullpeasant_man = runtime_dir + "3dmodels/peasant_man.dae";
-  const std::string fullzombie_ = runtime_dir + "3dmodels/Zombie Punching.fbx"; // contains a model and animation data
-  const std::string fullwalking_man = runtime_dir + "3dmodels/Walking.dae";  // contains a model and animation data
+  // test glb
+  const std::string cube_runtime_dir = runtime_dir + "3dmodels/cube.glb";
+  // test obj
+  const std::string ground_plane_runtime_dir_path = runtime_dir + "3dmodels/large_green_plane.obj";
+  const std::string fireplace_room_runtime_dir_path = runtime_dir + "3dmodels/fireplace_room.obj";
+  // test fbx
+  const std::string peasant_man_runtime_dir_path = runtime_dir + "3dmodels/peasant_man.fbx";
+  const std::string peasant_girl_runtime_dir_path = runtime_dir + "3dmodels/peasant_girl.fbx";
+  const std::string zombie_runtime_dir_path = runtime_dir + "3dmodels/zombie_punching.fbx"; // contains a model and animation data
 
   unsigned int se_coins1 = 0;
   unsigned int se_flashlight = 0;
@@ -50,16 +54,14 @@ public:
 
   bool g_Yes = false, g_No = false;
 
-
-
   unsigned int g_plight1_id = 0;
   float  point_light_loc[3] = { -194.0f, 125.0f, -32.0f };
   float* point_light_constant = new float(1.0f);
   float* point_light_linear = new float(0.027f);
   float* point_light_quadratic = new float(0.0028f);
-  float* point_light_ambient = new float(.3f);
-  float* point_light_diff = new float(.5f);
-  float* point_light_spec = new float(.3f);
+  float* point_light_ambient = new float(0.3f);
+  float* point_light_diff = new float(0.5f);
+  float* point_light_spec = new float(0.3f);
   bool debug_point_light = true;
 
   unsigned int g_slight1_id = 0;
@@ -80,8 +82,18 @@ public:
 } *tg;
 
 namespace TestGlobals {
-static void init() { if (!tg) tg = new Globals(); };
-static void reset() {
-  if (tg) { delete tg; tg = nullptr; }
+
+static void init() {
+  if (!tg) {
+    tg = new Globals();
+  }
 }
+
+static void reset() {
+  if (tg) {
+    delete tg;
+    tg = nullptr;
+  }
+}
+
 }

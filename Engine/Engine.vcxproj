@@ -97,7 +97,7 @@
   <ItemGroup>
     <ClInclude Include="src\OS\OpenGL\Loaders\AssimpSceneLoader.h" />
     <ClInclude Include="src\Mesh\AnimationData.h" />
-    <ClInclude Include="src\OS\OpenGL\Loaders\PrimativeMaker.h" />
+    <ClInclude Include="src\OS\OpenGL\PrimativeMaker.h" />
     <ClInclude Include="src\Mesh\Material.h" />
     <ClInclude Include="src\Mesh\MeshInfo.h" />
     <ClInclude Include="src\Mesh\TextureTypes.h" />
@@ -124,7 +124,6 @@
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Shadow.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Skycube.h" />
-    <ClInclude Include="src\ECS\entt.h" />
     <ClInclude Include="src\Mesh\Skeleton.h" />
     <ClInclude Include="src\Mesh\Bone.h" />
     <ClInclude Include="src\Mesh\Animator.h" />
@@ -162,7 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\OS\OpenGL\Loaders\AssimpSceneLoader.cpp" />
-    <ClCompile Include="src\OS\OpenGL\Loaders\PrimativeMaker.cpp" />
+    <ClCompile Include="src\OS\OpenGL\PrimativeMaker.cpp" />
     <ClCompile Include="src\Mesh\MeshInfo.cpp" />
     <ClCompile Include="src\OS\OpenGL\Loaders\Cache.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Fog.cpp" />
@@ -170,7 +169,6 @@
     <ClCompile Include="src\IntefaceRunetime.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Shadow.cpp" />
     <ClCompile Include="src\OS\OpenGL\InternalShaders\Skycube.cpp" />
-    <ClCompile Include="src\ECS\entt.cpp" />
     <ClCompile Include="src\Mesh\Skeleton.cpp" />
     <ClCompile Include="src\Mesh\Bone.cpp" />
     <ClCompile Include="src\Mesh\Animator.cpp" />
@@ -178,6 +176,7 @@
     <ClCompile Include="src\OS\Interface\Window.cpp" />
     <ClCompile Include="src\Mesh\Animation.cpp" />
     <ClCompile Include="src\OS\OpenGL\Loaders\MaterialLoader.cpp" />
+    <ClCompile Include="src\OS\OpenGL\RenderPipeline.cpp" />
     <ClCompile Include="src\Physics\NVidiaPhysx.cpp" />
     <ClCompile Include="src\GUI\imGUI.cpp" />
     <ClCompile Include="src\OS\OpenGL\Loaders\SceneLoader.cpp" />

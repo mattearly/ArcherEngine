@@ -41,6 +41,7 @@ public:
   void DrawStrip(unsigned int vao, const int& count);
   void SetViewportSize(GLint x, GLint y, GLsizei w, GLsizei h);
   void SetViewportClearColor(glm::vec3 color) noexcept;
+  void SetLogStream(const bool& on_or_off, const bool& file_or_stdout);
 
   void ClearScreen() noexcept;
 
@@ -60,6 +61,12 @@ public:
   void SetStencilOpDepthPassToReplace();
   void SetStencilFuncToAlways();
   void SetStencilFuncToNotEqual();
+
+  unsigned int MakeCube();
+
+  unsigned int MakeCone();
+
+  void DeletePrimatives();
 
   void Proc(void* proc);
 
@@ -116,5 +123,7 @@ public:
   /// </summary>
   void RenderSpotLightIcon(glm::vec3 location, glm::vec3 direction);
 
+private:
+  OpenGL();
 };
 }  // end namespace AA

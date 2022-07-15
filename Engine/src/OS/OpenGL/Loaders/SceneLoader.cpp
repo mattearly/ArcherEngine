@@ -1,15 +1,12 @@
 #include "AssimpSceneLoader.h"
-
 #include "../Graphics.h"
 #include "../../../Mesh/Vertex.h"
 #include "../../../Math/Conversions.h"
-
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <stb_image.h>
-
 #include <sstream>
 #include <utility>
 #include <forward_list>
@@ -187,7 +184,6 @@ static void recursive_process_node(aiNode* node, const aiScene* scene, std::vect
     aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
     out_mesh_info.push_back(extract_all_mesh(mesh, scene, &node->mTransformation, out_skel, in_load_path));
   }
-
   for (unsigned int i = 0; i < node->mNumChildren; ++i) {
     recursive_process_node(node->mChildren[i], scene, out_mesh_info, out_skel, in_load_path);
   }
@@ -208,7 +204,7 @@ int AssimpSceneLoader::Load_MeshesTexturesMaterials(Scene& out_model, const std:
   int load_status_code = 0;
   std::vector<MeshInfo> mesh_builder;
 
-  load_status_code = Cache::Instance()->try_load_from_cache(mesh_builder, in_path_to_load);
+  load_status_code = Cache::Get()->try_load_from_cache(mesh_builder, in_path_to_load);
 
   if (load_status_code == 1) { // already loaded
     out_model.SetMeshes(mesh_builder);
@@ -234,7 +230,7 @@ int AssimpSceneLoader::Load_MeshesTexturesMaterials(Scene& out_model, const std:
       SceneInfo scene_to_cache;
       scene_to_cache.meshes = mesh_builder;
       scene_to_cache.path = in_path_to_load;
-      Cache::Instance()->add(scene_to_cache);
+      Cache::Get()->add(scene_to_cache);
     }
   }
 
@@ -244,11 +240,11 @@ int AssimpSceneLoader::Load_MeshesTexturesMaterials(Scene& out_model, const std:
 int AssimpSceneLoader::Load_MeshesTexturesMaterialsBones(Scene& out_model, const std::string& in_path_to_load) {
   int return_code = 0;
   std::vector<MeshInfo> mesh_builder{};
-  Skeleton skeleton_builder{};
+  Skeleton skeleton_builder;
   glm::mat4 inv_trans{};
 
-  return_code = Cache::Instance()->try_load_from_cache(mesh_builder, skeleton_builder, inv_trans, in_path_to_load);
-  
+  return_code = Cache::Get()->try_load_from_cache(mesh_builder, skeleton_builder, inv_trans, in_path_to_load);
+
   if (return_code == 1) {
     out_model.SetMeshes(mesh_builder);
     out_model.SetSkeleton(skeleton_builder);
@@ -256,12 +252,12 @@ int AssimpSceneLoader::Load_MeshesTexturesMaterialsBones(Scene& out_model, const
     out_model.SetGlobalInverseTransform(inv_trans);
 
   } else /*if (return_code != 1)*/ {
-    
+
     Assimp::Importer importer;
     //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
     int post_processing_flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_ValidateDataStructure;
     const aiScene* scene = importer.ReadFile(in_path_to_load, post_processing_flags);
-    
+
     // check if errors on load
     if (!scene)
       return_code = -1;
@@ -273,20 +269,20 @@ int AssimpSceneLoader::Load_MeshesTexturesMaterialsBones(Scene& out_model, const
     if (return_code == 0) {
       // put together the model
       recursive_process_node(scene->mRootNode, scene, mesh_builder, skeleton_builder, in_path_to_load);
-      
+
       // set output
       out_model.SetMeshes(mesh_builder);
       out_model.SetPathID(in_path_to_load);
-      out_model.SetSkeleton(skeleton_builder);
+      out_model.SetSkeleton(skeleton_builder);  // copy save
       out_model.SetGlobalInverseTransform(glm::inverse(aiMat4_to_glmMat4(scene->mRootNode->mTransformation)));
 
       // cache for later reloads of the same model
       SceneInfo temp_mesh_info;
       temp_mesh_info.meshes = mesh_builder;
       temp_mesh_info.path = in_path_to_load;
-      temp_mesh_info.skelly = skeleton_builder;
+      temp_mesh_info.skelly = new Skeleton(skeleton_builder);  // copy save
       temp_mesh_info.inverse_transform = glm::inverse(aiMat4_to_glmMat4(scene->mRootNode->mTransformation));
-      Cache::Instance()->add(temp_mesh_info);
+      Cache::Get()->add(temp_mesh_info);
     }
   }
 
@@ -294,7 +290,7 @@ int AssimpSceneLoader::Load_MeshesTexturesMaterialsBones(Scene& out_model, const
 }
 
 void AssimpSceneLoader::Unload(const std::string& path_to_unload) {
-  Cache::Instance()->remove_scene_at_path(path_to_unload);
+  Cache::Get()->remove_scene_at_path(path_to_unload);
 }
 
 } // end namespace AA

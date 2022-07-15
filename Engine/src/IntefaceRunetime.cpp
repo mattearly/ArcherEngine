@@ -3,7 +3,6 @@
 #include <OS/Interface/Window.h>
 #include <Scene/Scene.h>
 #include "OS/OpenGL/Graphics.h"
-#include "OS/OpenGL/Loaders/PrimativeMaker.h"
 #include "Physics/NVidiaPhysx.h"
 #include "Scene/Lights.h"
 #include "Scene/Skybox.h"
@@ -149,7 +148,7 @@ void Interface::teardown() {
 
   mCameras.clear();
 
-  PrimativeMaker::unload_all();
+  OpenGL::GetGL()->DeletePrimatives();
 
   ClearAllRuntimeLamdaFunctions();
 

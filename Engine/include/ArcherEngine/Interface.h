@@ -145,7 +145,7 @@ public:
   /// </summary>
   /// <param name="animation_id">id of the animation or pass in -1 to turn off animation</param>
   /// <param name="animprop_id">id of the prop</param>
-  void SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id);
+  void SetAnimationOnProp(const unsigned int animation_id, const unsigned int animprop_id);
 
   /// <summary>
   /// Sets the directional light on the default lit shader.
@@ -352,6 +352,13 @@ public:
   /// </summary>
   /// <param name="name">desired window name</param>
   void SetWindowTitle(const char* name) noexcept;
+
+  /// <summary>
+  /// Turns the log stream on for console or file dir (outputs to your runtime dir)
+  /// </summary>
+  /// <param name="on_or_off">true = turn on, false = turn off</param>
+  /// <param name="file_or_stdout">true = file out, false = stdout; ignored if on_or_off is false.</param>
+  void SetLogStream(const bool& on_or_off, const bool& file_or_stdout);
 
   /// <summary>
   /// Toggles fullscreen.
