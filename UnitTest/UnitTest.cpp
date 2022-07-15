@@ -193,7 +193,7 @@ public:
     TestGlobals::reset();
   }
 
-  TEST_METHOD(SunLightShadows) {
+  TEST_METHOD(MovingSunLightShadows) {
     TestGlobals::init();
 
     // init engine
@@ -202,7 +202,7 @@ public:
       win_opts._windowing_mode = AA::WINDOW_MODE::WINDOWED;
       win_opts._height = 480;
       win_opts._width = 640;
-      win_opts._title = "SunLightShadowsTests";
+      win_opts._title = "MovingSunLightShadowsTest";
       bool initSuccess = tg->g_aa_interface.Init();
       Assert::AreEqual(initSuccess, true);
     }
@@ -223,21 +223,25 @@ public:
     tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(-20, 0, -25));
     tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->ground_plane_runtime_dir_path.c_str(), false, glm::vec3(0, -30.f, 0), glm::vec3(2));
     tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), false, glm::vec3(0, -30, -100), glm::vec3(.25f));
-
-    tg->g_update_func = tg->g_aa_interface.AddToUpdate([](float dt) {
-      static float accum_time = 0;
-      accum_time += dt;
-      auto t1 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
-      std::shared_ptr<AA::Scene> s1 = t1.lock();
-      s1->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
-      });
-
+    
     // default light and background
     tg->g_aa_interface.SetWindowClearColor();
 
-    // load sun
-    load_sun(tg->g_aa_interface);
+    // load sun with true moving light
+    load_sun(tg->g_aa_interface, true);
     tg->g_aa_interface.AddToOnQuit([]() {unload_sun(); });
+
+
+
+    tg->g_update_func = tg->g_aa_interface.AddToUpdate([](float dt) {
+      
+      static float accum_time = 0;
+      accum_time += dt / 2.0f;
+
+      // spin cube
+      auto cube_ref = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]).lock();
+      cube_ref->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
+      });
 
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("SunLightShadowsTest");
