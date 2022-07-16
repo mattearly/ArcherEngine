@@ -4,9 +4,9 @@
 
 static struct Sunlight {
   AA::Interface* interface_ref = nullptr;
-  float light_direction[3] = { -.33f, -1.f, -.33f };
-  float light_ambient[3] = { .033f, .033f, .033f };
-  float light_diffuse[3] = { .33f, .33f, .33f };
+  float light_direction[3] = { -.33f, -1.0f, -.33f };
+  float light_ambient[3] = { .099f, .099f, .099f };
+  float light_diffuse[3] = { .43f, .43f, .43f };
   float light_specular[3] = { .5f, .5f, .5f };
 
   bool shadow_on = true;
