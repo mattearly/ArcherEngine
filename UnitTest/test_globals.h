@@ -77,7 +77,7 @@ public:
   float* spot_light_diff = new float(1.0f);
   float* spot_light_spec = new float(1.0f);
 
-  float* cam_fov = new float(85.f);
+  float* cam_fov = new float(75.f);
 
   bool gamma_correction = false;
 } *tg;

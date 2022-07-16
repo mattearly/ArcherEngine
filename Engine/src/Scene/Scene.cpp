@@ -15,9 +15,9 @@ struct SceneData {
   glm::vec3 stencil_color{ glm::vec3(0.0f) };
   bool stenciled_with_normals{ false };
   float stencil_scale{ 1.1f };
-  bool cull_backface{ true };
+  bool cull_backface{ false };
   bool render_shadows{ true };
-  bool cull_frontface_for_shadows{ true };
+  bool cull_frontface_for_shadows{ false };
   Spacial3D spacial_data{};
   std::vector<MeshInfo> mMeshes{};
   std::string cached_load_path{};

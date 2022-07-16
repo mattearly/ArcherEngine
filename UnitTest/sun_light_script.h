@@ -11,12 +11,12 @@ static struct Sunlight {
 
   bool shadow_on = true;
 
-  float shadow_far_plane = 1024.f;
+  float shadow_far_plane = 1202.f;
 
-  float shadow_ortho_size = 505.f;
+  float shadow_ortho_size = 321.5f;
 
-  float shadow_bias_min = 0.00025f;
-  float shadow_bias_max_multi = 0.001f;
+  float shadow_bias_min = 0.00050f;
+  float shadow_bias_max_multi = 0.005637f;
 
 } *sun;
 
@@ -106,10 +106,13 @@ void load_sun(AA::Interface& interface, bool daycyclehack = false) {
   if (daycyclehack) {
     sun->interface_ref->AddToUpdate([](float dt) {
       static float passed_time = 0.f;
-      passed_time += dt;
+      passed_time += (dt/4.f);
+
+      sun->light_direction[0] = sin(passed_time);
+      sun->light_direction[2] = cos(passed_time);
 
       sun->interface_ref->SetSunLight(
-        glm::vec3(sin(passed_time), sun->light_direction[1], cos(passed_time)),
+        glm::vec3(sun->light_direction[0], sun->light_direction[1], sun->light_direction[2]),
         glm::vec3(sun->light_ambient[0], sun->light_ambient[1], sun->light_ambient[2]),
         glm::vec3(sun->light_diffuse[0], sun->light_diffuse[1], sun->light_diffuse[2]),
         glm::vec3(sun->light_specular[0], sun->light_specular[1], sun->light_specular[2])

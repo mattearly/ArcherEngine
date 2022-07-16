@@ -210,13 +210,16 @@ public:
       tg->g_window_ref = tg->g_aa_interface.GetWindow();
       std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
       tg->g_cam_id = tg->g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight(), true);
+      tg->g_aa_interface.GetCamera(tg->g_cam_id).lock()->SetPosition(glm::vec3(0,20,20));
+      tg->g_aa_interface.GetCamera(tg->g_cam_id).lock()->SetPitch(-33.f);
+
       setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
     }
 
     // load models
-    tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(-20, 0, -25));
-    tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->ground_plane_runtime_dir_path.c_str(), false, glm::vec3(0, -30.f, 0), glm::vec3(2));
-    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), false, glm::vec3(0, -30, -100), glm::vec3(.25f));
+    tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(-20, 0, -25), glm::vec3(.5f));
+    tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->ground_plane_runtime_dir_path.c_str(), false, glm::vec3(0, -40.f, 0), glm::vec3(1.f));
+    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), false, glm::vec3(0, -40, -100), glm::vec3(.1f));
 
     // default light and background
     tg->g_aa_interface.SetWindowClearColor();
@@ -654,8 +657,8 @@ public:
       std::shared_ptr<AA::Camera> local_camera_ref = tg->g_camera_ref.lock();
       local_camera_ref->SetKeepCameraToWindowSize(true);
       local_camera_ref->SetFOV(*tg->cam_fov);
-      local_camera_ref->SetPosition(glm::vec3(0, 200, 300));
-      local_camera_ref->SetPitch(-10.f);
+      local_camera_ref->SetPosition(glm::vec3(0, 50, 50));
+      local_camera_ref->SetPitch(-20.f);
       setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
       tg->g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
 
@@ -694,17 +697,17 @@ public:
           ground_plane_ids.push_back(tg->g_aa_interface.AddProp(tg->ground_plane_runtime_dir_path.c_str(), false, glm::vec3(i * 400, -1, j * 400), glm::vec3(1.f)));
     }
     // untextured cube
-    const int CUBE_SIZE = 20;
+    const int CUBE_SIZE = 8;
     tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(0, CUBE_SIZE, 0), glm::vec3(CUBE_SIZE));
 
     // peasant man
-    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), false, glm::vec3(0, 0, -200), glm::vec3(1.f));
+    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), false, glm::vec3(0, 0, -80), glm::vec3(0.1f));
 
     // man 
-    tg->g_peasant_girl_id = tg->g_aa_interface.AddProp(tg->peasant_girl_runtime_dir_path.c_str(), false, glm::vec3(180, 0, -100), glm::vec3(1.f));
+    tg->g_peasant_girl_id = tg->g_aa_interface.AddProp(tg->peasant_girl_runtime_dir_path.c_str(), false, glm::vec3(80, 0, -80), glm::vec3(0.1f));
 
     // zombie with punching anim
-    tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-180, 0, -100), glm::vec3(1.f));
+    tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-80, 0, -80), glm::vec3(0.1f));
     tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->zombie_runtime_dir_path.c_str(), tg->g_zombie_id[0]);
     tg->g_aa_interface.SetAnimationOnProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
 
