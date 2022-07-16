@@ -64,18 +64,6 @@ void OpenGL::BatchRenderShadows(
     }
   }
 
-  //for (const auto& anim_prop : animated_render_objects) {
-  //  if (anim_prop->GetRenderShadows()) {
-  //    assume_shadows = true;  // at least 1 thing has shadows
-  //    depth_shadow_renderer->SetMat4("u_model_matrix", anim_prop->GetFMM());
-  //    bool front_cull = anim_prop->GetCullFrontFaceForShadows();
-  //    if (front_cull) { glEnable(GL_CULL_FACE); glCullFace(GL_FRONT); }
-  //    const auto& meshes = anim_prop->GetMeshes();
-  //    for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); }
-  //    if (front_cull) { glCullFace(GL_BACK); glDisable(GL_CULL_FACE); }
-  //  }
-  //}
-
   if (assume_shadows) {  // at least 1 object needs dir light rendered shadows
     auto* uber_shadows = InternalShaders::Uber::Get();
     uber_shadows->SetInt("u_dir_light.Shadows", 1);
@@ -92,51 +80,27 @@ void OpenGL::BatchRenderToViewport(
   glViewport(vp.BottomLeft[0], vp.BottomLeft[1], vp.Width, vp.Height);
 
   for (const auto& render_object : render_objects) {
-    if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
-    if (render_object->animdata_) RenderAnimProp(render_object);
-    else RenderProp(render_object);
+    if (render_object->IsStenciled()) {
+      continue;  // skip, doing stenciled last
+    }
+    if (render_object->animdata_) {
+      RenderAnimProp(render_object);
+    } else {
+      RenderProp(render_object);
+    }
   }
 
   // stencils LAST
   for (const auto& render_object : render_objects) {
-    if (!render_object->IsStenciled()) continue;  // skip, already rendered
-    if (render_object->animdata_) RenderAnimStenciled(render_object);
-    else RenderStenciled(render_object);
+    if (!render_object->IsStenciled()) {
+      continue;  // skip, already rendered
+    }
+    if (render_object->animdata_) {
+      RenderAnimStenciled(render_object);
+    } else {
+      RenderStenciled(render_object);
+    }
   }
-
-  //for (const auto& render_object : animated_render_objects) {
-  //  if (render_object->IsStenciled()) continue;  // skip, doing stenciled last
-  //  if (render_object->mAnimator) {
-  //    InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
-  //    InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
-  //    auto transforms = render_object->mAnimator->GetFinalBoneMatrices();
-  //    for (unsigned int i = 0; i < transforms.size(); ++i) {
-  //      InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-  //      InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-  //    }
-  //  }
-  //  RenderProp(std::dynamic_pointer_cast<AA::Scene>(render_object));
-  //  InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-  //  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
-  //}
-
-
-
-  //for (const auto& render_object : animated_render_objects) {
-  //  if (!render_object->IsStenciled()) continue;
-  //  if (render_object->mAnimator) {
-  //    InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
-  //    InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
-  //    auto transforms = render_object->mAnimator->GetFinalBoneMatrices();
-  //    for (unsigned int i = 0; i < transforms.size(); ++i) {
-  //      InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-  //      InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
-  //    }
-  //  }
-  //  RenderStenciled(std::dynamic_pointer_cast<AA::Scene>(render_object));
-  //  InternalShaders::Uber::Get()->SetBool("u_is_animating", false);
-  //  InternalShaders::Stencil::Get()->SetBool("u_is_animating", false);
-  //}
 }
 
 // no changes to shaders before rendering the meshes of the object
@@ -222,7 +186,8 @@ void OpenGL::RenderAnimProp(const std::shared_ptr<AA::Scene>& render_object) {
     InternalShaders::Uber::Get()->SetBool("u_is_animating", true);
     InternalShaders::Stencil::Get()->SetBool("u_is_animating", true);
     auto transforms = render_object->GetFinalBoneMatrices();
-    for (unsigned int i = 0; i < transforms.size(); ++i) {
+    auto size = transforms.size();
+    for (unsigned int i = 0; i < size; ++i) {
       InternalShaders::Uber::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
       InternalShaders::Stencil::Get()->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
     }

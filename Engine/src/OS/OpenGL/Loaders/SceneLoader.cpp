@@ -15,14 +15,6 @@
 
 namespace AA {
 
-// local helper to set vertex bone data by default
-static void set_vertex_bone_data_to_default(AnimVertex& out_vertex) {
-  for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
-    out_vertex.m_BoneIDs[i] = -1;
-    out_vertex.m_Weights[i] = 0.0f;
-  }
-}
-
 // local helper to set a single AnimVertex with bone & weight
 static void set_vertex_bone_data(AnimVertex& out_vertex, int boneID, float weight) {
   for (int i = 0; i < MAX_BONE_INFLUENCE; ++i) {
@@ -40,16 +32,18 @@ static void extract_bone_weights_for_verts(aiMesh* mesh, const aiScene* scene, S
     int boneID = -1;
     std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
 
-    if (out_skel.m_BoneInfoMap.find(boneName) == out_skel.m_BoneInfoMap.end()) {
+    if (out_skel.m_BoneInfoMap.find(boneName) == out_skel.m_BoneInfoMap.end()) {  // didn't find
+    
       // didn't find bone, create a new one
       BoneInfo newBoneInfo{};
-      newBoneInfo.id = out_skel.m_BoneCounter;
+      newBoneInfo.id = boneID = out_skel.m_BoneCounter;
       newBoneInfo.offset = ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+
       out_skel.m_BoneInfoMap[boneName] = newBoneInfo;
-      boneID = out_skel.m_BoneCounter;
       out_skel.m_BoneCounter++;
-    } else {
-      boneID = out_skel.m_BoneInfoMap[boneName].id;
+    
+    } else {  // found
+      boneID = out_skel.m_BoneInfoMap[boneName].id;  // whatever it found
     }
 
     assert(boneID != -1);
@@ -130,12 +124,10 @@ static MeshInfo extract_all_mesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x4
   if (mesh->mTextureCoords[0]) { // case for when texture coordinantes exist
     for (unsigned int i = 0; i < num_of_vertices_on_mesh; ++i) {
       loaded_vertices.emplace_back(AnimVertex(aiVec3_to_glmVec3(mesh->mVertices[i]), glm::vec2(mesh->mTextureCoords[0][i].x, 1 - mesh->mTextureCoords[0][i].y), aiVec3_to_glmVec3(mesh->mNormals[i])));
-      set_vertex_bone_data_to_default(loaded_vertices.back());
     }
   } else {  // case for when texture coordinantes do not exist
     for (unsigned int i = 0; i < num_of_vertices_on_mesh; ++i) {
       loaded_vertices.emplace_back(AnimVertex(aiVec3_to_glmVec3(mesh->mVertices[i]), glm::vec2(0), aiVec3_to_glmVec3(mesh->mNormals[i])));
-      set_vertex_bone_data_to_default(loaded_vertices.back());
     }
   }
 
