@@ -80,12 +80,21 @@ public:
   void SoftReset() noexcept;
 
   /// <summary>
-  /// Creates a camera for use.
+  /// Creates a camera for use in a scene.
   /// </summary>
   /// <param name="w">viewport width</param>
   /// <param name="h">viewport height</param>
-  /// <returns>id to access the camera</returns>
+  /// <returns>unique id to access the camera</returns>
   unsigned int AddCamera(const int w = 0, const int h = 0);
+
+  /// <summary>
+  /// Creates a camera for use in a scene.
+  /// </summary>
+  /// <param name="w"></param>
+  /// <param name="h"></param>
+  /// <param name="stay_window_size"></param>
+  /// <returns>unique id to access the camera</returns>
+  unsigned int AddCamera(const int& w, const int& h, const bool& stay_window_size);
 
   /// <summary>
   /// Removes a from the system camera by id.

@@ -150,6 +150,12 @@ unsigned int Interface::AddCamera(const int w, const int h) {
   return mCameras.back()->GetUID();
 }
 
+unsigned int Interface::AddCamera(const int& w, const int& h, const bool& stay_window_size) {
+  auto uid = AddCamera(w, h);
+  GetCamera(uid).lock()->SetKeepCameraToWindowSize(stay_window_size);
+  return uid;
+}
+
 bool Interface::RemoveCamera(const int camId) {
   if (mCameras.empty())
     return false;

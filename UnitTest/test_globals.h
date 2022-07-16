@@ -45,6 +45,7 @@ public:
   unsigned int g_untextured_cube_id[3] = { 0,0,0 };
   unsigned int g_ground_plane_id = 0;
   unsigned int g_peasant_man_id = 0;
+  unsigned int g_peasant_girl_id = 0;
 
   unsigned int g_zombie_id[2] = { 0, 0 };
   unsigned int g_punching_anim_id = 0;
