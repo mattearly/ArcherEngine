@@ -204,6 +204,7 @@ int AssimpSceneLoader::Load_MeshesTexturesMaterials(Scene& out_model, const std:
   } else if (load_status_code == 0) { // not loaded
     Assimp::Importer importer;  // use assimp to import
     //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
+    // join is okay on non-animated models
     int ai_post_processing_flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_ValidateDataStructure;
     const aiScene* scene = importer.ReadFile(in_path_to_load, ai_post_processing_flags);
     if (!scene)  // error check
@@ -247,7 +248,8 @@ int AssimpSceneLoader::Load_MeshesTexturesMaterialsBones(Scene& out_model, const
 
     Assimp::Importer importer;
     //post processing -> http://assimp.sourceforge.net/lib_html/postprocess_8h.html
-    int post_processing_flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_ValidateDataStructure;
+    // do not use join on animated models
+    int post_processing_flags =/* aiProcess_JoinIdenticalVertices | */aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_ValidateDataStructure;
     const aiScene* scene = importer.ReadFile(in_path_to_load, post_processing_flags);
 
     // check if errors on load
