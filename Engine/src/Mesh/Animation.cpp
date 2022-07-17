@@ -50,8 +50,8 @@ void Animation::ReadMissingBones(const aiAnimation* animation, Skeleton& in_out_
     m_Skeleton.m_Bones.emplace_back(channel->mNodeName.data, in_out_skele.m_BoneInfoMap[channel->mNodeName.data].id, channel);
   }
 
-  //m_Skeleton.m_BoneInfoMap.merge(in_out_skele.m_BoneInfoMap);   // merge was added in c++17
-  m_Skeleton.m_BoneInfoMap = in_out_skele.m_BoneInfoMap;
+  m_Skeleton.m_BoneInfoMap.merge(in_out_skele.m_BoneInfoMap);   // merge was added in c++17
+  //m_Skeleton.m_BoneInfoMap = in_out_skele.m_BoneInfoMap;
 }
 
 void Animation::ReadHeirarchyData(AnimationNodeTree& dest, const aiNode* src) {
