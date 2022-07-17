@@ -277,8 +277,8 @@ public:
     tg->g_aa_interface.SetAnimationOnProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
 
     tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), true, glm::vec3(20, -30, -75), glm::vec3(.25f));
-    //tg->g_idle_anim_id = tg->g_aa_interface.AddAnimation(tg->idle_anim_runtime_dir_path.c_str(), tg->g_peasant_man_id);
-    //tg->g_aa_interface.SetAnimationOnProp(tg->g_idle_anim_id, tg->g_peasant_man_id);
+    tg->g_idle_anim_id = tg->g_aa_interface.AddAnimation(tg->idle_anim_runtime_dir_path.c_str(), tg->g_peasant_man_id);
+    tg->g_aa_interface.SetAnimationOnProp(tg->g_idle_anim_id, tg->g_peasant_man_id);
 
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("Animated Model Test");

@@ -32,6 +32,9 @@ public:
   const std::string peasant_man_runtime_dir_path = runtime_dir + "3dmodels/peasant_man.fbx";
   const std::string peasant_girl_runtime_dir_path = runtime_dir + "3dmodels/peasant_girl.fbx";
   const std::string zombie_runtime_dir_path = runtime_dir + "3dmodels/zombie_punching.fbx"; // contains a model and animation data
+  // test fbx animation
+  const std::string idle_anim_runtime_dir_path = runtime_dir + "3dmodels/animations/breathing_idle.fbx"; // contains animation data
+
 
   unsigned int se_coins1 = 0;
   unsigned int se_flashlight = 0;
@@ -50,8 +53,7 @@ public:
   unsigned int g_zombie_id[2] = { 0, 0 };
   unsigned int g_punching_anim_id = 0;
 
-  unsigned int g_walking_man_id = 0;
-  unsigned int g_walking_anim_id = 0;
+  unsigned int g_idle_anim_id = 0;
 
   bool g_Yes = false, g_No = false;
 
