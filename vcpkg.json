@@ -1,10 +1,9 @@
 {
-	"name": "aaengine",
-	"version": "1.4",
+	"name": "archerengine",
+	"version": "1.5",
 	"dependencies": [
 		"glm",
 		"assimp",
-		"entt",
 		"glfw3",
 		"glad",
 		"openal-soft",

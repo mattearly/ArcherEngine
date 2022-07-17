@@ -1,7 +1,7 @@
 #include "Animator.h"
 namespace AA {
 
-Animator::Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans, AnimProp& anim_prop) {
+Animator::Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans) {
   cached_global_inverse_transform = inv_trans;
   m_CurrentTime = 0.0;
   m_CurrentAnimation = anim;
@@ -26,7 +26,7 @@ void Animator::UpdateAnimation(float dt) {
   }
 }
 
-void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform) {
+void Animator::CalculateBoneTransform(const AnimationNodeTree* node, glm::mat4 parentTransform) {
   std::string nodeName = node->name;
   glm::mat4 nodeTransform = node->transformation;
 
@@ -51,7 +51,7 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
     CalculateBoneTransform(&node->children[i], accum_transform);
 }
 
-std::vector<glm::mat4> Animator::GetFinalBoneMatrices() {
+std::vector<glm::mat4> Animator::GetFinalBoneMatrices() const{
   return m_FinalBoneMatrices;
 }
 

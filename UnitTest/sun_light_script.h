@@ -4,24 +4,23 @@
 
 static struct Sunlight {
   AA::Interface* interface_ref = nullptr;
-  float light_direction[3] = { -.33f, -1.f, -.33f };
-  float light_ambient[3] = { .003f, .003f, .003f };
-  float light_diffuse[3] = { .3f, .3f, .3f };
+  float light_direction[3] = { -.33f, -1.0f, -.33f };
+  float light_ambient[3] = { .099f, .099f, .099f };
+  float light_diffuse[3] = { .43f, .43f, .43f };
   float light_specular[3] = { .5f, .5f, .5f };
 
   bool shadow_on = true;
 
-  float shadow_far_plane = 1024.f;
+  float shadow_far_plane = 1202.f;
 
-  float shadow_ortho_size = 1024.f;
+  float shadow_ortho_size = 321.5f;
 
-  float shadow_bias_min = 0.00025f;
-  float shadow_bias_max_multi = 0.001f;
+  float shadow_bias_min = 0.00050f;
+  float shadow_bias_max_multi = 0.005637f;
 
 } *sun;
 
-
-void load_sun(AA::Interface& interface) {
+void load_sun(AA::Interface& interface, bool daycyclehack = false) {
   if (!sun) {
     sun = new Sunlight();
     sun->interface_ref = &interface;
@@ -88,32 +87,38 @@ void load_sun(AA::Interface& interface) {
 
     }
     if (updated_shadows) {
-      auto strong_ref = sun->interface_ref->GetSunLight().lock();
-      strong_ref->Shadows = sun->shadow_on;
-    }
-    if (updated_shadows) {
-      auto strong = sun->interface_ref->GetSunLight().lock();
-      strong->Shadows = sun->shadow_on;
+      sun->interface_ref->GetSunLight().lock()->Shadows = sun->shadow_on;
     }
     if (updated_shadow_far) {
-      auto strong = sun->interface_ref->GetSunLight().lock();
-      strong->ShadowFarPlane = sun->shadow_far_plane;
+      sun->interface_ref->GetSunLight().lock()->ShadowFarPlane = sun->shadow_far_plane;
     }
     if (updated_shadow_bias_min) {
-      auto strong = sun->interface_ref->GetSunLight().lock();
-      strong->SetShadowBiasMin(sun->shadow_bias_min);
+      sun->interface_ref->GetSunLight().lock()->SetShadowBiasMin(sun->shadow_bias_min);
     }
     if (updated_shadow_bias_max) {
-      auto strong = sun->interface_ref->GetSunLight().lock();
-      strong->SetShadowBiasMax(sun->shadow_bias_max_multi);
+      sun->interface_ref->GetSunLight().lock()->SetShadowBiasMax(sun->shadow_bias_max_multi);
     }
     if (updated_shadow_ortho_size) {
-      auto strong = sun->interface_ref->GetSunLight().lock();
-      strong->ShadowOrthoSize = sun->shadow_ortho_size;
+      sun->interface_ref->GetSunLight().lock()->ShadowOrthoSize = sun->shadow_ortho_size;
     }
     });
 
+  if (daycyclehack) {
+    sun->interface_ref->AddToUpdate([](float dt) {
+      static float passed_time = 0.f;
+      passed_time += (dt/4.f);
 
+      sun->light_direction[0] = sin(passed_time);
+      sun->light_direction[2] = cos(passed_time);
+
+      sun->interface_ref->SetSunLight(
+        glm::vec3(sun->light_direction[0], sun->light_direction[1], sun->light_direction[2]),
+        glm::vec3(sun->light_ambient[0], sun->light_ambient[1], sun->light_ambient[2]),
+        glm::vec3(sun->light_diffuse[0], sun->light_diffuse[1], sun->light_diffuse[2]),
+        glm::vec3(sun->light_specular[0], sun->light_specular[1], sun->light_specular[2])
+      );
+      });
+  }
 }
 
 void unload_sun() {

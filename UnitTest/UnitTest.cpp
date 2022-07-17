@@ -70,8 +70,8 @@ public:
         int new_width = local_window_ref->GetCurrentWidth() + 50;
         int new_height = local_window_ref->GetCurrentHeight() + 50;
         local_window_ref->SetCurrentWidthAndHeight(new_width, new_height);
-        Assert::AreEqual(local_window_ref->GetCurrentWidth(), new_width);
-        Assert::AreEqual(local_window_ref->GetCurrentHeight(), new_height);
+        Assert::AreEqual(new_width, local_window_ref->GetCurrentWidth());
+        Assert::AreEqual(new_height, local_window_ref->GetCurrentHeight());
       }
       if (doToggleFS) { tg->g_aa_interface.ToggleWindowFullscreen(); };
       if (!MinSizeChanged) {
@@ -139,10 +139,8 @@ public:
     {
       tg->g_window_ref = tg->g_aa_interface.GetWindow();
       std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
-      tg->g_cam_id = tg->g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
+      tg->g_cam_id = tg->g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight(), true);
       tg->g_camera_ref = tg->g_aa_interface.GetCamera(tg->g_cam_id);
-      std::shared_ptr<AA::Camera> local_camera_ref = tg->g_camera_ref.lock();
-      local_camera_ref->SetKeepCameraToWindowSize(true);
     }
 
     tg->g_update_func = tg->g_aa_interface.AddToUpdate([](float dt) {
@@ -193,7 +191,7 @@ public:
     TestGlobals::reset();
   }
 
-  TEST_METHOD(SunLightShadows) {
+  TEST_METHOD(MovingSunLightShadows) {
     TestGlobals::init();
 
     // init engine
@@ -202,7 +200,7 @@ public:
       win_opts._windowing_mode = AA::WINDOW_MODE::WINDOWED;
       win_opts._height = 480;
       win_opts._width = 640;
-      win_opts._title = "SunLightShadowsTests";
+      win_opts._title = "MovingSunLightShadowsTest";
       bool initSuccess = tg->g_aa_interface.Init();
       Assert::AreEqual(initSuccess, true);
     }
@@ -211,33 +209,36 @@ public:
     {
       tg->g_window_ref = tg->g_aa_interface.GetWindow();
       std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
-      tg->g_cam_id = tg->g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
-      tg->g_camera_ref = tg->g_aa_interface.GetCamera(tg->g_cam_id);
-      std::shared_ptr<AA::Camera> local_camera_ref = tg->g_camera_ref.lock();
-      local_camera_ref->SetKeepCameraToWindowSize(true);
-      local_camera_ref->SetFOV(75.f);
+      tg->g_cam_id = tg->g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight(), true);
+      tg->g_aa_interface.GetCamera(tg->g_cam_id).lock()->SetPosition(glm::vec3(0,20,20));
+      tg->g_aa_interface.GetCamera(tg->g_cam_id).lock()->SetPitch(-33.f);
+
       setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
     }
 
     // load models
-    tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(-20, 0, -25));
-    tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(0, -30.f, 0), glm::vec3(2));
-    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(.25f));
-
-    tg->g_update_func = tg->g_aa_interface.AddToUpdate([](float dt) {
-      static float accum_time = 0;
-      accum_time += dt;
-      auto t1 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
-      std::shared_ptr<AA::Prop> s1 = t1.lock();
-      s1->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
-      });
+    tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(-20, 0, -25), glm::vec3(.5f));
+    tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->ground_plane_runtime_dir_path.c_str(), false, glm::vec3(0, -40.f, 0), glm::vec3(1.f));
+    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), false, glm::vec3(0, -40, -100), glm::vec3(.1f));
 
     // default light and background
     tg->g_aa_interface.SetWindowClearColor();
 
-    // load sun
-    load_sun(tg->g_aa_interface);
+    // load sun with true moving light
+    load_sun(tg->g_aa_interface, true);
     tg->g_aa_interface.AddToOnQuit([]() {unload_sun(); });
+
+
+
+    tg->g_update_func = tg->g_aa_interface.AddToUpdate([](float dt) {
+
+      static float accum_time = 0;
+      accum_time += dt / 2.0f;
+
+      // spin cube
+      auto cube_ref = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]).lock();
+      cube_ref->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
+      });
 
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("SunLightShadowsTest");
@@ -261,35 +262,23 @@ public:
 
   TEST_METHOD(SkeletalAnimation) {
     TestGlobals::init();
-
-    {
-      bool initSuccess = tg->g_aa_interface.Init();
-      Assert::AreEqual(initSuccess, true);
-    }
-
-    // camera that stays screen size
-    {
-      tg->g_window_ref = tg->g_aa_interface.GetWindow();
-      std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
-      tg->g_cam_id = tg->g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight());
-      tg->g_camera_ref = tg->g_aa_interface.GetCamera(tg->g_cam_id);
-      std::shared_ptr<AA::Camera> local_camera_ref = tg->g_camera_ref.lock();
-      local_camera_ref->SetKeepCameraToWindowSize(true);
-      local_camera_ref->SetFOV(75.f);
-
-      setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
-    }
-
-    tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(0, -30, -75), glm::vec3(.25f));
-    tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->fullzombie_.c_str(), tg->g_zombie_id[0]);
-    tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
-
-    // load sun
+    Assert::AreEqual(tg->g_aa_interface.Init(), true);
     load_sun(tg->g_aa_interface);
     tg->g_aa_interface.AddToOnQuit([]() {unload_sun(); });
-
-    // default light and background
     tg->g_aa_interface.SetWindowClearColor();
+    tg->g_cam_id = tg->g_aa_interface.AddCamera(
+      tg->g_aa_interface.GetWindow().lock()->GetCurrentMinWidth(),
+      tg->g_aa_interface.GetWindow().lock()->GetCurrentMinHeight(),
+      true);
+    setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
+
+    tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-20, -30, -75), glm::vec3(.25f));
+    tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->zombie_runtime_dir_path.c_str(), tg->g_zombie_id[0]);
+    tg->g_aa_interface.SetAnimationOnProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
+
+    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), true, glm::vec3(20, -30, -75), glm::vec3(.25f));
+    tg->g_idle_anim_id = tg->g_aa_interface.AddAnimation(tg->idle_anim_runtime_dir_path.c_str(), tg->g_peasant_man_id);
+    tg->g_aa_interface.SetAnimationOnProp(tg->g_idle_anim_id, tg->g_peasant_man_id);
 
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("Animated Model Test");
@@ -297,13 +286,9 @@ public:
       tg->g_Yes = ImGui::Button("Yes");
       tg->g_No = ImGui::Button("No");
       ImGui::End();
-
-      // state update
       if (tg->g_Yes || tg->g_No) { tg->g_aa_interface.Shutdown(); };
       });
-
     tg->g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
-
     int run_diag = tg->g_aa_interface.Run();
     Assert::AreEqual(run_diag, 0);
     Assert::AreEqual(tg->g_No, false);
@@ -347,9 +332,9 @@ public:
     }
 
     {
-      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(-10, -10, -10));
+      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(-10, -10, -10));
       auto w1 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
-      std::shared_ptr<AA::Prop> s1 = w1.lock();
+      std::shared_ptr<AA::Scene> s1 = w1.lock();
       s1->SetRotation(glm::vec3(1.571f, 3.14159f, 0));
       s1->SetStencil(true);
       s1->SetStencilColor(glm::vec3(.4, .4, .4));
@@ -357,19 +342,19 @@ public:
       s1->SetStencilScale(1.1f);
     }
 
-    tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(0, -30.f, 0), glm::vec3(3));
+    tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->ground_plane_runtime_dir_path.c_str(), false, glm::vec3(0, -30.f, 0), glm::vec3(3));
 
 
-    //tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -70), glm::vec3(.15f));
+    //tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), glm::vec3(0, -30, -70), glm::vec3(.15f));
 
 
 
     // Add Zombie With Punching Animation.
-    tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-30, -30, -70), glm::vec3(0.12f));
-    tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->fullzombie_.c_str(), tg->g_zombie_id[0]);
-    tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
+    tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-30, -30, -70), glm::vec3(0.12f));
+    tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->zombie_runtime_dir_path.c_str(), tg->g_zombie_id[0]);
+    tg->g_aa_interface.SetAnimationOnProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
     {
-      auto weak_tmp = tg->g_aa_interface.GetAnimProp(tg->g_zombie_id[0]);
+      auto weak_tmp = tg->g_aa_interface.GetProp(tg->g_zombie_id[0]);
       auto strong_tmp = weak_tmp.lock();
       strong_tmp->SetStencil(true);
       strong_tmp->SetStencilWithNormals(true);
@@ -431,30 +416,30 @@ public:
 
     // load models
     {
-      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(0, 0, -10));
+      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(0, 0, -10));
       auto w1 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
-      std::shared_ptr<AA::Prop> s1 = w1.lock();
+      std::shared_ptr<AA::Scene> s1 = w1.lock();
       s1->SetStencil(true);
       s1->SetStencilColor(glm::vec3(.4, .4, .4));
       s1->SetStencilWithNormals(false);
       s1->SetStencilScale(1.1f);
 
-      tg->g_untextured_cube_id[1] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(-10, 0, -10));
-      tg->g_untextured_cube_id[2] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(10, 0, -10));
+      tg->g_untextured_cube_id[1] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(-10, 0, -10));
+      tg->g_untextured_cube_id[2] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(10, 0, -10));
 
-      tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(0, -30.f, 0), glm::vec3(3, 1, 3));
+      tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->ground_plane_runtime_dir_path.c_str(), false, glm::vec3(0, -30.f, 0), glm::vec3(3, 1, 3));
 
-      tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, -30, -100), glm::vec3(.25f));
+      tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), false, glm::vec3(0, -30, -100), glm::vec3(.25f));
       auto w2 = tg->g_aa_interface.GetProp(tg->g_peasant_man_id);
-      std::shared_ptr<AA::Prop> s2 = w2.lock();
+      std::shared_ptr<AA::Scene> s2 = w2.lock();
       s2->SetStencil(true);
       s2->SetStencilColor(glm::vec3(.4, .4, .4));
       s2->SetStencilWithNormals(true);
       s2->SetStencilScale(3.f);
 
-      tg->g_walking_man_id = tg->g_aa_interface.AddProp(tg->fullwalking_man.c_str(), glm::vec3(-60, -30, -100), glm::vec3(.25f));
-      auto w3 = tg->g_aa_interface.GetProp(tg->g_walking_man_id);
-      std::shared_ptr<AA::Prop> s3 = w3.lock();
+      tg->g_peasant_girl_id = tg->g_aa_interface.AddProp(tg->peasant_girl_runtime_dir_path.c_str(), false, glm::vec3(-60, -30, -100), glm::vec3(.25f));
+      auto w3 = tg->g_aa_interface.GetProp(tg->g_peasant_girl_id);
+      std::shared_ptr<AA::Scene> s3 = w3.lock();
       s3->SetStencil(true);
       s3->SetStencilColor(glm::vec3(.4, .4, .4));
       s3->SetStencilWithNormals(true);
@@ -467,9 +452,9 @@ public:
       auto t1 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
       auto t2 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[1]);
       auto t3 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[2]);
-      std::shared_ptr<AA::Prop> st1 = t1.lock();
-      std::shared_ptr<AA::Prop> st2 = t2.lock();
-      std::shared_ptr<AA::Prop> st3 = t3.lock();
+      std::shared_ptr<AA::Scene> st1 = t1.lock();
+      std::shared_ptr<AA::Scene> st2 = t2.lock();
+      std::shared_ptr<AA::Scene> st3 = t3.lock();
       st1->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
       st2->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
       st3->SetRotation(glm::vec3(cos(accum_time), sin(accum_time), sin(accum_time)));
@@ -598,39 +583,43 @@ public:
 
     // Load and Test Models to make sure thy reuse the same VAO if loading from the same file
     {
-      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(-15, -7.5, -25));
-      tg->g_untextured_cube_id[1] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(15, -7.5, -25));
+      tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(-15, -7.5, -25));
+      tg->g_untextured_cube_id[1] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(15, -7.5, -25));
 
+      // check that they are the same vaos
       auto w1 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[0]);
-      std::shared_ptr<AA::Prop> s1 = w1.lock();
-      auto vao1 = s1->GetMeshes()[0].vao;
+      std::shared_ptr<AA::Scene> s1 = w1.lock();
+      auto vaolist = s1->GetVAOList();
 
       auto w2 = tg->g_aa_interface.GetProp(tg->g_untextured_cube_id[1]);
-      std::shared_ptr<AA::Prop> s2 = w2.lock();
-      auto vao2 = s2->GetMeshes()[0].vao;
+      std::shared_ptr<AA::Scene> s2 = w2.lock();
+      auto vaolist2 = s2->GetVAOList();
 
-      Assert::AreEqual(vao1, vao2);  // should be from the same vao
+      for (int i = 0; i < vaolist.size(); i++) {
+        Assert::AreEqual(vaolist[i], vaolist2[i]);  // should be from the same vao
+      }
     }
 
     // Load and Test Animated Models to make sure thy reuse the same VAO if loading from the same file
     {
-      tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-20, -30, -45), glm::vec3(.15f));
-      tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->fullzombie_.c_str(), tg->g_zombie_id[0]);
-      tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
+      tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-20, -30, -45), glm::vec3(.15f));
+      tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->zombie_runtime_dir_path.c_str(), tg->g_zombie_id[0]);
+      tg->g_aa_interface.SetAnimationOnProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
 
-      tg->g_zombie_id[1] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(20, -30, -45), glm::vec3(.15f));
-      tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->fullzombie_.c_str(), tg->g_zombie_id[1]);
-      tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_punching_anim_id, tg->g_zombie_id[1]);
+      tg->g_zombie_id[1] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(20, -30, -45), glm::vec3(.15f));
+      tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->zombie_runtime_dir_path.c_str(), tg->g_zombie_id[1]);
+      tg->g_aa_interface.SetAnimationOnProp(tg->g_punching_anim_id, tg->g_zombie_id[1]);
 
-      auto w1 = tg->g_aa_interface.GetAnimProp(tg->g_zombie_id[0]);
-      std::shared_ptr<AA::Prop> s1 = w1.lock();
-      auto vao3 = s1->GetMeshes()[0].vao;
+      auto w1 = tg->g_aa_interface.GetProp(tg->g_zombie_id[0]);
+      std::shared_ptr<AA::Scene> s1 = w1.lock();
+      auto vao3 = s1->GetVAOList();
 
-      auto w2 = tg->g_aa_interface.GetAnimProp(tg->g_zombie_id[0]);
-      std::shared_ptr<AA::Prop> s2 = w2.lock();
-      auto vao4 = s2->GetMeshes()[0].vao;
+      auto w2 = tg->g_aa_interface.GetProp(tg->g_zombie_id[0]);
+      std::shared_ptr<AA::Scene> s2 = w2.lock();
+      auto vao4 = s2->GetVAOList();
 
-      Assert::AreEqual(vao3, vao4);  // should be from the same vao
+      for (int j = 0; j < vao3.size(); j++)
+        Assert::AreEqual(vao3[j], vao4[j]);  // should be from the same vao
     }
 
     int run_diag = tg->g_aa_interface.Run();
@@ -647,8 +636,8 @@ public:
     {
       AA::WindowOptions win_opts;
       win_opts._windowing_mode = AA::WINDOW_MODE::WINDOWED;
-      win_opts._height = 480;
-      win_opts._width = 640;
+      win_opts._height = 900;
+      win_opts._width = 1600;
       win_opts._title = "LightingTests";
       bool initSuccess = tg->g_aa_interface.Init(win_opts);
       Assert::AreEqual(initSuccess, true);
@@ -668,8 +657,8 @@ public:
       std::shared_ptr<AA::Camera> local_camera_ref = tg->g_camera_ref.lock();
       local_camera_ref->SetKeepCameraToWindowSize(true);
       local_camera_ref->SetFOV(*tg->cam_fov);
-      local_camera_ref->SetPosition(glm::vec3(0, 200, 300));
-      local_camera_ref->SetPitch(-10.f);
+      local_camera_ref->SetPosition(glm::vec3(0, 50, 50));
+      local_camera_ref->SetPitch(-20.f);
       setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
       tg->g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
 
@@ -701,24 +690,26 @@ public:
       glm::vec3(*tg->point_light_spec));
 
     // ground
-    for (int i = -1; i < 2; i++)
-      for (int j = -1; j < 2; j++)
-        tg->g_aa_interface.AddProp(tg->fullgroundplane.c_str(), glm::vec3(i * 400, -1, j * 400), glm::vec3(1.f));
-
+    {
+      std::vector<unsigned int> ground_plane_ids{};  // keep them for a moment to debug
+      for (int i = -1; i < 2; i++)
+        for (int j = -1; j < 2; j++)
+          ground_plane_ids.push_back(tg->g_aa_interface.AddProp(tg->ground_plane_runtime_dir_path.c_str(), false, glm::vec3(i * 400, -1, j * 400), glm::vec3(1.f)));
+    }
     // untextured cube
-    const int CUBE_SIZE = 20;
-    tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->fullcubepath.c_str(), glm::vec3(0, CUBE_SIZE, 0), glm::vec3(CUBE_SIZE));
+    const int CUBE_SIZE = 8;
+    tg->g_untextured_cube_id[0] = tg->g_aa_interface.AddProp(tg->cube_runtime_dir.c_str(), false, glm::vec3(0, CUBE_SIZE, 0), glm::vec3(CUBE_SIZE));
 
     // peasant man
-    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->fullpeasant_man.c_str(), glm::vec3(0, 0, -200), glm::vec3(1.f));
+    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), false, glm::vec3(0, 0, -80), glm::vec3(0.1f));
 
-    // man with walking anim
-    tg->g_walking_man_id = tg->g_aa_interface.AddAnimProp(tg->fullwalking_man.c_str(), glm::vec3(180, 0, -100), glm::vec3(1.f));
+    // man 
+    tg->g_peasant_girl_id = tg->g_aa_interface.AddProp(tg->peasant_girl_runtime_dir_path.c_str(), false, glm::vec3(80, 0, -80), glm::vec3(0.1f));
 
     // zombie with punching anim
-    tg->g_zombie_id[0] = tg->g_aa_interface.AddAnimProp(tg->fullzombie_.c_str(), glm::vec3(-180, 0, -100), glm::vec3(1.f));
-    tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->fullzombie_.c_str(), tg->g_zombie_id[0]);
-    tg->g_aa_interface.SetAnimationOnAnimProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
+    tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-80, 0, -80), glm::vec3(0.1f));
+    tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->zombie_runtime_dir_path.c_str(), tg->g_zombie_id[0]);
+    tg->g_aa_interface.SetAnimationOnProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
 
 
 
@@ -856,8 +847,8 @@ public:
       std::shared_ptr<AA::Camera> local_camera_ref = tg->g_camera_ref.lock();
       local_camera_ref->SetKeepCameraToWindowSize(true);
       local_camera_ref->SetFOV(*tg->cam_fov);
-      local_camera_ref->SetPosition(glm::vec3(0, 0, 0));
-      local_camera_ref->SetPitch(-10.f);
+      local_camera_ref->SetPosition(glm::vec3(0, 10, 0));
+      local_camera_ref->SetPitch(-13.f);
       setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
       tg->g_aa_interface.AddToOnQuit([]() { turn_off_fly(); });
 
@@ -875,8 +866,11 @@ public:
         glm::vec3(*tg->spot_light_spec)
       );
 
-
       // a point light
+      tg->point_light_loc[0] = 58.7328f;
+      tg->point_light_loc[1] = 83.7934f;
+      tg->point_light_loc[2] = -72.3714f;
+
       tg->g_plight1_id = tg->g_aa_interface.AddPointLight(
         glm::vec3(tg->point_light_loc[0], tg->point_light_loc[1], tg->point_light_loc[2]),
         1.0f /* constant*/,
@@ -890,10 +884,11 @@ public:
 
       // fireplace room
       {
-        auto id = tg->g_aa_interface.AddProp("../../RuntimeFiles/3dmodels/fireplace_room.obj", glm::vec3(-10, -10, 0), glm::vec3(20));
-        //auto fr_weak = tg->g_aa_interface.GetProp(id);
-        //auto fr_strong = fr_weak.lock();
-        //fr_strong->
+        auto id = tg->g_aa_interface.AddProp(
+          tg->fireplace_room_runtime_dir_path.c_str(),
+          false,
+          glm::vec3(-20, -20, 0),
+          glm::vec3(40));
       }
     }
 
@@ -1042,6 +1037,5 @@ public:
 
     TestGlobals::reset();
   }
-
 };
 }

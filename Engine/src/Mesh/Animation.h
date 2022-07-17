@@ -1,7 +1,6 @@
 #pragma once
-
-#include "Mesh/AnimProp.h"
 #include "../Math/Conversions.h"
+#include "../Base/UniqueInstance.h"
 #include "Vertex.h"
 #include "Bone.h"
 #include "Skeleton.h"
@@ -18,14 +17,16 @@
 
 namespace AA {
 
-struct AssimpNodeData {
+struct AnimationNodeTree {
   glm::mat4 transformation;
   std::string name;
   int childrenCount;
-  std::vector<AssimpNodeData> children;
+  std::vector<AnimationNodeTree> children;
 };
 
 class AnimProp;
+
+struct AnimationData;
 
 class Animation : public UniqueInstance {
 
@@ -33,7 +34,7 @@ public:
 
   Animation();
 
-  Animation(const std::string& animationPath, std::shared_ptr<AnimProp> anim_prop);
+  Animation(const std::string& animationPath, Skeleton& in_out_skele);
 
   ~Animation();
 
@@ -41,22 +42,25 @@ public:
 
   float GetDuration();
 
-  const AssimpNodeData& GetRootNode();
+  const AnimationNodeTree& GetRootNode();
 
-  void ReadMissingBones(const aiAnimation* animation, std::shared_ptr<AnimProp> anim_prop);
+private:
 
-  void ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src);
+  void ReadMissingBones(const aiAnimation* animation, Skeleton& in_out_skele);
 
+  void ReadHeirarchyData(AnimationNodeTree& dest, const aiNode* src);
+
+  friend class Animator;
   Skeleton m_Skeleton;
 
 private:
 
-  float m_Duration;
+  float m_Duration = 0.0f;
 
-  float m_TicksPerSecond;
-  
-  AssimpNodeData m_RootNode;
-  
+  float m_TicksPerSecond = 0.0f;
+
+  AnimationNodeTree m_RootNode;
+
 };
 
 }

@@ -1,6 +1,5 @@
 #pragma once
 #include "Animation.h"
-#include "Mesh/AnimProp.h"
 #include <string>
 #include <map>
 #include <memory>
@@ -10,9 +9,9 @@ namespace AA {
 
 class Animation;
 
-struct AssimpNodeData;
+struct AnimationNodeTree;
 
-class AnimProp;
+class Scene;
 
 class Animator {
 
@@ -20,15 +19,15 @@ public:
 
   Animator() = delete;
 
-  Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans, AnimProp& anim_prop);
+  Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans);
 
   ~Animator();
 
   void UpdateAnimation(float dt);
 
-  void CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform);
+  void CalculateBoneTransform(const AnimationNodeTree* node, glm::mat4 parentTransform);
 
-  std::vector<glm::mat4> GetFinalBoneMatrices();
+  std::vector<glm::mat4> GetFinalBoneMatrices() const;
 
 private:
 

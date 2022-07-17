@@ -1,8 +1,7 @@
 #include <Interface.h>
 #include <Scene/Camera.h>
 #include <OS/Interface/Window.h>
-#include <Mesh/Prop.h>
-#include <Mesh/AnimProp.h>
+#include <Scene/Scene.h>
 #include "OS/OpenGL/Graphics.h"
 #include "OS/OpenGL/InternalShaders/Init.h"
 #include "Physics/NVidiaPhysx.h"
@@ -12,6 +11,7 @@
 #include "Sound/Speaker.h"
 #include "Sound/SoundEffect.h"
 #include "Sound/LongSound.h"
+#include "Mesh/Animation.h"
 #include "GUI/imGUI.h"
 #include <string>
 #include <sstream>
@@ -101,14 +101,9 @@ void Interface::SoftReset() noexcept {
   mCameras.clear();
 
   // delete all the meshes and textures from GPU memory
-  for (const auto& p : mProps) {
-    p->RemoveCache();
-  }
+
   mProps.clear();
-  for (const auto& ap : mAnimatedProps) {
-    ap->RemoveCache();
-  }
-  mAnimatedProps.clear();
+
   mAnimation.clear();
 
   RemoveSunLight();
@@ -155,6 +150,12 @@ unsigned int Interface::AddCamera(const int w, const int h) {
   return mCameras.back()->GetUID();
 }
 
+unsigned int Interface::AddCamera(const int& w, const int& h, const bool& stay_window_size) {
+  auto uid = AddCamera(w, h);
+  GetCamera(uid).lock()->SetKeepCameraToWindowSize(stay_window_size);
+  return uid;
+}
+
 bool Interface::RemoveCamera(const int camId) {
   if (mCameras.empty())
     return false;
@@ -187,23 +188,14 @@ std::weak_ptr<Camera> Interface::GetCamera(uidtype camId) {
 //
 // Props Access
 //
-unsigned int Interface::AddProp(const char* path, const glm::vec3 location, const glm::vec3 scale) {
-  mProps.emplace_back(std::make_shared<Prop>(path));
-  mProps.back()->spacial_data.MoveTo(location);
-  mProps.back()->spacial_data.ScaleTo(scale);
+unsigned int Interface::AddProp(const char* path, const bool& try_animated, const glm::vec3 location, const glm::vec3 scale) {
+  mProps.emplace_back(std::make_shared<Scene>(path, try_animated));
+  mProps.back()->SetLocation(location);
+  mProps.back()->SetScale(scale);
   return mProps.back()->GetUID();
 }
 
 bool Interface::RemoveProp(const unsigned int id) {
-
-  // remove cache (or decrement count of loaded in when multiloading)
-  for (auto& prop : mProps) {
-    if (prop->GetUID() == id) {
-      prop->RemoveCache();
-    }
-  }
-
-  // the actual remove
   auto before_size = mProps.size();
 
   auto ret_it = mProps.erase(
@@ -213,83 +205,31 @@ bool Interface::RemoveProp(const unsigned int id) {
       [&](auto& prop) { return prop->GetUID() == id; }),
     mProps.end());
 
-  auto after_size = mProps.size();
-
   // return true if successful removal, false otherwise
+  auto after_size = mProps.size();
   return (before_size != after_size);
 }
 
-[[nodiscard]] std::weak_ptr<Prop> Interface::GetProp(const unsigned int id) const {
+[[nodiscard]] std::weak_ptr<Scene> Interface::GetProp(const unsigned int id) const {
   for (auto& prop : mProps) {
     if (prop->GetUID() == id) {
       return prop;
     }
   }
-  throw(-9999);
+  throw(-9);
 }
-
-//
-// Anim Props Access
-//
-unsigned int Interface::AddAnimProp(const char* path, glm::vec3 starting_location, glm::vec3 starting_scale) {
-  mAnimatedProps.emplace_back(std::make_shared<AnimProp>(path));
-  mAnimatedProps.back()->spacial_data.MoveTo(starting_location);
-  mAnimatedProps.back()->spacial_data.ScaleTo(starting_scale);
-  return mAnimatedProps.back()->GetUID();
-}
-
-bool Interface::RemoveAnimProp(const unsigned int id) {
-  // remove cache (or decrement count of loaded in when multiloading)
-  for (auto& prop : mAnimatedProps) {
-    if (prop->GetUID() == id) {
-      prop->RemoveCache();
-    }
-  }
-
-  // the actual remove
-  auto before_size = mAnimatedProps.size();
-
-  auto ret_it = mAnimatedProps.erase(
-    std::remove_if(
-      mAnimatedProps.begin(),
-      mAnimatedProps.end(),
-      [&](auto& prop) { return prop->GetUID() == id; }),
-    mAnimatedProps.end());
-
-  auto after_size = mAnimatedProps.size();
-
-  // return true if successful removal, false otherwise
-  return (before_size != after_size);
-}
-
-std::weak_ptr<AnimProp> Interface::GetAnimProp(const unsigned int anim_prop_id) const {
-  for (auto& prop : mAnimatedProps) {
-    if (prop->GetUID() == anim_prop_id) {
-      return prop;
-    }
-  }
-  throw("prop id doesn't exist or is invalid");
-}
-
-
-
-unsigned int Interface::GetAnimPropBoneCount_testing(const unsigned int anim_prop_id) {
-  for (auto& prop : mAnimatedProps) {
-    if (prop->GetUID() == anim_prop_id)
-      return (unsigned int)prop->m_Skeleton.m_Bones.size();
-  }
-  return 0;
-}
-
 
 //
 // Animation Access
 //
-unsigned int Interface::AddAnimation(const char* path, const unsigned int anim_prop_id) {
-  for (auto& prop : mAnimatedProps) {
-    if (prop->GetUID() == anim_prop_id) {
-      mAnimation.emplace_back(std::make_shared<Animation>(path, prop));
-      return mAnimation.back()->GetUID();
+unsigned int Interface::AddAnimation(const char* path, const unsigned int prop_id_to_match_bones_with) {
+  for (auto& prop : mProps) {
+    if (prop->GetUID() == prop_id_to_match_bones_with) {
+      auto* skel = prop->GetSkeleton();
+      if (skel) {
+        mAnimation.emplace_back(std::make_shared<Animation>(path, *skel));
+        return mAnimation.back()->GetUID();
+      }
     }
   }
   throw("prop id doesn't exist");
@@ -311,37 +251,38 @@ bool Interface::RemoveAnimation(const unsigned int animation_id) {
   return (before_size != after_size);
 }
 
-void Interface::SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id) {
+void Interface::SetAnimationOnProp(const unsigned int animation_id, const unsigned int prop_id) {
   // this is terribly inefficient, but it should work
-  for (auto& animprop : mAnimatedProps) {
-    if (animprop->GetUID() == animprop_id) { // animated prop exists
-      if (animation_id == -1) { // -1 means reset
-        if (animprop->mAnimator) {
-          animprop->mAnimator.reset();
-        }
-        return;  // done
-      } else {  // not trying to reset
-        for (auto& animation : mAnimation) {
-          if (animation->GetUID() == animation_id) { // animation exists
-            animprop->SetAnimator(animation);
+  for (auto& p : mProps) {
+    if (!p->animdata_) {
+      continue;                         // not animated
+    }
+    if (p->GetUID() == prop_id) {   // animated prop with prop_id exists and is found
+      if (animation_id == -1) {         // -1 means reset the animator to not animating
+        p->ClearAnimator();
+        return;                         // done
+      } else {                          // not trying to reset
+        for (auto& anim : mAnimation) {
+          if (anim->GetUID() == animation_id) { // anim with animation_id exists
+            p->SetAnimator(anim);
             return;
           }
         }
       }
     }
   }
-  throw("invalid animation id or animated prop id");
+  throw("invalid anim id or animated prop id");
 }
 
-
+/*
 //
 // Physics Integration Access
 //
-void Interface::AddPropPhysics(const int prop_id, const COLLIDERTYPE type) {
+void Interface::AddPropPhysics(const int prop_id, const COLLIDERTYPE textureType) {
   // todo: fix
   for (auto& p : mProps) {
     if (p->GetUID() == prop_id) {
-      switch (type) {
+      switch (textureType) {
       case COLLIDERTYPE::BOX:
         p->spacial_data.mRigidBody =
           NVidiaPhysx::Get()->CreateBox(
@@ -384,7 +325,7 @@ void Interface::AddGroundPlane(const glm::vec3 norm, float distance) {
 void Interface::SimulateWorldPhysics(bool status) {
   mSimulateWorldPhysics = status;
 }
-
+*/
 
 //
 // Lights Interface
@@ -399,10 +340,14 @@ void Interface::SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::v
     mSunLight->Specular = spec;
     auto uber_shader = InternalShaders::Uber::Get();
     uber_shader->SetVec3("u_dir_light.Direction", mSunLight->Direction);
-    uber_shader->SetVec3("u_dir_light.Ambient",   mSunLight->Ambient);
-    uber_shader->SetVec3("u_dir_light.Diffuse",   mSunLight->Diffuse);
-    uber_shader->SetVec3("u_dir_light.Specular",  mSunLight->Specular);
+    uber_shader->SetVec3("u_dir_light.Ambient", mSunLight->Ambient);
+    uber_shader->SetVec3("u_dir_light.Diffuse", mSunLight->Diffuse);
+    uber_shader->SetVec3("u_dir_light.Specular", mSunLight->Specular);
   }
+}
+
+void Interface::SetSunLight(const SunLight& other) {
+  mSunLight = std::make_shared<SunLight>(other);
 }
 
 std::weak_ptr<SunLight> Interface::GetSunLight() noexcept {
@@ -928,7 +873,7 @@ void Interface::SetIMGUI(const bool value) {
 }
 
 void Interface::SetWindowClearColor(glm::vec3 color) noexcept {
-  OpenGL::SetViewportClearColor(color);
+  OpenGL::GetGL()->SetViewportClearColor(color);
 }
 
 std::weak_ptr<Window> Interface::GetWindow() {
@@ -943,6 +888,10 @@ void Interface::SetWindowTitle(const char* name) noexcept {
   auto shared = temp.lock();
   shared->_title = name;
   mWindow->apply_new_window_option_changes();
+}
+
+void Interface::SetLogStream(const bool& on_or_off, const bool& file_or_stdout) {
+  OpenGL::GetGL()->SetLogStream(on_or_off, file_or_stdout);
 }
 
 // toggles fullscreen as expected, does nothign if window is null

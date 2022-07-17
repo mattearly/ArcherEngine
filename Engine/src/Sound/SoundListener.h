@@ -18,7 +18,7 @@ public:
     const float& xat, const float& yat, const float& zat,
     const float& xup, const float& yup, const float& zup);
 
-  void SetDistanceModel(ALint type);
+  void SetDistanceModel(ALint textureType);
 
 protected:
   SoundListener();

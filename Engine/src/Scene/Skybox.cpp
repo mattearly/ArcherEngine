@@ -2,7 +2,7 @@
 #include <Utility/Files.h>
 #include "../OS/OpenGL/Graphics.h"
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
-#include "../OS/OpenGL/Loaders/TextureLoader.h"
+#include "../OS/OpenGL/Loaders/AssimpSceneLoader.h"
 namespace AA {
 
 Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
@@ -13,7 +13,7 @@ Skybox::Skybox(std::vector<std::string> incomingSkymapFiles) {
 
 Skybox::~Skybox() {
   if (mCubemapTexId != 0) {
-    OpenGL::DeleteTex(1u, mCubemapTexId);  // todo: cache textures and reuse
+    OpenGL::GetGL()->DeleteTex(1u, mCubemapTexId);  // todo: cache textures and reuse
   }
 }
 
@@ -27,12 +27,12 @@ const unsigned int Skybox::GetVAO() const {
 
 void Skybox::setup_cube_geometry() {
   if (mVAO == 0) {
-    mVAO = OpenGL::Primitives::load_cube();
+    mVAO = OpenGL::GetGL()->MakeCube();
   }
 }
 
 void Skybox::setup_incoming_textures(std::vector<std::string>& incomingSkymapFiles) {
-  mCubemapTexId = TextureLoader::LoadCubeMapTexture(incomingSkymapFiles);     // todo: load up debug box if skymap files are wrong
+  mCubemapTexId = AssimpSceneLoader::LoadCubeMapTexture(incomingSkymapFiles);  // todo: load up debug box if skymap files are wrong
 }
 
 }  // end namespace AA

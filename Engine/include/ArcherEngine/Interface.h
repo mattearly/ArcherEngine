@@ -18,13 +18,11 @@
 #include "Scene/SunLight.h"
 #include "OS/Interface/Window.h"
 #include "WindowOptions.h"
-#include "Mesh/Prop.h"
-#include "Mesh/AnimProp.h"
+#include "Scene/Scene.h"
 
 namespace AA {
 
 class imGUI;
-class AnimProp;
 class Animation;
 struct PointLight;
 struct SpotLight;
@@ -82,12 +80,21 @@ public:
   void SoftReset() noexcept;
 
   /// <summary>
-  /// Creates a camera for use.
+  /// Creates a camera for use in a scene.
   /// </summary>
   /// <param name="w">viewport width</param>
   /// <param name="h">viewport height</param>
-  /// <returns>id to access the camera</returns>
+  /// <returns>unique id to access the camera</returns>
   unsigned int AddCamera(const int w = 0, const int h = 0);
+
+  /// <summary>
+  /// Creates a camera for use in a scene.
+  /// </summary>
+  /// <param name="w"></param>
+  /// <param name="h"></param>
+  /// <param name="stay_window_size"></param>
+  /// <returns>unique id to access the camera</returns>
+  unsigned int AddCamera(const int& w, const int& h, const bool& stay_window_size);
 
   /// <summary>
   /// Removes a from the system camera by id.
@@ -104,13 +111,13 @@ public:
   std::weak_ptr<Camera> GetCamera(uidtype camId);
 
   /// <summary>
-  /// Adds a Prop.
+  /// Adds a Scene.
   /// </summary>
   /// <param name="path">literal path to the resource</param>
   /// <param name="location">optional: starting location, default = 0,0,0</param>
   /// <param name="scale">optional: starting size, default = 1,1,1</param>
   /// <returns>id of the prop</returns>
-  unsigned int AddProp(const char* path, const glm::vec3 location = glm::vec3(0), const glm::vec3 scale = glm::vec3(1));
+  unsigned int AddProp(const char* path, const bool& try_animated, const glm::vec3 location = glm::vec3(0), const glm::vec3 scale = glm::vec3(1));
 
   /// <summary>
   /// Removes a prop for our list of managed ones.
@@ -125,46 +132,15 @@ public:
   /// </summary>
   /// <param name="id">id of the prop to access</param>
   /// <returns>a weak ptr to a prop</returns>
-  [[nodiscard]] std::weak_ptr<Prop> GetProp(const unsigned int id) const;
+  [[nodiscard]] std::weak_ptr<Scene> GetProp(const unsigned int id) const;
 
   /// <summary>
-  /// Adds a Animated Prop.
-  /// Assumes Bones and Animations are included in the file.
-  /// </summary>
-  /// <param name="path">literal path</param>
-  /// <param name="location">optional: starting location, default = 0,0,0</param>
-  /// <returns>id of the animated prop</returns>
-  unsigned int AddAnimProp(const char* path, glm::vec3 starting_location = glm::vec3(0), glm::vec3 starting_scale = glm::vec3(0));
-
-  /// <summary>
-/// Removes an animated prop for our list of managed ones.
-/// Calls remove cache on model data.
-/// </summary>
-/// <param name="id">id of the prop to remove</param>
-/// <returns>true if successful, false otherwise</returns>
-  bool RemoveAnimProp(const unsigned int id);
-
-  /// <summary>
-  /// Returns the bone count.
-  /// </summary>
-  /// <param name="id"></param>
-  /// <returns></returns>
-  unsigned int GetAnimPropBoneCount_testing(const unsigned int anim_prop_id);
-
-  /// <summary>
-  /// User access to animated props and their public functions.
-  /// </summary>
-  /// <param name="anim_prop_id">unique identifier</param>
-  /// <returns>Returns weak access to an AnimatedProp</returns>
-  std::weak_ptr<AnimProp> GetAnimProp(const unsigned int anim_prop_id) const;
-
-  /// <summary>
-  /// Adds Skeletal Animation Data to the memory bank of a Animated Prop.
+  /// Adds Skeletal Animation Data to the memory bank of a Animated Scene.
   /// </summary>
   /// <param name="path">path to a file (fbx tested, but should handle any file that assimp can load</param>
   /// <param name="anim_prop_id">The Unique ID of the animated prop to apply this animation to.</param>
   /// <returns>The Unique ID to access this animation.</returns>
-  unsigned int AddAnimation(const char* path, const unsigned int anim_prop_id);
+  unsigned int AddAnimation(const char* path, const unsigned int prop_id_to_match_bones_with);
 
   /// <summary>
   /// Remvoes animation from memory bank.
@@ -176,32 +152,9 @@ public:
   /// <summary>
   /// set animation to an prop with bones (animprop)
   /// </summary>
-  /// <param name="animation_id">id of the animation or -1 to turn off animation</param>
+  /// <param name="animation_id">id of the animation or pass in -1 to turn off animation</param>
   /// <param name="animprop_id">id of the prop</param>
-  void SetAnimationOnAnimProp(const unsigned int animation_id, const unsigned int animprop_id);
-
-  enum class COLLIDERTYPE { BOX, SPHERE, CAPSULE };
-
-  /// <summary>
-  /// Adds physic to a prop. In testing. Bug: flips transforms
-  /// Needs resize and and other functionality.
-  /// </summary>
-  /// <param name="prop_id">id of the prop to effect</param>
-  /// <param name="type">what kind of colliderbox</param>
-  void AddPropPhysics(const int prop_id, const COLLIDERTYPE type = COLLIDERTYPE::BOX);
-
-  /// <summary>
-  /// Adds a invisible ground plane. In testing.
-  /// </summary>
-  /// <param name="norm">facing direction</param>
-  /// <param name="distance">distance (from norm direction?)</param>
-  void AddGroundPlane(const glm::vec3 norm, float distance);
-
-  /// <summary>
-  /// Sets the stats of the physics update every frame.
-  /// </summary>
-  /// <param name="status">true to turn on, false to turn off</param>
-  void SimulateWorldPhysics(bool status);
+  void SetAnimationOnProp(const unsigned int animation_id, const unsigned int animprop_id);
 
   /// <summary>
   /// Sets the directional light on the default lit shader.
@@ -215,6 +168,8 @@ public:
   /// <param name="diff">Diffuse</param>
   /// <param name="spec">Specular</param>
   void SetSunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
+
+  void SetSunLight(const SunLight& other);
 
   std::weak_ptr<SunLight> GetSunLight() noexcept;
 
@@ -410,6 +365,13 @@ public:
   void SetWindowTitle(const char* name) noexcept;
 
   /// <summary>
+  /// Turns the log stream on for console or file dir (outputs to your runtime dir)
+  /// </summary>
+  /// <param name="on_or_off">true = turn on, false = turn off</param>
+  /// <param name="file_or_stdout">true = file out, false = stdout; ignored if on_or_off is false.</param>
+  void SetLogStream(const bool& on_or_off, const bool& file_or_stdout);
+
+  /// <summary>
   /// Toggles fullscreen.
   /// </summary>
   /// <param name="try_borderless">attempts borderless fullscreen if true</param>
@@ -513,9 +475,7 @@ private:
 
   std::vector<std::shared_ptr<Camera> > mCameras;
 
-  std::vector<std::shared_ptr<Prop> > mProps;
-
-  std::vector<std::shared_ptr<AnimProp> > mAnimatedProps;
+  std::vector<std::shared_ptr<Scene> > mProps;
 
   std::vector<std::shared_ptr<Animation> > mAnimation;
 

@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
-#include <PxPhysics.h>
+//#include <PxPhysics.h>
 namespace AA {
 class Spacial3D final {
 public:
@@ -10,14 +10,14 @@ public:
   void RotateTo(const glm::vec3& rot);
   void ProcessModifications();
 private: 
-  physx::PxRigidDynamic* mRigidBody;
+  //physx::PxRigidDynamic* mRigidBody;
   glm::vec3 mCurrentLocation;
   glm::vec3 mCurrentScale;
   glm::vec3 mCurrentRot;  // expressed as 3 radians that corrispond to xyz rotation amounts
   bool has_unprocessed_modifications;
   glm::mat4 mFinalModelMatrix;
   friend class Interface;
-  friend class Prop;
+  friend class Scene;
 };
 
 }

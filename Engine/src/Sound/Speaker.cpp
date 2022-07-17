@@ -26,7 +26,7 @@
 /// AL_DIRECTION fv, 3f, iv, 3i direction vector
 /// AL_SOURCE_RELATIVE i, iv determines if the positions are relative to the listener
 ///                          default is AL_FALSE
-/// AL_SOURCE_TYPE i, iv the source type – AL_UNDETERMINED, AL_STATIC, or AL_STREAMING
+/// AL_SOURCE_TYPE i, iv the source textureType – AL_UNDETERMINED, AL_STATIC, or AL_STREAMING
 /// AL_LOOPING i, iv turns looping on(AL_TRUE) or off(AL_FALSE)
 /// AL_BUFFER i, iv the ID of the attached buffer
 /// AL_SOURCE_STATE i, iv the state of the source(AL_STOPPED, AL_PLAYING, …)
