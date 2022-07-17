@@ -126,9 +126,6 @@
     <ClInclude Include="include\Engine\Scene\Viewport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OS\OpenGL\InternalShaders\ShaderUniforms.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -19,6 +19,8 @@ struct TanVertex :public LitVertex {
   glm::vec3 BiTangent{};
 };
 
+// These must also match on the shader code when processing bones
+//constexpr auto MAX_BONES = 100;  // todo: we don't seem to be using this but we should, somewhere
 constexpr auto MAX_BONE_INFLUENCE = 4;
 
 struct AnimVertex : public LitVertex {

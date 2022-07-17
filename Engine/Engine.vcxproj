@@ -118,7 +118,6 @@
     <ClInclude Include="include\ArcherEngine\WindowOptions.h" />
     <ClInclude Include="include\Engine\Support.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Basic.h" />
-    <ClInclude Include="src\OS\OpenGL\InternalShaders\ShaderUniforms.h" />
     <ClInclude Include="include\Engine\Scene\Viewport.h" />
     <ClInclude Include="include\Engine\WindowOptions.h" />
     <ClInclude Include="src\OS\OpenGL\InternalShaders\Init.h" />

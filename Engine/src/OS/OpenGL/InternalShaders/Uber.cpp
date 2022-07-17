@@ -24,6 +24,7 @@ out VS_OUT {
   vec3 Norm;
 } vs_out;
 
+// must match in animation code
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
 

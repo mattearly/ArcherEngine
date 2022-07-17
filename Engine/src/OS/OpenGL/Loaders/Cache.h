@@ -55,7 +55,6 @@ public:
   void add(const TextureMapType& list);
 
   void remove_sceneinfo(const SceneInfo& matching);
-  void remove_texture2dinfo(const Texture2DInfo& matching);
 
 private:
 
