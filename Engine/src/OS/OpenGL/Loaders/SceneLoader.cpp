@@ -28,25 +28,19 @@ static void set_vertex_bone_data(AnimVertex& out_vertex, int boneID, float weigh
 
 // local helper to set the bone weights on verticies from aimesh and scene
 static void extract_bone_weights_for_verts(aiMesh* mesh, const aiScene* scene, Skeleton& out_skel, std::vector<AnimVertex>& out_vertices) {
-  for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
-    int boneID = -1;
-    std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-
-    if (out_skel.m_BoneInfoMap.find(boneName) == out_skel.m_BoneInfoMap.end()) {  // didn't find
+  auto num_bones = mesh->mNumBones;
+  for (unsigned int boneIndex = 0; boneIndex < num_bones; ++boneIndex) {
     
-      // didn't find bone, create a new one
-      BoneInfo newBoneInfo{};
-      newBoneInfo.id = boneID = out_skel.m_BoneCounter;
-      newBoneInfo.offset = ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+    // name for finding in our map
+    BONE_MAP_KEY boneName = mesh->mBones[boneIndex]->mName.C_Str();
 
-      out_skel.m_BoneInfoMap[boneName] = newBoneInfo;
-      out_skel.m_BoneCounter++;
-    
-    } else {  // found
-      boneID = out_skel.m_BoneInfoMap[boneName].id;  // whatever it found
+    if (out_skel.m_BoneInfoMap.find(boneName) == out_skel.m_BoneInfoMap.end()) {  // didn't find this bone name in our current out_skel map
+      BoneInfo boneinfo;
+      boneinfo.id = out_skel.m_BoneCounter;
+      boneinfo.offset = ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+      out_skel.m_BoneInfoMap[boneName] = boneinfo;
+      out_skel.m_BoneCounter++;  // update
     }
-
-    assert(boneID != -1);
 
     auto weights = mesh->mBones[boneIndex]->mWeights;
     int numWeights = mesh->mBones[boneIndex]->mNumWeights;
@@ -55,8 +49,9 @@ static void extract_bone_weights_for_verts(aiMesh* mesh, const aiScene* scene, S
       int vertexId = weights[weightIndex].mVertexId;
       float weight = weights[weightIndex].mWeight;
       assert(vertexId < out_vertices.size());
-      set_vertex_bone_data(out_vertices[vertexId], boneID, weight);
+      set_vertex_bone_data(out_vertices[vertexId], out_skel.m_BoneInfoMap[boneName].id, weight);
     }
+
   }
 }
 
