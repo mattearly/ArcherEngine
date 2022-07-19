@@ -43,8 +43,8 @@ void main(){
     for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++) {
       if(inBoneIds[i] == -1) continue;
       if(inBoneIds[i] >= MAX_BONES) {
-          totalPosition = vec4(inPos, 1.0f);
-          break;
+        totalPosition = vec4(inPos, 1.0f);
+        break;
       }
       vec4 localPosition = u_final_bone_mats[inBoneIds[i]] * vec4(inPos, 1.0);
       totalPosition += localPosition * inWeights[i];
