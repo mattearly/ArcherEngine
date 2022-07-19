@@ -266,10 +266,13 @@ public:
     load_sun(tg->g_aa_interface);
     tg->g_aa_interface.AddToOnQuit([]() {unload_sun(); });
     tg->g_aa_interface.SetWindowClearColor();
-    tg->g_cam_id = tg->g_aa_interface.AddCamera(
-      tg->g_aa_interface.GetWindow().lock()->GetCurrentMinWidth(),
-      tg->g_aa_interface.GetWindow().lock()->GetCurrentMinHeight(),
-      true);
+    // add a camera that fills full screens
+    {
+      tg->g_window_ref = tg->g_aa_interface.GetWindow();
+      std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
+      tg->g_cam_id = tg->g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight(), true);
+      tg->g_camera_ref = tg->g_aa_interface.GetCamera(tg->g_cam_id);
+    }
     setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
 
     tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-20, -30, -75), glm::vec3(.25f));
