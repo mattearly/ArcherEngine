@@ -35,10 +35,12 @@ void OpenGL::BatchRenderShadows(
     dir_light.ShadowOrthoSize,
     dir_light.ShadowNearPlane,
     dir_light.ShadowFarPlane);
+  
+  const auto DIRECTIONAL_LIGHT_DIST_SCALE = 100.f;
 
   lightView = glm::lookAt(
-    view_pos + (200.f * -dir_light.Direction),
-    view_pos + glm::vec3(0.0f),
+    view_pos + (DIRECTIONAL_LIGHT_DIST_SCALE * -dir_light.Direction),
+    view_pos,
     glm::vec3(0.0, 1.0, 0.0));
 
   lightSpaceMatrix = lightProjection * lightView;
