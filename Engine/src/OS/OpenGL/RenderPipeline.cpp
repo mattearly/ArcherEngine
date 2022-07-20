@@ -35,10 +35,12 @@ void OpenGL::BatchRenderShadows(
     dir_light.ShadowOrthoSize,
     dir_light.ShadowNearPlane,
     dir_light.ShadowFarPlane);
+  
+  const auto DIRECTIONAL_LIGHT_DIST_SCALE = 100.f;
 
   lightView = glm::lookAt(
-    view_pos + (200.f * -dir_light.Direction),
-    view_pos + glm::vec3(0.0f),
+    view_pos + (DIRECTIONAL_LIGHT_DIST_SCALE * -dir_light.Direction),
+    view_pos,
     glm::vec3(0.0, 1.0, 0.0));
 
   lightSpaceMatrix = lightProjection * lightView;
@@ -54,13 +56,34 @@ void OpenGL::BatchRenderShadows(
   bool assume_shadows = false;
   for (const auto& prop : render_objects) {
     if (prop->GetRenderShadows()) {
+
       assume_shadows = true;  // at least 1 thing has shadows
-      depth_shadow_renderer->SetMat4("u_model_matrix", prop->GetFMM());
+      auto has_anim = prop->HasAnimation();
       bool front_cull = prop->GetCullFrontFaceForShadows();
-      if (front_cull) { glEnable(GL_CULL_FACE); glCullFace(GL_FRONT); }
       const auto& meshes = prop->GetMeshes();
-      for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); }
-      if (front_cull) { glCullFace(GL_BACK); glDisable(GL_CULL_FACE); }
+
+      
+      if (has_anim) {
+        depth_shadow_renderer->SetBool("u_is_animating", true);
+        auto transforms = prop->GetFinalBoneMatrices();
+        auto size = transforms.size();
+        for (unsigned int i = 0; i < size; ++i) {
+          depth_shadow_renderer->SetMat4("u_final_bone_mats[" + std::to_string(i) + "]", transforms[i]);
+        }
+      }
+      depth_shadow_renderer->SetMat4("u_model_matrix", prop->GetFMM());
+      if (front_cull) { 
+        glEnable(GL_CULL_FACE); 
+        glCullFace(GL_FRONT);
+      }
+      for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); } // render shadows to depthframe buffer
+
+
+      // back to defaults for next render
+      glCullFace(GL_BACK); 
+      glDisable(GL_CULL_FACE);
+      // turn off anim in any case after render so we don't leave it on by default
+      depth_shadow_renderer->SetBool("u_is_animating", false);
     }
   }
 

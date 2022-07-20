@@ -27,7 +27,7 @@ void Animator::UpdateAnimation(float dt) {
 }
 
 void Animator::CalculateBoneTransform(const AnimationNodeTree* node, glm::mat4 parentTransform) {
-  std::string nodeName = node->name;
+  BONE_MAP_KEY nodeName = node->name;
   glm::mat4 nodeTransform = node->transformation;
 
   Bone* Bone = m_CurrentAnimation->m_Skeleton.FindBone(nodeName);

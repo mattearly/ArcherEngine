@@ -10,7 +10,7 @@ Bone* Skeleton::FindBone(const std::string& name) {
 }
 
 
-const std::map<std::string, BoneInfo>& Skeleton::GetBoneIDMap() {
+const std::map<BONE_MAP_KEY, BoneInfo>& Skeleton::GetBoneIDMap() {
   return m_BoneInfoMap;
 }
 

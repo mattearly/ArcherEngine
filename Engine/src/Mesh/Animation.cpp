@@ -41,13 +41,13 @@ void Animation::ReadMissingBones(const aiAnimation* animation, Skeleton& in_out_
   //reading channels(bones engaged in an animation and their keyframes)
   for (int i = 0; i < num_animation_channels; i++) {
     auto channel = animation->mChannels[i];
-    std::string boneName = channel->mNodeName.data;
+    BONE_MAP_KEY boneName = channel->mNodeName.data;
 
     if (in_out_skele.m_BoneInfoMap.find(boneName) == in_out_skele.m_BoneInfoMap.end()) {
       in_out_skele.m_BoneInfoMap[boneName].id = in_out_skele.m_BoneCounter;
       in_out_skele.m_BoneCounter++;
     }
-    m_Skeleton.m_Bones.emplace_back(channel->mNodeName.data, in_out_skele.m_BoneInfoMap[channel->mNodeName.data].id, channel);
+    m_Skeleton.m_Bones.emplace_back(channel->mNodeName.data, in_out_skele.m_BoneInfoMap[boneName].id, channel);
   }
 
   m_Skeleton.m_BoneInfoMap.merge(in_out_skele.m_BoneInfoMap);   // merge was added in c++17
