@@ -223,7 +223,6 @@ void Scene::SetAnimator(std::shared_ptr<Animation>& anim) {
   if (!animdata_)
     return;
   animdata_->mAnimator = std::make_unique<Animator>(anim, animdata_->mGlobalInverseTransform);
-
 }
 
 void Scene::SetGlobalInverseTransform(const glm::mat4& inv_trans) {

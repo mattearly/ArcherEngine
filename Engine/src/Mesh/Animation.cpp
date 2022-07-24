@@ -21,8 +21,8 @@ Animation::Animation(const std::string& animationPath, Skeleton& in_out_skele) {
   const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
   assert(scene && scene->mRootNode);
   auto animation = scene->mAnimations[0];
-  m_Duration = static_cast<float>(animation->mDuration);
-  m_TicksPerSecond = static_cast<float>(animation->mTicksPerSecond);
+  m_Duration = animation->mDuration;
+  m_TicksPerSecond = animation->mTicksPerSecond;
   ReadHeirarchyData(m_RootNode, scene->mRootNode);
   ReadMissingBones(animation, in_out_skele);
 }
@@ -50,21 +50,21 @@ void Animation::ReadMissingBones(const aiAnimation* animation, Skeleton& in_out_
     m_Skeleton.m_Bones.emplace_back(channel->mNodeName.data, in_out_skele.m_BoneInfoMap[boneName].id, channel);
   }
 
-  m_Skeleton.m_BoneInfoMap.merge(in_out_skele.m_BoneInfoMap);   // merge was added in c++17
-  //m_Skeleton.m_BoneInfoMap = in_out_skele.m_BoneInfoMap;
+  //m_Skeleton.m_BoneInfoMap.merge(in_out_skele.m_BoneInfoMap);   // merge was added in c++17
+  m_Skeleton.m_BoneInfoMap = in_out_skele.m_BoneInfoMap;
 }
 
-void Animation::ReadHeirarchyData(AnimationNodeTree& dest, const aiNode* src) {
+void Animation::ReadHeirarchyData(AnimationNodeTree& out_node_tree, const aiNode* src) {
   assert(src);
 
-  dest.name = src->mName.data;
-  dest.transformation = ConvertMatrixToGLMFormat(src->mTransformation);
-  dest.childrenCount = src->mNumChildren;
+  out_node_tree.name = src->mName.data;
+  out_node_tree.transformation = ConvertMatrixToGLMFormat(src->mTransformation);
+  out_node_tree.childrenCount = src->mNumChildren;
 
   for (unsigned int i = 0; i < src->mNumChildren; i++) {
     AnimationNodeTree newData;
     ReadHeirarchyData(newData, src->mChildren[i]);
-    dest.children.push_back(newData);
+    out_node_tree.children.push_back(newData);
   }
 }
 }

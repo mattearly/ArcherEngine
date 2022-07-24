@@ -4,14 +4,11 @@
 #include <map>
 #include <memory>
 
-
 namespace AA {
 
 class Animation;
 
 struct AnimationNodeTree;
-
-class Scene;
 
 class Animator {
 

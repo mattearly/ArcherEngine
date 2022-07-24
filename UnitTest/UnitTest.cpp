@@ -275,17 +275,19 @@ public:
     }
     setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
 
-    tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-20, -30, -75), glm::vec3(.25f));
+    auto model_scale = glm::vec3(0.25f);
+
+    tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-20, -30, -75), model_scale);
     tg->g_punching_anim_id = tg->g_aa_interface.AddAnimation(tg->zombie_runtime_dir_path.c_str(), tg->g_zombie_id[0]);
     tg->g_aa_interface.SetAnimationOnProp(tg->g_punching_anim_id, tg->g_zombie_id[0]);
 
-    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), true, glm::vec3(20, -30, -75), glm::vec3(.25f));
+    tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), true, glm::vec3(20, -30, -75), model_scale);
     tg->g_idle_anim_id = tg->g_aa_interface.AddAnimation(tg->idle_anim_runtime_dir_path.c_str(), tg->g_peasant_man_id);
     tg->g_aa_interface.SetAnimationOnProp(tg->g_idle_anim_id, tg->g_peasant_man_id); 
-    
-    tg->g_vanguard_id = tg->g_aa_interface.AddProp(tg->vanguard_runtime_dir_path.c_str(), true, glm::vec3(0, -30, -125), glm::vec3(.25f));
-    auto test_anim = tg->g_aa_interface.AddAnimation(tg->idle_anim_runtime_dir_path.c_str(), tg->g_vanguard_id);
-    tg->g_aa_interface.SetAnimationOnProp(test_anim, tg->g_vanguard_id);
+
+    //tg->g_vanguard_id = tg->g_aa_interface.AddProp(tg->vanguard_runtime_dir_path.c_str(), true, glm::vec3(0, -30, -125), model_scale);
+    //auto test_anim = tg->g_aa_interface.AddAnimation(tg->vanguard_runtime_dir_path.c_str(), tg->g_vanguard_id);
+    //tg->g_aa_interface.SetAnimationOnProp(test_anim, tg->g_vanguard_id);
 
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("Animated Model Test");

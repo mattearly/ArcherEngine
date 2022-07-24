@@ -27,7 +27,7 @@ static void set_vertex_bone_data(AnimVertex& out_vertex, int boneID, float weigh
 }
 
 // local helper to set the bone weights on verticies from aimesh and scene
-static void extract_bone_weights_for_verts(aiMesh* mesh, const aiScene* scene, Skeleton& out_skel, std::vector<AnimVertex>& out_vertices) {
+static void extract_bone_weights_for_verts(Skeleton& out_skel, aiMesh* mesh, const aiScene* scene, std::vector<AnimVertex>& vertices) {
   auto num_bones = mesh->mNumBones;
   for (unsigned int boneIndex = 0; boneIndex < num_bones; ++boneIndex) {
     
@@ -48,8 +48,8 @@ static void extract_bone_weights_for_verts(aiMesh* mesh, const aiScene* scene, S
     for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex) {
       int vertexId = weights[weightIndex].mVertexId;
       float weight = weights[weightIndex].mWeight;
-      assert(vertexId < out_vertices.size());
-      set_vertex_bone_data(out_vertices[vertexId], out_skel.m_BoneInfoMap[boneName].id, weight);
+      assert(vertexId < vertices.size());
+      set_vertex_bone_data(vertices[vertexId], out_skel.m_BoneInfoMap[boneName].id, weight);
     }
 
   }
@@ -107,7 +107,7 @@ static MeshInfo extract_all_mesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x4
 /// 4 step helper function for Load_MeshesTexturesMaterialsBones & recursive_process_node
 /// </summary>
 /// <returns>MeshInfo: data for drawing a Mesh</returns>
-static MeshInfo extract_all_mesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x4* trans, Skeleton& out_skel, const std::string& in_load_path) {
+static MeshInfo extract_all_mesh(Skeleton& out_skel, aiMesh* mesh, const aiScene* scene, aiMatrix4x4* trans, const std::string& in_load_path) {
   // Sanity Check
   unsigned int num_of_vertices_on_mesh = mesh->mNumVertices;
   if (num_of_vertices_on_mesh == 0)
@@ -126,7 +126,7 @@ static MeshInfo extract_all_mesh(aiMesh* mesh, const aiScene* scene, aiMatrix4x4
     }
   }
 
-  extract_bone_weights_for_verts(mesh, scene, out_skel, loaded_vertices);
+  extract_bone_weights_for_verts(out_skel, mesh, scene, loaded_vertices);
 
   // Step2: Get the Indices to draw triangle faces with
   std::vector<unsigned int> loaded_elements;
@@ -169,7 +169,7 @@ static void recursive_process_node(aiNode* node, const aiScene* scene, std::vect
 static void recursive_process_node(aiNode* node, const aiScene* scene, std::vector<MeshInfo>& out_mesh_info, Skeleton& out_skel, const std::string& in_load_path) {
   for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
     aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-    out_mesh_info.push_back(extract_all_mesh(mesh, scene, &node->mTransformation, out_skel, in_load_path));
+    out_mesh_info.push_back(extract_all_mesh(out_skel, mesh, scene, &node->mTransformation, in_load_path));
   }
   for (unsigned int i = 0; i < node->mNumChildren; ++i) {
     recursive_process_node(node->mChildren[i], scene, out_mesh_info, out_skel, in_load_path);

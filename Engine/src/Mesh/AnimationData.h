@@ -4,6 +4,7 @@
 #include <memory>
 #include "Skeleton.h"
 namespace AA {
+class Animator;
 struct AnimationData {
   glm::mat4 mGlobalInverseTransform;
   std::unique_ptr<Animator> mAnimator;

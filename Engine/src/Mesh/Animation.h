@@ -48,13 +48,13 @@ private:
   friend class Animator;
   void ReadMissingBones(const aiAnimation* animation, Skeleton& in_out_skele);
 
-  void ReadHeirarchyData(AnimationNodeTree& dest, const aiNode* src);
+  void ReadHeirarchyData(AnimationNodeTree& out_node_tree, const aiNode* src);
 
   Skeleton m_Skeleton;
 
-  float m_Duration = 0.0f;
+  double m_Duration = 0.0;
 
-  float m_TicksPerSecond = 0.0f;
+  double m_TicksPerSecond = 0.0;
 
   AnimationNodeTree m_RootNode;
 
