@@ -589,3 +589,16 @@ pythonenv3.8/
 # Downloadable Test Resources
 /RuntimeFiles
 
+# CMAKE via https://raw.githubusercontent.com/github/gitignore/main/CMake.gitignore
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
