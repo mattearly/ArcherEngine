@@ -12,17 +12,17 @@ struct BoneInfo {
   glm::mat4 offset;
 };
 
+typedef const std::string BONE_MAP_KEY;
+
 struct Skeleton {
 
   Bone* FindBone(const std::string& name);
 
-  const std::map<std::string, BoneInfo>& GetBoneIDMap();
-
-  // ---------------
+  const std::map<BONE_MAP_KEY, BoneInfo>& GetBoneIDMap();
 
   std::vector<Bone> m_Bones;
 
-  std::map<std::string, BoneInfo> m_BoneInfoMap;
+  std::map<BONE_MAP_KEY, BoneInfo> m_BoneInfoMap;
 
   unsigned int m_BoneCounter = 0;
 

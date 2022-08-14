@@ -45,15 +45,12 @@ public:
   const AnimationNodeTree& GetRootNode();
 
 private:
-
+  friend class Animator;
   void ReadMissingBones(const aiAnimation* animation, Skeleton& in_out_skele);
 
   void ReadHeirarchyData(AnimationNodeTree& dest, const aiNode* src);
 
-  friend class Animator;
   Skeleton m_Skeleton;
-
-private:
 
   float m_Duration = 0.0f;
 

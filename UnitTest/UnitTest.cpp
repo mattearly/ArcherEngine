@@ -266,10 +266,13 @@ public:
     load_sun(tg->g_aa_interface);
     tg->g_aa_interface.AddToOnQuit([]() {unload_sun(); });
     tg->g_aa_interface.SetWindowClearColor();
-    tg->g_cam_id = tg->g_aa_interface.AddCamera(
-      tg->g_aa_interface.GetWindow().lock()->GetCurrentMinWidth(),
-      tg->g_aa_interface.GetWindow().lock()->GetCurrentMinHeight(),
-      true);
+    // add a camera that fills full screens
+    {
+      tg->g_window_ref = tg->g_aa_interface.GetWindow();
+      std::shared_ptr<AA::Window> local_window_ref = tg->g_window_ref.lock();
+      tg->g_cam_id = tg->g_aa_interface.AddCamera(local_window_ref->GetCurrentWidth(), local_window_ref->GetCurrentHeight(), true);
+      tg->g_camera_ref = tg->g_aa_interface.GetCamera(tg->g_cam_id);
+    }
     setup_fpp_fly(tg->g_cam_id, tg->g_aa_interface);
 
     tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-20, -30, -75), glm::vec3(.25f));
@@ -278,7 +281,11 @@ public:
 
     tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), true, glm::vec3(20, -30, -75), glm::vec3(.25f));
     tg->g_idle_anim_id = tg->g_aa_interface.AddAnimation(tg->idle_anim_runtime_dir_path.c_str(), tg->g_peasant_man_id);
-    tg->g_aa_interface.SetAnimationOnProp(tg->g_idle_anim_id, tg->g_peasant_man_id);
+    tg->g_aa_interface.SetAnimationOnProp(tg->g_idle_anim_id, tg->g_peasant_man_id); 
+    
+    tg->g_vanguard_id = tg->g_aa_interface.AddProp(tg->vanguard_runtime_dir_path.c_str(), true, glm::vec3(0, -30, -125), glm::vec3(.25f));
+    auto test_anim = tg->g_aa_interface.AddAnimation(tg->idle_anim_runtime_dir_path.c_str(), tg->g_vanguard_id);
+    tg->g_aa_interface.SetAnimationOnProp(test_anim, tg->g_vanguard_id);
 
     tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
       ImGui::Begin("Animated Model Test");
@@ -343,11 +350,6 @@ public:
     }
 
     tg->g_ground_plane_id = tg->g_aa_interface.AddProp(tg->ground_plane_runtime_dir_path.c_str(), false, glm::vec3(0, -30.f, 0), glm::vec3(3));
-
-
-    //tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), glm::vec3(0, -30, -70), glm::vec3(.15f));
-
-
 
     // Add Zombie With Punching Animation.
     tg->g_zombie_id[0] = tg->g_aa_interface.AddProp(tg->zombie_runtime_dir_path.c_str(), true, glm::vec3(-30, -30, -70), glm::vec3(0.12f));
