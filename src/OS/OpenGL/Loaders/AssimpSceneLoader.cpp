@@ -1,5 +1,6 @@
 #include "AssimpSceneLoader.h"
 namespace AA {
+
 bool AssimpSceneLoader::doLogging = false;
 
 static C_STRUCT aiLogStream logstream;

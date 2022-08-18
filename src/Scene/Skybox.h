@@ -1,11 +1,9 @@
 #pragma once
-#include "Scene/Camera.h"
 #include "../OS/OpenGL/OGLShader.h"
 #include <vector>
 #include <string>
 #include <memory>
 namespace AA {
-class Camera;
 // sticking with this pattern: 
 // https://learnopengl.com/Advanced-OpenGL/Cubemaps
 // although many skybox texture sets found online seem to be in differing order

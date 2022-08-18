@@ -2,6 +2,7 @@
 #include "../Graphics.h"
 #include "../../../Mesh/Vertex.h"
 #include "../../../Math/Conversions.h"
+#include <Scene/Scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <glm/glm.hpp>
@@ -29,7 +30,7 @@ static void set_vertex_bone_data(AnimVertex& out_vertex, int boneID, float weigh
 static void extract_bone_weights_for_verts(aiMesh* mesh, const aiScene* scene, Skeleton& out_skel, std::vector<AnimVertex>& out_vertices) {
   auto num_bones = mesh->mNumBones;
   for (unsigned int boneIndex = 0; boneIndex < num_bones; ++boneIndex) {
-    
+
     // name for finding in our map
     BONE_MAP_KEY boneName = mesh->mBones[boneIndex]->mName.C_Str();
 
@@ -177,7 +178,7 @@ static void recursive_process_node(aiNode* node, const aiScene* scene, std::vect
 
 // Loads the data from the model at path, and saves it to out_model
 // returns true (negative int) on fail to open:
-//   error codes: 
+//   error codes:
 //    -1 = scene was null after attempt to load
 //    -2 = scene has incomplete flag from assimp after attempted to load
 //    -3 = there is no root node on the model
