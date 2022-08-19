@@ -601,3 +601,7 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+# THE BUILD FOLDER, STAPH
+[Bb][Uu][Ii][Ll][Dd]/
+CMakeSettings.json

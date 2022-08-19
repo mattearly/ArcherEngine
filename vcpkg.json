@@ -1,11 +1,11 @@
 {
 	"name": "archerengine",
-	"version": "1.5",
+	"version": "2.0",
 	"dependencies": [
 		"glm",
 		"assimp",
 		"glfw3",
-		"glad",
+		"glew",
 		"openal-soft",
 		"libsndfile",
 		{
@@ -15,8 +15,6 @@
 				"opengl3-binding"
 			]
 		},
-		"physx",
-		"stb",
-		"curl"
+		"stb"
 	]
 }
