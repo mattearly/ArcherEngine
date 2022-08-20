@@ -12,7 +12,7 @@ External Libraries will be required to build Archer.
 
 ##### required libs:
 ```bash
-sudo apt-get install libimgui-dev libglfw3-dev libglm-dev libopengl-dev libsndfile-dev libopenal-dev libcurl-dev libassimp-dev libglew-dev libopenal-dev
+sudo apt-get install libimgui-dev libglfw3-dev libglm-dev libopengl-dev libsndfile-dev libopenal-dev libcurl-dev libassimp-dev libglew-dev
 ```
 
 ##### build commands:
