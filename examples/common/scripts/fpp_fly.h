@@ -29,17 +29,17 @@ unsigned int fly_mouse_handling_func = 0;
 unsigned int fly_update_func = 0;
 std::weak_ptr<AA::Window> fly_window;
 std::weak_ptr<AA::Camera> fly_camera;
-AA::Interface* interface_ref = nullptr;
+AA::Interface* fly_script_interface_ref = nullptr;
 
 void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
   if (fly_setup) return;
 
   cam_id_set_to = cam_id_to_fly;
-  interface_ref = &interface;
+  fly_script_interface_ref = &interface;
 
   fly_mouse_button_func = interface.AddToMouseButtonHandling([](AA::MouseButtons& mb) {
     if (mb.mouseButton2) {
-      fly_window = interface_ref->GetWindow();
+      fly_window = fly_script_interface_ref->GetWindow();
       std::shared_ptr<AA::Window> local_fly_window = fly_window.lock();
       if (!is_cursor_on) {
         local_fly_window->SetCursorToNormal();
@@ -76,7 +76,7 @@ void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
     yDelta = lastY - cursor.yOffset;
 
     if (xDelta != 0.0 || yDelta != 0.0) {
-      fly_camera = interface_ref->GetCamera(cam_id_set_to);
+      fly_camera = fly_script_interface_ref->GetCamera(cam_id_set_to);
       std::shared_ptr<AA::Camera> local_fly_cam = fly_camera.lock();
       local_fly_cam->ShiftPitchAndYaw(yDelta * FPP_SENSITIVITY, xDelta * FPP_SENSITIVITY);
 
@@ -87,7 +87,7 @@ void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
     });
 
   fly_update_func = interface.AddToUpdate([](float dt) {
-    fly_camera = interface_ref->GetCamera(cam_id_set_to);
+    fly_camera = fly_script_interface_ref->GetCamera(cam_id_set_to);
     if (move.forward) {
       std::shared_ptr<AA::Camera> local_fly_cam = fly_camera.lock();
       move_diff += local_fly_cam->GetFront();
@@ -162,21 +162,21 @@ void turn_off_fly() {
   UnprocessedMovements = false;
   snap_to_center = false;
 
-  if (interface_ref->RemoveFromMouseButtonHandling(fly_mouse_button_func)) {
+  if (fly_script_interface_ref->RemoveFromMouseButtonHandling(fly_mouse_button_func)) {
     fly_mouse_button_func = 0;
   }
-  if (interface_ref->RemoveFromKeyHandling(fly_kb_button_func)) {
+  if (fly_script_interface_ref->RemoveFromKeyHandling(fly_kb_button_func)) {
     fly_kb_button_func = 0;
   }
-  if (interface_ref->RemoveFromMouseHandling(fly_mouse_handling_func)) {
+  if (fly_script_interface_ref->RemoveFromMouseHandling(fly_mouse_handling_func)) {
     fly_mouse_handling_func = 0;
   }
-  if (interface_ref->RemoveFromOnUpdate(fly_update_func)) {
+  if (fly_script_interface_ref->RemoveFromOnUpdate(fly_update_func)) {
     fly_update_func = 0;
   }
 
   fly_window.reset();
   fly_camera.reset();
-  interface_ref = nullptr;
+  fly_script_interface_ref = nullptr;
 
 }
