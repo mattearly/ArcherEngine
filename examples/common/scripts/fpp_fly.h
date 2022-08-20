@@ -1,3 +1,4 @@
+#pragma once
 #include <ArcherEngine/Interface.h>
 #include <glm/glm.hpp>
 #include <memory>

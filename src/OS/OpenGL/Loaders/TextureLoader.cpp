@@ -1,6 +1,5 @@
 #include "AssimpSceneLoader.h"
 #include "../Graphics.h"
-#include <stb/stb_image.h>
 #include <assimp/Importer.hpp>
 #include <string>
 #include <utility>
@@ -30,6 +29,12 @@
 //#define STBI_MALLOC malloc
 //#define STBI_REALLOC realloc
 //#define STBI_FREE free
+
+#ifdef __linux__
+#include <stb/stb_image.h>
+#elif _WIN32
+#include <stb_image.h>
+#endif
 
 namespace AA {
 

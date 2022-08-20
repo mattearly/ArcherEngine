@@ -32,8 +32,12 @@ TODO
 
 ### WINDOWS
 
-TODO
+#### requires vcpkg to handle libs
 
+see [https://github.com/microsoft/vcpkg](https://github.com/microsoft/vcpkg)
+should work via the vcpkg.json manifest once vcpkg is set up
+
+use cmake to prepare your build.
 
 ## Library Function Definitions
 
