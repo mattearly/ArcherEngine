@@ -49,7 +49,7 @@ bool AA::NavigateFileSystem(std::string& out, const char* filetypereg, const cha
   char* file_hunted = NULL;
   nfdresult_t result = NFD_OpenDialog(filetypereg, starting_pref, &file_hunted);
   if (result == NFD_OKAY) {
-    out = model_file;
+    out = file_hunted;
   }
   else if (result == NFD_CANCEL) {
     func_result = false;
