@@ -604,4 +604,5 @@ _deps
 
 # THE BUILD FOLDER, STAPH
 [Bb][Uu][Ii][Ll][Dd]/
+out/
 CMakeSettings.json

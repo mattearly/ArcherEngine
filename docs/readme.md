@@ -11,11 +11,13 @@ External Libraries will be required to build Archer.
 #### Linux Mint:
 
 ##### required libs:
+
 ```bash
 sudo apt-get install libimgui-dev libglfw3-dev libglm-dev libopengl-dev libsndfile-dev libopenal-dev libcurl-dev libassimp-dev libglew-dev
 ```
 
 ##### build commands:
+
 ```bash
 chmod +x linux_build.sh
 ./linux_build.sh
