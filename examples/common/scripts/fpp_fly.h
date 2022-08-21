@@ -44,23 +44,31 @@ void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
       if (!is_cursor_on) {
         local_fly_window->SetCursorToNormal();
         is_cursor_on = !is_cursor_on;
-      } else {
+      }
+      else {
         local_fly_window->SetCursorToDisabled();
         is_cursor_on = !is_cursor_on;
         snap_to_center = true;
       }
     }
-    });
+  });
 
   fly_kb_button_func = interface.AddToKeyHandling([](AA::KeyboardButtons& kb) {
-    if (kb.w) { move.forward = true; } else { move.forward = false; }
-    if (kb.s) { move.backwards = true; } else { move.backwards = false; }
-    if (kb.a) { move.left = true; } else { move.left = false; }
-    if (kb.d) { move.right = true; } else { move.right = false; }
-    if (kb.spacebar) { move.up = true; } else { move.up = false; }
-    if (kb.c) { move.down = true; } else { move.down = false; }
-    if (kb.leftShift) { move.sprint = true; } else { move.sprint = false; }
-    });
+    if (kb.w) { move.forward = true; }
+    else { move.forward = false; }
+    if (kb.s) { move.backwards = true; }
+    else { move.backwards = false; }
+    if (kb.a) { move.left = true; }
+    else { move.left = false; }
+    if (kb.d) { move.right = true; }
+    else { move.right = false; }
+    if (kb.spacebar) { move.up = true; }
+    else { move.up = false; }
+    if (kb.c) { move.down = true; }
+    else { move.down = false; }
+    if (kb.leftShift) { move.sprint = true; }
+    else { move.sprint = false; }
+  });
 
   fly_mouse_handling_func = interface.AddToMouseHandling([](AA::MouseCursorPos& cursor) {
     if (is_cursor_on) return;
@@ -84,7 +92,7 @@ void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
       lastY = cursor.yOffset;
     }
 
-    });
+  });
 
   fly_update_func = interface.AddToUpdate([](float dt) {
     fly_camera = fly_script_interface_ref->GetCamera(cam_id_set_to);
@@ -127,7 +135,8 @@ void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
       // going up or down logic
       if (move.up) {
         amount_shifted.y += dt * DEFAULTMOVESPEED;
-      } else if (move.down) {
+      }
+      else if (move.down) {
         amount_shifted.y -= dt * DEFAULTMOVESPEED;
       }
 
@@ -140,7 +149,7 @@ void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
       UnprocessedMovements = !UnprocessedMovements;
       move_diff = glm::vec3(0);
     }
-    });
+  });
 
   fly_setup = true;
 }
