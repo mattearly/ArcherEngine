@@ -1,7 +1,11 @@
 #pragma once
 #include <ArcherEngine/Interface.h>
 #include <ArcherEngine/Utility/FileDialog.h>
+#ifdef __linux__
+#include <imgui/imgui.h>
+#elif _WIN32
 #include <imgui.h>
+#endif
 #include <memory>
 #include <string>
 
