@@ -1,5 +1,4 @@
 #include "Skybox.h"
-#include <Utility/Files.h>
 #include "../OS/OpenGL/Graphics.h"
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
 #include "../OS/OpenGL/Loaders/AssimpSceneLoader.h"
