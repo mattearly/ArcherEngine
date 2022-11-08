@@ -4,11 +4,11 @@ Project("ArcherEngine" VERSION 1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
-file(GLOB_RECURSE PRIVATE_HEADERS "src/*.h")
-file(GLOB_RECURSE PUBLIC_HEADERS "include/ArcherEngine/*.h")
+file(GLOB_RECURSE ARCHER_SOURCES "src/*.cpp")
+file(GLOB_RECURSE ARCHER_PRIVATE_HEADERS "src/*.h")
+file(GLOB_RECURSE ARCHER_PUBLIC_HEADERS "include/ArcherEngine/*.h")
 
-add_library(archer ${SOURCES} ${PRIVATE_HEADERS} ${PUBLIC_HEADERS})
+add_library(archer ${ARCHER_SOURCES} ${ARCHER_PRIVATE_HEADERS} ${ARCHER_PUBLIC_HEADERS})
 
 target_include_directories(archer PRIVATE "${CMAKE_SOURCE_DIR}/include/ArcherEngine")
 
