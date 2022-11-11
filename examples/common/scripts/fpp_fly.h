@@ -4,7 +4,6 @@
 #include <memory>
 
 // globals local to this file
-bool fly_setup = false;
 struct Move {
   bool forward = false;
   bool backwards = false;
@@ -32,7 +31,7 @@ std::weak_ptr<AA::Camera> fly_camera;
 AA::Interface* fly_script_interface_ref = nullptr;
 
 void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
-  if (fly_setup) return;
+  if (fly_script_interface_ref) return;   // already setup
 
   cam_id_set_to = cam_id_to_fly;
   fly_script_interface_ref = &interface;
@@ -151,12 +150,12 @@ void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
     }
   });
 
-  fly_setup = true;
 }
 
 void turn_off_fly() {
+  if(!fly_script_interface_ref) return; // isn't setup
+
   cam_id_set_to = 0;
-  fly_setup = false;
   move.forward = false;
   move.backwards = false;
   move.left = false;
