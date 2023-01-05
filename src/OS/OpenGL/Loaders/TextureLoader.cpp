@@ -246,7 +246,6 @@ unsigned int AssimpSceneLoader::LoadCubeMapTexture(const std::vector<std::string
   stbi_set_flip_vertically_on_load(0); // tell stb_image.h to not flip loaded texture's on the y-axis.
   for (auto i = 0; i < 6; ++i) {
     data[i] = stbi_load(six_texture_paths[i].c_str(), &width, &height, &nrChannel, 0);
-
   }
   if (data[0] && data[5]) {  // ensure first and last data pics are there (middle not checked but assumed)
     int format = helper_get_ogl_of_stb_internal_format(nrChannel);

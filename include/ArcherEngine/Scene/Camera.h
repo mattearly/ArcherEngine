@@ -15,7 +15,6 @@ public:
   Camera(int width, int height);
   ~Camera();
 
-  
   void ProjectionChanged();
 
   /// <summary>
@@ -201,11 +200,11 @@ protected:
   float            Yaw;
   float            Pitch;
   float            MaxRenderDistance;
-  
+
   glm::mat4        mProjectionMatrix;
-  
+
   ProjectionType   mProjectionType;
-  
+
   bool             isAlwaysScreenSize;
   int              RenderDepth;  // lower renders first
 
