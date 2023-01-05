@@ -26,7 +26,7 @@ int main() {
     strong_cam_ref->SetPitch(-35.f);
     archer_engine_interface.GetSunLight().lock()->Shadows = false;  // no shadows
     setup_fpp_fly(editor_cam, archer_engine_interface);
-    setup_file_menu(archer_engine_interface);
+    setup_file_menu(editor_cam, archer_engine_interface);
     archer_engine_interface.AddToOnQuit([]() { turn_off_fly(); remove_file_menu(); });
 
   }
