@@ -28,8 +28,8 @@ SunLight::SunLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec)
   uber_shader->SetVec3("u_dir_light.Diffuse", Diffuse);
   uber_shader->SetVec3("u_dir_light.Specular", Specular);
   uber_shader->SetBool("u_dir_light.Shadows", Shadows);
-  uber_shader->SetBool("u_dir_light.ShadowBiasMin", ShadowBiasMin);
-  uber_shader->SetBool("u_dir_light.ShadowBiasMax", ShadowBiasMax);
+  uber_shader->SetFloat("u_dir_light.ShadowBiasMin", ShadowBiasMin);
+  uber_shader->SetFloat("u_dir_light.ShadowBiasMax", ShadowBiasMax);
 
 
   if (ShadowDepthMapFBO != 0 && ShadowDepthMapTextureId != 0) {
