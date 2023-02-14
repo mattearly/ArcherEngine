@@ -106,7 +106,8 @@ static int load_textures_from_scene(
     if (ai_embedded_texture) {
       std::string embedded_filename = ai_embedded_texture->mFilename.C_Str();
 
-      // fix path for glb (and fbx?) embedded textures and not having to reload them, as path is often our reuse already loaded key
+      // todo: fix path for glb (and fbx?) embedded textures and not having to reload them, as path is often our reuse already loaded key
+      // todo: multiple textres of the same type may be using the same typename
       if (embedded_filename == "") { embedded_filename = model_file_name + "." + model_file_extension + "/" + toString(typeName); }
 
       // see if it has already been loaded previously to reuse
