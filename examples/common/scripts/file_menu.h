@@ -92,7 +92,7 @@ void setup_file_menu(const unsigned int& cam_id, AA::Interface& interface) {
     for (const auto& id : prop_ids) {
       std::stringstream ss;
       ss << id;
-      std::string the_text = "MODEL ID: " + ss.str();
+      std::string the_text = "ID: " + ss.str();
       ImGui::Text(the_text.c_str());
     }
     ImGui::End();
