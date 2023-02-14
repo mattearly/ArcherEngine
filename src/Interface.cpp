@@ -171,7 +171,7 @@ bool Interface::RemoveCamera(const int camId) {
   return false;   // fail remove
 }
 
-std::weak_ptr<Camera> Interface::GetCamera(uidtype camId) {
+[[nodiscard]] std::weak_ptr<Camera> Interface::GetCamera(uidtype camId) {
   for (auto& cam : mCameras) {
     if (cam->GetUID() == camId) {
       return cam;
@@ -213,6 +213,15 @@ bool Interface::RemoveProp(const unsigned int id) {
     }
   }
   throw(-9);
+}
+
+[[nodiscard]] std::vector<uint32_t> Interface::GetAllPropIds() {
+  std::vector<uint32_t> return_vec;
+  return_vec.reserve(mProps.size());
+  for (auto& prop : mProps) {
+    return_vec.push_back(prop->GetUID());
+  }
+  return return_vec;
 }
 
 //

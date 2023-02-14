@@ -404,7 +404,7 @@ GLuint OpenGL::Upload2DTex(const unsigned char* tex_data, int width, int height,
   //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
   // internal format for GL_RGBA should be GL_RGBA8 for reasons https://youtu.be/n4k7ANAFsIQ?t=910
-  auto internalformat = (format == GL_RGBA) ? GL_RGBA8 : GL_RGB;
+  GLint internalformat = (format == GL_RGBA) ? GL_RGBA8 : GL_RGB;
   if (format == GL_RED)
     internalformat = GL_RED;
 

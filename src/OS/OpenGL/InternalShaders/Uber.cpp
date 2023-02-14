@@ -89,7 +89,7 @@ struct Material {
   vec3 Tint;
   vec3 Ambient;
   vec3 SpecularColor;
-  vec3 EmissionColor;  
+  vec3 EmissionColor;
 
   float Shininess;
 };
@@ -129,7 +129,7 @@ uniform sampler2D u_shadow_map; // texture 4
 
 uniform ReflectionModel u_reflection_model;
 uniform vec3 u_view_pos;
-uniform mat4 u_light_space_matrix;  
+uniform mat4 u_light_space_matrix;
 
 uniform DirectionalLight u_dir_light;
 
@@ -267,7 +267,7 @@ vec3 CalculatePointLights(PointLight light, vec3 normal, vec3 viewDir) {
     specular = light.Specular * spec * texture(u_material.Specular, fs_in.TexUV).r;
   } else {
     specular = light.Specular * spec * u_material.SpecularColor.r;
-  } 
+  }
 
   ambient *= attenuation;
   diffuse *= attenuation;

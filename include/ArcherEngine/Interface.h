@@ -108,7 +108,7 @@ public:
   /// </summary>
   /// <param name="camId">id that was returned by AddCamera()</param>
   /// <returns></returns>
-  std::weak_ptr<Camera> GetCamera(uidtype camId);
+  [[nodiscard]] std::weak_ptr<Camera> GetCamera(uidtype camId);
 
   /// <summary>
   /// Adds a Scene.
@@ -133,6 +133,12 @@ public:
   /// <param name="id">id of the prop to access</param>
   /// <returns>a weak ptr to a prop</returns>
   [[nodiscard]] std::weak_ptr<Scene> GetProp(const unsigned int id) const;
+
+  /// <summary>
+  /// returns a list of all prop ids
+  /// </summary>
+  /// <returns>a vector full of uint32_t which are all the ids</returns>
+  [[nodiscard]] std::vector<uint32_t> GetAllPropIds();
 
   /// <summary>
   /// Adds Skeletal Animation Data to the memory bank of a Animated Scene.

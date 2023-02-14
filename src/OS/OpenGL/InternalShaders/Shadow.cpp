@@ -51,11 +51,7 @@ void main()
   const std::string FRAG_CODE =
     R"(
 #version 430 core
-
-void main()
-{             
-    // gl_FragDepth = gl_FragCoord.z;
-}
+void main() {}
 )";
 
   SHADOWSHADER = new OGLShader(VERT_CODE.c_str(), FRAG_CODE.c_str());

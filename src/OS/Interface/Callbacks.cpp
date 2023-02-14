@@ -114,13 +114,13 @@ void KEYCALLBACK(GLFWwindow* w, int key, int scancode, int action, int mods) {
   // esc
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     g_keyboard_input_status.esc = true;
-  } else if (key == GLFW_KEY_ESCAPE == GLFW_RELEASE) {
+  } else if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
     g_keyboard_input_status.esc = false;
   }
   // function keys
   if (key == GLFW_KEY_F1 == GLFW_PRESS) {
     g_keyboard_input_status.f1 = true;
-  } else if (key == GLFW_KEY_F1 == GLFW_RELEASE) {
+  } else if (key == GLFW_KEY_F1 && action == GLFW_RELEASE) {
     g_keyboard_input_status.f1 = false;
   }
   if (key == GLFW_KEY_F2 && action == GLFW_PRESS) {
