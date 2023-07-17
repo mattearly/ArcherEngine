@@ -33,7 +33,7 @@ void setup_file_menu(const unsigned int& cam_id, AA::Interface& interface) {
           if (ok)
             file_interface_ref->AddProp(file.c_str(), false);
         }
-        if (ImGui::MenuItem("Import Skybox Files...", "", nullptr)) {
+        if (ImGui::MenuItem("Import Skybox Files (order:udlfrb)", "", nullptr)) {
           // todo: this does a no-existext job oof telling the user which to load.
           //   they should be picked in order of up down left front right back
           std::string up{}, down{}, left{}, front{}, right{}, back{};
