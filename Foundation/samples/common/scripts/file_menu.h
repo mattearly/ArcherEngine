@@ -75,41 +75,49 @@ void setup_file_menu(const unsigned int& cam_id, AA::Interface& interface) {
       ImGui::EndMainMenuBar();
     }
 
-  // CONDITIONALS
-  if (show_controls) {
-    ImGui::Begin("Controls");
-    ImGui::Text("TOGGLE MOUSE: right click");
-    ImGui::Text("MOVE: wasd");
-    ImGui::Text("LOOK: mouse (when toggled)");
-    ImGui::Text("FLY UP: spacebar");
-    ImGui::Text("FLY DOWN: c");
-    ImGui::End();
-  }
-  if (show_model_panel) {
-    ImGui::Begin("Models");
-    // test to see if we can get a list of models showing
-    std::vector<uint32_t> prop_ids = aa_engine_ref->GetAllPropIds();
-    for (const auto& id : prop_ids) {
-      std::stringstream ss;
-
-      // model id (unique identifier)
-      ss << id;
-      std::string id_text = "ID: " + ss.str();
-      ImGui::Text(id_text.c_str());
-
-      // get other stats
-      auto model_ref = aa_engine_ref->GetProp(id).lock();
-
-      // model location
-      ss.str(std::string());
-      auto loc = model_ref->GetLocation();
-      ss << "Location: " << loc.x << ", " << loc.y << ", " << loc.z;
-      std::string loc_string = ss.str();
-      ImGui::Text(loc_string.c_str());
-
+    // CONDITIONALS
+    if (show_controls) {
+      ImGui::Begin("Controls");
+      ImGui::Text("TOGGLE MOUSE: right click");
+      ImGui::Text("MOVE: wasd");
+      ImGui::Text("LOOK: mouse (when toggled)");
+      ImGui::Text("FLY UP: spacebar");
+      ImGui::Text("FLY DOWN: c");
+      ImGui::End();
     }
-    ImGui::End();
-  }
+    if (show_model_panel) {
+      ImGui::Begin("Models");
+      // test to see if we can get a list of models showing
+      std::vector<uint32_t> prop_ids = aa_engine_ref->GetAllPropIds();
+      for (const auto& id : prop_ids) {
+        std::stringstream ss;
+
+        // model id (unique identifier)
+        ss << id;
+        std::string id_text = "ID: " + ss.str();
+        ImGui::Text(id_text.c_str());
+
+        // get other stats
+        auto model_ref = aa_engine_ref->GetProp(id).lock();
+
+        // changable model location
+        ss.str(std::string());
+        auto& loc = model_ref->GetLocation();
+        ss << "Location: ";// << loc.x << ", " << loc.y << ", " << loc.z;
+        std::string loc_string = ss.str();
+        ImGui::Text(loc_string.c_str());
+        float pos[3] = { 0,0,0 };
+        pos[0] = loc.x; pos[1] = loc.y; pos[2] = loc.z;
+        static const float MIN = -3000.f, MAX = 3000.f;
+        bool loc_changed = ImGui::SliderFloat3("xyz", pos, MIN, MAX, "%.2f");
+        if (loc_changed) {
+          model_ref->SetLocation(glm::vec3(pos[0], pos[1], pos[2]));
+        }
+
+
+      }
+      ImGui::End();
+    }
   });
 }
 
