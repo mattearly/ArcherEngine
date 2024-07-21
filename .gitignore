@@ -606,3 +606,4 @@ _deps
 [Bb][Uu][Ii][Ll][Dd]/
 out/
 CMakeSettings.json
+Foundation/cmake
