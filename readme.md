@@ -18,7 +18,7 @@
 
 ## Build & Run
 
-### [docs/readme.md](docs/readme.md)
+### [doc/readme.md](doc/readme.md)
 
 ### Unit Tests
 
@@ -28,12 +28,12 @@ TODO
 
 | SYNTAX | DESCRIPTION |
 | ------ | ----------- |
-| ../build/examples/editor/editor_example.exe | Example Game Engine Front End Editor Starting Point |
+| ../build/samples/editor/editor_example.exe | Example Game Engine Front End Editor Starting Point |
 
 ## Example Code
 
 ```cpp
-#include <AAEngine/Interface.h>
+#include <ArcherEngine/Interface.h>
 AA::Interface instance; // global so you can access it in lambda scripting
 int main(int argc, char** argv) {
   WindowOptions opts;

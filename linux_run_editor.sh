@@ -1,2 +1,2 @@
 
-./build/examples/editor/editor_example
+./build/Foundation/samples/editor/editor_example
