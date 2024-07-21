@@ -1,6 +1,6 @@
 {
 	"name": "archerengine",
-	"version": "2.1",
+	"version": "2.2",
 	"dependencies": [
 		"glm",
 		"assimp",
@@ -16,6 +16,6 @@
 			]
 		},
 		"stb",
-		"nativefiledialog"
+		"nativefiledialog-extended"
 	]
 }
