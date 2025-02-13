@@ -37,7 +37,10 @@ bool AA::NavigateFileSystem(std::string& out, const char* filetypereg, const cha
   out.clear();
   bool func_result = true;
   char* file_hunted = NULL;
-  nfdresult_t result = NFD_OpenDialog(filetypereg, starting_pref, &file_hunted);
+
+  // todo: filter - arg filetypereg is ignored right now
+ // const nfdu8filteritem_t filter(filetypereg, NULL);
+  nfdresult_t result = NFD_OpenDialogU8(&file_hunted, NULL, NULL, starting_pref);
   if (result == NFD_OKAY) {
     out = file_hunted;
   }
