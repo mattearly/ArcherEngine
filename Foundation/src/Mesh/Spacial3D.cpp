@@ -1,3 +1,5 @@
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include "Spacial3D.h"
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>

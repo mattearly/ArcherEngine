@@ -1,3 +1,5 @@
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <Scene/Camera.h>
 #include "../OS/OpenGL/InternalShaders/Skycube.h"
 #include "../OS/OpenGL/InternalShaders/Stencil.h"
