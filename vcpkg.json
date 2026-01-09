@@ -1,21 +1,20 @@
 {
-	"name": "archerengine",
-	"version": "2.2",
-	"dependencies": [
-		"glm",
-		"assimp",
-		"glfw3",
-		"glew",
-		"openal-soft",
-		"libsndfile",
-		{
-			"name": "imgui",
-			"features": [
-				"glfw-binding",
-				"opengl3-binding"
-			]
-		},
-		"stb",
-		"nativefiledialog-extended"
-	]
+  "name": "archerengine",
+  "dependencies": [
+    "assimp",
+    "glew",
+    "glfw3",
+    "glm",
+    {
+      "name": "imgui",
+      "features": [
+        "glfw-binding",
+        "opengl3-binding"
+      ]
+    },
+    "libsndfile",
+    "nativefiledialog-extended",
+    "openal-soft",
+    "stb"
+  ]
 }
