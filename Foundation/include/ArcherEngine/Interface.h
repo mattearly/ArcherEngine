@@ -349,7 +349,7 @@ public:
   /// <summary>
   /// Changes the volume (gain).
   /// </summary>
-  /// <param name="new_vol">new gain settings. negative values are treated as 0.f</param>
+  /// <param name="new_vol">new gain settings. 0.f to 1.f. negative values are treated as 0.f</param>
   void SetMusicVolume(float new_vol);
 
   /// <summary>

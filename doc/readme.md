@@ -4,6 +4,15 @@ archer lib will need to be linked to your C++ project to use. This should be pre
 
 ## Building for your OS
 
+### WINDOWS
+
+#### requires vcpkg to handle libs
+
+see [https://github.com/microsoft/vcpkg](https://github.com/microsoft/vcpkg)
+should work via the vcpkg.json manifest once vcpkg is set up
+
+use cmake to prepare your build.
+
 ### LINUX
 
 External Libraries will be required to build Archer.
@@ -28,21 +37,9 @@ the demo does not have any models loaded by default, so you will see a black scr
 You can fly around with wasd, move down with c, move up with spacebar, look with the mouse, toggle fpp control with right click.
 That is all the demo does for now.
 
-### MACOS
-
-TODO
-
-### WINDOWS
-
-#### requires vcpkg to handle libs
-
-see [https://github.com/microsoft/vcpkg](https://github.com/microsoft/vcpkg)
-should work via the vcpkg.json manifest once vcpkg is set up
-
-use cmake to prepare your build.
-
 ## Library Function Definitions
 
 - Generate via Doxygen
 - See [Interface.h](AAEngine/include/AAEngine/Interface.h) Header for core user access functions.
 - Old ones (todo - new version): [Old Docs Webpage](https://mattearly.github.io/AncientArcher/index.html)
+
