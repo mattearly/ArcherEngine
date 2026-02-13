@@ -52,6 +52,10 @@ public:
 
   const glm::vec3& GetLocation() const;
 
+  const glm::vec3& GetScale() const;
+
+  const glm::vec3& GetRotation() const;
+
   /// <summary>
   /// Moves a prop to a location
   /// </summary>

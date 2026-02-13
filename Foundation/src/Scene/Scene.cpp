@@ -166,6 +166,14 @@ const glm::vec3& Scene::GetLocation() const {
   return scenedata_->spacial_data.mCurrentLocation;
 }
 
+const glm::vec3& Scene::GetScale() const {
+  return scenedata_->spacial_data.mCurrentScale;
+}
+
+const glm::vec3& Scene::GetRotation() const {
+  return scenedata_->spacial_data.mCurrentRot;
+}
+
 void Scene::SetLocation(const glm::vec3& loc) {
   scenedata_->spacial_data.MoveTo(loc);
 }
