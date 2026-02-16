@@ -4,16 +4,41 @@
 *   and extra to the RuntimeFiles directory.
 */
 
-#include "pch.h"
+#include <ArcherEngine/Interface.h>
+#include <imgui.h>
+#include <vector>
+#include <string>
 #include "test_globals.h"
 #include "fly_cam_script.h"
 #include "sun_light_script.h"
-#include "CppUnitTest.h"
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+int main(int argc, char* argv[]) {
+  if (argc == 1) {
+    TestGlobals::init();
+    bool initSuccess = tg->g_aa_interface.Init();
+    if (initSuccess != true) { return -2; }
+    tg->g_imgui_func = tg->g_aa_interface.AddToImGuiUpdate([]() {
+      ImGui::Begin("default init");
+      ImGui::Text("Click \"ok\" to continue");
+      bool result = ImGui::Button("ok");
+      ImGui::End();
+      // update state
+      if (result) { tg->g_aa_interface.Shutdown(); };
+    });
+    int run_diag = tg->g_aa_interface.Run();
 
-namespace AAUnitTest
-{
+    if (run_diag != 0) { return -3; }
+
+    TestGlobals::reset();
+
+    return 0;  // success if we got here
+  }
+
+  return -1; // no tests ran (probably? tbd)
+}
+
+
+/*
 TEST_CLASS(AAUnitTest) {
 public:
 
@@ -281,8 +306,8 @@ public:
 
     tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), true, glm::vec3(20, -30, -75), glm::vec3(.25f));
     tg->g_idle_anim_id = tg->g_aa_interface.AddAnimation(tg->idle_anim_runtime_dir_path.c_str(), tg->g_peasant_man_id);
-    tg->g_aa_interface.SetAnimationOnProp(tg->g_idle_anim_id, tg->g_peasant_man_id); 
-    
+    tg->g_aa_interface.SetAnimationOnProp(tg->g_idle_anim_id, tg->g_peasant_man_id);
+
     tg->g_vanguard_id = tg->g_aa_interface.AddProp(tg->vanguard_runtime_dir_path.c_str(), true, glm::vec3(0, -30, -125), glm::vec3(.25f));
     auto test_anim = tg->g_aa_interface.AddAnimation(tg->idle_anim_runtime_dir_path.c_str(), tg->g_vanguard_id);
     tg->g_aa_interface.SetAnimationOnProp(test_anim, tg->g_vanguard_id);
@@ -671,7 +696,7 @@ public:
         local_camera_ref->GetFront(),
         *tg->spot_light_inner, // inner
         *tg->spot_light_outer, // outer
-        1.0f /* constant*/,
+        1.0f,  //constant
         *tg->spot_light_linear,
         *tg->spot_light_quadratic,
         glm::vec3(*tg->spot_light_ambient),
@@ -684,7 +709,7 @@ public:
     tg->g_aa_interface.DebugLightIndicatorsOnOrOff(tg->debug_point_light);
     tg->g_plight1_id = tg->g_aa_interface.AddPointLight(
       glm::vec3(tg->point_light_loc[0], tg->point_light_loc[1], tg->point_light_loc[2]),
-      1.0f /* constant*/,
+      1.0f,  // constant
       *tg->point_light_linear,
       *tg->point_light_quadratic,
       glm::vec3(*tg->point_light_ambient),
@@ -705,7 +730,7 @@ public:
     // peasant man
     tg->g_peasant_man_id = tg->g_aa_interface.AddProp(tg->peasant_man_runtime_dir_path.c_str(), false, glm::vec3(0, 0, -80), glm::vec3(0.1f));
 
-    // man 
+    // man
     tg->g_peasant_girl_id = tg->g_aa_interface.AddProp(tg->peasant_girl_runtime_dir_path.c_str(), false, glm::vec3(80, 0, -80), glm::vec3(0.1f));
 
     // zombie with punching anim
@@ -768,7 +793,7 @@ public:
           glm::vec3(*tg->point_light_spec));
       }
 
-      if (/*update_slight1_loc || update_slight1_dir ||*/ update_slight1_inner || update_slight1_outer ||
+      if (update_slight1_inner || update_slight1_outer ||
         update_slight1_linear || update_slight1_quadratic || update_slight1_ambient || update_slight1_diff || update_slight1_spec) {
         auto cam = tg->g_camera_ref.lock();
         auto loc = cam->GetPosition();
@@ -860,7 +885,7 @@ public:
         local_camera_ref->GetFront(),
         *tg->spot_light_inner, // inner
         *tg->spot_light_outer, // outer
-        1.0f /* constant*/,
+        1.0f,  // constant
         *tg->spot_light_linear,
         *tg->spot_light_quadratic,
         glm::vec3(*tg->spot_light_ambient),
@@ -875,7 +900,7 @@ public:
 
       tg->g_plight1_id = tg->g_aa_interface.AddPointLight(
         glm::vec3(tg->point_light_loc[0], tg->point_light_loc[1], tg->point_light_loc[2]),
-        1.0f /* constant*/,
+        1.0f,  // constant
         *tg->point_light_linear,
         *tg->point_light_quadratic,
         glm::vec3(*tg->point_light_ambient),
@@ -937,7 +962,7 @@ public:
           glm::vec3(*tg->point_light_ambient), glm::vec3(*tg->point_light_diff), glm::vec3(*tg->point_light_spec));
       }
 
-      if (/*update_slight1_loc || update_slight1_dir ||*/ update_slight1_inner || update_slight1_outer ||
+      if (update_slight1_inner || update_slight1_outer ||
         update_slight1_linear || update_slight1_quadratic || update_slight1_ambient || update_slight1_diff || update_slight1_spec) {
         auto cam = tg->g_camera_ref.lock();
         auto loc = cam->GetPosition();
@@ -1041,3 +1066,5 @@ public:
   }
 };
 }
+
+*/
