@@ -607,3 +607,4 @@ _deps
 out/
 CMakeSettings.json
 Foundation/cmake
+CMakeUserPreset.json

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ArcherEngine/Interface.h>
+
 // globals local to this file
 static bool fly_setup = false;
 struct Move {

@@ -63,7 +63,7 @@ void setup_fpp_fly(unsigned int cam_id_to_fly, AA::Interface& interface) {
     else { move.right = false; }
     if (kb.spacebar) { move.up = true; }
     else { move.up = false; }
-    if (kb.c) { move.down = true; }
+    if (kb.c || kb.leftControl) { move.down = true; }
     else { move.down = false; }
     if (kb.leftShift) { move.sprint = true; }
     else { move.sprint = false; }

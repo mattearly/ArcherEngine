@@ -34,8 +34,7 @@ void setup_file_menu(const unsigned int& cam_id, AA::Interface& interface) {
             aa_engine_ref->AddProp(file.c_str(), false);
         }
         if (ImGui::MenuItem("Import Skybox Files (order:udlfrb)", "", nullptr)) {
-          // todo: this does a no-existext job oof telling the user which to load.
-          //   they should be picked in order of up down left front right back
+          // they should be picked in order of up down left front right back
           std::string up{}, down{}, left{}, front{}, right{}, back{};
           const char* types = "png,tga,jpg,jpeg,gif,tiff,bmp";
           bool has_up = AA::NavigateFileSystem(up, types, "");
@@ -82,7 +81,7 @@ void setup_file_menu(const unsigned int& cam_id, AA::Interface& interface) {
       ImGui::Text("MOVE: wasd");
       ImGui::Text("LOOK: mouse (when toggled)");
       ImGui::Text("FLY UP: spacebar");
-      ImGui::Text("FLY DOWN: c");
+      ImGui::Text("FLY DOWN: c/lcntrl");
       ImGui::End();
     }
     if (show_model_panel) {
@@ -100,20 +99,29 @@ void setup_file_menu(const unsigned int& cam_id, AA::Interface& interface) {
         // get other stats
         auto model_ref = aa_engine_ref->GetProp(id).lock();
 
-        // changable model location
-        ss.str(std::string());
+        // changable model location/scale/rotation
+
         auto& loc = model_ref->GetLocation();
-        ss << "Location: ";// << loc.x << ", " << loc.y << ", " << loc.z;
-        std::string loc_string = ss.str();
+        std::string loc_string = "Location: ";
         ImGui::Text(loc_string.c_str());
         float pos[3] = { 0,0,0 };
         pos[0] = loc.x; pos[1] = loc.y; pos[2] = loc.z;
-        static const float MIN = -3000.f, MAX = 3000.f;
-        bool loc_changed = ImGui::SliderFloat3("xyz", pos, MIN, MAX, "%.2f");
+        static const float MAX = 2000.f, MIN = MAX * -1.f;
+        bool loc_changed = ImGui::SliderFloat3("location", pos, MIN, MAX, "%.2f");
         if (loc_changed) {
           model_ref->SetLocation(glm::vec3(pos[0], pos[1], pos[2]));
         }
 
+
+        std::string sca_string = "Scale: ";
+        ImGui::Text(sca_string.c_str());
+        float scale[3] = { 1,1,1 };
+        auto& sca = model_ref->GetScale();
+        scale[0] = sca.x; scale[1] = sca.y; scale[2] = sca.z;
+        bool scale_changed = ImGui::SliderFloat3("scale", scale, 0.01f, 25.f, "%.01f");
+        if (scale_changed) {
+          model_ref->SetScale(glm::vec3(scale[0], scale[1], scale[2]));
+        }
 
       }
       ImGui::End();
