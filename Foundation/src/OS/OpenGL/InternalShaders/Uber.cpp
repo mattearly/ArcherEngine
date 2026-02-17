@@ -25,7 +25,7 @@ out VS_OUT {
 } vs_out;
 
 // must match in animation code
-const int MAX_BONES = 100;
+const int MAX_BONES = 250;
 const int MAX_BONE_INFLUENCE = 4;
 
 uniform mat4 u_projection_matrix;

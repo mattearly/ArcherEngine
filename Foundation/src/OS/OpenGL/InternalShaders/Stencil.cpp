@@ -17,7 +17,7 @@ layout(location=2)in vec3 inNorm;
 layout(location=3)in ivec4 inBoneIds;
 layout(location=4)in vec4 inWeights;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 250;
 const int MAX_BONE_INFLUENCE = 4;
 
 uniform mat4 u_projection_matrix;

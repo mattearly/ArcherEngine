@@ -1,14 +1,17 @@
 #include "Animator.h"
 namespace AA {
 
+static const int MAX_BONES = 250;
+//static const int MAX_BONE_INFLUENCE = 4;
+
 Animator::Animator(std::shared_ptr<Animation> anim, glm::mat4 inv_trans) {
   cached_global_inverse_transform = inv_trans;
   m_CurrentTime = 0.0;
   m_CurrentAnimation = anim;
 
-  m_FinalBoneMatrices.reserve(100);
+  m_FinalBoneMatrices.reserve(MAX_BONES);
 
-  for (int i = 0; i < 100; i++)
+  for (int i = 0; i < MAX_BONES; i++)
     m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 }
 

@@ -19,7 +19,7 @@ layout (location = 4) in vec4 inWeights;
 uniform mat4 u_light_space_matrix;
 uniform mat4 u_model_matrix;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 250;
 const int MAX_BONE_INFLUENCE = 4;
 
 uniform mat4 u_final_bone_mats[MAX_BONES];
