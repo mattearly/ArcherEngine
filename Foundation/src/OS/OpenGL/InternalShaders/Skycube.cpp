@@ -11,7 +11,7 @@ void Skycube::Init() {
 
   const std::string VERT_CODE =
     R"(
-#version 430 core
+#version 330
 layout(location = 0) in vec3 inPos;
 out vec3 TexCoords;
 uniform mat4 u_projection_matrix;
@@ -25,7 +25,7 @@ void main(){
 
   const std::string FRAG_CODE = 
     R"(
-#version 430 core
+#version 330
 in vec3 TexCoords;
 out vec4 FragColor;
 uniform samplerCube u_skybox;

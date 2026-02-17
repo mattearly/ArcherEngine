@@ -11,7 +11,7 @@ void Stencil::Init() {
 
   const std::string VERT_CODE = 
     R"(
-#version 430 core
+#version 330
 layout(location=0)in vec3 inPos;
 layout(location=2)in vec3 inNorm;
 layout(location=3)in ivec4 inBoneIds;

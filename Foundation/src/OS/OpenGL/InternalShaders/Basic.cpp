@@ -11,7 +11,7 @@ void Basic::Init() {
 
   const std::string VERT_CODE =
     R"(
-#version 430 core
+#version 330
 layout (location = 0) in vec3 inPos;
 uniform mat4 u_view_matrix;
 uniform mat4 u_projection_matrix;
@@ -23,7 +23,7 @@ void main() {
 
   const std::string FRAG_CODE =
     R"(
-#version 430 core
+#version 330
 out vec4 out_Color;
 void main() {
   out_Color = vec4(1.0,1.0,1.0,1.0);

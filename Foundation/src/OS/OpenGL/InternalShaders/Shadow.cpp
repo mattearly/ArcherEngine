@@ -11,7 +11,7 @@ void Shadow::Init() {
 
   const std::string VERT_CODE =
     R"(
-#version 430 core
+#version 330
 layout (location = 0) in vec3 inPos;
 layout (location = 3) in ivec4 inBoneIds;
 layout (location = 4) in vec4 inWeights;
@@ -50,7 +50,7 @@ void main()
 
   const std::string FRAG_CODE =
     R"(
-#version 430 core
+#version 330
 void main() {}
 )";
 
