@@ -33,6 +33,25 @@ void setup_file_menu(const unsigned int& cam_id, AA::Interface& interface) {
           if (ok)
             aa_engine_ref->AddProp(file.c_str(), false);
         }
+
+        // attempts to load the bones of the model if it has them
+        if (ImGui::MenuItem("Import Animated Model File...", "", nullptr)) {
+          std::string file{};
+          bool ok = AA::NavigateFileSystem(file, "fbx,glb,obj,dae", "");
+          if (ok)
+            aa_engine_ref->AddProp(file.c_str(), true);
+        }
+
+        // todo(mje): this only sets on the first loaded model (total hack, needs updated for more robustness)
+        if (ImGui::MenuItem("Import Animation File...", "", nullptr)) {
+          std::string file{};
+          bool ok = AA::NavigateFileSystem(file, "fbx", "");
+          if (ok) {
+            auto id = aa_engine_ref->AddAnimation(file.c_str(), aa_engine_ref->GetAllPropIds().front());  // set to first model (testing hack)
+            aa_engine_ref->SetAnimationOnProp(id, aa_engine_ref->GetAllPropIds().front());
+          }
+        }
+
         if (ImGui::MenuItem("Import Skybox Files (order:udlfrb)", "", nullptr)) {
           // they should be picked in order of up down left front right back
           std::string up{}, down{}, left{}, front{}, right{}, back{};
