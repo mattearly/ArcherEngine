@@ -25,7 +25,7 @@ static inline std::string toString(const TextureType& t) {
   case TextureType::UNKNOWN: return std::string("Unknown");
   default: return std::string("Undefined");
   }
-  
+
 }
 
 }

@@ -16,7 +16,7 @@ Camera::Camera(int width, int height) {
   ResetToDefault();
   if (width == 0 || height == 0) {
     SetKeepCameraToWindowSize(true);
-  } 
+  }
   mViewport.Width = width;
   mViewport.Height = height;
   static int LastRenderDepth = 0;
@@ -218,7 +218,7 @@ void Camera::NewFrame() {
   }
   if (camera_projection_changed) {
     update_cached_projection_matrix();
-    if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_projection_matrix",  mProjectionMatrix);
+    if (InternalShaders::Uber::IsActive()) InternalShaders::Uber::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
     if (InternalShaders::Stencil::IsActive()) InternalShaders::Stencil::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
     if (InternalShaders::Skycube::IsActive()) InternalShaders::Skycube::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);
     if (InternalShaders::Basic::IsActive()) InternalShaders::Basic::Get()->SetMat4("u_projection_matrix", mProjectionMatrix);

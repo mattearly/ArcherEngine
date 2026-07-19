@@ -1,4 +1,13 @@
 #include "Bone.h"
+#include <assimp/quaternion.h>
+#include <assimp/vector3.h>
+#include <glm/fwd.hpp>
+#include <cassert>
+#include <string>
+#include <assimp/anim.h>
+#include <glm/gtx/quaternion.hpp>
+#include "../Math/Conversions.h"
+
 namespace AA {
 
 Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)
@@ -11,7 +20,7 @@ Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)
   for (int positionIndex = 0; positionIndex < m_NumPositions; ++positionIndex) {
     aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
     float timeStamp = static_cast<float>(channel->mPositionKeys[positionIndex].mTime);
-    KeyPosition data;
+    KeyPosition data{};
     data.position = GetGLMVec(aiPosition);
     data.timeStamp = timeStamp;
     m_Positions.push_back(data);
@@ -21,7 +30,7 @@ Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)
   for (int rotationIndex = 0; rotationIndex < m_NumRotations; ++rotationIndex) {
     aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
     float timeStamp = static_cast<float>(channel->mRotationKeys[rotationIndex].mTime);
-    KeyRotation data;
+    KeyRotation data{};
     data.orientation = GetGLMQuat(aiOrientation);
     data.timeStamp = timeStamp;
     m_Rotations.push_back(data);
@@ -31,7 +40,7 @@ Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)
   for (int keyIndex = 0; keyIndex < m_NumScalings; ++keyIndex) {
     aiVector3D scale = channel->mScalingKeys[keyIndex].mValue;
     float timeStamp = static_cast<float>(channel->mScalingKeys[keyIndex].mTime);
-    KeyScale data;
+    KeyScale data{};
     data.scale = GetGLMVec(scale);
     data.timeStamp = timeStamp;
     m_Scales.push_back(data);
@@ -45,32 +54,32 @@ void Bone::Update(float animationTime) {
   m_LocalTransform = translation * rotation * scale;
 }
 
-glm::mat4 Bone::GetLocalTransform() { return m_LocalTransform; }
+glm::mat4 Bone::GetLocalTransform() const { return m_LocalTransform; }
 
 std::string Bone::GetBoneName() const { return m_Name; }
 
-int Bone::GetBoneID() { return m_ID; }
+int Bone::GetBoneID() const { return m_ID; }
 
 int Bone::GetPositionIndex(float animationTime) {
-  for (int i = 0; i < m_NumPositions - 1; ++i) {
+  for (size_t i = 0; i < m_NumPositions - 1; ++i) {
     if (animationTime < m_Positions[i + 1].timeStamp)
       return i;
   }
-  assert(0);
+  assert(0);  // not found, error
   return -1;
 }
 
 int Bone::GetRotationIndex(float animationTime) {
-  for (int i = 0; i < m_NumRotations - 1; ++i) {
+  for (size_t i = 0; i < m_NumRotations - 1; ++i) {
     if (animationTime < m_Rotations[i + 1].timeStamp)
       return i;
   }
-  assert(0);
+  assert(0);  // not found, error
   return -1;
 }
 
 int Bone::GetScaleIndex(float animationTime) {
-  for (int i = 0; i < m_NumScalings - 1; ++i) {
+  for (size_t i = 0; i < m_NumScalings - 1; ++i) {
     if (animationTime < m_Scales[i + 1].timeStamp)
       return i;
   }
@@ -107,10 +116,8 @@ glm::mat4 Bone::InterpolateRotation(float animationTime) {
 
   int p0Index = GetRotationIndex(animationTime);
   int p1Index = p0Index + 1;
-  float scaleFactor = GetScaleFactor(m_Rotations[p0Index].timeStamp,
-    m_Rotations[p1Index].timeStamp, animationTime);
-  glm::quat finalRotation = glm::slerp(m_Rotations[p0Index].orientation,
-    m_Rotations[p1Index].orientation, scaleFactor);
+  float scaleFactor = GetScaleFactor(m_Rotations[p0Index].timeStamp, m_Rotations[p1Index].timeStamp, animationTime);
+  glm::quat finalRotation = glm::slerp(m_Rotations[p0Index].orientation, m_Rotations[p1Index].orientation, scaleFactor);
   finalRotation = glm::normalize(finalRotation);
   return glm::toMat4(finalRotation);
 }

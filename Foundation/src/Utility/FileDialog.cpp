@@ -9,7 +9,7 @@ bool AA::NavigateFileSystem(std::string& out, const char* filetypereg, const cha
   int status;
   char path[PATH_MAX];
 
-  FILE *fp;
+  FILE* fp;
   fp = popen("zenity --file-selection", "r");
   if (fp == NULL) {
     func_result = false;
@@ -43,11 +43,9 @@ bool AA::NavigateFileSystem(std::string& out, const char* filetypereg, const cha
   nfdresult_t result = NFD_OpenDialogU8(&file_hunted, NULL, NULL, starting_pref);
   if (result == NFD_OKAY) {
     out = file_hunted;
-  }
-  else if (result == NFD_CANCEL) {
+  } else if (result == NFD_CANCEL) {
     func_result = false;
-  }
-  else {
+  } else {
     func_result = false;
   }
   return func_result;

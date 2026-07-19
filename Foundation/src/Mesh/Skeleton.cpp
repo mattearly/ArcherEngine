@@ -3,9 +3,9 @@ namespace AA {
 
 Bone* Skeleton::FindBone(const std::string& name) {
   auto iter = std::find_if(m_Bones.begin(), m_Bones.end(), [&](const Bone& Bone) { return Bone.GetBoneName() == name; });
-  if (iter == m_Bones.end()) 
+  if (iter == m_Bones.end())
     return nullptr;
-  else 
+  else
     return &(*iter);
 }
 

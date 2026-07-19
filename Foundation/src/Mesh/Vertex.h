@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <glm/fwd.hpp>
 namespace AA {
 
 struct UnlitVertex {

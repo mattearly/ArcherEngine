@@ -126,7 +126,7 @@ unsigned int PrimativeMaker::load_cone() {
 
   };
 
- unsigned int out_num_elements = sizeof(faces) / sizeof(faces[0]);
+  unsigned int out_num_elements = sizeof(faces) / sizeof(faces[0]);
 
   if (vao_to_the_cone == 0) {
     // needs loaded

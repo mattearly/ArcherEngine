@@ -68,12 +68,12 @@ public:
 
   void DeletePrimatives();
 
-//   void Proc( void(* (*)(const char*))() );
-  void Proc(void* proc);
+  //   void Proc( void(* (*)(const char*))() );
+  //  void Proc(void* proc);
 
-  //
-  // render graph stuff
-  //
+    //
+    // render graph stuff
+    //
   void ResetToDefault();
 
   /// <summary>

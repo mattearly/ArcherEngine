@@ -1,8 +1,6 @@
 #pragma once
 #include "../Base/UniqueInstance.h"
 #include <AL/al.h>
-#include <glm/glm.hpp>
-#include <vector>
 
 namespace AA {
 /// <summary>

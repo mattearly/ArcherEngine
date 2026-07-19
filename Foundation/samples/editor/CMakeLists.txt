@@ -9,7 +9,7 @@ target_include_directories(editor_example
     "${CMAKE_SOURCE_DIR}/Foundation/samples/common/scripts"
     "${CMAKE_SOURCE_DIR}/Foundation/include")
 
-if (UNIX) 
+if (UNIX)
     #put special unix commands here
 elseif (WIN32)
 	target_link_libraries(editor_example PRIVATE glm::glm imgui::imgui)

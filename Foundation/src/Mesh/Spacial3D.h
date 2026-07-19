@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
-//#include <PxPhysics.h>
+
 namespace AA {
 class Spacial3D final {
 public:
@@ -9,8 +9,7 @@ public:
   void ScaleTo(const glm::vec3& scale);
   void RotateTo(const glm::vec3& rot);
   void ProcessModifications();
-private: 
-  //physx::PxRigidDynamic* mRigidBody;
+private:
   glm::vec3 mCurrentLocation;
   glm::vec3 mCurrentScale;
   glm::vec3 mCurrentRot;  // expressed as 3 radians that corrispond to xyz rotation amounts

@@ -35,7 +35,7 @@ void OpenGL::BatchRenderShadows(
     dir_light.ShadowOrthoSize,
     dir_light.ShadowNearPlane,
     dir_light.ShadowFarPlane);
-  
+
   const auto DIRECTIONAL_LIGHT_DIST_SCALE = 100.f;
 
   lightView = glm::lookAt(
@@ -62,7 +62,7 @@ void OpenGL::BatchRenderShadows(
       bool front_cull = prop->GetCullFrontFaceForShadows();
       const auto& meshes = prop->GetMeshes();
 
-      
+
       if (has_anim) {
         depth_shadow_renderer->SetBool("u_is_animating", true);
         auto transforms = prop->GetFinalBoneMatrices();
@@ -72,15 +72,15 @@ void OpenGL::BatchRenderShadows(
         }
       }
       depth_shadow_renderer->SetMat4("u_model_matrix", prop->GetFMM());
-      if (front_cull) { 
-        glEnable(GL_CULL_FACE); 
+      if (front_cull) {
+        glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
       }
       for (const auto& m : meshes) { DrawElements(m.vao, m.numElements); } // render shadows to depthframe buffer
 
 
       // back to defaults for next render
-      glCullFace(GL_BACK); 
+      glCullFace(GL_BACK);
       glDisable(GL_CULL_FACE);
       // turn off anim in any case after render so we don't leave it on by default
       depth_shadow_renderer->SetBool("u_is_animating", false);

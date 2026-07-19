@@ -9,7 +9,7 @@ void Stencil::Init() {
   if (STENCILSHADER)
     return;
 
-  const std::string VERT_CODE = 
+  const std::string VERT_CODE =
     R"(
 #version 330
 layout(location=0)in vec3 inPos;

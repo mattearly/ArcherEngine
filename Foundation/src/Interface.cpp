@@ -140,7 +140,7 @@ unsigned int Interface::AddCamera(const int w, const int h) {
   if (mCameras.size() > 1) {
     std::sort(mCameras.begin(), mCameras.end(), [](auto a, auto b) {
       return (a->GetRenderDepth() < b->GetRenderDepth());
-      });
+    });
   }
 
   return mCameras.back()->GetUID();

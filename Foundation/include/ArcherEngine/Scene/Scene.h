@@ -37,7 +37,7 @@ public:
   const bool IsStenciledWithNormals() const;
 
   const bool IsAnimated() const;
-  
+
   const bool HasAnimation() const;
 
   const float GetStencilScale() const;
@@ -126,7 +126,7 @@ private:
   void SetSkeleton(const Skeleton& skel);
   Skeleton* GetSkeleton();
   std::vector<glm::mat4> GetFinalBoneMatrices() const;
-  
+
   void Load(const std::string& path, const bool& getanimdata);
 
   std::unique_ptr<SceneData> scenedata_;

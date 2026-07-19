@@ -2,7 +2,7 @@
 #include "Bone.h"
 #include <vector>
 #include <map>
-namespace AA{
+namespace AA {
 
 struct BoneInfo {
   /*id is index in finalBoneMatrices*/

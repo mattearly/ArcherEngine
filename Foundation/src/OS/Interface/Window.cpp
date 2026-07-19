@@ -378,13 +378,13 @@ void Window::default_init() {
     //     OpenGL::GetGL()->Proc((void*)glfwGetProcAddress);
 
 
-	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
-// 		std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
-		glfwTerminate();
-		throw(glewGetErrorString(err));
-	}
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
+    {
+      // 		std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
+      glfwTerminate();
+      throw(glewGetErrorString(err));
+    }
 
   }
   if (mWindowOptions->_stencil_bits > 0) {

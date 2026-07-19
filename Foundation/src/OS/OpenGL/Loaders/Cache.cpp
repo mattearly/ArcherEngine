@@ -42,7 +42,7 @@ void Cache::add(const TextureMapType& texture_list) {
 
 void Cache::remove_sceneinfo(const SceneInfo& matching) {
   for (auto& scene : all_loaded_scenes_) {
-    if (scene == matching) 
+    if (scene == matching)
       scene.ref_count--;
 
   }
@@ -69,7 +69,7 @@ void Cache::remove_scene_at_path(const std::string& path_to_remove) {
           }
         }
       }
-      
+
     }
   }
 

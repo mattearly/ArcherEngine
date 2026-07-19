@@ -3,10 +3,11 @@
 #include "Spacial3D.h"
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/fwd.hpp>
 
 namespace AA {
 
-Spacial3D::Spacial3D() /*: mRigidBody() */{
+Spacial3D::Spacial3D() {
   mCurrentLocation = glm::vec3(0);
   mCurrentRot = glm::vec3(0);
   mCurrentScale = glm::vec3(1);

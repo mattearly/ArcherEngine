@@ -23,7 +23,7 @@ void main(){
 }
 )";
 
-  const std::string FRAG_CODE = 
+  const std::string FRAG_CODE =
     R"(
 #version 330
 in vec3 TexCoords;

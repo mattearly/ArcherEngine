@@ -26,9 +26,9 @@ private:
   std::vector<KeyPosition> m_Positions;
   std::vector<KeyRotation> m_Rotations;
   std::vector<KeyScale> m_Scales;
-  int m_NumPositions;
-  int m_NumRotations;
-  int m_NumScalings;
+  size_t m_NumRotations;
+  size_t m_NumScalings;
+  size_t m_NumPositions;
 
   glm::mat4 m_LocalTransform;
   std::string m_Name;
@@ -44,9 +44,9 @@ public:
   tranformations*/
   void Update(float animationTime);
 
-  glm::mat4 GetLocalTransform();
+  glm::mat4 GetLocalTransform() const;
   std::string GetBoneName() const;
-  int GetBoneID();
+  int GetBoneID() const;
 
   /* Gets the current index on mKeyPositions to interpolate to based on
   the current animation time*/
